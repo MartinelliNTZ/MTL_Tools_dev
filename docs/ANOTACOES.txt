@@ -1,0 +1,165 @@
+IMPLEMENTACOES
+
+    - Ferramenta Replace: colocar botao de trroccar campos de entrada e saida, 
+    -acrescentar centralizar tela de todos os layouts 
+    -Atribuir bandas 0 a todos raster 
+    -Recorte pela camada raster de múltiplas camadas 
+    -Todos scripts de colheita 
+    - matriz de linhas paralelas 
+    -Classificador de declividade 
+    -Amostrador de raster cálculo gerador de dif e gerador de estatística 
+    -Projeto padrão 
+    - Escolhe uma pasta ja salva um QGZ já cria pastas e carrega camadas base como UTM, google satélite, 
+    -Botão de adicionar estilos salvos no qgis meus como gradiente entre outros. 
+    - log viewere e melhorar o log
+    - melhoria no buffer de vector util verificar se a camada e 4326 reprojetar, 
+    - melhoria no drone cordinates gerar a area concave hull 0,025000
+    aplicar buffer e so entao reprojetar novamente para evitar erros
+    - nova ferramenta que aplica buffer negativo e positivo
+    - nova ferramenta que faz geometria por expressao e gera a diferenca entre dois pontos make_line(
+    $geometry,
+    geometry(
+        get_feature(
+            'Geometrias_corrigidas_58ac3c9a_7748_4042_b4a9_8ca309b0aca8',
+             'field_1' ,
+              "name" 
+        )
+    )
+)
+
+
+BUGS CONHECIDOS
+    - corrigir bug do calcular automatico, para ele trazer o z ou simplesmente tirar essa funcao(trava em grandes itrens)
+    - calculo automatico de campos trava em kmls ( nem deve ser permitido em kml)
+    - impedir multipla instancias dos codigos
+    - impedir que os plugins trave o qgis em todas as ferramentas
+    - Ferramenta de calculo ta deixando a camda edital realizando e ainda dando msg de erro
+    - Arquivo shp precisa sempre executar 2 vezes para substituir(impossivel de resolver )
+
+ferramentas = name                              tipo                            produto                     risco
+    - 01: Exportar Todos os Layouts             janela                          pdf/png                     substituir produtos antigos
+    - 02: Substituir Textos nos Layouts         janela                          alteracoes nos layouts      critico/alteracao QGZ
+    - 03: Salvar, Fechar e Reabrir Projeto      instantanea de sistema          nenhum                      critico/alteracao QGZ/perda de dados temporarios
+    - 04: Carregar Pasta de Arquivos            janela                          carregamento de produtos    alteracao QGZ
+    - 05: Gerar Rastro de Implemento            janela                          vetor                       nenhum
+    - 06: Sobre o MTL Tools                     janela                          nenhum                      nenhum
+    - 07: Capturar Coordenadas                  intantanea+janela de resultado  resultados na tela          travamento da task
+    - 08: Calcular Campos Vetoriais             instantanea                     atributos nos vetores       manipulacao de vetores/perda de dados por substituicao
+    - 09: Obter Coordenadas de Drone            janela                          vetor                       travamento do qgis por excesso de dados
+    - 10: Converter Multipart                   instantanea                     nenhum                      manipulacao de vetores/perda de dados 
+    - 11: Copiar Atributos de Vetores           janela                          atributos nos vetores       manipulacao de vetores/perda de dados por substituicao
+    - 12:
+    - 13:
+    - 14:
+    - 15:
+
+
+changelog=
+    1.4.0.6
+    -Ferramentas normalizadas = 5 e 11(novamente)
+    1.4.0 - 2026/01/19
+    - Nova ferramenta: tranformacao de multpart para part simples
+    - Documentacao de cenarios 8 e 10 e 11
+    - Alterada a infodialog para exibir markdown corretamente
+    - Nova ferramenta: Tranferidor de atributos entre camadas vetoriais
+    - Criação de BasePluginMTL para normalizacao do codigo: 
+    - Ferramentas normalizadas = 2, 8, 10 e 11   (3, 6 e 7 não sao padronizaveis)
+    - Criacao de Layouts utils e project utils
+
+    1.3.0 - 2026/01/16
+    - retirado bug duplica instancia toda vez que fecho as ferramentas de janela
+    - Menu principal migrado para aba separada
+    - Criação de ícones de menu
+    - Organização do plugin principal
+    - Nova ferramenta: cálculo automático de campos de tamanho, comprimento e XY
+    - Melhoria na ferramenta de obtenção de UTM, com inclusão de informações de município e estado via API BigDataCloud
+    - Nova ferramenta: obtenção de trajeto e pontos das fotos do drone a partir de arquivos MRK
+    - Criação de grupos na toolbar para Vetores e Agricultura de Precisão
+    - Continuação e refinamento da ferramenta de obtenção de pontos de drone
+    - Criação de um plugin padrão
+    - Implementação de utilitário de logs (Log Utils)
+    - Conversão de ícones para formato .ico (redução de uso de memória)
+    - Criação de função padrão para adicionar botões na toolbar, organizando e padronizando o código
+    
+    1.2.6 — 2026/01/12
+    - Implementado menu de informações “Sobre”
+    - Reorganização da toolbar com divisão lógica de menus em grupos
+    - Adicionada aba de instruções para a ferramenta de criação de Rastro de Implemento
+    - Correção de bugs relacionados aos ícones das ferramentas
+    - Nova ferramenta: Obter Zona UTM e Altimetria a partir de clique no mapa
+
+    1.2.5 — 2026/01/11
+    - Ajustes no Rastro de Implemento para compatibilidade com QGIS 3.16
+    - Correção de bug na exportação de PDFs e PNGs
+    - Adicionado instalador automático de bibliotecas Python
+
+    1.2.4 — 2025/12/14
+    - Processing: Validador de MDT (implementação inicial – funcionalidade instável)
+
+    1.2.3 — 2025/12/12
+    - Refatoração: separação da lógica do Amostrador de Valores
+    - Refatoração: separação da lógica da Diferença de Atributos
+    - Refatoração: separação da lógica de Estatísticas
+    - Correção de bug na ferramenta de Estatística: flag de exportação CSV não era persistida
+    - Implementado CRS de saída configurável no Amostrador de Valores
+    - Criação de ToolKey centralizada para gerenciamento interno
+    - Correção de bug que iniciava uma nova instância do QGIS antes do encerramento completo ao reiniciar via plugin
+
+    1.2.2 — 2025/12/11
+    - Correções gerais de bugs e ajustes internos
+
+    1.2.1 — 2025/12/11
+    - Correções gerais de bugs
+    - Correção de bug na ferramenta de Estatística relacionado a campos de texto
+
+    1.2.0 — 2025/12/10
+    - Nova ferramenta: Carregar pastas de arquivos diretamente no QGIS
+    - Implementado sistema de instruções de uso em todas as ferramentas do plugin
+    - Ajuste no Replace para substituição de labels inteiros
+    - Processing: Amostragem em massa de valores de raster
+    - Adicionados ícones personalizados na Caixa de Ferramentas de Processamento
+    - Processing: Gerador de Diferença entre Campos
+
+    1.1.2 — 2025/12/10
+    - Criada aba dedicada para o plugin na interface do QGIS
+    - Correção de travamento na ferramenta Export All
+    - Implementada geração de livro de PDFs e livro de PNGs
+    - Ferramenta Replace Layouts removida do painel principal
+    - Persistência de configurações via sistema de preferências
+
+    1.1.1 — 2025/12/09
+    - Nova ferramenta: Reiniciar QGIS via plugin
+    - Criado Processing Provider do plugin
+
+    1.1.0 — 2025/12/09
+    - Nova ferramenta: Replace Text in Layouts
+    - Backup automático
+    - Log detalhado de execução
+
+    1.0.0 — 2025/12/09
+    - Versão inicial
+    - Ferramenta: Export All Layouts (PDF/PNG)
+
+
+
+
+    NOVASS FUNCOES
+    Ferramenta para processamento de arquivos MRK e fotos associadas. Recebe a pasta dos arquivos, com opção de processar somente a pasta selecionada ou vasculhar 
+    também as subpastas. Permite salvar o resultado temporariamente (em memória) ou em arquivo. Possui opção de unir todos os MRK em um único arquivo ou gerar um 
+    shapefile para cada arquivo MRK. Inclui opção de cruzar os metadados com as fotos correspondentes, trazendo informações como a hora batida entre MRK e imagem.
+
+Ferramenta de buffer, permitindo aplicação de buffer positivo ou negativo sobre camadas vetoriais.
+
+Ferramenta para cálculo automático de atributos geométricos, gerando comprimento (length) para linhas, coordenadas X e Y para pontos e área para polígonos.
+
+Ferramenta de processamento de declividade e altimetria. Recebe um DEM fornecido pelo usuário ou faz o download automático de um DEM. Recebe um KML definindo a área de interesse. Permite definir a resolução de saída do DEM e aplicar um buffer na área (por exemplo, 100 m). Possui seletor de intervalo para geração de curvas de nível. Permite gerar produtos individualmente, com opção de excluir ou salvar cada resultado. Possui opção de salvar os arquivos com nome padrão em uma pasta específica e carregar automaticamente os resultados em um grupo no QGIS. Aplica estilos predefinidos para declividade, altimetria e curvas de nível. Permite definir um tamanho mínimo para exclusão de curvas (por exemplo, 50 m).
+
+O fluxo inclui recortar o DEM pela área com buffer, gerar um DEM em alta resolução, extrair curvas de nível em intervalos configuráveis (1, 3, 5, 10, 20, 25, 50, 100), gerar declividade total e declividade recortada, melhorar a resolução da declividade, reclassificar os resultados e aplicar estilos automaticamente. Todas as opções de caminhos e pastas de saída são salvas nas preferências do plugin.
+
+Ferramenta de pesquisa de funções do QGIS, incluindo algoritmos de processamento e funcionalidades de plugins instalados, facilitando a descoberta de ferramentas.
+
+Gerenciador de atalhos por projeto, funcionando como um grupo dentro do plugin, permitindo configurar e organizar atalhos para ações frequentes, como corrigir geometrias, reprojetar camadas, entre outras, de forma específica para cada projeto.
+
+Ferramenta de criação automática de vetores, onde o usuário escolhe o tipo de vetor (ponto, linha ou polígono) e o plugin cria automaticamente o arquivo na pasta padrão (por exemplo, raiz/Shapefile), usando o último nome escolhido ou permitindo selecionar outra pasta.
+
+Assistente inteligente de preenchimento de atributos, que sugere valores de campos com base em regras, vizinhança espacial ou aprendizado mínimo semi-automático, funcionando como um “autocompletar” em tabelas de atributos. O objetivo é reduzir esforço manual, erros de digitação e aumentar a consistência dos dados.

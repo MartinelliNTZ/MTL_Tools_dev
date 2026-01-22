@@ -1,0 +1,158 @@
+[16:00:16] Iniciando processamento de coordenadas de drone
+[16:00:16] MRKs processados (2796 pontos)
+[16:00:16] check photos: False, points: 2796
+[16:00:16] continue_with_points: criando camada de pontos (2796 pontos)
+[16:00:16] save_layer chamado → C:/Users/LINES-COLAB/Desktop/Nova pasta/b.kml
+[16:00:16] Driver detectado: KML
+[16:00:16] CRS original: EPSG:4326
+[16:00:16] Features: 2796
+[16:00:16] Campos: ['foto', 'alt', 'data_name']
+[16:00:16] Chamando writeAsVectorFormatV3
+[16:03:01] Iniciando processamento de coordenadas de drone
+[16:03:01] MRKs processados (2796 pontos)
+[16:03:01] check photos: False, points: 2796
+[16:03:01] continue_with_points: criando camada de pontos (2796 pontos)
+[16:07:39] Iniciando processamento de coordenadas de drone
+[16:07:39] MRKs processados (2796 pontos)
+[16:07:39] check photos: False, points: 2796
+[16:07:39] continue_with_points: criando camada de pontos (2796 pontos)
+[16:07:39] save_layer chamado → C:/Users/LINES-COLAB/Desktop/Nova pasta/b.shp
+[16:07:39] Driver detectado: ESRI Shapefile
+[16:07:39] CRS original: EPSG:4326
+[16:07:39] Features: 2796
+[16:07:39] Campos: ['foto', 'alt', 'data_name']
+[16:07:39] Chamando writeAsVectorFormatV3
+[16:10:44] Iniciando processamento de coordenadas de drone
+[16:10:44] MRKs processados (2796 pontos)
+[16:10:44] check photos: False, points: 2796
+[16:10:44] continue_with_points: criando camada de pontos (2796 pontos)
+[16:10:44] save_layer chamado → C:/Users/LINES-COLAB/Desktop/Nova pasta/b.kml
+[16:10:44] Driver: KML
+[16:10:44] CRS: EPSG:4326
+[16:10:44] Features: 2796
+[16:10:44] Chamando writeAsVectorFormatV3
+[16:10:44] Arquivo salvo com sucesso: C:/Users/LINES-COLAB/Desktop/Nova pasta/b.kml
+[16:10:44] Layer carregado com sucesso
+[16:11:09] Iniciando processamento de coordenadas de drone
+[16:11:09] MRKs processados (2796 pontos)
+[16:11:09] check photos: False, points: 2796
+[16:11:09] continue_with_points: criando camada de pontos (2796 pontos)
+[16:11:09] save_layer chamado → C:/Users/LINES-COLAB/Desktop/Nova pasta/b.kml
+[16:11:09] Driver: KML
+[16:11:09] CRS: EPSG:4326
+[16:11:09] Features: 2796
+[16:11:09] Chamando writeAsVectorFormatV3
+[16:11:09] Arquivo salvo com sucesso: C:/Users/LINES-COLAB/Desktop/Nova pasta/b.kml
+[16:11:09] Layer carregado com sucesso
+[16:11:09] save_layer chamado → C:/Users/LINES-COLAB/Desktop/Nova pasta/c.kml
+[16:11:09] Driver: KML
+[16:11:09] CRS: EPSG:4326
+[16:11:09] Features: 1
+[16:11:09] Chamando writeAsVectorFormatV3
+[16:11:09] Arquivo salvo com sucesso: C:/Users/LINES-COLAB/Desktop/Nova pasta/c.kml
+[16:11:09] Layer carregado com sucesso
+[16:23:17] Iniciando processamento de coordenadas de drone
+[16:23:17] MRKs processados (2796 pontos)
+[16:23:17] check photos: False, points: 2796
+[16:23:17] continue_with_points: criando camada de pontos (2796 pontos)
+[16:23:17] save_layer chamado → C:/Users/LINES-COLAB/Desktop/Nova pasta/c.kml
+[16:23:17] Driver: KML
+[16:23:17] CRS: EPSG:4326
+[16:23:17] Features: 1
+[16:23:17] Chamando writeAsVectorFormatV3
+[16:23:17] Arquivo salvo com sucesso: C:/Users/LINES-COLAB/Desktop/Nova pasta/c.kml
+[16:23:17] Layer carregado com sucesso
+[16:23:30] Iniciando processamento de coordenadas de drone
+[16:23:30] MRKs processados (2796 pontos)
+[16:23:30] check photos: False, points: 2796
+[16:23:30] continue_with_points: criando camada de pontos (2796 pontos)
+[16:23:30] save_layer chamado → C:/Users/LINES-COLAB/Desktop/Nova pasta/4.kml
+[16:23:30] Driver: KML
+[16:23:30] CRS: EPSG:4326
+[16:23:30] Features: 2796
+[16:23:30] Chamando writeAsVectorFormatV3
+[16:23:30] Arquivo salvo com sucesso: C:/Users/LINES-COLAB/Desktop/Nova pasta/4.kml
+[16:23:30] Layer carregado com sucesso
+[16:23:30] save_layer chamado → C:/Users/LINES-COLAB/Desktop/Nova pasta/c.kml
+[16:23:30] Driver: KML
+[16:23:30] CRS: EPSG:4326
+[16:23:30] Features: 1
+[16:23:30] Chamando writeAsVectorFormatV3
+[16:23:30] Arquivo salvo com sucesso: C:/Users/LINES-COLAB/Desktop/Nova pasta/c.kml
+[16:23:30] Layer carregado com sucesso
+[16:23:45] Iniciando processamento de coordenadas de drone
+[16:23:45] MRKs processados (2796 pontos)
+[16:23:45] check photos: False, points: 2796
+[16:23:45] continue_with_points: criando camada de pontos (2796 pontos)
+[16:23:45] save_layer chamado → C:/Users/LINES-COLAB/Desktop/Nova pasta/c.kml
+[16:23:45] Driver: KML
+[16:23:45] CRS: EPSG:4326
+[16:23:45] Features: 1
+[16:23:45] Chamando writeAsVectorFormatV3
+[16:23:45] Arquivo salvo com sucesso: C:/Users/LINES-COLAB/Desktop/Nova pasta/c.kml
+[16:23:45] Layer carregado com sucesso
+[16:28:15] Iniciando processamento de coordenadas de drone
+[16:28:15] MRKs processados (2796 pontos)
+[16:28:15] check photos: False, points: 2796
+[16:28:15] continue_with_points: criando camada de pontos (2796 pontos)
+[16:28:16] save_layer chamado → C:/Users/LINES-COLAB/Desktop/Nova pasta/5.kml
+[16:28:16] Driver: KML
+[16:28:16] CRS: EPSG:4326
+[16:28:16] Features: 2796
+[16:28:16] Chamando writeAsVectorFormatV3
+[16:28:16] Arquivo salvo com sucesso: C:/Users/LINES-COLAB/Desktop/Nova pasta/5.kml
+[16:28:16] Layer carregado com sucesso
+[16:28:16] save_layer chamado → C:/Users/LINES-COLAB/Desktop/Nova pasta/c.kml
+[16:28:16] Driver: KML
+[16:28:16] CRS: EPSG:4326
+[16:28:16] Features: 1
+[16:28:16] Chamando writeAsVectorFormatV3
+[16:28:16] Arquivo salvo com sucesso: C:/Users/LINES-COLAB/Desktop/Nova pasta/c.kml
+[16:28:16] Layer carregado com sucesso
+[16:28:31] Iniciando processamento de coordenadas de drone
+[16:28:31] MRKs processados (2796 pontos)
+[16:28:31] check photos: False, points: 2796
+[16:28:31] continue_with_points: criando camada de pontos (2796 pontos)
+[16:28:31] save_layer chamado → C:/Users/LINES-COLAB/Desktop/Nova pasta/c.kml
+[16:28:31] Driver: KML
+[16:28:31] CRS: EPSG:4326
+[16:28:31] Features: 1
+[16:28:31] Chamando writeAsVectorFormatV3
+[16:28:31] Arquivo salvo com sucesso: C:/Users/LINES-COLAB/Desktop/Nova pasta/c.kml
+[16:28:31] Layer carregado com sucesso
+[16:29:49] Iniciando processamento de coordenadas de drone
+[16:29:49] MRKs processados (2796 pontos)
+[16:29:49] check photos: False, points: 2796
+[16:29:49] continue_with_points: criando camada de pontos (2796 pontos)
+[16:29:49] save_layer chamado → C:/Users/LINES-COLAB/Desktop/Nova pasta/5.kml
+[16:29:49] Driver: KML
+[16:29:49] CRS: EPSG:4326
+[16:29:49] Features: 2796
+[16:29:49] Chamando writeAsVectorFormatV3
+[16:29:49] Arquivo salvo com sucesso: C:/Users/LINES-COLAB/Desktop/Nova pasta/5.kml
+[16:29:49] Layer carregado com sucesso
+[16:29:49] save_layer chamado → C:/Users/LINES-COLAB/Desktop/Nova pasta/c.kml
+[16:29:49] Driver: KML
+[16:29:49] CRS: EPSG:4326
+[16:29:49] Features: 1
+[16:29:49] Chamando writeAsVectorFormatV3
+[16:29:49] Arquivo salvo com sucesso: C:/Users/LINES-COLAB/Desktop/Nova pasta/c.kml
+[16:29:49] Layer carregado com sucesso
+[16:32:26] Iniciando processamento de coordenadas de drone
+[16:32:26] MRKs processados (2796 pontos)
+[16:32:26] check photos: False, points: 2796
+[16:32:26] continue_with_points: criando camada de pontos (2796 pontos)
+[16:32:26] save_layer chamado → C:/Users/LINES-COLAB/Desktop/Nova pasta/5.kml
+[16:32:26] Driver: KML
+[16:32:26] CRS: EPSG:4326
+[16:32:26] Features: 2796
+[16:32:26] Chamando writeAsVectorFormatV3
+[16:32:26] Arquivo salvo com sucesso: C:/Users/LINES-COLAB/Desktop/Nova pasta/5.kml
+[16:32:26] Layer carregado com sucesso
+[16:32:26] save_layer chamado → C:/Users/LINES-COLAB/Desktop/Nova pasta/c.kml
+[16:32:26] Driver: KML
+[16:32:26] CRS: EPSG:4326
+[16:32:26] Features: 1
+[16:32:26] Chamando writeAsVectorFormatV3
+[16:32:26] Arquivo salvo com sucesso: C:/Users/LINES-COLAB/Desktop/Nova pasta/c.kml
+[16:32:26] Layer carregado com sucesso

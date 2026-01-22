@@ -1,0 +1,55 @@
+[16:53:01] Iniciando replace em layouts
+[16:53:01] Layouts encontrados: 3
+[16:53:01] Old text: 'FAZENDA' | New text: 'Fazenda'
+[16:53:01] Case sensitive: True
+[16:53:01] Full replace: False
+[16:53:01] Total de substituições: 0
+[16:53:01] Finalizado em 2026-01-19T16:53:01.742411
+[16:53:35] Iniciando replace em layouts
+[16:53:35] Layouts encontrados: 3
+[16:53:35] Old text: 'Martinelli' | New text: 'Fazenda'
+[16:53:35] Case sensitive: True
+[16:53:35] Full replace: True
+[16:53:35] [Layout 1] 'Martinelli is Very Good is Very Good is Very Good' -> 'Fazenda'
+[16:53:35] [Layout 1] alterações: 1
+[16:53:35] [Layout 1 cópia] 'Martinelli is Very Good is Very Good is Very Good' -> 'Fazenda'
+[16:53:35] [Layout 1 cópia] alterações: 1
+[16:53:35] [Layout 1 cópia cópia] 'Martinelli is Very Good is Very Good is Very Good' -> 'Fazenda'
+[16:53:35] [Layout 1 cópia cópia] alterações: 1
+[16:53:35] Total de substituições: 3
+[16:53:35] Finalizado em 2026-01-19T16:53:35.467229
+[16:55:20] Iniciando replace em layouts
+[16:55:20] Layouts encontrados: 3
+[16:55:20] Old text: 'Martinelli' | New text: 'Fazenda'
+[16:55:20] Case sensitive: True
+[16:55:20] Full replace: True
+[16:55:20] Total de substituições: 0
+[16:55:20] Finalizado em 2026-01-19T16:55:20.175701
+[17:34:16] Iniciando replace em layouts
+[17:34:16] Layouts encontrados: 3
+[17:34:16] Old text: 'Martinelli' | New text: 'Fazenda'
+[17:34:16] Case sensitive: True
+[17:34:16] Full replace: True
+[17:34:16] Total de substituições: 0
+[17:34:16] Finalizado em 2026-01-19T17:34:16.893494
+[17:35:00] Iniciando replace em layouts
+[17:35:00] Layouts encontrados: 3
+[17:35:00] Old text: 'Martinelli' | New text: 'Fazenda'
+[17:35:00] Case sensitive: True
+[17:35:00] Full replace: True
+[17:35:00] Total de substituições: 0
+[17:35:00] Finalizado em 2026-01-19T17:35:00.318443
+[17:35:34] Iniciando replace em layouts
+[17:35:34] Layouts encontrados: 3
+[17:35:34] Old text: 'Martinelli' | New text: 'Fazenda'
+[17:35:34] Case sensitive: True
+[17:35:34] Full replace: True
+[17:35:34] Total de substituições: 0
+[17:35:34] Finalizado em 2026-01-19T17:35:34.451067
+[17:40:41] Iniciando replace em layouts
+[17:40:41] Layouts encontrados: 3
+[17:40:41] Old text: 'Martinelli' | New text: 'Fazenda'
+[17:40:41] Case sensitive: True
+[17:40:41] Full replace: True
+[17:40:41] Total de substituições: 0
+[17:40:41] Finalizado em 2026-01-19T17:40:41.843652

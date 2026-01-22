@@ -1,0 +1,42 @@
+[09:16:24] Iniciando processamento de coordenadas de drone
+[09:16:24] MRKs processados (15865 pontos)
+[09:16:24] check photos: False, points: 15865
+[09:16:24] continue_with_points: criando camada de pontos (15865 pontos)
+[09:16:24] save_layer chamado → C:/Users/LINES-COLAB/Desktop/Nova pasta/5.kml
+[09:16:24] Driver: KML
+[09:16:24] CRS: EPSG:4326
+[09:16:24] Features: 15865
+[09:16:24] Chamando writeAsVectorFormatV3
+[09:16:25] Arquivo salvo com sucesso: C:/Users/LINES-COLAB/Desktop/Nova pasta/5.kml
+[09:16:25] Layer carregado com sucesso
+[09:16:25] save_layer chamado → C:/Users/LINES-COLAB/Desktop/Nova pasta/c.kml
+[09:16:25] Driver: KML
+[09:16:25] CRS: EPSG:4326
+[09:16:25] Features: 1
+[09:16:25] Chamando writeAsVectorFormatV3
+[09:16:25] Arquivo salvo com sucesso: C:/Users/LINES-COLAB/Desktop/Nova pasta/c.kml
+[09:16:25] Layer carregado com sucesso
+[09:19:33] Iniciando processamento de coordenadas de drone
+[09:19:34] MRKs processados (16013 pontos)
+[09:19:34] check photos: False, points: 16013
+[09:19:34] continue_with_points: criando camada de pontos (16013 pontos)
+[18:30:02] Iniciando processamento de coordenadas de drone
+[18:30:02] MRKs processados (873 pontos)
+[18:30:02] check photos: False, points: 873
+[18:30:02] continue_with_points: criando camada de pontos (873 pontos)
+[18:30:06] Iniciando processamento de coordenadas de drone
+[18:30:06] MRKs processados (873 pontos)
+[18:30:06] check photos: False, points: 873
+[18:30:06] continue_with_points: criando camada de pontos (873 pontos)
+[18:31:21] Iniciando processamento de coordenadas de drone
+[18:31:21] MRKs processados (873 pontos)
+[18:31:21] check photos: False, points: 873
+[18:31:21] continue_with_points: criando camada de pontos (873 pontos)
+[18:31:24] Iniciando processamento de coordenadas de drone
+[18:31:24] MRKs processados (873 pontos)
+[18:31:24] check photos: False, points: 873
+[18:31:24] continue_with_points: criando camada de pontos (873 pontos)
+[18:31:25] Iniciando processamento de coordenadas de drone
+[18:31:25] MRKs processados (873 pontos)
+[18:31:25] check photos: False, points: 873
+[18:31:25] continue_with_points: criando camada de pontos (873 pontos)

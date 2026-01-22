@@ -1,0 +1,168 @@
+CONTEXTO GERAL
+
+Você está trabalhando em um PLUGIN QGIS GRANDE, PROFISSIONAL e DE LONGO PRAZO, escrito em Python.
+Esse plugin contém DEZENAS DE FERRAMENTAS e manipula dados VETORIAIS, RASTERS, PDFs, imagens e relatórios.
+
+O projeto NÃO segue MVC puro.
+A arquitetura adotada é baseada em:
+- Plugins (View + Controller juntos)
+- Serviços orquestradores
+- Utils de domínio (vector, raster, etc.)
+- Separação rígida de responsabilidades
+
+A UI já é resolvida por:
+- WidgetFactory (criação de widgets)
+- UiWidgetHelper (comportamento visual reutilizável)
+
+VOCÊ NÃO DEVE CRIAR NENHUMA LÓGICA DE UI NESTAS CLASSES.
+
+
+OBJETIVO DO PROMPT
+
+Gerar 11 CLASSES UTILITÁRIAS DE DOMÍNIO ESPACIAL
+Essas classes serão usadas por um PluginService (orquestrador) e NUNCA diretamente pela UI.
+
+Elas DEVEM:
+- Ser reutilizáveis
+- Ser stateless
+- Não controlar fluxo de ferramentas
+- Não conhecer UI, dialogs ou widgets
+- Não conhecer outras utils diretamente
+- Ter responsabilidades bem delimitadas
+
+
+ESTRUTURA DE PASTAS OBRIGATÓRIA
+
+/utils/vector/
+- VectorLayerSource.py
+- VectorLayerProjection.py
+- VectorLayerGeometry.py
+- VectorLayerMetrics.py
+- VectorLayerAttributes.py
+
+/utils/raster/
+- RasterLayerSource.py
+- RasterLayerProjection.py
+- RasterLayerProcessing.py
+- RasterLayerMetrics.py
+- RasterVectorBridge.py
+- RasterLayerRendering.py
+
+
+REGRAS DE IMPLEMENTAÇÃO (MUITO IMPORTANTE)
+
+1) Cada arquivo deve conter UMA classe
+2) Cada classe deve conter EXATAMENTE 12 métodos
+3) Todos os métodos devem estar VAZIOS (usar apenas pass)
+4) Os nomes dos métodos devem ser:
+   - em inglês
+   - claros
+   - autoexplicativos
+   - coerentes com QGIS / GIS
+5) Cada método deve conter UM comentário curto em PT-BR explicando o que ele faz
+6) Cada classe deve conter um DOCSTRING no topo em PT-BR contendo:
+   - O escopo da classe
+   - Sua responsabilidade principal
+   - O que explicitamente NÃO é responsabilidade dela
+7) NÃO usar herança entre essas classes
+8) NÃO importar UI, QtWidgets ou dialogs
+9) NÃO executar processamento real (é apenas estrutura base)
+10) NÃO criar métodos genéricos demais como "processData" ou "handleStuff"
+
+
+RESPONSABILIDADE DE CADA CLASSE
+
+========================
+VETORES
+========================
+
+VectorLayerSource
+- Entrada, saída e origem de camadas vetoriais
+- Carregar, salvar, validar, clonar
+- NÃO faz reprojeção
+- NÃO faz cálculo geométrico
+
+VectorLayerProjection
+- CRS, reprojeção e unidades
+- Conversão de sistemas de referência
+- NÃO altera atributos
+- NÃO faz métricas
+
+VectorLayerGeometry
+- Transformações geométricas
+- Buffer, dissolve, merge, explode
+- ALTERA geometria
+- NÃO calcula métricas
+
+VectorLayerMetrics
+- Leitura e cálculos espaciais
+- Área, comprimento, estatísticas
+- NÃO altera dados
+
+VectorLayerAttributes
+- Campos e atributos
+- Listagem, criação, cálculo, validação
+- Ponte entre dados espaciais e tabulares
+
+
+========================
+RASTER
+========================
+
+RasterLayerSource
+- Carregamento, salvamento e criação de rasters
+- Validação de arquivos, bandas e nodata
+- NÃO reprojeta
+- NÃO processa pixels
+
+RasterLayerProjection
+- CRS, resolução, alinhamento e extent
+- Reprojeção raster
+- Ajuste espacial
+- NÃO altera valores diretamente
+
+RasterLayerProcessing
+- Processamento raster destrutivo
+- Operações pixel a pixel
+- Reclassificação, máscara, combinação
+
+RasterLayerMetrics
+- Estatísticas raster
+- Histograma, área por classe
+- NÃO modifica raster
+
+RasterVectorBridge
+- Integração raster ↔ vetor
+- Recorte, rasterização, estatística zonal
+- Ponte entre domínios
+
+RasterLayerRendering
+- Simbologia e visualização raster
+- Estilo, rampas de cor, renderização
+- NÃO salva arquivos
+- NÃO processa dados
+
+
+LISTA DE MÉTODOS (ORIENTAÇÃO)
+
+Cada classe deve conter métodos coerentes com:
+- QGIS Processing
+- Manipulação real de dados espaciais
+- Fluxos GIS profissionais
+
+Os métodos devem parecer prontos para serem implementados no futuro,
+mas agora DEVEM ficar vazios.
+
+
+SAÍDA ESPERADA
+
+- Gere os 11 arquivos Python
+- Cada arquivo com sua classe
+- Código limpo
+- Comentários claros
+- Sem lógica real
+- Sem imports desnecessários
+
+NÃO gere explicações.
+NÃO gere texto fora do código.
+APENAS os arquivos com as classes.

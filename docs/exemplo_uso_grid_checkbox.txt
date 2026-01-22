@@ -1,0 +1,35 @@
+        #-----------------------------------------------
+        EXTENSOES_ARQUIVO = [
+            ".shp", ".geojson", ".gpkg", ".kml", ".kmz",
+            ".csv", ".xlsx", ".tif", ".jpg", ".png",
+            ".pdf", ".dwg", ".dxf", ".txtrrrrrrrrr", ".zip"
+        ]
+
+        self.layout_extensoes, self.chk_extensoes = UiWidgetUtils.create_checkbox_grid(
+            EXTENSOES_ARQUIVO,
+            items_per_row=6,
+            title="Extensões disponíveis para salvar:"
+        )
+
+        layout.addLayout(self.layout_extensoes)
+
+
+    def _load_prefs(self):
+
+        
+        # ✅ RESTAURA ESTADO DAS EXTENSÕES
+        saved_ext = prefs.get('extensoes_selecionadas', {})
+
+        for name, chk in self.chk_extensoes.items():
+            chk.setChecked(bool(saved_ext.get(name, False)))
+
+    def _save_prefs(self):     
+
+        
+        # ✅ SALVA ESTADO DAS EXTENSÕES
+        data['extensoes_selecionadas'] = {
+            name: chk.isChecked()
+            for name, chk in self.chk_extensoes.items()
+        }
+        
+        save_tool_prefs(self.TOOL_KEY, data)

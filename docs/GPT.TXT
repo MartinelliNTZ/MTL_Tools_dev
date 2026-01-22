@@ -1,0 +1,224 @@
+
+Estou confiruando um plugins no qgis com os seguintes padroes:
+PLUGIM PADRAO:  Estou criando um plugin para qgis que rode em todas as versoes 3.16 e acima(em versoes abaixo e opcional), 
+pasta_raiz = pasta onde o arquivo qgz do projeto qgis se encontra
+
+PREFERENCIAS:
+o padrao é salvar o maximo de preferencias possivel 
+ultilizando a classe MTL_TOOLS/utils/preference.py(
+Instruções mínimas para usar o sistema de preferências:As preferências ficam em um arquivo JSON dentro da pasta AppDataLocation/MTLTools.Para ler tudo use load_prefs().Para 
+salvar tudo use save_prefs(dicionario).Para ler prefs de uma ferramenta use load_tool_prefs("id_da_ferramenta").Para salvar prefs de uma ferramenta use 
+save_tool_prefs("id_da_ferramenta", dicionario).Sempre trabalhar com dicionários e deixar o JSON como fonte única de armazenamento.)que salva em json,
+
+MODELO DE MVC:
+que a logica do projeto fique dentro de MTL_TOOLS/model(vou chamar de model) para ser reaproveitada ela deve ser bem generica e especifica de forma que qualquer outra 
+classe possa reaprobeitar inclusive se necessitar de muita especificacoes devem ter 2 3 classes logicas para cada ferramenta lembrando que essas camadas devem ser simples e 
+reapriveitaveis recebem valores nos parametros e retornam valores e objetos nos paramentros , a a parte visual (view) + controler sao unificados  MTL_TOOLS/plugins os 
+plugins fixos nos paineis precisam ter  icons ficam dentro  de MTL_TOOLS/icons, todos 
+as ferramentas tem uma toolkey que e salva em uma variavel em  MTL_TOOLS/utils/tool_key.py nesse padrao [class ToolKey:  ATTRIBUTE_STATISTICS = "attribute_statistics"] 
+para o attribute_statistics.py. 
+
+MODELS/UTILS PRONTOS:
+utils/crs_utils.py fornece informações de coordenadas de um ponto em diferentes formatos e projeções.
+decimal_to_dms(value)Recebe: valor decimal de latitude ou longitude Retorna: string no formato graus/minutos/segundos
+utm_zone_from_lon(lon)Recebe: longitude em decimal Retorna: número da zona UTM
+utm_letter_from_lat(lat)Recebe: latitude em decimal Retorna: letra da zona UTM
+transform_point(point, source_crs, target_crs) Recebe: ponto (QgsPointXY), CRS de origem e CRS de destino Retorna: ponto transformado no CRS de destino
+get_coord_info(point, canvas_crs) Recebe: ponto (QgsPointXY) e CRS do mapa Retorna: dicionário com latitude/longitude decimal e DMS, coordenadas UTM, zona numérica e letra, 
+hemisfério e EPSG do CRS UTM correspondente
+
+utils/projecion_helper.py : Classe ProjectionHelper: utilitário para reprojetar features entre CRSs no QGIS.
+Método reproject_features(features, source_crs, target_crs, context)
+Recebe: lista de QgsFeature, CRS de origem, CRS de destino, contexto de processamento (QgsProcessingContext)
+Faz: reprojeta cada feature para o CRS de destino
+Retorna: nova lista de QgsFeature reprojetadas; se o CRS destino for inválido, retorna a lista original
+
+Classe QgisMessageUtil: utilitário estático para exibir mensagens no QGIS, modal e não modal, com logging e confirmação.
+_push_message_bar(iface, title, message, level, duration): envia mensagem para a message bar (fallback para modal se necessário)
+bar_info / bar_success / bar_warning / bar_critical(iface, message, title, duration): mostram notificações não modais na barra de mensagens
+modal_info / modal_success / modal_warning / modal_error / modal_debug(iface, message, title): mostram caixas modais bloqueantes
+confirm(iface, message, title): exibe caixa de confirmação Yes/No, retorna True/False
+show_exception(iface, exc, user_message): exibe erro modal com mensagem amigável e registra traceback no log
+log(message, level, tag): escreve mensagem no QgsMessageLog
+Recebe: iface (QgisInterface), mensagens, título opcional, nível de severidade, exceções.
+Retorna: nada diretamente, exibe mensagens e grava logs.
+
+Classe AltimetriaTask: tarefa assíncrona do QGIS para obter a altitude de um ponto usando a API OpenTopoData (SRTM 90m).
+init(lat, lon, callback)
+Recebe: latitude e longitude (decimais) e uma função callback para retornar o resultado
+Armazena: altitude e possível erro
+run()
+Faz a requisição HTTP para a API OpenTopoData
+Valida a resposta e extrai a elevação
+Retorna: True se sucesso (altitude obtida), False se erro
+finished(success)
+Executado ao terminar a tarefa
+Mostra mensagens na Message Bar do QGIS sobre sucesso ou falha
+Chama a função callback com (altitude, None) em caso de sucesso ou (None, erro) em caso de falha
+Resumo: recebe coordenadas e retorna a altitude aproximada do ponto ou uma mensagem de erro de forma assíncrona, usando QGIS Task e notificações na interface.
+
+
+
+TIPOS DE FERRAMENTAS:
+As ferramentas podem ser de dois grupos: 
+    - Instantaneas (tipo 1: ao clicar na ferramenta ela ja comeca a agir, tipo2: ao clicar ela ja começa a agir e posteriormente abre uma 
+janela)
+    - Janela: Ao clicar na ferramenta ela abre uma janela de interacao 
+Ferramentas instantenas quase nao usam preferencias e sao perigosas uma vez que o usuario nao tem controle sobre as acoes por isso devem ser bem planejadas
+Ferramentas de janela precisam de uso massivo de preferencias e devem requerer diversos dados para facilitar a vida  od usuario,
+
+INSTRUCOES:
+Ferramntas de janela tem um botao de instrucoes que abre uma InfoDialog que exibe instrucoes basicas salvas em MTL_TOOLS/plugins/instructions
+Classe InfoDialog: cria uma janela de diálogo no QGIS para mostrar instruções de um arquivo de texto.
+Recebe: caminho do arquivo (instructions_path), título opcional, parent opcional
+Mostra: conteúdo do arquivo em texto somente leitura
+Inclui: botão “Fechar”
+Retorna: nada, apenas exibe a janela
+
+ESTILO QML:
+ as ferramentas que geram camadas deve 
+ser possivel aplicar um estilo qml como opcional , havendo uma checkbox para determinar se aplica ou nao ,e que deve ser salvo nas preferencias o seu caminho de forma 
+que toda vez que executa da a opcas de sair com estilo promto ja o campo que recebe o caminho deve conter o nome do arquivo tb C:/Users/user/Imagens/aaaaaa.qml. 
+
+SALVAR CAMADAS GERADAS:
+Quando gera camadas deve ter uma opcao de salvar camada no salvamento da camda devem ser dados varias opcoes de tipos de arquivo como por exemplo 
+vetores : shp, kml, kmz, gpkg , etc..., 
+raster devem ter tiff, ecw, kmz, etc...
+outros .....
+e o campo que recebe o caminho do arquivo deve conter o nome do arquivo exemplo : C:/Users/user/Imagens/aaaaaa.shp
+Ferramentas que geram muitas camadas devem ter a opcao de salvar em massa, onde vc so escolhe a pasta de saida ela gera todos os arquivos naquela pasta , nesses casos o 
+salvamento individual deve ser desabilitado ao ativar essa opcao e deve habilitar uma checkbox que de aopcao de carregar todas as camadas salvas nesta pasta em um grupo dentro
+do projeto atual
+
+LOG E BACKUP:
+Ferramentas que mecham diretamente no arquivo QGZ , como mecher nas layouts, mudar nome de layers, dentre outras devem gerar um log das modificacoes em pasta_raiz/log 
+contendo o identificador da ferramenta_log_yyyymmddHHMMSS e tambem deve salvar um backup do qrquivo qgz em pasta_raiz/backup adicionando um _yyyymmddHHMMS no final do arquivo
+
+GRUPOS DE MENUS:
+Cada ferramenta pertence a um grupo de menu para organizacao dentro do plugin principal:
+agriculture_menu
+layers_menu
+layouts_menu
+raster_menu
+vectors_menu
+system_menu
+
+Agora entenda complemtamente os padroes do projeto e me ajude a gerar o plugin com as seguintes especificacoes, mas de gerar na proxima mensagem faça perguntas relevantes
+a respeito das necessidade e divida as etapas se necessario, tambem irei enviar algumas classes ja prontas para facilitar o entendimento do projeto
+especificacoes
+
+
+Quero uma ferramenta de janela que     Ferramenta para processamento de arquivos MRK e fotos associadas. Recebe a pasta dos arquivos, com opção de processar somente a pasta 
+selecionada ou vasculhar 
+    também as subpastas(checked box). Permite salvar o resultado temporariamente (em memória) ou em arquivo quando salvo em arquivo deve dar opcoes de formatos 
+    . Possui opção de unir todos os MRK em um único arquivo ou gerar um 
+    vector para cada arquivo MRK. Inclui opção de cruzar os metadados com as fotos correspondentes, as seguintes informacoes(caso houver, caso nao encontre NULL)
+
+Nome: DJI_20251107021714_0012_V.JPG → nome_arq
+Tamanho: 12,1 MB → tam_mb
+Tipo de item: Arquivo JPG → tipo_arq
+Data de modificação: 06/11/2025 15:17 → dt_modif
+Data da criação: 12/11/2025 16:18 → dt_criaca
+
+Modelo da câmera: M3E → cam_model
+Intensidade de bits: 24 → bit_depth
+
+Largura_px: 5280 → larg_px
+altura_px: 3956 → alt_px
+Resolução horizontal: 96 dpi → res_h_dpi
+res_vert_dpi: 96 → res_v_dpi
+
+Distância focal: 12 mm → focal_mm
+Distância focal de 35 mm: 24 → focal35mm
+Velocidade ISO: ISO-100 → iso
+Abertura máxima: 2.97 → abert_f e trazelas como colunas de atributos dentro do arquivo gerado para ca foto(para isso ele deve entender que foto correspondente ao MRK 
+deve se encontrar na mesma pasta do arquivo mrk , ele deve vasculhar subpastas em busca do mrk mas quando encontrar ele deve tratar a pasta em que ele esta como um voo e logo 
+as fotos desse voo devem estar dentro da mesma pasta do mrk) 
+
+antes de processeguir quero que vc aja como um engenheiro de software analise detalhadamente as instrucoes e na proxima mensagemfaça perguntas relevantes ou peça que eu envie 
+algumas classes para vc poder seguir com a escrita do codigo veja que tambem enviarei algumas claases para vc ter base
+
+
+
+
+
+
+Quero um plugin instantaneo  que primeiro de tudo eu preciso estar com uma camada vetorial selecionada e editavel, ele deve exibir mensagem de erro caso nao
+ seja cumprido os requisitos, depois ele deve identificar o tipo de vetor: linhas pontos poligonos, multinhas multipoligonos.... identificado o tipo de vetor ele deve entao 
+ criar os seguintes campos para com 
+ ponto = x y -8 casa decimais- e z -casas decimais
+ linha = length -4 casa decimais
+ poligono = area - 4 casa decimais
+ antes de criar ele verifica se o campo ja existe se existir ele exibe uma mensagem de confirmacao para o usuario se ele quer substituir os valores, se ele quer renomear _1, _2 ... 
+ ou se ele quer  cancelar (ele tambem pode fechar a mensagem e vai cancelar.) se nao existir ele simplesmente cria os campo de da um alerta de sucesso. 
+ os campos deve ser calculados para cada feicao dentro da camada vetorial. o Z do ponto é um pouco  mais complexo deve ser perguntado se deseja adicionar o z do ponto, em caso
+ negativo nao cria o z caso afirmativo ultilizara a AltimetriaTask para buscar ponto por ponto, exibira uma janela de carregamento segundoplano e quando completado exibe mensagem
+ de sucesso (pontos que fracassaram em obter z devem ficar em branco.) caso hajam mais de 100 feicoes de pontos deve exibir um segundo alerta dizendo que task pode demorar 
+ muito tempo. caso o usuario queira fazer o z de mais de cem pontos deve se criar um backup qgz, mais de 5000 pontos deve nem perguntar se quer obter o z apenas uma mensagem
+ " Impossivel obter Z de mais de 5000 pontos, processguindo com codigo...." algo assim
+ apos calcular os campos ele nao exibe 
+ x y cordenadas obtidas de lat long de acordo com ?CRS da camada
+ length dada em metros de acordo com tamanho da camda (caso wgs84 ou outra projecao ainda deve ser dada em metros)
+ area é dada em hectares
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+provider
+✔️ Instruções mínimas para criar algoritmos compatíveis com MTLProvider
+Crie uma classe que herde de QgsProcessingAlgorithm.
+Implemente obrigatoriamente:
+initAlgorithm, processAlgorithm, name, displayName, group, groupId, createInstance.
+Use o grupo e ID:
+group = "MTL Tools"
+groupId = "mtl_tools"
+No final, retorne um dict em processAlgorithm.
+O algoritmo deve ser registrado adicionando:
+self.addAlgorithm(SuaClasse())
+dentro do método loadAlgorithms() do MTLProvider.
+
+
+
+
+
+
+
+MUITO BEM AGORA EU TENHO 3 SCRIPTS UM QUE PEGA VARIOS RASTERS E UMA CAMADA DE PONTOS E FAZ A AMOSTRAGEM DE VALORES, TENHO UM QUE PEGA TODOS OS CAMPOS (OU OS SELHECIONADOS)
+ E FAZ A DIFERENÇA DELES COM UM ATRIBUTO BASE, E UM TERCEIRO QUE FAZ A ESTATISTICAS DOS ATRINBUTOS. AGORA EU QUERO CRIAR UM OUTRO QUE SEJA A UNIAO DESSES SCRIPTS . ELE DEVE RECEBER:
+
+    CAMDA DE PONTOS(FEICOES PQ POSSO ESCOLHER MANDAR TODAS OS SO AS SELECIOANDAS)
+    ATRIBUTO BASE DESSA CAMADA
+    UMA LISTA DE RASTERS   
+    
+    NAS CONFIGURACOES AVANCADAS CHECKS COM TODAS AS ESTATISTICAS DISPONIVEIS
+    nas avançadas tb um prefixo
+    UM CAMPO DE PRECISAO(mencione que o maximo de caracteres de umn shp é 9)
+    um check para saido do csv como pt br
+
+    ELE DEVE ENTAO PEGAR ESSA CAMADA DE PONTOS FAZER A AMOSTRAGENS DE VALORES DE TODOS OS RASTERS , E CRIAR UM CAMPO COM O NOME DO ATRIBNBUTO SENDO O NOME DO RASTERS   
+DEPOIS ELE VAI FAZER A DIFERENÇA APENAS DESSES ATRIBUTOS MENOS O VALOR DO ATRIBUTO BASE, E GERAR NOVOS CAMPOS COM PREFIXO definido por fim ele ira fazer a estatisticas apenas dos campos
+de diferenças entao as suas saidas serao uma nova cama de pontos e a tabela csv  na qual a tabela csv deve ser exibida um link no final com assim como os outros scripts as preferencias devem ser salvas como preferences.py
+ele deve rodar no provider e ele deve tentar de toda forma reaproveitar os scripts anteriores de forma a evitar reescrita de codigo aqui estao meus 3 script e espero suas sugestoesd e escrita da nova ferramenta
+
