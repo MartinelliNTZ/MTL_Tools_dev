@@ -30,8 +30,49 @@ class VectorLayerProjection:
         pass
 
     def reproject_layer_to_crs(self, layer, target_crs, external_tool_key="untraceable"):
-        """Reprojeta a camada para um CRS diferente, transformando todas as geometrias."""
-        pass
+        """
+        Cria uma camada reprojetada em memória.
+        """
+
+        if not layer or not layer.isValid():
+            return None
+
+        if not target_crs or not target_crs.isValid():
+            return None
+
+        source_crs = layer.crs()
+        if source_crs == target_crs:
+            return layer
+
+        uri = f"{layer.geometryType()}?crs={target_crs.authid()}"
+        new_layer = QgsVectorLayer(uri, f"{layer.name()}_reprojected", "memory")
+
+        new_layer.dataProvider().addAttributes(layer.fields())
+        new_layer.updateFields()
+
+        transform = QgsCoordinateTransform(
+            source_crs,
+            target_crs,
+            QgsProject.instance().transformContext()
+        )
+
+        feats = []
+        for feat in layer.getFeatures():
+            new_feat = QgsFeature(layer.fields())
+            new_feat.setAttributes(feat.attributes())
+
+            geom = feat.geometry()
+            if geom and not geom.isEmpty():
+                geom = QgsGeometry(geom)
+                geom.transform(transform)
+                new_feat.setGeometry(geom)
+
+            feats.append(new_feat)
+
+        new_layer.dataProvider().addFeatures(feats)
+        new_layer.updateExtents()
+
+        return new_layer
 
     def validate_crs_compatibility(self, layer1, layer2, external_tool_key="untraceable"):
         """Verifica se duas camadas possuem CRS compatíveis ou próximos."""

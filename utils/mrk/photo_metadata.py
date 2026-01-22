@@ -4,7 +4,7 @@ import re
 from datetime import datetime
 from PIL import Image, ExifTags
 from PyQt5.QtCore import QVariant
-from ..log_utils import LogUtils
+from ..log_utils import LogUtilsOld
 from ..tool_keys import ToolKey
 
 LOG_PATH = r"D:\mtl_photo_metadata_debug.txt"
@@ -102,7 +102,7 @@ class PhotoMetadata:
             for fname in files:
                 if fname.lower().endswith(".jpg") and PhotoMetadata.DJI_RE.search(fname):
                     all_files.append((root, fname))
-        LogUtils.log(ToolKey.DRONE_COORDINATES,
+        LogUtilsOld.log(ToolKey.DRONE_COORDINATES,
             f"Indexando fotos: {len(all_files)} arquivos encontrados")
         total = len(all_files)
         if total == 0:
@@ -178,7 +178,7 @@ class PhotoMetadata:
             # LOG A CADA 5%
             percent_done = i / total
             if percent_done >= next_log:
-                LogUtils.log(ToolKey.DRONE_COORDINATES,
+                LogUtilsOld.log(ToolKey.DRONE_COORDINATES,
                     f"{int(percent_done*100)}%  {i} arquivos / {total}")
                 next_log += 0.05  # próximo 5%
 

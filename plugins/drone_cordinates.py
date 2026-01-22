@@ -12,7 +12,7 @@ from ..utils.task.drone_task import DronePhotosTask
 from ..utils.mrk.mrk_parser import MrkParser
 from ..utils.mrk.photo_metadata import PhotoMetadata
 from ..utils.vector_utils import VectorUtils
-from ..utils.log_utils import LogUtils
+from ..utils.log_utils import LogUtilsOld
 
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
 from ..utils.tool_keys import ToolKey
@@ -215,7 +215,7 @@ class DroneCordinates(QDialog):
         })
 
     def _run(self):
-            LogUtils.log(self.TOOL_KEY, "Iniciando processamento de coordenadas de drone")
+            LogUtilsOld.log(self.TOOL_KEY, "Iniciando processamento de coordenadas de drone")
             base = self.txt_folder.text().strip()
             if not os.path.isdir(base):
                 return
@@ -231,21 +231,21 @@ class DroneCordinates(QDialog):
                 recursive=self.chk_recursive.isChecked(),
                 extra_fields=extra_fields
             )
-            LogUtils.log(self.TOOL_KEY, f"MRKs processados ({len(points)} pontos)")
+            LogUtilsOld.log(self.TOOL_KEY, f"MRKs processados ({len(points)} pontos)")
 
             if not points:
-                LogUtils.log(self.TOOL_KEY, F"nenhum ponto encontrado nos MRKs em {base}")
+                LogUtilsOld.log(self.TOOL_KEY, F"nenhum ponto encontrado nos MRKs em {base}")
                 return
 
 
             # --- Cruzar com fotos ---
-            LogUtils.log(self.TOOL_KEY, F"check photos: {self.chk_photos.isChecked()}, points: {len(points)}")
+            LogUtilsOld.log(self.TOOL_KEY, F"check photos: {self.chk_photos.isChecked()}, points: {len(points)}")
             if self.chk_photos.isChecked() and points:
-                LogUtils.log(self.TOOL_KEY, f"Cruzando MRKs com fotos em {base}")
+                LogUtilsOld.log(self.TOOL_KEY, f"Cruzando MRKs com fotos em {base}")
 
                 # callback que será chamado quando a task terminar
                 def continue_flow(result_points):
-                    LogUtils.log(self.TOOL_KEY, f"MRKs enriquecidos com fotos ({len(result_points)} pontos)")
+                    LogUtilsOld.log(self.TOOL_KEY, f"MRKs enriquecidos com fotos ({len(result_points)} pontos)")
                     self._continue_with_points(result_points, extra_fields=extra_fields)
                 
 
@@ -258,11 +258,11 @@ class DroneCordinates(QDialog):
                     recursive=self.chk_recursive.isChecked(),
                     callback=continue_flow   # <<< aqui é o importante
                 )
-                LogUtils.log(self.TOOL_KEY, F"Adicionando task de cruzamento de fotos ao gerenciador de tarefas do QGIS{task}")
+                LogUtilsOld.log(self.TOOL_KEY, F"Adicionando task de cruzamento de fotos ao gerenciador de tarefas do QGIS{task}")
 
                 QgsApplication.taskManager().addTask(task)
                 task_manager = QgsApplication.taskManager()
-                LogUtils.log(self.TOOL_KEY, f"{task_manager.tasks()}  # para checar tasks adicionadas")
+                LogUtilsOld.log(self.TOOL_KEY, f"{task_manager.tasks()}  # para checar tasks adicionadas")
 
             else:
                 # Sem cruzamento de fotos, segue normal
@@ -270,7 +270,7 @@ class DroneCordinates(QDialog):
 
     def _continue_with_points(self, points,extra_fields=None):
         # 3️⃣ Camada pontos
-        LogUtils.log(self.TOOL_KEY, f"continue_with_points: criando camada de pontos ({len(points)} pontos)")
+        LogUtilsOld.log(self.TOOL_KEY, f"continue_with_points: criando camada de pontos ({len(points)} pontos)")
         vl_pts = MrkParser.to_point_layer(
             points,
             name="MRK_Pontos",

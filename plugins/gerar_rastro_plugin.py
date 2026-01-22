@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Optional
 import time
 
-from ..utils.log_utils import LogUtils
+from ..utils.log_utils import LogUtilsOld
 from ..utils.qgis_messagem_util import QgisMessageUtil
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
 from ..utils.tool_keys import ToolKey
@@ -21,6 +21,7 @@ from ..utils.ui_widget_utils import  UiWidgetUtils
 from ..utils.project_utils import  ProjectUtils
 from ..utils.string_utils import StringUtils
 from ..utils.vector_utils import VectorUtils
+from ..core.config.LogUtils import LogUtils
 
 
 class GerarRastroDialog(BasePluginMTL):
@@ -47,7 +48,7 @@ class GerarRastroDialog(BasePluginMTL):
         # LAYOUT
         # -------------------------------------------------------
         layout = QVBoxLayout()
-
+        LogUtils.log("Iniciando Build ui",tool=self.TOOL_KEY)
 
         # input layer
         layoutH1, self.cmb_layers, self.chk_only_selected = UiWidgetUtils.create_layer_input(

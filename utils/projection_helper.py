@@ -20,7 +20,6 @@ class ProjectionHelper:
         :param context: QgsProcessingContext
         :return: nova lista de features reprojetadas
         """
-
         if not target_crs.isValid():
             return features  # Sem reprojeção
 

@@ -7,7 +7,7 @@ from qgis.PyQt.QtWidgets import (
 from qgis.PyQt.QtCore import Qt
 from qgis.core import QgsProject, QgsVectorLayer
 
-from ...utils.log_utils import LogUtils
+from ...utils.log_utils import LogUtilsOld
 from ...utils.qgis_messagem_util import QgisMessageUtil
 from ...utils.info_dialog import InfoDialog
 from ..copy_attributes_plugin import CopyAttributesController
@@ -112,7 +112,7 @@ class CopyAttributesView(QDialog):
                 if self.lst_fields.item(i).checkState() == Qt.Checked
             ]
 
-        LogUtils.log(self.TOOL_KEY, "Iniciando cópia de atributos")
+        LogUtilsOld.log(self.TOOL_KEY, "Iniciando cópia de atributos")
 
         model = CopyAttributesModel(self.iface)
         ok = model.run(target, source, fields)

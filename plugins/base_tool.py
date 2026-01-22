@@ -12,7 +12,7 @@ from qgis.core import QgsProject
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
 from ..utils.tool_keys import ToolKey
 from ..utils.info_dialog import InfoDialog
-from ..utils.log_utils import LogUtils
+from ..utils.log_utils import LogUtilsOld
 
 
 class BaseTool(QDialog):
@@ -203,15 +203,15 @@ class BaseTool(QDialog):
             self._save_prefs()
 
             # LOG
-            LogUtils.log(self.TOOL_KEY, "Execução iniciada")
-            LogUtils.log(self.TOOL_KEY, f"Layer ID: {layer_id}")
-            LogUtils.log(self.TOOL_KEY, f"Salvar: {self.chk_save.isChecked()}")
+            LogUtilsOld.log(self.TOOL_KEY, "Execução iniciada")
+            LogUtilsOld.log(self.TOOL_KEY, f"Layer ID: {layer_id}")
+            LogUtilsOld.log(self.TOOL_KEY, f"Salvar: {self.chk_save.isChecked()}")
 
             # PROCESSAMENTO FUTURO AQUI
             QMessageBox.information(self, "OK", "Ferramenta base executada com sucesso.")
 
         except Exception as e:
-            LogUtils.exception(self.TOOL_KEY, e)
+            LogUtilsOld.exception(self.TOOL_KEY, e)
             QMessageBox.critical(self, "Erro", str(e))
 
 

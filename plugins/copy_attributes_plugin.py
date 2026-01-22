@@ -11,7 +11,7 @@ from qgis.gui import QgsMapLayerComboBox
 
 from ..utils.vector_utils import VectorUtils
 from ..utils.tool_keys import ToolKey
-from ..utils.log_utils import LogUtils
+from ..utils.log_utils import LogUtilsOld
 from ..utils.qgis_messagem_util import QgisMessageUtil
 from ..utils.ui_widget_utils import UiWidgetUtils
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
@@ -142,7 +142,7 @@ class CopyAttributes(BasePluginMTL):
                 if self.lst_fields.item(i).checkState() == Qt.Checked
             ]
 
-        LogUtils.log(self.TOOL_KEY, "Iniciando cópia de atributos")
+        LogUtilsOld.log(self.TOOL_KEY, "Iniciando cópia de atributos")
 
         def conflict_resolver(field_name):
             return QgisMessageUtil.ask_field_conflict(

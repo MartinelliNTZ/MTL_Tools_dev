@@ -20,7 +20,7 @@ from qgis.core import (
     QgsCoordinateTransformContext
 )
 from pathlib import Path
-from ..utils.log_utils import LogUtils
+from ..utils.log_utils import LogUtilsOld
 from ..utils.string_utils import StringUtils
 import os
 from typing import Optional
@@ -88,10 +88,10 @@ class VectorUtils:
         - Retorna o caminho salvo (str) ou None em erro
         """
 
-        LogUtils.log(toolkey, f"save_layer chamado → {output_path}. Decision: {decision}. Layer valid: {layer.isValid() if layer else 'None'}. ")
+        LogUtilsOld.log(toolkey, f"save_layer chamado → {output_path}. Decision: {decision}. Layer valid: {layer.isValid() if layer else 'None'}. ")
 
         if not isinstance(layer, QgsVectorLayer) or not output_path:
-            LogUtils.log(toolkey, "Layer inválida ou output_path vazio")
+            LogUtilsOld.log(toolkey, "Layer inválida ou output_path vazio")
             return None
 
         path = Path(output_path)
@@ -101,7 +101,7 @@ class VectorUtils:
         # -------------------------------
         if path.exists() and decision == "rename":
             path = VectorUtils._auto_rename(path)
-            LogUtils.log(toolkey, f"Arquivo existe. Renomeado para: {path.name}")
+            LogUtilsOld.log(toolkey, f"Arquivo existe. Renomeado para: {path.name}")
 
         output_path = str(path)
 
@@ -119,18 +119,18 @@ class VectorUtils:
 
         driver = driver_map.get(ext)
         if not driver:
-            LogUtils.log(toolkey, f"Extensão não suportada: {ext}")
+            LogUtilsOld.log(toolkey, f"Extensão não suportada: {ext}")
             return None
 
-        LogUtils.log(toolkey, f"Driver: {driver}")
-        LogUtils.log(toolkey, f"CRS: {layer.crs().authid()}")
-        LogUtils.log(toolkey, f"Features: {layer.featureCount()}")
+        LogUtilsOld.log(toolkey, f"Driver: {driver}")
+        LogUtilsOld.log(toolkey, f"CRS: {layer.crs().authid()}")
+        LogUtilsOld.log(toolkey, f"Features: {layer.featureCount()}")
 
         # -------------------------------
         # REPROJEÇÃO AUTOMÁTICA PARA KML
         # -------------------------------
         if driver == "KML" and layer.crs().authid() != "EPSG:4326":
-            LogUtils.log(toolkey, "Reprojetando para EPSG:4326")
+            LogUtilsOld.log(toolkey, "Reprojetando para EPSG:4326")
 
             target_crs = QgsCoordinateReferenceSystem("EPSG:4326")
             transform = QgsCoordinateTransform(
@@ -160,14 +160,14 @@ class VectorUtils:
             mem.updateExtents()
             layer = mem
 
-            LogUtils.log(toolkey, "Reprojeção concluída")
+            LogUtilsOld.log(toolkey, "Reprojeção concluída")
                                 # Remove dataset físico
             if decision == "overwrite" and (ext == ".shp" or ext == ".gpkg"):
-                LogUtils.log(toolkey, "Overwrite solicitado pelo usuário limpando lixo SHP.")                    
+                LogUtilsOld.log(toolkey, "Overwrite solicitado pelo usuário limpando lixo SHP.")
                 try:
                     VectorUtils._remove_existing_dataset(os.path)
                 except Exception as e:
-                    LogUtils.log("toolkey", f"Erro ao remover dataset existente: {e}")
+                    LogUtilsOld.log("toolkey", f"Erro ao remover dataset existente: {e}")
                     return None   
     # -------------------------------
         # ESCRITA SEGURA (OVERWRITE REAL)
@@ -180,7 +180,7 @@ class VectorUtils:
         context = QgsProject.instance().transformContext()
 
         if hasattr(QgsVectorFileWriter, "writeAsVectorFormatV3"):
-            LogUtils.log(toolkey, "Usando writeAsVectorFormatV3")
+            LogUtilsOld.log(toolkey, "Usando writeAsVectorFormatV3")
             result = QgsVectorFileWriter.writeAsVectorFormatV3(
                 layer,
                 output_path,
@@ -188,7 +188,7 @@ class VectorUtils:
                 options
             )
         else:
-            LogUtils.log(toolkey, "Usando writeAsVectorFormatV2")
+            LogUtilsOld.log(toolkey, "Usando writeAsVectorFormatV2")
             result = QgsVectorFileWriter.writeAsVectorFormatV2(
                 layer,
                 output_path,
@@ -204,11 +204,11 @@ class VectorUtils:
             err_msg = ""
 
         if err_code != QgsVectorFileWriter.NoError:
-            LogUtils.log(toolkey, f"ERRO AO SALVAR ({err_code}): {err_msg}")           
+            LogUtilsOld.log(toolkey, f"ERRO AO SALVAR ({err_code}): {err_msg}")
             
             return None
 
-        LogUtils.log(toolkey, f"Arquivo salvo com sucesso: {output_path}")
+        LogUtilsOld.log(toolkey, f"Arquivo salvo com sucesso: {output_path}")
         return output_path
 
 
@@ -219,10 +219,10 @@ class VectorUtils:
         toolkey="VectorUtils.save_layer",
         decision: str = "rename"
     ):
-        LogUtils.log(toolkey, f"save_layer chamado → {output_path}")
+        LogUtilsOld.log(toolkey, f"save_layer chamado → {output_path}")
 
         if layer is None or not output_path:
-            LogUtils.log(toolkey, "Layer ou output_path inválido")
+            LogUtilsOld.log(toolkey, "Layer ou output_path inválido")
             return None
 
         path = Path(output_path)
@@ -234,23 +234,23 @@ class VectorUtils:
 
             if decision == "rename":
                 new_path = VectorUtils._auto_rename(path)
-                LogUtils.log(
+                LogUtilsOld.log(
                     toolkey,
                     f"Arquivo existe. Renomeando para: {new_path.name}"
                 )
                 path = new_path
 
             elif decision == "overwrite":
-                LogUtils.log(toolkey, "Arquivo existe. Overwrite solicitado")
+                LogUtilsOld.log(toolkey, "Arquivo existe. Overwrite solicitado")
 
                 # Remove dataset físico
                 try:
                     VectorUtils._remove_existing_dataset(path)
                 except Exception as e:
-                    LogUtils.log(toolkey, f"Erro ao remover dataset existente: {e}")
+                    LogUtilsOld.log(toolkey, f"Erro ao remover dataset existente: {e}")
                     return None
             else:
-                LogUtils.log(toolkey, f"Decision inválida: {decision}")
+                LogUtilsOld.log(toolkey, f"Decision inválida: {decision}")
                 return None
 
         output_path = str(path)
@@ -270,18 +270,18 @@ class VectorUtils:
 
         driver = driver_map.get(ext)
         if not driver:
-            LogUtils.log(toolkey, f"Extensão não suportada: {ext}")
+            LogUtilsOld.log(toolkey, f"Extensão não suportada: {ext}")
             return None
 
-        LogUtils.log(toolkey, f"Driver: {driver}")
-        LogUtils.log(toolkey, f"CRS: {layer.crs().authid()}")
-        LogUtils.log(toolkey, f"Features: {layer.featureCount()}")
+        LogUtilsOld.log(toolkey, f"Driver: {driver}")
+        LogUtilsOld.log(toolkey, f"CRS: {layer.crs().authid()}")
+        LogUtilsOld.log(toolkey, f"Features: {layer.featureCount()}")
 
         # -------------------------------
         # REPROJEÇÃO REAL PARA KML
         # -------------------------------
         if driver == "KML" and layer.crs().authid() != "EPSG:4326":
-            LogUtils.log(toolkey, "Reprojetando para EPSG:4326")
+            LogUtilsOld.log(toolkey, "Reprojetando para EPSG:4326")
 
             target_crs = QgsCoordinateReferenceSystem("EPSG:4326")
             transform = QgsCoordinateTransform(
@@ -311,7 +311,7 @@ class VectorUtils:
             mem.updateExtents()
             layer = mem
 
-            LogUtils.log(toolkey, "Reprojeção concluída")
+            LogUtilsOld.log(toolkey, "Reprojeção concluída")
 
         # -------------------------------
         # ESCRITA
@@ -326,7 +326,7 @@ class VectorUtils:
         # ESCRITA (QGIS 3.16+ SAFE)
         # -------------------------------
         if hasattr(QgsVectorFileWriter, "writeAsVectorFormatV3"):
-            LogUtils.log(toolkey, "Usando writeAsVectorFormatV3")
+            LogUtilsOld.log(toolkey, "Usando writeAsVectorFormatV3")
             result = QgsVectorFileWriter.writeAsVectorFormatV3(
                 layer,
                 output_path,
@@ -334,7 +334,7 @@ class VectorUtils:
                 options
             )
         else:
-            LogUtils.log(toolkey, "Usando writeAsVectorFormatV2")
+            LogUtilsOld.log(toolkey, "Usando writeAsVectorFormatV2")
             result = QgsVectorFileWriter.writeAsVectorFormatV2(
                 layer,
                 output_path,
@@ -351,10 +351,10 @@ class VectorUtils:
             err_msg = ""
 
         if err_code != QgsVectorFileWriter.NoError:
-            LogUtils.log(toolkey, f"ERRO AO SALVAR ({err_code}): {err_msg}")
+            LogUtilsOld.log(toolkey, f"ERRO AO SALVAR ({err_code}): {err_msg}")
             return None
 
-        LogUtils.log(toolkey, f"Arquivo salvo com sucesso: {output_path}")
+        LogUtilsOld.log(toolkey, f"Arquivo salvo com sucesso: {output_path}")
 
         # -------------------------------
         # RECARREGAMENTO DA LAYER
@@ -366,10 +366,10 @@ class VectorUtils:
         )
 
         if not saved_layer.isValid():
-            LogUtils.log(toolkey, "Layer salvo é inválido")
+            LogUtilsOld.log(toolkey, "Layer salvo é inválido")
             return None
 
-        LogUtils.log(toolkey, "Layer carregado com sucesso")
+        LogUtilsOld.log(toolkey, "Layer carregado com sucesso")
         return saved_layer 
 
     @staticmethod

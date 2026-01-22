@@ -12,7 +12,7 @@ import time
 
 from ..utils.crs_utils import get_coord_info
 from ..utils.info_dialog import InfoDialog
-from ..utils.log_utils import LogUtils
+from ..utils.log_utils import LogUtilsOld
 from ..utils.qgis_messagem_util import QgisMessageUtil
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
 from ..utils.tool_keys import ToolKey
@@ -220,7 +220,7 @@ class BasePluginMTL(QDialog):
 
             if decision == "overwrite":
                 ProjectUtils.remove_file_from_project_hard(output_path)  
-                LogUtils.log("toolkey", "Overwrite solicitado pelo usuário.")                 
+                LogUtilsOld.log("toolkey", "Overwrite solicitado pelo usuário.")
             
             #-------------------------------------------------
         

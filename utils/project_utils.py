@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 from qgis.core import QgsProject, QgsMapLayer, QgsVectorLayer
 from qgis.PyQt.QtWidgets import QApplication
-from ..utils.log_utils import LogUtils
+from ..utils.log_utils import LogUtilsOld
 from pathlib import Path
 import gc
 
@@ -74,7 +74,7 @@ class ProjectUtils:
             return layer.id() in project.mapLayers()
 
         except Exception as e:
-            LogUtils.log("project_utils", f"Erro ao verificar camada no projeto: {e}")
+            LogUtilsOld.log("project_utils", f"Erro ao verificar camada no projeto: {e}")
             return False
 
     @staticmethod
@@ -98,7 +98,7 @@ class ProjectUtils:
             return True
 
         except Exception as e:
-            LogUtils.log("project_utils", f"Erro ao remover camada do projeto: {e}")
+            LogUtilsOld.log("project_utils", f"Erro ao remover camada do projeto: {e}")
             return False
     @staticmethod
     def is_file_in_project(file_path: str) -> bool:
@@ -126,7 +126,7 @@ class ProjectUtils:
             return False
 
         except Exception as e:
-            LogUtils.log("project_utils", f"Erro ao verificar arquivo no projeto: {e}")
+            LogUtilsOld.log("project_utils", f"Erro ao verificar arquivo no projeto: {e}")
             return False
     @staticmethod
     def remove_file_from_project(file_path: str) -> bool:
@@ -154,7 +154,7 @@ class ProjectUtils:
             return False
 
         except Exception as e:
-            LogUtils.log("project_utils", f"Erro ao remover arquivo do projeto: {e}")
+            LogUtilsOld.log("project_utils", f"Erro ao remover arquivo do projeto: {e}")
             return False
 
     @staticmethod
@@ -211,7 +211,7 @@ class ProjectUtils:
             return True
 
         except Exception as e:
-            LogUtils.log(
+            LogUtilsOld.log(
                 "project_utils",
                 f"Erro ao remover camada e liberar datasource: {e}"
             )

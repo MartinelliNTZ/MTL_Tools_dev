@@ -4,9 +4,13 @@ from qgis.PyQt.QtWidgets import QAction, QMenu
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import QgsApplication
 from qgis.PyQt.QtWidgets import QAction, QMenu, QToolButton, QWidgetAction
+from pathlib import Path
 
-
+from .utils.qgis_messagem_util import QgisMessageUtil
 from .processing.provider import MTLProvider
+from .core.config.LogCleanupUtils import LogCleanupUtils
+from .core.config.LogUtils import LogUtils
+
 
 
 class MTL_Tools:
@@ -21,13 +25,19 @@ class MTL_Tools:
     # INICIAR GUI E PROCESSING
     # =====================================================
     def initGui(self):
-
+        plugin_root = Path(__file__).resolve().parent
+        LogUtils.init(plugin_root)
+        # mantém só os últimos 15 logs
+        LogCleanupUtils.keep_last_n(plugin_root, keep=15)
+        LogUtils.info("Plugin inicializado", tool="system")
         # -------------------------
         # 1) ATIVAR PROCESSING PROVIDER
         # -------------------------
-        self.provider = MTLProvider()
-        QgsApplication.processingRegistry().addProvider(self.provider)
-
+        try:
+            self.provider = MTLProvider()
+            QgsApplication.processingRegistry().addProvider(self.provider)
+        except Exception as e:
+            QgisMessageUtil.bar_critical(self.iface.mainWindow(),f"Erro ao carregar provider. Erro: {e}")
         # -------------------------
         # 2) CRIAR TOOLBAR EXCLUSIVA
         # -------------------------

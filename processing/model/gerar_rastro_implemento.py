@@ -14,10 +14,10 @@ import processing
 from typing import Optional
 from qgis.core import QgsProject
 from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes
-from utils.qgis_messagem_util import QgisMessageUtil
+from .utils.qgis_messagem_util import QgisMessageUtil
 
-from utils.preferences import load_tool_prefs, save_tool_prefs
-from utils.tool_keys import ToolKey
+from .utils.preferences import load_tool_prefs, save_tool_prefs
+from .utils.tool_keys import ToolKey
 
 
 class GerarRastroModel:

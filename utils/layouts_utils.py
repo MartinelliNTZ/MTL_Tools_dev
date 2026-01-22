@@ -4,7 +4,7 @@ from datetime import datetime
 
 from qgis.core import QgsLayoutItemLabel, QgsProject
 
-from .log_utils import LogUtils
+from .log_utils import LogUtilsOld
 
 
 class LayoutsUtils:
@@ -73,11 +73,11 @@ class LayoutsUtils:
         total_layouts = len(layouts)
         total_changes = 0
 
-        LogUtils.log(tool_key, "Iniciando replace em layouts")
-        LogUtils.log(tool_key, f"Layouts encontrados: {total_layouts}")
-        LogUtils.log(tool_key, f"Old text: '{old_text}' | New text: '{new_text}'")
-        LogUtils.log(tool_key, f"Case sensitive: {case_sensitive}")
-        LogUtils.log(tool_key, f"Full replace: {full_replace}")
+        LogUtilsOld.log(tool_key, "Iniciando replace em layouts")
+        LogUtilsOld.log(tool_key, f"Layouts encontrados: {total_layouts}")
+        LogUtilsOld.log(tool_key, f"Old text: '{old_text}' | New text: '{new_text}'")
+        LogUtilsOld.log(tool_key, f"Case sensitive: {case_sensitive}")
+        LogUtilsOld.log(tool_key, f"Full replace: {full_replace}")
 
         for layout in layouts:
             layout_name = layout.name()
@@ -95,19 +95,19 @@ class LayoutsUtils:
                     total_changes += 1
                     layout_changes += 1
 
-                    LogUtils.log(
+                    LogUtilsOld.log(
                         tool_key,
                         f"[{layout_name}] '{original}' -> '{replaced}'"
                     )
 
             if layout_changes:
-                LogUtils.log(
+                LogUtilsOld.log(
                     tool_key,
                     f"[{layout_name}] alterações: {layout_changes}"
                 )
 
-        LogUtils.log(tool_key, f"Total de substituições: {total_changes}")
-        LogUtils.log(tool_key, f"Finalizado em {datetime.now().isoformat()}")
+        LogUtilsOld.log(tool_key, f"Total de substituições: {total_changes}")
+        LogUtilsOld.log(tool_key, f"Finalizado em {datetime.now().isoformat()}")
 
         return {
             "total_layouts": total_layouts,
