@@ -250,7 +250,7 @@ class ExportAllLayoutsDialog(QDialog):
             )
 
             if resp == QMessageBox.Yes:
-                cmd_path = os.path.join(os.path.dirname(__file__), "..", "lib", "install_pypdf2.bat")
+                cmd_path = os.path.join(os.path.dirname(__file__), "..", "core","setup", "install_pypdf2.bat")
                 os.startfile(cmd_path)
                 QMessageBox.information(
                     self,
@@ -276,7 +276,7 @@ class ExportAllLayoutsDialog(QDialog):
             )
 
             if resp == QMessageBox.Yes:
-                cmd_path = os.path.join(os.path.dirname(__file__), "..", "lib", "install_pillow.cmd")
+                cmd_path = os.path.join(os.path.dirname(__file__), "..", "core","setup", "install_pillow.cmd")
                 os.startfile(cmd_path)
                 QMessageBox.information(
                     self,
