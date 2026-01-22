@@ -16,10 +16,9 @@ from qgis.core import (
 
 # Preferências
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
-from ..utils.tool_keys import ToolKey
 
 # Lógica
-from ..model.difference_fields_model import DifferenceFieldsModel
+from .model.difference_fields_model import DifferenceFieldsModel
 
 from PyQt5.QtCore import QVariant
 

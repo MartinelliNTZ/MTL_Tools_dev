@@ -3,7 +3,7 @@ from qgis.PyQt.QtWidgets import QAction
 from qgis.core import QgsVectorLayer, QgsWkbTypes, QgsApplication
 import os
 
-from ..model.vector_field_calculator import VectorFieldCalculator
+from .model.vector_field_calculator import VectorFieldCalculator
 from ..utils.altimetry_task import AltimetriaTask
 from ..utils.qgis_messagem_util import QgisMessageUtil
 from ..utils.crs_utils import get_coord_info

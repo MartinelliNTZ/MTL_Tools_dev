@@ -71,7 +71,7 @@ class LoadFolderLayersDialog(QDialog):
 
         # Caminho do arquivo de instruções
         self.instructions_file = os.path.join(
-            os.path.dirname(__file__), "instructions", "load_folder_layers.md"
+            os.path.dirname(__file__),"..","resources", "instructions", "load_folder_layers.md"
         )
 
         main = QVBoxLayout()

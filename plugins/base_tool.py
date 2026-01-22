@@ -39,7 +39,7 @@ class BaseTool(QDialog):
             self.setWindowIcon(QIcon(icon_path))
 
         self.instructions_file = os.path.join(
-            os.path.dirname(__file__), "instructions", "base_tool.md"
+            os.path.dirname(__file__),"..","resources", "instructions", "base_tool.md"
         )
 
         self._build_ui()

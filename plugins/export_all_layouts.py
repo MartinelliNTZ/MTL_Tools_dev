@@ -48,7 +48,7 @@ class ExportAllLayoutsDialog(QDialog):
         info_layout.addWidget(btn_info)
         # Caminho do arquivo de instruções
         self.instructions_file = os.path.join(
-            os.path.dirname(__file__), "instructions", "export_all_layouts_help.md"
+            os.path.dirname(__file__),"..","resources", "instructions", "export_all_layouts_help.md"
         )
 
         layout.addLayout(info_layout)

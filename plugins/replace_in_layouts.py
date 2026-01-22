@@ -39,7 +39,7 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
 
         self.instructions_file = os.path.join(
             os.path.dirname(__file__),
-            "instructions",
+            "..","resources", "instructions",
             "replace_in_layouts_help.md"
         )
 

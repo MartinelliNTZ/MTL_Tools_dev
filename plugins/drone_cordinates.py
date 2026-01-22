@@ -46,7 +46,7 @@ class DroneCordinates(QDialog):
 
         self.instructions_file = os.path.join(
             os.path.dirname(__file__),
-            "instructions",
+            "..","resources", "instructions",
             "drone_coordinates_help.md"
         )
 

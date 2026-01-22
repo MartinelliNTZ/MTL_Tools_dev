@@ -29,7 +29,7 @@ from ..utils.tool_keys import ToolKey
 
 
 # Import do model
-from ..model.attribute_statistics_model import  AttributeStatisticsModel
+from .model.attribute_statistics_model import  AttributeStatisticsModel
 
 TOOL_KEY = ToolKey.ATTRIBUTE_STATISTICS
 

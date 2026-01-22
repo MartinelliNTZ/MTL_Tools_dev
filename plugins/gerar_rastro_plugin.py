@@ -81,7 +81,7 @@ class GerarRastroDialog(BasePluginMTL):
 
         # instruções
         self.instructions_file = os.path.join(
-            os.path.dirname(__file__), "instructions", "generate_trail_help.md"# Caminho do arquivo de instruções
+            os.path.dirname(__file__),"..","resources", "instructions", "generate_trail_help.md"# Caminho do arquivo de instruções
         )      
          
         # buttons

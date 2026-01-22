@@ -40,7 +40,7 @@ class CopyAttributes(BasePluginMTL):
         
         self.instructions_file = os.path.join(
             os.path.dirname(__file__),
-            "instructions",
+            "..","resources", "instructions",
             "copy_attributes_help.md"
         )
 

@@ -16,7 +16,7 @@ from qgis.core import (
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
 
 # Lógicas externas
-from ..model.raster_mass_sampler_model import RasterMassSamplerModel
+from .model.raster_mass_sampler_model import RasterMassSamplerModel
 from ..utils.projection_helper import ProjectionHelper
 from ..utils.tool_keys import ToolKey
 #from ..qgis_model.implement_trail.py import ....
