@@ -6,6 +6,8 @@ from qgis.core import QgsApplication
 from qgis.PyQt.QtWidgets import QAction, QMenu, QToolButton, QWidgetAction
 from pathlib import Path
 
+from .utils.tool_keys import ToolKey
+
 from .utils.qgis_messagem_util import QgisMessageUtil
 from .processing.provider import MTLProvider
 from .core.config.LogCleanupUtils import LogCleanupUtils
@@ -20,7 +22,7 @@ class MTL_Tools:
         self.toolbar = None
         self.actions = []
         self.provider = None
-
+    TOOL_KEY = ToolKey.MTL_TOOLS_PLUGIN
     # =====================================================
     # INICIAR GUI E PROCESSING
     # =====================================================
@@ -29,241 +31,299 @@ class MTL_Tools:
         LogUtils.init(plugin_root)
         # mantém só os últimos 15 logs
         LogCleanupUtils.keep_last_n(plugin_root, keep=15)
-        LogUtils.info("Plugin inicializado", tool="system")
+        LogUtils.info("Plugin inicializado", tool=self.TOOL_KEY)
         # -------------------------
         # 1) ATIVAR PROCESSING PROVIDER
         # -------------------------
         try:
             self.provider = MTLProvider()
             QgsApplication.processingRegistry().addProvider(self.provider)
+            LogUtils.info("Processing Provider carregado com sucesso", tool=self.TOOL_KEY)
         except Exception as e:
+            LogUtils.error(f"Erro ao carregar Processing Provider: {str(e)}", tool=self.TOOL_KEY)
             QgisMessageUtil.bar_critical(self.iface.mainWindow(),f"Erro ao carregar provider. Erro: {e}")
         # -------------------------
         # 2) CRIAR TOOLBAR EXCLUSIVA
         # -------------------------
-        self.toolbar = self.iface.addToolBar("MTL Tools")
-        self.toolbar.setObjectName("MTL_Tools_Toolbar")
+        try:
+            self.toolbar = self.iface.addToolBar("MTL Tools")
+            self.toolbar.setObjectName("MTL_Tools_Toolbar")
+            LogUtils.debug("Toolbar MTL Tools criada com sucesso", tool=self.TOOL_KEY)
+        except Exception as e:
+            LogUtils.error(f"Erro ao criar toolbar: {str(e)}", tool=self.TOOL_KEY)
+            return
 
         # -------------------------
         # 3) MENU PRINCIPAL E SUBMENUS
         # -------------------------
-        self.menu = QMenu("MTL Tools", self.iface.mainWindow())
-        self.menu.setObjectName("MTL_Tools")
-        standard_menu = self.iface.firstRightStandardMenu()
-        self.iface.mainWindow().menuBar().insertMenu(standard_menu.menuAction(), self.menu)
-        self.menu.clear()
+        try:
+            self.menu = QMenu("MTL Tools", self.iface.mainWindow())
+            self.menu.setObjectName("MTL_Tools")
+            standard_menu = self.iface.firstRightStandardMenu()
+            self.iface.mainWindow().menuBar().insertMenu(standard_menu.menuAction(), self.menu)
+            self.menu.clear()
+            LogUtils.debug("Menu MTL Tools criado com sucesso", tool=self.TOOL_KEY)
+        except Exception as e:
+            LogUtils.error(f"Erro ao criar menu principal: {str(e)}", tool=self.TOOL_KEY)
+            return
         
 
     
      
 
         # Submenus        
-        self.agriculture_menu = QMenu("Agricultura de Precisão", self.menu)
-        icon = QIcon(os.path.join(os.path.dirname(__file__),"resources", "icons", "agriculture.ico"))
-        self.agriculture_menu.setIcon(icon)
-        self.layers_menu = QMenu("Camadas", self.menu)
-        icon = QIcon(os.path.join(os.path.dirname(__file__),"resources", "icons", "layer.ico"))
-        self.layers_menu.setIcon(icon)
-        self.layouts_menu = QMenu("Layouts", self.menu)
-        icon = QIcon(os.path.join(os.path.dirname(__file__),"resources", "icons", "layout.ico"))
-        self.layouts_menu.setIcon(icon)
-        self.raster_menu = QMenu("Raster", self.menu)
-        icon = QIcon(os.path.join(os.path.dirname(__file__),"resources", "icons", "raster.ico"))
-        self.raster_menu.setIcon(icon)
-        self.system_menu = QMenu("Sistema", self.menu)
-        icon = QIcon(os.path.join(os.path.dirname(__file__),"resources", "icons", "system.ico"))
-        self.system_menu.setIcon(icon)
-        self.vectors_menu = QMenu("Vetores", self.menu)
-        icon = QIcon(os.path.join(os.path.dirname(__file__),"resources", "icons", "vector.ico"))
-        self.vectors_menu.setIcon(icon)
+        try:
+            self.agriculture_menu = QMenu("Agricultura de Precisão", self.menu)
+            icon = QIcon(os.path.join(os.path.dirname(__file__),"resources", "icons", "agriculture.ico"))
+            self.agriculture_menu.setIcon(icon)
+            self.layers_menu = QMenu("Camadas", self.menu)
+            icon = QIcon(os.path.join(os.path.dirname(__file__),"resources", "icons", "layer.ico"))
+            self.layers_menu.setIcon(icon)
+            self.layouts_menu = QMenu("Layouts", self.menu)
+            icon = QIcon(os.path.join(os.path.dirname(__file__),"resources", "icons", "layout.ico"))
+            self.layouts_menu.setIcon(icon)
+            self.raster_menu = QMenu("Raster", self.menu)
+            icon = QIcon(os.path.join(os.path.dirname(__file__),"resources", "icons", "raster.ico"))
+            self.raster_menu.setIcon(icon)
+            self.system_menu = QMenu("Sistema", self.menu)
+            icon = QIcon(os.path.join(os.path.dirname(__file__),"resources", "icons", "system.ico"))
+            self.system_menu.setIcon(icon)
+            self.vectors_menu = QMenu("Vetores", self.menu)
+            icon = QIcon(os.path.join(os.path.dirname(__file__),"resources", "icons", "vector.ico"))
+            self.vectors_menu.setIcon(icon)
 
-        # Adiciona submenus ao menu principal
-        self.menu.addMenu(self.agriculture_menu)
-        self.menu.addMenu(self.layers_menu)
-        self.menu.addMenu(self.layouts_menu)
-        self.menu.addMenu(self.raster_menu)
-        self.menu.addMenu(self.vectors_menu)
-        self.menu.addMenu(self.system_menu)
+            # Adiciona submenus ao menu principal
+            self.menu.addMenu(self.agriculture_menu)
+            self.menu.addMenu(self.layers_menu)
+            self.menu.addMenu(self.layouts_menu)
+            self.menu.addMenu(self.raster_menu)
+            self.menu.addMenu(self.vectors_menu)
+            self.menu.addMenu(self.system_menu)
+            LogUtils.debug("Submenus criados com sucesso", tool=self.TOOL_KEY)
+        except Exception as e:
+            LogUtils.error(f"Erro ao criar submenus: {str(e)}", tool=self.TOOL_KEY)
+            return
 
         # -------------------------
         # 4) CONFIGURAÇÃO DAS AÇÕES (ORDEM NUMÉRICA)
         # -------------------------
-        # 1-Export All Layouts
-        export_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "export_icon.ico")
-        self.action_export_all = QAction(QIcon(export_icon), "Exportar todos os Layouts", self.iface.mainWindow())
-        self.action_export_all.triggered.connect(self.run_export_layouts)
+        try:
+            # 1-Export All Layouts
+            export_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "export_icon.ico")
+            self.action_export_all = QAction(QIcon(export_icon), "Exportar todos os Layouts", self.iface.mainWindow())
+            self.action_export_all.triggered.connect(self.run_export_layouts)
 
-        # 2-Replace in Layouts
-        replace_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "replace_in_layouts.ico")
-        self.action_replace_layouts = QAction(QIcon(replace_icon), "Substituir textos nos Layouts", self.iface.mainWindow())
-        self.action_replace_layouts.triggered.connect(self.run_replace_layouts)
+            # 2-Replace in Layouts
+            replace_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "replace_in_layouts.ico")
+            self.action_replace_layouts = QAction(QIcon(replace_icon), "Substituir textos nos Layouts", self.iface.mainWindow())
+            self.action_replace_layouts.triggered.connect(self.run_replace_layouts)
 
-        # 3-Restart QGIS
-        restart_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "restart_qgis.ico")
-        self.action_restart_qgis = QAction(QIcon(restart_icon), "Salvar, Fechar e Reabrir Projeto", self.iface.mainWindow())
-        self.action_restart_qgis.triggered.connect(self.run_restart_qgis)
+            # 3-Restart QGIS
+            restart_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "restart_qgis.ico")
+            self.action_restart_qgis = QAction(QIcon(restart_icon), "Salvar, Fechar e Reabrir Projeto", self.iface.mainWindow())
+            self.action_restart_qgis.triggered.connect(self.run_restart_qgis)
 
-        # 4-Carregar pasta de arquivos
-        load_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "load_folder.ico")
-        self.action_load_folder = QAction(QIcon(load_icon), "Carregar pasta de arquivos", self.iface.mainWindow())
-        self.action_load_folder.triggered.connect(self.run_load_folder)
+            # 4-Carregar pasta de arquivos
+            load_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "load_folder.ico")
+            self.action_load_folder = QAction(QIcon(load_icon), "Carregar pasta de arquivos", self.iface.mainWindow())
+            self.action_load_folder.triggered.connect(self.run_load_folder)
 
-        # 5-Gerar Rastro Implemento
-        gerar_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "gerar_rastro.ico")
-        self.action_gerar_rastro = QAction(QIcon(gerar_icon), "Gerar Rastro Implemento", self.iface.mainWindow())
-        self.action_gerar_rastro.triggered.connect(self.run_gerar_rastro)
+            # 5-Gerar Rastro Implemento
+            gerar_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "gerar_rastro.ico")
+            self.action_gerar_rastro = QAction(QIcon(gerar_icon), "Gerar Rastro Implemento", self.iface.mainWindow())
+            self.action_gerar_rastro.triggered.connect(self.run_gerar_rastro)
 
-        # 6-About Dialog
-        about_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "about.ico")
-        self.action_about_dialog = QAction(QIcon(about_icon), "Sobre o MTL Tools", self.iface.mainWindow())
-        self.action_about_dialog.triggered.connect(self.run_about_dialog)
-        
-        # null-base tool
-        base_tool_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "mtl_agro.ico")
-        self.action_base_tool = QAction(QIcon(base_tool_icon), "Base Tool", self.iface.mainWindow())
-        self.action_base_tool.triggered.connect(self.run_base_tool)
-
-
-        # 7-Capturar Coordenadas
-        coord_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "coord.ico")
-        self.action_coord_click = QAction(QIcon(coord_icon), "Capturar Coordenadas", self.iface.mainWindow())
-        self.action_coord_click.triggered.connect(self.run_coord_click)
-        
-        
-        # 8-Calcular campos vetoriais
-        vector_field_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "vector_field.ico")
-        self.action_vector_fields = QAction(QIcon(vector_field_icon), "Calcular Campos Vetoriais", self.iface.mainWindow())
-        self.action_vector_fields.triggered.connect(self.run_vector_fields)      
+            # 6-About Dialog
+            about_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "about.ico")
+            self.action_about_dialog = QAction(QIcon(about_icon), "Sobre o MTL Tools", self.iface.mainWindow())
+            self.action_about_dialog.triggered.connect(self.run_about_dialog)
+            
+            # 12-Logcat Tool
+            logcat_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "mtl_agro.ico")
+            self.action_logcat = QAction(QIcon(logcat_icon), "Logcat - Viewer de Logs", self.iface.mainWindow())
+            self.action_logcat.triggered.connect(self.run_logcat)
+            
+            # null-base tool
+            base_tool_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "mtl_agro.ico")
+            self.action_base_tool = QAction(QIcon(base_tool_icon), "Base Tool", self.iface.mainWindow())
+            self.action_base_tool.triggered.connect(self.run_base_tool)
 
 
-        # 09-Obter coordenadas de drone
-        drone_coord_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "drone_cordinates.ico")
-        self.action_drone_coords = QAction(QIcon(drone_coord_icon), "Obter Coordenadas de Drone", self.iface.mainWindow())
-        self.action_drone_coords.triggered.connect(self.run_drone_coords)
-        
-        # 10-Realizar multipart de todas as feições
-        multipart_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "vector_multpart.ico")
-        self.action_multpart = QAction(QIcon(multipart_icon), "Promover a multiparte", self.iface.mainWindow())
-        self.action_multpart.triggered.connect(self.run_multpart)
+            # 7-Capturar Coordenadas
+            coord_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "coord.ico")
+            self.action_coord_click = QAction(QIcon(coord_icon), "Capturar Coordenadas", self.iface.mainWindow())
+            self.action_coord_click.triggered.connect(self.run_coord_click)
+            
+            
+            # 8-Calcular campos vetoriais
+            vector_field_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "vector_field.ico")
+            self.action_vector_fields = QAction(QIcon(vector_field_icon), "Calcular Campos Vetoriais", self.iface.mainWindow())
+            self.action_vector_fields.triggered.connect(self.run_vector_fields)      
 
-        # 11-Copiar atributos entre camadas
-        copy_atributes_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "copy_attributes.ico")
-        self.action_copy_atributes = QAction(QIcon(copy_atributes_icon), "Copiar Atributos", self.iface.mainWindow())
-        self.action_copy_atributes.triggered.connect(self.run_copy_atributes)
+
+            # 09-Obter coordenadas de drone
+            drone_coord_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "drone_cordinates.ico")
+            self.action_drone_coords = QAction(QIcon(drone_coord_icon), "Obter Coordenadas de Drone", self.iface.mainWindow())
+            self.action_drone_coords.triggered.connect(self.run_drone_coords)
+            
+            # 10-Realizar multipart de todas as feições
+            multipart_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "vector_multpart.ico")
+            self.action_multpart = QAction(QIcon(multipart_icon), "Promover a multiparte", self.iface.mainWindow())
+            self.action_multpart.triggered.connect(self.run_multpart)
+
+            # 11-Copiar atributos entre camadas
+            copy_atributes_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "copy_attributes.ico")
+            self.action_copy_atributes = QAction(QIcon(copy_atributes_icon), "Copiar Atributos", self.iface.mainWindow())
+            self.action_copy_atributes.triggered.connect(self.run_copy_atributes)
+            
+            LogUtils.debug("Todas as ações criadas com sucesso", tool=self.TOOL_KEY)
+        except Exception as e:
+            LogUtils.error(f"Erro ao criar ações: {str(e)}", tool=self.TOOL_KEY)
+            return
 
         # -------------------------
         # 5) ADICIONAR AÇÕES AO MENU (ORDEM ALFABÉTICA)
         # -------------------------
-        # Agricultura de Precisão
-        self.agriculture_menu.addAction(self.action_gerar_rastro)
-        self.agriculture_menu.addAction(self.action_drone_coords)
+        try:
+            # Agricultura de Precisão
+            self.agriculture_menu.addAction(self.action_gerar_rastro)
+            self.agriculture_menu.addAction(self.action_drone_coords)
 
-        # Camadas
-        self.layers_menu.addAction(self.action_load_folder)
+            # Camadas
+            self.layers_menu.addAction(self.action_load_folder)
 
-        # Layouts
-        self.layouts_menu.addAction(self.action_export_all)
-        self.layouts_menu.addAction(self.action_replace_layouts)
+            # Layouts
+            self.layouts_menu.addAction(self.action_export_all)
+            self.layouts_menu.addAction(self.action_replace_layouts)
 
-        # Sistema
-        self.system_menu.addAction(self.action_restart_qgis)
+            # Sistema
+            self.system_menu.addAction(self.action_restart_qgis)
+            self.system_menu.addAction(self.action_logcat)
 
-        # Vetores
-        self.vectors_menu.addAction(self.action_coord_click)
-        self.vectors_menu.addAction(self.action_vector_fields)
+            # Vetores
+            self.vectors_menu.addAction(self.action_coord_click)
+            self.vectors_menu.addAction(self.action_vector_fields)
 
-        # Menu principal
-        self.menu.addAction(self.action_about_dialog)
-        #self.menu.addAction(self.action_base_tool)
+            # Menu principal
+            self.menu.addAction(self.action_about_dialog)
+            
+            LogUtils.debug("Ações adicionadas aos menus com sucesso", tool=self.TOOL_KEY)
+        except Exception as e:
+            LogUtils.error(f"Erro ao adicionar ações aos menus: {str(e)}", tool=self.TOOL_KEY)
+            return
 
         # -------------------------
         # 6) TOOLBAR
         # -------------------------
- 
-        # ==================================================
-        # BOTÃO SISTEMA NA TOOLBAR (com dropdown)
-        # ==================================================
-        self._add_toolbar_dropdown(
-            title="Sistema",
-            main_action=self.action_restart_qgis,
-            secondary_actions=[self.action_restart_qgis]
-        )       
+        try:
+            # ==================================================
+            # BOTÃO SISTEMA NA TOOLBAR (com dropdown)
+            # ==================================================
+            self._add_toolbar_dropdown(
+                title="Sistema",
+                main_action=self.action_restart_qgis,
+                secondary_actions=[self.action_restart_qgis,
+                                   self.action_logcat,
+                                   self.action_about_dialog]
+            )       
 
-        # ==================================================
-        # BOTÃO LAYOUTS NA TOOLBAR (com dropdown)
-        # ==================================================
-        self._add_toolbar_dropdown(
-            title="Layouts",
-            main_action=self.action_export_all,
-            secondary_actions=[self.action_replace_layouts]
-        )
+            # ==================================================
+            # BOTÃO LAYOUTS NA TOOLBAR (com dropdown)
+            # ==================================================
+            self._add_toolbar_dropdown(
+                title="Layouts",
+                main_action=self.action_export_all,
+                secondary_actions=[self.action_replace_layouts]
+            )
 
-        # ==================================================
-        # BOTÃO CAMDAS NA TOOLBAR (com dropdown)
-        # ==================================================
-        self._add_toolbar_dropdown(
-            title="Vetores",
-            main_action=self.action_load_folder,
-            secondary_actions=[self.action_load_folder]
-        )
-        # ==================================================
-        # BOTÃO "VETORES" NA TOOLBAR (com dropdown)
-        # ==================================================
-        self._add_toolbar_dropdown(
-            title="Vetores",
-            #main_action=self.action_vector_fields,#padrao
-            main_action=self.action_copy_atributes,#editavel para debug
-            secondary_actions=[     self.action_coord_click,    
-                                    self.action_copy_atributes,                                                         
-                                    self.action_multpart,]
-        )
-        # ==================================================
-        # BOTÃO "AGRICULTURA DE PRECISÃO" NA TOOLBAR (com dropdown)
-        # ==================================================
-        self._add_toolbar_dropdown(
-            title="Agricultura de Precisão",
-            main_action=self.action_drone_coords,
-            secondary_actions=[self.action_gerar_rastro]
-        )        
-        # ==================================================
-        # BOTÃO "RASTER" NA TOOLBAR (com dropdown)
-        # ==================================================
+            # ==================================================
+            # BOTÃO CAMDAS NA TOOLBAR (com dropdown)
+            # ==================================================
+            self._add_toolbar_dropdown(
+                title="Vetores",
+                main_action=self.action_load_folder,
+                secondary_actions=[self.action_load_folder]
+            )
+            # ==================================================
+            # BOTÃO "VETORES" NA TOOLBAR (com dropdown)
+            # ==================================================
+            self._add_toolbar_dropdown(
+                title="Vetores",
+                #main_action=self.action_vector_fields,#padrao
+                main_action=self.action_copy_atributes,#editavel para debug
+                secondary_actions=[     self.action_coord_click,    
+                                        self.action_copy_atributes,                                                         
+                                        self.action_multpart,]
+            )
+            # ==================================================
+            # BOTÃO "AGRICULTURA DE PRECISÃO" NA TOOLBAR (com dropdown)
+            # ==================================================
+            self._add_toolbar_dropdown(
+                title="Agricultura de Precisão",
+                main_action=self.action_drone_coords,
+                secondary_actions=[self.action_gerar_rastro]
+            )        
+            # ==================================================
+            # BOTÃO "RASTER" NA TOOLBAR (com dropdown)
+            # ==================================================
 
-        self.toolbar.addSeparator()
+            self.toolbar.addSeparator()
+            LogUtils.debug("Botões de toolbar criados com sucesso", tool=self.TOOL_KEY)
+        except Exception as e:
+            LogUtils.error(f"Erro ao criar botões da toolbar: {str(e)}", tool=self.TOOL_KEY)
+            return
 
         # Salva todas as ações para cleanup
-        self.actions.extend([
-            self.action_export_all,
-            self.action_replace_layouts,
-            self.action_restart_qgis,
-            self.action_load_folder,
-            self.action_gerar_rastro,
-            self.action_about_dialog,
-            self.action_coord_click,
-            self.action_vector_fields,
-            self.action_drone_coords,
-            self.action_multpart,
-            self.action_copy_atributes
-        ])
+        try:
+            self.actions.extend([
+                self.action_export_all,
+                self.action_replace_layouts,
+                self.action_restart_qgis,
+                self.action_load_folder,
+                self.action_gerar_rastro,
+                self.action_about_dialog,
+                self.action_logcat,
+                self.action_coord_click,
+                self.action_vector_fields,
+                self.action_drone_coords,
+                self.action_multpart,
+                self.action_copy_atributes
+            ])
+            LogUtils.info("MTL Tools: GUI inicializada com sucesso", tool=self.TOOL_KEY)
+        except Exception as e:
+            LogUtils.error(f"Erro ao salvar ações para cleanup: {str(e)}", tool=self.TOOL_KEY)
 
 
     # =====================================================
     # DESCARREGAR PLUGIN
     # =====================================================
     def unload(self):
+        try:
+            # Remover provider do Processing
+            if self.provider:
+                QgsApplication.processingRegistry().removeProvider(self.provider)
+                LogUtils.info("Processing Provider removido com sucesso", tool=self.TOOL_KEY)
+        except Exception as e:
+            LogUtils.error(f"Erro ao remover Processing Provider: {str(e)}", tool=self.TOOL_KEY)
 
-        # Remover provider do Processing
-        if self.provider:
-            QgsApplication.processingRegistry().removeProvider(self.provider)
+        try:
+            # Remover ações do menu e toolbar
+            for act in self.actions:
+                self.iface.removePluginMenu("MTL Tools", act)
+                self.iface.removeToolBarIcon(act)
+            LogUtils.info("Ações removidas com sucesso", tool=self.TOOL_KEY)
+        except Exception as e:
+            LogUtils.error(f"Erro ao remover ações: {str(e)}", tool=self.TOOL_KEY)
 
-        # Remover ações do menu e toolbar
-        for act in self.actions:
-            self.iface.removePluginMenu("MTL Tools", act)
-            self.iface.removeToolBarIcon(act)
-
-        # Remover toolbar
-        if self.toolbar:
-            del self.toolbar
+        try:
+            # Remover toolbar
+            if self.toolbar:
+                del self.toolbar
+                LogUtils.info("Toolbar removida com sucesso", tool=self.TOOL_KEY)
+        except Exception as e:
+            LogUtils.error(f"Erro ao remover toolbar: {str(e)}", tool=self.TOOL_KEY)
+        
+        LogUtils.info("Plugin MTL Tools descarregado", tool=self.TOOL_KEY)
             
             
 #===========================FERRAMENTAS INSTANTANEAS DE SISTEMA===================================================================
@@ -271,27 +331,45 @@ class MTL_Tools:
     # EXECUTAR: Restart QGIS
     # =====================================================
     def run_restart_qgis(self):
-        from .plugins.restart_qgis import run_restart_qgis
-        run_restart_qgis(self.iface)        
+        try:
+            from .plugins.restart_qgis import run_restart_qgis
+            LogUtils.info("Iniciando plugin: Restart QGIS", tool=self.TOOL_KEY)
+            run_restart_qgis(self.iface)
+            LogUtils.info("Plugin Restart QGIS executado com sucesso", tool=self.TOOL_KEY)
+        except Exception as e:
+            LogUtils.error(f"Erro ao executar Restart QGIS: {str(e)}", tool=self.TOOL_KEY)
+            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro no plugin Restart QGIS:\n{str(e)}")
 
 #===========================FERRAMENTAS INSTANTANEAS===================================================================
     # =====================================================
     # EXECUTAR: Calcular Campos Vetoriais
     # =====================================================
     def run_vector_fields(self):
-        from .plugins.vector_field_plugin import VectorFieldPlugin
-        # manter referência viva
-        self.vector_field_plugin = VectorFieldPlugin(self.iface)
-        self.vector_field_plugin.run_vector_field()
+        try:
+            from .plugins.vector_field_plugin import VectorFieldPlugin
+            LogUtils.info("Iniciando plugin: Calcular Campos Vetoriais", tool=self.TOOL_KEY)
+            # manter referência viva
+            self.vector_field_plugin = VectorFieldPlugin(self.iface)
+            self.vector_field_plugin.run_vector_field()
+            LogUtils.info("Plugin Calcular Campos Vetoriais executado com sucesso", tool=self.TOOL_KEY)
+        except Exception as e:
+            LogUtils.error(f"Erro ao executar Calcular Campos Vetoriais: {str(e)}", tool=self.TOOL_KEY)
+            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro no plugin Calcular Campos Vetoriais:\n{str(e)}")
         
     # =====================================================
     # EXECUTAR: Converter para Multipart
     # =====================================================
     def run_multpart(self):
-        from .plugins.vector_multpart_plugin import VectorMultipartPlugin
-        # manter referência viva
-        self.vector_multpart_plugin = VectorMultipartPlugin(self.iface)
-        self.vector_multpart_plugin.run_multpart()
+        try:
+            from .plugins.vector_multpart_plugin import VectorMultipartPlugin
+            LogUtils.info("Iniciando plugin: Converter para Multipart", tool=self.TOOL_KEY)
+            # manter referência viva
+            self.vector_multpart_plugin = VectorMultipartPlugin(self.iface)
+            self.vector_multpart_plugin.run_multpart()
+            LogUtils.info("Plugin Converter para Multipart executado com sucesso", tool=self.TOOL_KEY)
+        except Exception as e:
+            LogUtils.error(f"Erro ao executar Converter para Multipart: {str(e)}", tool=self.TOOL_KEY)
+            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro no plugin Converter para Multipart:\n{str(e)}")
  
 #===========================FERRAMENTAS INSTANTANEA COM JANELA DE RESULTADOS=======================================================================
        
@@ -299,33 +377,72 @@ class MTL_Tools:
     # EXECUTAR: Obter Coordenadas ao Clicar no Mapa
     # =====================================================
     def run_coord_click(self):
-        from .plugins.coord_click_tool import CoordClickTool        
-        self.coord_click_tool = CoordClickTool(self.iface)
-        self.iface.mapCanvas().setMapTool(self.coord_click_tool)
+        try:
+            from .plugins.coord_click_tool import CoordClickTool
+            LogUtils.info("Ativando ferramenta: Capturar Coordenadas", tool=self.TOOL_KEY)
+            self.coord_click_tool = CoordClickTool(self.iface)
+            self.iface.mapCanvas().setMapTool(self.coord_click_tool)
+            LogUtils.info("Ferramenta Capturar Coordenadas ativada com sucesso", tool=self.TOOL_KEY)
+        except Exception as e:
+            LogUtils.error(f"Erro ao ativar Capturar Coordenadas: {str(e)}", tool=self.TOOL_KEY)
+            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro na ferramenta Capturar Coordenadas:\n{str(e)}")
         
 
 #===========================FERRAMENTAS DE JANELA COM SAIDA QGIS=======================================================================
     # =====================================================
     # EXECUTAR: Export All Layouts
-    # ===============================================   ======
+    # =====================================================
     def run_export_layouts(self):
-        from .plugins.export_all_layouts import ExportAllLayoutsDialog
-        dlg = ExportAllLayoutsDialog(self.iface)
-        dlg.exec()
+        try:
+            from .plugins.export_all_layouts import ExportAllLayoutsDialog
+            LogUtils.info("Abrindo diálogo: Exportar todos os Layouts", tool=self.TOOL_KEY)
+            dlg = ExportAllLayoutsDialog(self.iface)
+            dlg.exec()
+            LogUtils.info("Diálogo Exportar Layouts fechado", tool=self.TOOL_KEY)
+        except Exception as e:
+            LogUtils.error(f"Erro ao executar Exportar Layouts: {str(e)}", tool=self.TOOL_KEY)
+            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro no plugin Exportar Layouts:\n{str(e)}")
 
     # =====================================================
     # EXECUTAR: Gerar Rastro Implemento (painel)
     # =====================================================
     def run_gerar_rastro(self):
-        from .plugins.gerar_rastro_plugin import run_gerar_rastro
-        self.gerar_rastro_dlg = run_gerar_rastro(self.iface)
-        
+        try:
+            from .plugins.gerar_rastro_plugin import run_gerar_rastro
+            LogUtils.info("Abrindo diálogo: Gerar Rastro Implemento", tool=self.TOOL_KEY)
+            self.gerar_rastro_dlg = run_gerar_rastro(self.iface)
+            LogUtils.info("Diálogo Gerar Rastro Implemento aberto com sucesso", tool=self.TOOL_KEY)
+        except Exception as e:
+            LogUtils.error(f"Erro ao executar Gerar Rastro Implemento: {str(e)}", tool=self.TOOL_KEY)
+            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro no plugin Gerar Rastro Implemento:\n{str(e)}")
+    # =====================================================
+    # EXECUTAR: Logcat Tool
+    # =====================================================
+    def run_logcat(self):
+        try:
+            from .plugins.logcat.logcat_plugin import run
+            LogUtils.info("Abrindo diálogo: Logcat - Viewer de Logs", tool=self.TOOL_KEY)
+            self.logcat_dlg = run(self.iface)
+            LogUtils.info("Diálogo Logcat aberto com sucesso", tool=self.TOOL_KEY)
+        except Exception as e:
+            LogUtils.error(f"Erro ao executar Logcat: {str(e)}", tool=self.TOOL_KEY)
+            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro no plugin Logcat:\n{str(e)}")
+
+
+
+   
     # =====================================================
     # EXECUTAR: Obter Coordenadas de Drone
     # =====================================================
     def run_drone_coords(self):
-        from .plugins.drone_cordinates import run_drone_cordinates
-        self.drone_cordinates_dlg =run_drone_cordinates(self.iface)
+        try:
+            from .plugins.drone_cordinates import run_drone_cordinates
+            LogUtils.info("Abrindo diálogo: Obter Coordenadas de Drone", tool=self.TOOL_KEY)
+            self.drone_cordinates_dlg = run_drone_cordinates(self.iface)
+            LogUtils.info("Diálogo Obter Coordenadas de Drone aberto com sucesso", tool=self.TOOL_KEY)
+        except Exception as e:
+            LogUtils.error(f"Erro ao executar Obter Coordenadas de Drone: {str(e)}", tool=self.TOOL_KEY)
+            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro no plugin Obter Coordenadas de Drone:\n{str(e)}")
 
 
        
@@ -336,40 +453,71 @@ class MTL_Tools:
     # EXECUTAR: Replace Text in Layouts
     # =====================================================
     def run_replace_layouts(self):
-        from .plugins.replace_in_layouts import run_replace_in_layouts
-        self.replace_layouts_dlg =run_replace_in_layouts(self.iface)
+        try:
+            from .plugins.replace_in_layouts import run_replace_in_layouts
+            LogUtils.info("Abrindo diálogo: Substituir textos nos Layouts", tool=self.TOOL_KEY)
+            self.replace_layouts_dlg = run_replace_in_layouts(self.iface)
+            LogUtils.info("Diálogo Substituir Layouts aberto com sucesso", tool=self.TOOL_KEY)
+        except Exception as e:
+            LogUtils.error(f"Erro ao executar Substituir Layouts: {str(e)}", tool=self.TOOL_KEY)
+            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro no plugin Substituir Layouts:\n{str(e)}")
 
 
     # =====================================================
     # EXECUTAR: Load Folder Layers
     # =====================================================
     def run_load_folder(self):
-        from .plugins.load_folder_layers import run_load_folder_layers
-        run_load_folder_layers(self.iface)
+        try:
+            from .plugins.load_folder_layers import run_load_folder_layers
+            LogUtils.info("Iniciando plugin: Carregar pasta de arquivos", tool=self.TOOL_KEY)
+            run_load_folder_layers(self.iface)
+            LogUtils.info("Plugin Carregar pasta de arquivos executado com sucesso", tool=self.TOOL_KEY)
+        except Exception as e:
+            LogUtils.error(f"Erro ao executar Carregar pasta de arquivos: {str(e)}", tool=self.TOOL_KEY)
+            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro no plugin Carregar pasta:\n{str(e)}")
 
  
     # =====================================================
     # EXECUTAR: About Dialog
     # =====================================================
     def run_about_dialog(self):
-        from .plugins.about_dialog import run_about_dialog
-        run_about_dialog(self.iface)
+        try:
+            from .plugins.about_dialog import run_about_dialog
+            LogUtils.info("Abrindo diálogo: Sobre o MTL Tools", tool=self.TOOL_KEY)
+            run_about_dialog(self.iface)
+            LogUtils.info("Diálogo Sobre MTL Tools fechado", tool=self.TOOL_KEY)
+        except Exception as e:
+            LogUtils.error(f"Erro ao executar Sobre o MTL Tools: {str(e)}", tool=self.TOOL_KEY)
+            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro ao abrir Sobre MTL Tools:\n{str(e)}")
         
     # =====================================================
     # EXECUTAR: Base Tool
     # =====================================================
     def run_base_tool(self):
-        from .plugins.base_tool import run_base_tool
-        run_base_tool(self.iface)
+        try:
+            from .plugins.base_tool import run_base_tool
+            LogUtils.info("Iniciando plugin: Base Tool", tool=self.TOOL_KEY)
+            run_base_tool(self.iface)
+            LogUtils.info("Plugin Base Tool executado com sucesso", tool=self.TOOL_KEY)
+        except Exception as e:
+            LogUtils.error(f"Erro ao executar Base Tool: {str(e)}", tool=self.TOOL_KEY)
+            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro no plugin Base Tool:\n{str(e)}")
         
     # =====================================================
     # EXECUTAR: Copiar Atributos entre Camadas
     # =====================================================
     def run_copy_atributes(self):
-        from .plugins.copy_attributes_plugin import run_copy_attributes
-        self.copy_attributes_dlg = run_copy_attributes(self.iface)
+        try:
+            from .plugins.copy_attributes_plugin import run_copy_attributes
+            LogUtils.info("Abrindo diálogo: Copiar Atributos", tool=self.TOOL_KEY)
+            self.copy_attributes_dlg = run_copy_attributes(self.iface)
+            LogUtils.info("Diálogo Copiar Atributos aberto com sucesso", tool=self.TOOL_KEY)
+        except Exception as e:
+            LogUtils.error(f"Erro ao executar Copiar Atributos: {str(e)}", tool=self.TOOL_KEY)
+            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro no plugin Copiar Atributos:\n{str(e)}")
 
         
+
 
         
     
@@ -416,6 +564,3 @@ class MTL_Tools:
             self.toolbar.addSeparator()
 
         return widget_action
-
-
-

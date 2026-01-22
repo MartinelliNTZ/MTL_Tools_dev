@@ -35,6 +35,7 @@ BUGS CONHECIDOS
     - impedir que os plugins trave o qgis em todas as ferramentas
     - Ferramenta de calculo ta deixando a camda edital realizando e ainda dando msg de erro
     - Arquivo shp precisa sempre executar 2 vezes para substituir(impossivel de resolver )
+    - ferramenta de carregamento de pastas trava ao 
 
 ferramentas = name                              tipo                            produto                     risco
     - 01: Exportar Todos os Layouts             janela                          pdf/png                     substituir produtos antigos
@@ -48,7 +49,7 @@ ferramentas = name                              tipo                            
     - 09: Obter Coordenadas de Drone            janela                          vetor                       travamento do qgis por excesso de dados
     - 10: Converter Multipart                   instantanea                     nenhum                      manipulacao de vetores/perda de dados 
     - 11: Copiar Atributos de Vetores           janela                          atributos nos vetores       manipulacao de vetores/perda de dados por substituicao
-    - 12:
+    - 12: Logcat viewere                        Janela multcore                 nenhum                      nenhum
     - 13:
     - 14:
     - 15:
@@ -60,11 +61,13 @@ changelog=
     - Novas classes para lidar com vetores (; - VectorLayerSource.py; - VectorLayerProjection.py; - VectorLayerGeometry.py; - VectorLayerMetrics.py; - VectorLayerAttributes.py)
     - novas classes para lidar com raster; - RasterLayerSource.py; - RasterLayerProjection.py; - RasterLayerProcessing.py; - RasterLayerMetrics.py; - RasterLayerRendering.py_
     - classe para fazer a transição entre dados vetoriais e raster. - RasterVectorBridge.py;
+    - Nova Ferramenta: logcat para depurtrcacao de erros (100% gpt nao e possivel dar manutencao)
+    - Documentação de cenarios: 8 e 10 e 11
     1.4.0.6
     -Ferramentas normalizadas = 5 e 11(novamente)- padronicao fracassada por
     1.4.0 - 2026/01/19
     - Nova ferramenta: transformação de multipart para part simples
-    - Documentação de cenarios 8 e 10 e 11
+    - Documentação de cenarios: 8 e 10 e 11
     - Alterada a infodialog para exibir markdown corretamente
     - Nova ferramenta: Tranferidor de atributos entre camadas vetoriais
     - Criação de BasePluginMTL para normalizacao do codigo: 

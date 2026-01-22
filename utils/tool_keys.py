@@ -3,6 +3,7 @@
 
 class ToolKey:
     # plugins/
+    MTL_TOOLS_PLUGIN  = "mtl_tools_plugin"
     EXPORT_ALL_LAYOUTS = "export_all_layouts"
     DRONE_COORDINATES = "drone_coordinates"
     LOAD_FOLDER_LAYERS = "load_folder_layers"
@@ -25,6 +26,7 @@ class ToolKey:
     # Cores por tool_key (toolbar-first, semântica)
     TOOL_KEY_COLORS = {
         # === Toolbar / ações principais ===
+        MTL_TOOLS_PLUGIN: "#804E0A",  # laranja claro → plugin principal
         EXPORT_ALL_LAYOUTS: "#4ECDC4",  # turquesa → exportação / layout
         DRONE_COORDINATES: "#45B7D1",  # azul → coordenadas / espacial
         LOAD_FOLDER_LAYERS: "#96CEB4",  # verde → carga de dados

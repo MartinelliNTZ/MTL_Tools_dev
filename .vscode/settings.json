@@ -1,6 +1,9 @@
 {
     "chat.tools.terminal.autoApprove": {
         "Test-Path": true,
-        "Get-Item": true
-    }
+        "Get-Item": true,
+        "ForEach-Object": true,
+        "Move-Item": true
+    },
+    "chat.agent.maxRequests": 150
 }

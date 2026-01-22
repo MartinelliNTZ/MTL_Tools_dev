@@ -23,11 +23,11 @@ class LogUtils:
     CRITICAL = "CRITICAL"
     # Cores para níveis de log
     LEVEL_COLORS = {
-        'DEBUG': '#9CA3AF',      # Cinza
-        'INFO': '#10B981',       # Verde
-        'WARNING': '#F59E0B',    # Âmbar
-        'ERROR': '#EF4444',      # Vermelho
-        'CRITICAL': '#7C2D12'    # Marrom escuro
+        'DEBUG': '#9CA3AF',      # Cinza (suave)
+        'INFO': '#10B981',       # Verde (informação)
+        'WARNING': '#F59E0B',    # Âmbar (atenção)
+        'ERROR': '#DC2626',      # Vermelho forte (erro)
+        'CRITICAL': '#991B1B'    # Vermelho escuro muito forte (crítico)
     }
 
     _lock = threading.Lock()
