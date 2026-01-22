@@ -32,7 +32,7 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
         self.setMinimumWidth(520)
 
         icon_path = os.path.join(
-            os.path.dirname(__file__), "..", "icons", "mtl_tools_icon.png"
+            os.path.dirname(__file__), "..", "resources","icons", "mtl_tools_icon.png"
         )
         if os.path.exists(icon_path):
             self.setWindowIcon(QIcon(icon_path))

@@ -149,7 +149,7 @@ class ElevationAnalisys(QgsProcessingAlgorithm):
 
     # ------------------------ UI INFO ------------------------
     def icon(self):
-        path = os.path.join(os.path.dirname(__file__), "..", "icons", "raster_mass.png")
+        path = os.path.join(os.path.dirname(__file__), "..", "resources","icons", "raster_mass.ico")
         return QIcon(path)
 
     def group(self):

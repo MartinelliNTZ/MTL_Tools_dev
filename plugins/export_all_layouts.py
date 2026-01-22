@@ -31,7 +31,7 @@ class ExportAllLayoutsDialog(QDialog):
         self.setWindowTitle("MTL Tools - Export All Layouts")
         self.setMinimumWidth(450)
 
-        icon_path = os.path.join(os.path.dirname(__file__), "..","icons", "export_icon.png")
+        icon_path = os.path.join(os.path.dirname(__file__),"..", "resources","icons", "export_icon.ico")
         if os.path.exists(icon_path):
             self.setWindowIcon(QIcon(icon_path))
 

@@ -17,7 +17,7 @@ class VectorMultipartPlugin(BasePluginMTL):
 
     def initGui(self):
         self.create_action(
-            "../icons/multipart.png",
+            "../resources/icons/multipart.png",
             "Converter para Multipart",
             self.run_multpart
         )

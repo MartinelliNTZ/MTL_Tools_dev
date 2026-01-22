@@ -30,7 +30,7 @@ class DroneCordinates(QDialog):
         self.setWindowTitle("MTL Tools — Coordenadas de Drone")
         self.setMinimumWidth(420)
 
-        icon_path = os.path.join(os.path.dirname(__file__), "..", "icons", "coord.png")
+        icon_path = os.path.join(os.path.dirname(__file__), "..", "resources","icons", "coord.ico")
         if os.path.exists(icon_path):
             self.setWindowIcon(QIcon(icon_path))
 

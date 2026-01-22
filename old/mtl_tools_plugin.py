@@ -49,22 +49,22 @@ class MTL_Tools:
 
         # Submenus        
         self.agriculture_menu = QMenu("Agricultura de Precisão", self.menu)
-        icon = QIcon(os.path.join(os.path.dirname(__file__), "icons", "agriculture.png"))
+        icon = QIcon(os.path.join(os.path.dirname(__file__), "resources","icons", "agriculture.png"))
         self.agriculture_menu.setIcon(icon)
         self.layers_menu = QMenu("Camadas", self.menu)
-        icon = QIcon(os.path.join(os.path.dirname(__file__), "icons", "layer.png"))
+        icon = QIcon(os.path.join(os.path.dirname(__file__), "resources","icons", "layer.png"))
         self.layers_menu.setIcon(icon)
         self.layouts_menu = QMenu("Layouts", self.menu)
-        icon = QIcon(os.path.join(os.path.dirname(__file__), "icons", "layout.png"))
+        icon = QIcon(os.path.join(os.path.dirname(__file__), "resources","icons", "layout.png"))
         self.layouts_menu.setIcon(icon)
         self.raster_menu = QMenu("Raster", self.menu)
-        icon = QIcon(os.path.join(os.path.dirname(__file__), "icons", "raster.png"))
+        icon = QIcon(os.path.join(os.path.dirname(__file__), "resources","icons", "raster.png"))
         self.raster_menu.setIcon(icon)
         self.system_menu = QMenu("Sistema", self.menu)
-        icon = QIcon(os.path.join(os.path.dirname(__file__), "icons", "system.png"))
+        icon = QIcon(os.path.join(os.path.dirname(__file__), "resources","icons", "system.png"))
         self.system_menu.setIcon(icon)
         self.vectors_menu = QMenu("Vetores", self.menu)
-        icon = QIcon(os.path.join(os.path.dirname(__file__), "icons", "vector.png"))
+        icon = QIcon(os.path.join(os.path.dirname(__file__), "resources","icons", "vector.png"))
         self.vectors_menu.setIcon(icon)
 
         # Adiciona submenus ao menu principal
@@ -79,54 +79,54 @@ class MTL_Tools:
         # 4) CONFIGURAÇÃO DAS AÇÕES (ORDEM NUMÉRICA)
         # -------------------------
         # Export All Layouts
-        export_icon = os.path.join(os.path.dirname(__file__), "icons", "export_icon.png")
+        export_icon = os.path.join(os.path.dirname(__file__), "resources","icons", "export_icon.ico")
         self.action_export_all = QAction(QIcon(export_icon), "Exportar todos os Layouts", self.iface.mainWindow())
         self.action_export_all.triggered.connect(self.run_export_layouts)
 
         # Replace in Layouts
-        replace_icon = os.path.join(os.path.dirname(__file__), "icons", "replace_in_layouts.png")
+        replace_icon = os.path.join(os.path.dirname(__file__), "resources","icons", "replace_in_layouts.ico")
         self.action_replace_layouts = QAction(QIcon(replace_icon), "Substituir textos nos Layouts", self.iface.mainWindow())
         self.action_replace_layouts.triggered.connect(self.run_replace_layouts)
 
         # Restart QGIS
-        restart_icon = os.path.join(os.path.dirname(__file__), "icons", "restart_qgis.png")
+        restart_icon = os.path.join(os.path.dirname(__file__), "resources","icons", "restart_qgis.ico")
         self.action_restart_qgis = QAction(QIcon(restart_icon), "Salvar, Fechar e Reabrir Projeto", self.iface.mainWindow())
         self.action_restart_qgis.triggered.connect(self.run_restart_qgis)
 
         # Carregar pasta de arquivos
-        load_icon = os.path.join(os.path.dirname(__file__), "icons", "load_folder.png")
+        load_icon = os.path.join(os.path.dirname(__file__), "resources","icons", "load_folder.ico")
         self.action_load_folder = QAction(QIcon(load_icon), "Carregar pasta de arquivos", self.iface.mainWindow())
         self.action_load_folder.triggered.connect(self.run_load_folder)
 
         # Gerar Rastro Implemento
-        gerar_icon = os.path.join(os.path.dirname(__file__), "icons", "gerar_rastro.png")
+        gerar_icon = os.path.join(os.path.dirname(__file__), "resources","icons", "gerar_rastro.ico")
         self.action_gerar_rastro = QAction(QIcon(gerar_icon), "Gerar Rastro Implemento", self.iface.mainWindow())
         self.action_gerar_rastro.triggered.connect(self.run_gerar_rastro)
 
         # About Dialog
-        about_icon = os.path.join(os.path.dirname(__file__), "icons", "about.png")
+        about_icon = os.path.join(os.path.dirname(__file__), "resources","icons", "about.ico")
         self.action_about_dialog = QAction(QIcon(about_icon), "Sobre o MTL Tools", self.iface.mainWindow())
         self.action_about_dialog.triggered.connect(self.run_about_dialog)
         # base tool
-        base_tool_icon = os.path.join(os.path.dirname(__file__), "icons", "mtl_agro.png")
+        base_tool_icon = os.path.join(os.path.dirname(__file__), "resources","icons", "mtl_agro.png")
         self.action_base_tool = QAction(QIcon(base_tool_icon), "Sobre o MTL Tools", self.iface.mainWindow())
         self.action_base_tool.triggered.connect(self.run_base_tool)
 
 
         # Capturar Coordenadas
-        coord_icon = os.path.join(os.path.dirname(__file__), "icons", "coord.png")
+        coord_icon = os.path.join(os.path.dirname(__file__), "resources","icons", "coord.ico")
         self.action_coord_click = QAction(QIcon(coord_icon), "Capturar Coordenadas", self.iface.mainWindow())
         self.action_coord_click.triggered.connect(self.run_coord_click)
         
         
         # Calcular campos vetoriais
-        vector_field_icon = os.path.join(os.path.dirname(__file__), "icons", "vector_field.png")
+        vector_field_icon = os.path.join(os.path.dirname(__file__), "resources","icons", "vector_field.ico")
         self.action_vector_fields = QAction(QIcon(vector_field_icon), "Calcular Campos Vetoriais", self.iface.mainWindow())
         self.action_vector_fields.triggered.connect(self.run_vector_fields)      
 
 
         # Obter coordenadas de drone
-        drone_coord_icon = os.path.join(os.path.dirname(__file__), "icons", "drone_cordinates.png")
+        drone_coord_icon = os.path.join(os.path.dirname(__file__), "resources","icons", "drone_cordinates.ico")
         self.action_drone_coords = QAction(QIcon(drone_coord_icon), "Obter Coordenadas de Drone", self.iface.mainWindow())
         self.action_drone_coords.triggered.connect(self.run_drone_coords)
 

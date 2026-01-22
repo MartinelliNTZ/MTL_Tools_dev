@@ -55,7 +55,7 @@ class DifferenceFieldsAlgorithm(QgsProcessingAlgorithm):
 
     def icon(self):
         icon_path = os.path.join(
-            os.path.dirname(__file__), "..", "icons", "field_diference.png"
+            os.path.dirname(__file__), "..", "resources","icons", "field_diference.ico"
         )
         return QIcon(icon_path)
 

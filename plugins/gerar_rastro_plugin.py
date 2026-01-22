@@ -34,7 +34,7 @@ class GerarRastroDialog(BasePluginMTL):
         self.iface = iface
         self.setWindowTitle("MTL Tools — Gerar Rastro Implemento")
         self.setMinimumWidth(360)
-        icon_path = os.path.join(os.path.dirname(__file__), "..", "icons", "gerar_rastro.ico")
+        icon_path = os.path.join(os.path.dirname(__file__), "..", "resources","icons", "gerar_rastro.ico")
         if os.path.exists(icon_path):
             self.setWindowIcon(QIcon(icon_path))
 

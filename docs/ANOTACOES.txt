@@ -55,11 +55,16 @@ ferramentas = name                              tipo                            
 
 
 changelog=
+    1.4.0.7
+    - mudanca na hierarquia das pastas.
+    - Novas classes para lidar com vetores (; - VectorLayerSource.py; - VectorLayerProjection.py; - VectorLayerGeometry.py; - VectorLayerMetrics.py; - VectorLayerAttributes.py)
+    - novas classes para lidar com raster; - RasterLayerSource.py; - RasterLayerProjection.py; - RasterLayerProcessing.py; - RasterLayerMetrics.py; - RasterLayerRendering.py_
+    - classe para fazer a transição entre dados vetoriais e raster. - RasterVectorBridge.py;
     1.4.0.6
-    -Ferramentas normalizadas = 5 e 11(novamente)
+    -Ferramentas normalizadas = 5 e 11(novamente)- padronicao fracassada por
     1.4.0 - 2026/01/19
-    - Nova ferramenta: tranformacao de multpart para part simples
-    - Documentacao de cenarios 8 e 10 e 11
+    - Nova ferramenta: transformação de multipart para part simples
+    - Documentação de cenarios 8 e 10 e 11
     - Alterada a infodialog para exibir markdown corretamente
     - Nova ferramenta: Tranferidor de atributos entre camadas vetoriais
     - Criação de BasePluginMTL para normalizacao do codigo: 

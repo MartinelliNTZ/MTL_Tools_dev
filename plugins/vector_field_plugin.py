@@ -19,7 +19,7 @@ class VectorFieldPlugin(BasePluginMTL):
 
     def initGui(self):
         self.create_action(
-            "../icons/vector_field.png",
+            "../resources/icons/vector_field.png",
             "Calcular Campos Vetoriais",
             self.run_vector_field
         )

@@ -24,7 +24,7 @@ class CopyAttributes(BasePluginMTL):
     def __init__(self, iface):
         super().__init__(iface.mainWindow())
         self.iface = iface
-        icon_path = os.path.join(os.path.dirname(__file__), "..", "icons", "copy_attributes.ico")
+        icon_path = os.path.join(os.path.dirname(__file__), "..", "resources","icons", "copy_attributes.ico")
         if os.path.exists(icon_path):
             self.setWindowIcon(QIcon(icon_path))
         self.PLUGIN_NAME = "Copiar Atributos"

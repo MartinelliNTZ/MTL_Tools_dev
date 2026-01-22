@@ -23,7 +23,7 @@ class AboutDialog(QDialog):
         # =====================================================
         logo_path = os.path.join(
             os.path.dirname(__file__),
-            "..", "icons", "mtl_agro.png"
+            "..", "resources","icons", "mtl_agro.png"
         )
 
         if os.path.exists(logo_path):

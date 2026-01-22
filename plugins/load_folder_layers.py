@@ -65,7 +65,7 @@ class LoadFolderLayersDialog(QDialog):
         self.setWindowTitle("MTL Tools — Carregar Pasta de Arquivos")
         self.setMinimumWidth(520)
 
-        icon_path = os.path.join(os.path.dirname(__file__), "..","icons", "load_folder.png")
+        icon_path = os.path.join(os.path.dirname(__file__),"..", "resources","icons", "load_folder.ico")
         if os.path.exists(icon_path):
             self.setWindowIcon(QIcon(icon_path))
 

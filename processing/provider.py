@@ -35,5 +35,5 @@ class MTLProvider(QgsProcessingProvider):
         return "MTL Tools – Processamento"
     
     def icon(self):
-        path = os.path.join(os.path.dirname(__file__), "..", "icons", "mtl_tools_icon.png")
+        path = os.path.join(os.path.dirname(__file__), "..", "resources","icons", "mtl_tools_icon.ico")
         return QIcon(path)

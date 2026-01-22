@@ -102,7 +102,7 @@ class AttributeStatisticsAlgorithm(QgsProcessingAlgorithm):
         return "estatistica"
 
     def icon(self):
-        icon_path = os.path.join(os.path.dirname(__file__), "..", "icons", "attribute_stats.png")
+        icon_path = os.path.join(os.path.dirname(__file__), "..", "resources","icons", "attribute_stats.ico")
         return QIcon(icon_path) if os.path.exists(icon_path) else QIcon()
 
     def createInstance(self):
