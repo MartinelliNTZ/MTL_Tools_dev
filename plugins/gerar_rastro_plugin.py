@@ -20,7 +20,7 @@ from ..utils.qgis_messagem_util import QgisMessageUtil
 from ..utils.ui_widget_utils import  UiWidgetUtils
 from ..utils.project_utils import  ProjectUtils
 from ..utils.string_utils import StringUtils
-from ..utils.vector_utils import VectorUtils
+from ..utils.vector.VectorLayerGeometry import VectorLayerGeometry
 from ..core.config.LogUtils import LogUtils
 
 
@@ -136,7 +136,6 @@ class GerarRastroDialog(BasePluginMTL):
         except Exception as e:
             LogUtils.warning(f"Erro ao restaurar algumas preferências: {str(e)}", tool=self.TOOL_KEY)
         
-
     def _save_prefs(self):       
         LogUtils.debug("Salvando preferências da ferramenta", tool=self.TOOL_KEY)
         layer = self.cmb_layers.currentLayer()
@@ -163,13 +162,14 @@ class GerarRastroDialog(BasePluginMTL):
                 "Selecione uma camada de linhas válida."
             )
             return
-
+        #receber valores
         tam = float(self.spin_tam.value())
         save_to_folder = self.chk_save_file.isChecked()
         out_file = self.txt_output_file.text().strip() if save_to_folder else None
         only_selected = self.chk_only_selected.isChecked()
         LogUtils.info(f"Parâmetros: camada='{layer.name()}', tamanho={tam}m, selecionadas={only_selected}, salvar_arquivo={save_to_folder}", tool=self.TOOL_KEY)
-
+        
+        # executar
         out_layer = self.run(
             layer,
             tam,
@@ -242,10 +242,10 @@ class GerarRastroDialog(BasePluginMTL):
         # 2) validar tipo
         # -------------------------------------------------
         LogUtils.info("2/6] Validando tipo de camada", tool=self.TOOL_KEY)
-        layer_type = VectorUtils.get_layer_type(layer)
+        layer_type = VectorLayerGeometry.get_layer_type(layer)
         LogUtils.debug(f"Tipo de camada detectado: {layer_type}", tool=self.TOOL_KEY)
-        
-        if layer_type != VectorUtils.TYPE_LINE:
+
+        if layer_type != QgsWkbTypes.LineGeometry:
             LogUtils.error(f"Tipo de camada inválido. Esperado: LINE, Obtido: {layer_type}", tool=self.TOOL_KEY)
             QgisMessageUtil.modal_error(
                 self.iface,
@@ -260,7 +260,7 @@ class GerarRastroDialog(BasePluginMTL):
         LogUtils.info("3/6] Processando seleção de feições", tool=self.TOOL_KEY)
         if only_selected:
             LogUtils.debug(f"Filtrando apenas feições selecionadas. Total selecionadas: {layer.selectedFeatureCount()}", tool=self.TOOL_KEY)
-            layer_sel, err = VectorUtils.get_selected_features(layer)
+            layer_sel, err = VectorLayerGeometry.get_selected_features(layer)
             if err:
                 LogUtils.error(f"Erro ao obter feições selecionadas: {err}", tool=self.TOOL_KEY)
                 QgisMessageUtil.modal_error(self.iface, err)
@@ -276,9 +276,8 @@ class GerarRastroDialog(BasePluginMTL):
         LogUtils.info("4/6] Explodindo linhas em segmentos", tool=self.TOOL_KEY)
         LogUtils.debug(f"Iniciando explosão de {layer.featureCount()} feições...", tool=self.TOOL_KEY)
         
-        exploded = VectorUtils.explode_lines(
-            layer=layer,
-            feedback=feedback
+        exploded = VectorLayerGeometry.explode_multipart_features(
+            layer=layer , external_tool_key=self.TOOL_KEY           
         )
 
         if exploded is None:
@@ -298,11 +297,10 @@ class GerarRastroDialog(BasePluginMTL):
         distance = float(tamanhoimplemento) / 2.0
         LogUtils.debug(f"Distância de buffer: {distance}m (metade do tamanho: {tamanhoimplemento}m)", tool=self.TOOL_KEY)
 
-        buffer_layer = VectorUtils.buffer_layer(
+        buffer_layer = VectorLayerGeometry.create_buffer_geometry(
             layer=exploded,
             distance=distance,
-            output_path=None,  # 👈 SEMPRE memory aqui
-            feedback=feedback
+            output_path=None,  # 👈 SEMPRE memory aqui            
         )
 
         if buffer_layer is None:

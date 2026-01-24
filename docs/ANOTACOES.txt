@@ -36,6 +36,7 @@ BUGS CONHECIDOS
     - Ferramenta de calculo ta deixando a camda edital realizando e ainda dando msg de erro
     - Arquivo shp precisa sempre executar 2 vezes para substituir(impossivel de resolver )
     - ferramenta de carregamento de pastas trava ao 
+    - logcat trava as vezes pq ta escrevendo e lendo os logs em tempo real
 
 ferramentas = name                              tipo                            produto                     risco
     - 01: Exportar Todos os Layouts             janela                          pdf/png                     substituir produtos antigos
@@ -56,6 +57,10 @@ ferramentas = name                              tipo                            
 
 
 changelog=
+    1.4.0.9  --- proximo passo desacoplar vectorutils de BasePluginMTL
+    1.4.0.8
+    - iniciando VectorLayerGeometry
+    - VectorUtils desacoplada de gerar rastro
     1.4.0.7
     - mudanca na hierarquia das pastas.
     - Novas classes para lidar com vetores (; - VectorLayerSource.py; - VectorLayerProjection.py; - VectorLayerGeometry.py; - VectorLayerMetrics.py; - VectorLayerAttributes.py)

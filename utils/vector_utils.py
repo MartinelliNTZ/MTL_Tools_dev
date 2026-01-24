@@ -573,7 +573,7 @@ class VectorUtils:
                 'INPUT': layer,
                 'OUTPUT': 'memory:'
             },
-            feedback=feedback
+        
         )
 
         return result.get('OUTPUT')
