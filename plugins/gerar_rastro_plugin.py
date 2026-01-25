@@ -78,19 +78,18 @@ class GerarRastroDialog(BasePluginMTL):
         #---------------------------------------
 
         # salvar em arquivo ou temporário (campo único: arquivo completo)
-        save_layout, self.chk_save_file, self.txt_output_file = (
-            OldUiWidgetUtils.create_save_file_selector(
-                parent=self
-            )
+   
+        
+        #novo
+        save_layout, self.save_selector = WidgetFactory.create_save_file_selector(
+            parent=self,
+            file_filter=StringUtils.FILTER_VECTOR,
         )
         layout.addLayout(save_layout)
         LogUtils.debug("Componente de salvamento de arquivo adicionado", tool=self.TOOL_KEY)
 
+
         # aplicar estilo QML
-        h_qml, self.chk_apply_style, self.txt_qml = OldUiWidgetUtils.create_qml_selector(
-            parent=self
-        )
-        layout.addLayout(h_qml)
         #novo
         qml_layout, self.qml_selector = WidgetFactory.create_qml_selector(
             parent=self
@@ -129,29 +128,31 @@ class GerarRastroDialog(BasePluginMTL):
         last_file = prefs.get('last_output_file', '')
         apply_style = prefs.get('apply_style', False)
         last_qml = prefs.get('last_qml_path', '')
+        self.qml_selector.set_qml_path(last_qml)
+        self.qml_selector.set_enabled(bool(apply_style))
+
         if last_tam is not None:
             try:
                 self.spin_tam.setValue(float(last_tam))
             except Exception:
                 pass
 
-        try:
-            self.chk_save_file.setChecked(bool(save_to_folder))
-            self.txt_output_file.setText(last_file)
-            self.chk_apply_style.setChecked(bool(apply_style))
-            self.txt_qml.setText(last_qml)
+        try:            
+            self.save_selector.set_enabled(bool(save_to_folder))
+
+            self.save_selector.set_qml_path(last_file)
             LogUtils.debug("Preferências carregadas e aplicadas com sucesso", tool=self.TOOL_KEY)
         except Exception as e:
             LogUtils.warning(f"Erro ao restaurar algumas preferências: {str(e)}", tool=self.TOOL_KEY)
         
     def _save_prefs(self):       
         LogUtils.debug("Salvando preferências da ferramenta", tool=self.TOOL_KEY)
-        data = []
+        data = {}
         data['last_implement_length'] = float(self.spin_tam.value())
-        data['save_to_folder'] = bool(self.chk_save_file.isChecked())
-        data['last_output_file'] = self.txt_output_file.text().strip()
-        data['apply_style'] = bool(self.chk_apply_style.isChecked())
-        data['last_qml_path'] = self.txt_qml.text().strip()
+        data['save_to_folder'] = bool(self.save_selector.is_enabled())
+        data['last_output_file'] = self.save_selector.get_qml_path()
+        data['apply_style'] = bool(self.qml_selector.is_enabled())
+        data['last_qml_path'] = self.qml_selector.get_qml_path()
         
         save_tool_prefs(self.TOOL_KEY, data)
         LogUtils.debug(f"Preferências salvas: tamanho={data['last_implement_length']}m, salvar_arquivo={data['save_to_folder']}", tool=self.TOOL_KEY)
@@ -169,8 +170,8 @@ class GerarRastroDialog(BasePluginMTL):
             return
         #receber valores
         tam = float(self.spin_tam.value())
-        save_to_folder = self.chk_save_file.isChecked()
-        out_file = self.txt_output_file.text().strip() if save_to_folder else None
+        save_to_folder = self.save_selector.get_qml_path()
+        out_file = self.save_selector.get_qml_path() if save_to_folder else None
         only_selected = self.layer_input.only_selected_enabled()
         LogUtils.info(f"Parâmetros: camada='{layer.name()}', tamanho={tam}m, selecionadas={only_selected}, salvar_arquivo={save_to_folder}", tool=self.TOOL_KEY)
         
@@ -188,13 +189,14 @@ class GerarRastroDialog(BasePluginMTL):
             LogUtils.error("Processamento cancelado ou falhou", tool=self.TOOL_KEY)
             return
 
-        # aplicar estilo (PADRÃO ÚNICO)
-        if self.chk_apply_style.isChecked():
-            qml = self.txt_qml.text().strip()
+        # aplicar estilo (PADRÃO ÚNICO)  
+        if self.qml_selector.is_enabled():
+            qml = self.qml_selector.get_qml_path()
             if qml:
                 LogUtils.info(f"Aplicando estilo QML: {qml}", tool=self.TOOL_KEY)
                 self.apply_qml_style(out_layer, qml)
                 LogUtils.debug("Estilo QML aplicado com sucesso", tool=self.TOOL_KEY)
+
 
 
         LogUtils.info("Processamento executado com sucesso", tool=self.TOOL_KEY)

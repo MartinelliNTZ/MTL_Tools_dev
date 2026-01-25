@@ -4,6 +4,8 @@
 
 class StringUtils:
     APP_NAME = "MTL Tools"
+    #Filtros de arquivos
+    FILTER_ALL = "All files (*.*)"
     FILTER_VECTOR = "Shapefile (*.shp);;GeoPackage (*.gpkg);;GeoJSON (*.geojson *.json);;KML (*.kml);;CSV (*.csv)"
     FILTER_QGIS_STYLE = 'QML files (*.qml)'
     VECTOR_DRIVERS = {

@@ -251,7 +251,8 @@ class MTL_Tools:
                 title="Vetores",
                 #main_action=self.action_vector_fields,#padrao
                 main_action=self.action_copy_atributes,#editavel para debug
-                secondary_actions=[     self.action_coord_click,    
+                secondary_actions=[     self.action_vector_fields,
+                                        self.action_coord_click,    
                                         self.action_copy_atributes,                                                         
                                         self.action_multpart,]
             )
@@ -260,8 +261,11 @@ class MTL_Tools:
             # ==================================================
             self._add_toolbar_dropdown(
                 title="Agricultura de Precisão",
-                main_action=self.action_drone_coords,
-                secondary_actions=[self.action_gerar_rastro]
+                #main_action=self.action_drone_coords,
+                main_action=self.action_gerar_rastro,
+                secondary_actions=[
+                    self.action_drone_coords,
+                    self.action_gerar_rastro]
             )        
             # ==================================================
             # BOTÃO "RASTER" NA TOOLBAR (com dropdown)

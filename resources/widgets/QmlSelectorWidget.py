@@ -16,8 +16,8 @@ class QmlSelectorWidget(QWidget):
         self,
         *,
         checkbox_text="Aplicar estilo (QML) ao resultado",
-        label_text="QML:",
-        file_filter=StringUtils.FILTER_QGIS_STYLE,
+        label_text="Arquivo:",
+        file_filter=StringUtils.FILTER_ALL,
         file_dialog_callback=None,
         parent=None
     ):
@@ -79,8 +79,10 @@ class QmlSelectorWidget(QWidget):
     # --------------------------------------------------
     def is_enabled(self) -> bool:
         return self._chk.isChecked()
+    def set_enabled(self, enabled: bool):
+        self._chk.setChecked(enabled)
 
-    def qml_path(self) -> str:
+    def get_qml_path(self) -> str:
         return self._txt.text().strip()
 
     def set_qml_path(self, path: str):

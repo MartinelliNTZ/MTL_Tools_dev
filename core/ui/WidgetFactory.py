@@ -7,7 +7,7 @@ from qgis.PyQt.QtCore import QObject, QEvent, Qt
 from qgis.gui import QgsMapLayerComboBox
 from ...utils.string_utils import StringUtils
 from ...resources.widgets.LayerInputWidget import LayerInputWidget
-from ...resources.widgets.qml_selector_widget import QmlSelectorWidget
+from ...resources.widgets.QmlSelectorWidget import QmlSelectorWidget
 
 
 class WidgetFactory:
@@ -21,7 +21,10 @@ class WidgetFactory:
             *,
             parent,
             separator_top=False,
-            separator_bottom=True
+            separator_bottom=True,
+            file_filter=StringUtils.FILTER_ALL,
+            checkbox_text="Titulo do checkbox",
+            label_text="Arquivo:"
     ):
         layout = QVBoxLayout()
 
@@ -30,7 +33,40 @@ class WidgetFactory:
 
         widget = QmlSelectorWidget(
             parent=parent,
-            file_dialog_callback=parent.select_file
+            file_dialog_callback=parent.select_file,
+            file_filter=file_filter,
+            checkbox_text=checkbox_text,
+            label_text=label_text,
+        )
+
+        layout.addWidget(widget)
+
+        if separator_bottom:
+            layout.addWidget(WidgetFactory.create_separator())
+
+        return layout, widget
+    
+    @staticmethod
+    def create_save_file_selector(
+            *,
+            parent,
+            separator_top=False,
+            separator_bottom=True,
+            file_filter=StringUtils.FILTER_ALL,
+        checkbox_text: str = "Salvar em arquivo (caso não marcado: camada temporária)",
+        label_text: str = "Salvar em (arquivo):",
+    ):
+        layout = QVBoxLayout()
+
+        if separator_top:
+            layout.addWidget(WidgetFactory.create_separator())
+
+        widget = QmlSelectorWidget(
+            parent=parent,
+            file_dialog_callback=parent.select_file,
+            file_filter=file_filter,
+            checkbox_text=checkbox_text,
+            label_text=label_text,
         )
 
         layout.addWidget(widget)
