@@ -32,6 +32,10 @@ class ClassColorProvider:
         Converte nome da classe em um valor de hue (0-359).
         Determinístico.
         """
+        # Garantir que class_name não é None
+        if class_name is None:
+            class_name = "UnknownClass"
+        
         # Usar hash SHA256 para boa distribuição
         h = hashlib.sha256(class_name.encode("utf-8")).hexdigest()
         # Pegar primeiros 8 caracteres hexadecimais
@@ -90,7 +94,12 @@ class ClassColorProvider:
         """
         Retorna cor hexadecimal para a classe.
         Sempre a mesma cor para a mesma classe.
+        Tolerante a None: usa "UnknownClass" como fallback.
         """
+        # Garantir que class_name não é None
+        if class_name is None:
+            class_name = "UnknownClass"
+        
         if class_name in self._cache:
             return self._cache[class_name]
         

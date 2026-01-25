@@ -7,7 +7,8 @@ from qgis.PyQt.QtCore import QObject, QEvent, Qt
 from qgis.gui import QgsMapLayerComboBox
 from ...utils.string_utils import StringUtils
 from ...resources.widgets.LayerInputWidget import LayerInputWidget
-from ...resources.widgets.QmlSelectorWidget import QmlSelectorWidget
+from ...resources.widgets.FileSelectorWidget import FileSelectorWidget
+from ...resources.widgets.BottomActionButtonsWidget import BottomActionButtonsWidget
 
 
 class WidgetFactory:
@@ -15,6 +16,36 @@ class WidgetFactory:
         super().__init__(combo)
         self.combo = combo
         self.iface = iface
+    @staticmethod
+    def create_bottom_action_buttons(
+        *,
+        parent,
+        run_callback,
+        close_callback,
+        info_callback=None,
+        separator_top=False,
+        separator_bottom=False,
+        tool_key=None,
+    ):
+        layout = QVBoxLayout()
+
+        if separator_top:
+            layout.addWidget(WidgetFactory.create_separator())
+
+        widget = BottomActionButtonsWidget(
+            parent=parent,
+            run_callback=run_callback,
+            close_callback=close_callback,
+            info_callback=info_callback,
+            tool_key=tool_key,
+        )
+
+        layout.addWidget(widget)
+        if separator_bottom:
+            layout.addWidget(WidgetFactory.create_separator())
+
+
+        return layout, widget
 
     @staticmethod
     def create_qml_selector(
@@ -22,16 +53,16 @@ class WidgetFactory:
             parent,
             separator_top=False,
             separator_bottom=True,
-            file_filter=StringUtils.FILTER_ALL,
-            checkbox_text="Titulo do checkbox",
-            label_text="Arquivo:"
+            file_filter=StringUtils.FILTER_QGIS_STYLE,
+            checkbox_text="Aplicar estilo QML",
+            label_text="QML:"
     ):
         layout = QVBoxLayout()
 
         if separator_top:
             layout.addWidget(WidgetFactory.create_separator())
 
-        widget = QmlSelectorWidget(
+        widget = FileSelectorWidget(
             parent=parent,
             file_dialog_callback=parent.select_file,
             file_filter=file_filter,
@@ -52,16 +83,16 @@ class WidgetFactory:
             parent,
             separator_top=False,
             separator_bottom=True,
-            file_filter=StringUtils.FILTER_ALL,
-        checkbox_text: str = "Salvar em arquivo (caso não marcado: camada temporária)",
-        label_text: str = "Salvar em (arquivo):",
+            file_filter=StringUtils.FILTER_VECTOR,
+            checkbox_text: str = "Salvar em arquivo (caso não marcado: camada temporária)",
+            label_text: str = "Salvar em:",
     ):
         layout = QVBoxLayout()
 
         if separator_top:
             layout.addWidget(WidgetFactory.create_separator())
 
-        widget = QmlSelectorWidget(
+        widget = FileSelectorWidget(
             parent=parent,
             file_dialog_callback=parent.select_file,
             file_filter=file_filter,
@@ -120,7 +151,9 @@ class WidgetFactory:
             minimum=0.0,
             maximum=99999999.0,
             value=0.0,
-            keyboard_tracking=False
+            keyboard_tracking=False,
+            separator_top=False,
+            separator_bottom=True
     ):
         """
         Cria um input numérico com label (QDoubleSpinBox)
@@ -150,6 +183,8 @@ class WidgetFactory:
         """
 
         layout = QHBoxLayout()
+        if separator_top:
+            layout.addWidget(WidgetFactory.create_separator())
 
         lbl = QLabel(label_text)
         layout.addWidget(lbl)
@@ -162,6 +197,8 @@ class WidgetFactory:
         spin.setValue(value)
 
         layout.addWidget(spin)
+        if separator_bottom:
+            layout.addWidget(WidgetFactory.create_separator())
 
         return layout, spin
 

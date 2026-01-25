@@ -9,15 +9,14 @@ from qgis.PyQt.QtGui import QIcon
 import os
 from pathlib import Path
 from typing import Optional
-import time
 
-from ..utils.log_utils import LogUtilsOld
+
+
 from ..utils.qgis_messagem_util import QgisMessageUtil
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
 from ..utils.tool_keys import ToolKey
 from ..plugins.base_plugin import BasePluginMTL
 from ..utils.qgis_messagem_util import QgisMessageUtil
-from ..utils.ui_widget_utils import  OldUiWidgetUtils
 from ..utils.project_utils import  ProjectUtils
 from ..utils.string_utils import StringUtils
 from ..utils.vector.VectorLayerGeometry import VectorLayerGeometry
@@ -34,19 +33,19 @@ class GerarRastroDialog(BasePluginMTL):
     def __init__(self, iface):
         super().__init__(iface.mainWindow())
         self.iface = iface
-        LogUtils.info("Inicializando diálogo Gerar Rastro Implemento", tool=self.TOOL_KEY)
+        LogUtils.log("Inicializando diálogo Gerar Rastro Implemento", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         self.setWindowTitle("MTL Tools — Gerar Rastro Implemento")
         self.setMinimumWidth(360)
         icon_path = os.path.join(os.path.dirname(__file__), "..", "resources","icons", "gerar_rastro.ico")
         if os.path.exists(icon_path):
             self.setWindowIcon(QIcon(icon_path))
-            LogUtils.debug(f"Ícone carregado de: {icon_path}", tool=self.TOOL_KEY)
+            LogUtils.log(f"Ícone carregado de: {icon_path}", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
 
-        LogUtils.debug("Construindo interface de usuário", tool=self.TOOL_KEY)
+        LogUtils.log("Construindo interface de usuário", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         self._build_ui()
-        LogUtils.debug("Carregando preferências do usuário", tool=self.TOOL_KEY)
+        LogUtils.log("Carregando preferências do usuário", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         self._load_prefs()
-        LogUtils.info("Diálogo Gerar Rastro Implemento inicializado com sucesso", tool=self.TOOL_KEY)
+        LogUtils.log("Diálogo Gerar Rastro Implemento inicializado com sucesso", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         
         
     def _build_ui(self):
@@ -54,25 +53,25 @@ class GerarRastroDialog(BasePluginMTL):
         # LAYOUT
         # -------------------------------------------------------
         layout = QVBoxLayout()
-        LogUtils.info("Construindo interface da ferramenta", tool=self.TOOL_KEY)
+        LogUtils.log("Construindo interface da ferramenta", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
 
 
         #novo
         l1, self.layer_input = WidgetFactory.create_layer_input(
             label_text="Camada de Linhas (INPUT):",
             filters=[QgsMapLayerProxyModel.LineLayer],
-            parent=self, separator_top=True
+            parent=self
         )
         layout.addLayout(l1)
 
-        LogUtils.debug("Componente de camada de entrada adicionado", tool=self.TOOL_KEY)
+        LogUtils.log("Componente de camada de entrada adicionado", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
 
         # tamanhoimplemento
         h2, self.spin_tam = WidgetFactory.create_double_spin_input(
             "Tamanho implemento: (sempre em metros)"
         )
         layout.addLayout(h2)
-        LogUtils.debug("Componente de tamanho de implemento adicionado", tool=self.TOOL_KEY)
+        LogUtils.log("Componente de tamanho de implemento adicionado", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         
 
         #---------------------------------------
@@ -86,7 +85,7 @@ class GerarRastroDialog(BasePluginMTL):
             file_filter=StringUtils.FILTER_VECTOR,
         )
         layout.addLayout(save_layout)
-        LogUtils.debug("Componente de salvamento de arquivo adicionado", tool=self.TOOL_KEY)
+        LogUtils.log("Componente de salvamento de arquivo adicionado", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
 
 
         # aplicar estilo QML
@@ -99,7 +98,7 @@ class GerarRastroDialog(BasePluginMTL):
         #----
 
 
-        LogUtils.debug("Componente de estilo QML adicionado", tool=self.TOOL_KEY)      
+        LogUtils.log("Componente de estilo QML adicionado", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")      
 
         # instruções
         self.instructions_file = os.path.join(
@@ -107,28 +106,29 @@ class GerarRastroDialog(BasePluginMTL):
         )      
          
         # buttons
-        layout.addLayout(
-            OldUiWidgetUtils.create_run_close_buttons(
-                self.on_run,
-                self.close,
-                info_callback=lambda: self.show_info_dialog(
-            "📘 Instruções – Gerar Rastro de Máquinas"
+        buttons_layout, self.action_buttons = WidgetFactory.create_bottom_action_buttons(
+            parent=self,
+            run_callback=self.on_run,
+            close_callback=self.close,
+            info_callback=lambda: self.show_info_dialog(
+                "📘 Instruções – Gerar Rastro de Máquinas"
+            ),
+            tool_key=self.TOOL_KEY,
         )
-            )
-        )
-        
+
+        layout.addLayout(buttons_layout)
         self.setLayout(layout)
-        LogUtils.info("Interface da ferramenta construída com sucesso", tool=self.TOOL_KEY)
+        LogUtils.log("Interface da ferramenta construída com sucesso", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
 
     def _load_prefs(self):
-        LogUtils.debug("Carregando preferências salvas da ferramenta", tool=self.TOOL_KEY)
+        LogUtils.log(f"Carregando preferências salvas da ferramenta. Self={self}", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         prefs = load_tool_prefs(self.TOOL_KEY)
         last_tam = prefs.get('last_implement_length')
         save_to_folder = prefs.get('save_to_folder', False)
         last_file = prefs.get('last_output_file', '')
         apply_style = prefs.get('apply_style', False)
         last_qml = prefs.get('last_qml_path', '')
-        self.qml_selector.set_qml_path(last_qml)
+        self.qml_selector.set_file_path(last_qml)
         self.qml_selector.set_enabled(bool(apply_style))
 
         if last_tam is not None:
@@ -140,29 +140,29 @@ class GerarRastroDialog(BasePluginMTL):
         try:            
             self.save_selector.set_enabled(bool(save_to_folder))
 
-            self.save_selector.set_qml_path(last_file)
-            LogUtils.debug("Preferências carregadas e aplicadas com sucesso", tool=self.TOOL_KEY)
+            self.save_selector.set_file_path(last_file)
+            LogUtils.log("Preferências carregadas e aplicadas com sucesso", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         except Exception as e:
-            LogUtils.warning(f"Erro ao restaurar algumas preferências: {str(e)}", tool=self.TOOL_KEY)
+            LogUtils.log(f"Erro ao restaurar algumas preferências: {str(e)}", level="WARNING", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         
     def _save_prefs(self):       
-        LogUtils.debug("Salvando preferências da ferramenta", tool=self.TOOL_KEY)
+        LogUtils.log("Salvando preferências da ferramenta", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         data = {}
         data['last_implement_length'] = float(self.spin_tam.value())
         data['save_to_folder'] = bool(self.save_selector.is_enabled())
-        data['last_output_file'] = self.save_selector.get_qml_path()
+        data['last_output_file'] = self.save_selector.get_file_path()
         data['apply_style'] = bool(self.qml_selector.is_enabled())
-        data['last_qml_path'] = self.qml_selector.get_qml_path()
+        data['last_qml_path'] = self.qml_selector.get_file_path()
         
         save_tool_prefs(self.TOOL_KEY, data)
-        LogUtils.debug(f"Preferências salvas: tamanho={data['last_implement_length']}m, salvar_arquivo={data['save_to_folder']}", tool=self.TOOL_KEY)
+        LogUtils.log(f"Preferências salvas: tamanho={data['last_implement_length']}m, salvar_arquivo={data['save_to_folder']}", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
 
     def on_run(self):
-        LogUtils.info("Iniciando processamento: Gerar Rastro Implemento", tool=self.TOOL_KEY)
+        LogUtils.log("Iniciando processamento: Gerar Rastro Implemento", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         layer = self.layer_input.current_layer()
 
         if not isinstance(layer, QgsVectorLayer):
-            LogUtils.warning("Nenhuma camada de linhas válida selecionada", tool=self.TOOL_KEY)
+            LogUtils.log("Nenhuma camada de linhas válida selecionada", level="WARNING", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
             QgisMessageUtil.bar_warning(
                 self.iface,
                 "Selecione uma camada de linhas válida."
@@ -170,10 +170,19 @@ class GerarRastroDialog(BasePluginMTL):
             return
         #receber valores
         tam = float(self.spin_tam.value())
-        save_to_folder = self.save_selector.get_qml_path()
-        out_file = self.save_selector.get_qml_path() if save_to_folder else None
+        save_to_folder = self.save_selector.is_enabled()
+        out_file = self.save_selector.get_file_path().strip() if save_to_folder else ""
+        
+        # Validar: output_path deve ser None se não for um caminho válido
+        # (vazio, começa com "memory", ou contém caracteres inválidos de caminho)
+        if save_to_folder and out_file and not out_file.startswith("memory"):
+            output_path = out_file
+        else:
+            save_to_folder = False  # Forçar salvar em memória se arquivo inválido
+            output_path = None
+        
         only_selected = self.layer_input.only_selected_enabled()
-        LogUtils.info(f"Parâmetros: camada='{layer.name()}', tamanho={tam}m, selecionadas={only_selected}, salvar_arquivo={save_to_folder}", tool=self.TOOL_KEY)
+        LogUtils.log(f"Parâmetros: camada='{layer.name()}', tamanho={tam}m, selecionadas={only_selected}, salvar_arquivo={save_to_folder}", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         
         # executar
         out_layer = self.run(
@@ -181,25 +190,25 @@ class GerarRastroDialog(BasePluginMTL):
             tam,
             only_selected=only_selected,
             save_to_folder=save_to_folder,
-            output_path=out_file
+            output_path=output_path
         )
 
         # se cancelou ou falhou
         if out_layer is None:
-            LogUtils.error("Processamento cancelado ou falhou", tool=self.TOOL_KEY)
+            LogUtils.log("Processamento cancelado ou falhou", level="ERROR", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
             return
 
         # aplicar estilo (PADRÃO ÚNICO)  
         if self.qml_selector.is_enabled():
-            qml = self.qml_selector.get_qml_path()
+            qml = self.qml_selector.get_file_path()
             if qml:
-                LogUtils.info(f"Aplicando estilo QML: {qml}", tool=self.TOOL_KEY)
+                LogUtils.log(f"Aplicando estilo QML: {qml}", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
                 self.apply_qml_style(out_layer, qml)
-                LogUtils.debug("Estilo QML aplicado com sucesso", tool=self.TOOL_KEY)
+                LogUtils.log("Estilo QML aplicado com sucesso", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
 
 
 
-        LogUtils.info("Processamento executado com sucesso", tool=self.TOOL_KEY)
+        LogUtils.log("Processamento executado com sucesso", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         QgisMessageUtil.bar_success(
             self.iface,
             "Processamento executado com sucesso."
@@ -224,21 +233,21 @@ class GerarRastroDialog(BasePluginMTL):
         # -------------------------------------------------
         # 1) resolver camada
         # -------------------------------------------------
-        LogUtils.info("1/6] Resolvendo camada de entrada", tool=self.TOOL_KEY)
+        LogUtils.log("1/6] Resolvendo camada de entrada", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         layer = (
             input_layer
             if isinstance(input_layer, QgsVectorLayer)
             else QgsProject.instance().mapLayer(input_layer)
         )
-        LogUtils.debug(f"Camada resolvida: {layer.name() if layer else 'None'}", tool=self.TOOL_KEY)
+        LogUtils.log(f"Camada resolvida: {layer.name() if layer else 'None'}", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         
         if layer.crs().authid() == "EPSG:4326":
             original_tam = tamanhoimplemento
             tamanhoimplemento = tamanhoimplemento / 111120.0
-            LogUtils.debug(f"CRS em WGS84 detectado. Tamanho convertido: {original_tam}m → {tamanhoimplemento:.6f}°", tool=self.TOOL_KEY)
+            LogUtils.log(f"CRS em WGS84 detectado. Tamanho convertido: {original_tam}m → {tamanhoimplemento:.6f}°", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
 
         if not isinstance(layer, QgsVectorLayer):
-            LogUtils.error("Camada de entrada inválida - não é QgsVectorLayer", tool=self.TOOL_KEY)
+            LogUtils.log("Camada de entrada inválida - não é QgsVectorLayer", level="ERROR", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
             QgisMessageUtil.modal_error(
                 self.iface,
                 "Camada de entrada inválida."
@@ -248,61 +257,61 @@ class GerarRastroDialog(BasePluginMTL):
         # -------------------------------------------------
         # 2) validar tipo
         # -------------------------------------------------
-        LogUtils.info("2/6] Validando tipo de camada", tool=self.TOOL_KEY)
+        LogUtils.log("2/6] Validando tipo de camada", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         layer_type = VectorLayerGeometry.get_layer_type(layer)
-        LogUtils.debug(f"Tipo de camada detectado: {layer_type}", tool=self.TOOL_KEY)
+        LogUtils.log(f"Tipo de camada detectado: {layer_type}", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
 
         if layer_type != QgsWkbTypes.LineGeometry:
-            LogUtils.error(f"Tipo de camada inválido. Esperado: LINE, Obtido: {layer_type}", tool=self.TOOL_KEY)
+            LogUtils.log(f"Tipo de camada inválido. Esperado: LINE, Obtido: {layer_type}", level="ERROR", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
             QgisMessageUtil.modal_error(
                 self.iface,
                 "A camada de entrada deve ser do tipo LINHA."
             )
             return None
-        LogUtils.debug("Camada validada como tipo LINE", tool=self.TOOL_KEY)
+        LogUtils.log("Camada validada como tipo LINE", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
 
         # -------------------------------------------------
         # 3) somente selecionadas
         # -------------------------------------------------
-        LogUtils.info("3/6] Processando seleção de feições", tool=self.TOOL_KEY)
+        LogUtils.log("3/6] Processando seleção de feições", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         if only_selected:
-            LogUtils.debug(f"Filtrando apenas feições selecionadas. Total selecionadas: {layer.selectedFeatureCount()}", tool=self.TOOL_KEY)
+            LogUtils.log(f"Filtrando apenas feições selecionadas. Total selecionadas: {layer.selectedFeatureCount()}", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
             layer_sel, err = VectorLayerGeometry.get_selected_features(layer)
             if err:
-                LogUtils.error(f"Erro ao obter feições selecionadas: {err}", tool=self.TOOL_KEY)
+                LogUtils.log(f"Erro ao obter feições selecionadas: {err}", level="ERROR", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
                 QgisMessageUtil.modal_error(self.iface, err)
                 return None
             layer = layer_sel
-            LogUtils.debug(f"Usando camada com feições selecionadas: {layer.name()}", tool=self.TOOL_KEY)
+            LogUtils.log(f"Usando camada com feições selecionadas: {layer.name()}", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         else:
-            LogUtils.debug(f"Processando todas as feições da camada. Total: {layer.featureCount()}", tool=self.TOOL_KEY)
+            LogUtils.log(f"Processando todas as feições da camada. Total: {layer.featureCount()}", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
 
         # -------------------------------------------------
         # 4) explode linhas
         # -------------------------------------------------
-        LogUtils.info("4/6] Explodindo linhas em segmentos", tool=self.TOOL_KEY)
-        LogUtils.debug(f"Iniciando explosão de {layer.featureCount()} feições...", tool=self.TOOL_KEY)
+        LogUtils.log("4/6] Explodindo linhas em segmentos", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
+        LogUtils.log(f"Iniciando explosão de {layer.featureCount()} feições...", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         
         exploded = VectorLayerGeometry.explode_multipart_features(
             layer=layer , external_tool_key=self.TOOL_KEY           
         )
 
         if exploded is None:
-            LogUtils.error("Falha ao explodir linhas", tool=self.TOOL_KEY)
+            LogUtils.log("Falha ao explodir linhas", level="ERROR", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
             QgisMessageUtil.modal_error(
                 self.iface,
                 "Falha ao explodir linhas."
             )
             return None
         
-        LogUtils.debug(f"Linhas explodidas com sucesso. Total de segmentos: {exploded.featureCount()}", tool=self.TOOL_KEY)
+        LogUtils.log(f"Linhas explodidas com sucesso. Total de segmentos: {exploded.featureCount()}", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
 
         # -------------------------------------------------
         # 5) buffer (SEMPRE memory)
         # -------------------------------------------------
-        LogUtils.info("5/6] Gerando buffer (rastro)", tool=self.TOOL_KEY)
+        LogUtils.log("5/6] Gerando buffer (rastro)", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         distance = float(tamanhoimplemento) / 2.0
-        LogUtils.debug(f"Distância de buffer: {distance}m (metade do tamanho: {tamanhoimplemento}m)", tool=self.TOOL_KEY)
+        LogUtils.log(f"Distância de buffer: {distance}m (metade do tamanho: {tamanhoimplemento}m)", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
 
         buffer_layer = VectorLayerGeometry.create_buffer_geometry(
             layer=exploded,
@@ -311,25 +320,25 @@ class GerarRastroDialog(BasePluginMTL):
         )
 
         if buffer_layer is None:
-            LogUtils.error("Falha ao gerar buffer", tool=self.TOOL_KEY)
+            LogUtils.log("Falha ao gerar buffer", level="ERROR", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
             QgisMessageUtil.modal_error(
                 self.iface,
                 "Falha ao gerar buffer."
             )
             return None
         
-        LogUtils.debug(f"Buffer gerado com sucesso. Total de polígonos: {buffer_layer.featureCount()}", tool=self.TOOL_KEY)
+        LogUtils.log(f"Buffer gerado com sucesso. Total de polígonos: {buffer_layer.featureCount()}", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         
         # -------------------------------------------------
         # 6) Salvar resultado
         # -------------------------------------------------
-        LogUtils.info("6/6] Salvando resultado", tool=self.TOOL_KEY)
+        LogUtils.log("6/6] Salvando resultado", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         result = self.save_vector_layer(buffer_layer, output_path, save_to_folder, output_name)
         
         if result:
-            LogUtils.info(f"Rastro salvo com sucesso: {result.name()}", tool=self.TOOL_KEY)
+            LogUtils.log(f"Rastro salvo com sucesso: {result.name()}", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         else:
-            LogUtils.warning("Resultado em memória (camada não persistida)", tool=self.TOOL_KEY)
+            LogUtils.log("Resultado em memória (camada não persistida)", level="WARNING", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         
         return result
         

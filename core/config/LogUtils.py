@@ -1,12 +1,12 @@
 # utils/log_utils.py
 import json
 import threading
-import inspect
 import uuid
 import os
 from pathlib import Path
 from datetime import datetime
 import traceback
+from .log_sync import LOG_FILE_LOCK
 
 class LogUtils:
     """
@@ -30,7 +30,6 @@ class LogUtils:
         'CRITICAL': '#991B1B'    # Vermelho escuro muito forte (crítico)
     }
 
-    _lock = threading.Lock()
     _initialized = False
     _log_file = None
     _session_id = None
@@ -74,8 +73,8 @@ class LogUtils:
         if not cls._initialized:
             return
 
-        tool = tool or cls._resolve_tool()
-        class_name = class_name or cls._resolve_class()
+        tool = tool or "unknown_tool"
+        class_name = class_name or "UnknownClass"
 
         cls._write_event(level, msg, tool, class_name, data)
 
@@ -99,6 +98,9 @@ class LogUtils:
     def exception(cls, exc: Exception, *, tool=None, class_name=None, **data):
         tb = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
 
+        tool = tool or "unknown_tool"
+        class_name = class_name or "UnknownClass"
+
         data["exception"] = {
             "type": type(exc).__name__,
             "message": str(exc),
@@ -119,6 +121,10 @@ class LogUtils:
 
     @classmethod
     def _write_event(cls, level, msg, tool, class_name, data=None):
+        # Garantir que nunca escrevemos None
+        tool = tool or "unknown_tool"
+        class_name = class_name or "UnknownClass"
+        
         event = {
             "ts": datetime.now().isoformat(timespec="seconds"),
             "level": level,
@@ -133,29 +139,13 @@ class LogUtils:
             "data": data or {}
         }
 
-        with cls._lock:
+        with LOG_FILE_LOCK:
             try:
                 with open(cls._log_file, "a", encoding="utf-8") as f:
                     json.dump(event, f, ensure_ascii=False)
                     f.write("\n")
             except Exception:
                 pass  # logger nunca quebra o plugin
-
-    @staticmethod
-    def _resolve_class():
-        for frame in inspect.stack():
-            self_obj = frame.frame.f_locals.get("self")
-            if self_obj:
-                return self_obj.__class__.__name__
-        return "UnknownClass"
-
-    @staticmethod
-    def _resolve_tool():
-        for frame in inspect.stack():
-            self_obj = frame.frame.f_locals.get("self")
-            if self_obj and hasattr(self_obj, "TOOL_KEY"):
-                return getattr(self_obj, "TOOL_KEY")
-        return "unknown_tool"
 
     @staticmethod
     def _read_plugin_version(plugin_root: Path) -> str:

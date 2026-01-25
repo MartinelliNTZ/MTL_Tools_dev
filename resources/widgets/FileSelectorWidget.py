@@ -7,7 +7,7 @@ from qgis.PyQt.QtWidgets import (
 from ...utils.string_utils import StringUtils
 
 
-class QmlSelectorWidget(QWidget):
+class FileSelectorWidget(QWidget):
     """
     Widget exclusivo para seleção opcional de arquivo QML.
     """
@@ -15,7 +15,7 @@ class QmlSelectorWidget(QWidget):
     def __init__(
         self,
         *,
-        checkbox_text="Aplicar estilo (QML) ao resultado",
+        checkbox_text="Arquivo?",
         label_text="Arquivo:",
         file_filter=StringUtils.FILTER_ALL,
         file_dialog_callback=None,
@@ -79,11 +79,12 @@ class QmlSelectorWidget(QWidget):
     # --------------------------------------------------
     def is_enabled(self) -> bool:
         return self._chk.isChecked()
+
     def set_enabled(self, enabled: bool):
         self._chk.setChecked(enabled)
 
-    def get_qml_path(self) -> str:
+    def get_file_path(self) -> str:
         return self._txt.text().strip()
 
-    def set_qml_path(self, path: str):
+    def set_file_path(self, path: str):
         self._txt.setText(path or "")

@@ -6,7 +6,14 @@ Lê apenas linhas novas, sem reler o arquivo inteiro.
 from pathlib import Path
 from typing import List, Optional
 from ..model.log_entry import LogEntry
-import threading
+
+# Import do lock global para sincronizar com LogUtils
+try:
+    from .....core.config.log_sync import LOG_FILE_LOCK
+except ImportError:
+    # Fallback se import relativo falhar
+    import threading
+    LOG_FILE_LOCK = threading.Lock()
 
 
 class LogLoader:
@@ -27,7 +34,6 @@ class LogLoader:
         self.log_file_path = Path(log_file_path)
         self._offset = 0  # Próxima posição a ler
         self._line_count = 0  # Total de linhas vistas
-        self._lock = threading.Lock()
     
     def load_all(self) -> List[LogEntry]:
         """
@@ -36,7 +42,7 @@ class LogLoader:
         """
         entries = []
         
-        with self._lock:
+        with LOG_FILE_LOCK:
             if not self.log_file_path.exists():
                 return entries
             
@@ -59,15 +65,23 @@ class LogLoader:
         """
         Carrega apenas NOVAS linhas desde a última leitura.
         Retorna lista vazia se não houver novas linhas.
+        Tolerante a escrita simultânea: ignora linhas inválidas/JSON incompleto.
         """
         entries = []
         
-        with self._lock:
+        with LOG_FILE_LOCK:
             if not self.log_file_path.exists():
                 return entries
             
             try:
                 with open(self.log_file_path, "r", encoding="utf-8") as f:
+                    # Verificar se offset é válido (arquivo pode ter sido truncado)
+                    file_size = f.seek(0, 2)  # Vai para final
+                    if self._offset > file_size:
+                        # Arquivo foi truncado/reset, reiniciar do início
+                        self._offset = 0
+                        self._line_count = 0
+                    
                     # Ir para onde paramos
                     f.seek(self._offset)
                     
@@ -77,6 +91,7 @@ class LogLoader:
                         entry = LogEntry.from_json_line(line, self._line_count)
                         if entry:
                             entries.append(entry)
+                        # Se linha for inválida, ignorar silenciosamente
                     
                     # Atualizar offset
                     self._offset = f.tell()
@@ -87,16 +102,16 @@ class LogLoader:
     
     def reset(self) -> None:
         """Reinicializa o offset para reler desde o início."""
-        with self._lock:
+        with LOG_FILE_LOCK:
             self._offset = 0
             self._line_count = 0
     
     def get_position(self) -> int:
         """Retorna posição atual (byte offset)."""
-        with self._lock:
+        with LOG_FILE_LOCK:
             return self._offset
     
     def get_line_count(self) -> int:
         """Retorna número total de linhas vistas."""
-        with self._lock:
+        with LOG_FILE_LOCK:
             return self._line_count
