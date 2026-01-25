@@ -22,6 +22,7 @@ from ..utils.project_utils import  ProjectUtils
 from ..utils.string_utils import StringUtils
 from ..utils.vector.VectorLayerGeometry import VectorLayerGeometry
 from ..core.config.LogUtils import LogUtils
+from ..core.ui.WidgetFactory import WidgetFactory
 
 
 class GerarRastroDialog(BasePluginMTL):
@@ -56,11 +57,14 @@ class GerarRastroDialog(BasePluginMTL):
         LogUtils.info("Construindo interface da ferramenta", tool=self.TOOL_KEY)
 
         # input layer
-        layoutH1, self.cmb_layers, self.chk_only_selected = UiWidgetUtils.create_layer_input(
-            "Camada de Linhas (INPUT):",[
-            QgsMapLayerProxyModel.LineLayer]
+        #novo
+        self.layer_input = WidgetFactory.create_layer_input(
+            label_text="Camada de Linhas (INPUT):",
+            filters=[QgsMapLayerProxyModel.LineLayer],
+            parent=self
         )
-        layout.addLayout(layoutH1)
+        layout.addWidget(self.layer_input)
+
         LogUtils.debug("Componente de camada de entrada adicionado", tool=self.TOOL_KEY)
 
         # tamanhoimplemento
@@ -111,8 +115,7 @@ class GerarRastroDialog(BasePluginMTL):
     def _load_prefs(self):
         LogUtils.debug("Carregando preferências salvas da ferramenta", tool=self.TOOL_KEY)
         prefs = load_tool_prefs(self.TOOL_KEY)
-        last_id = prefs.get('last_input_layer_id')
-        last_tam = prefs.get('last_tamanhoimplemento')
+        last_tam = prefs.get('last_implement_length')
         save_to_folder = prefs.get('save_to_folder', False)
         last_file = prefs.get('last_output_file', '')
         apply_style = prefs.get('apply_style', False)
@@ -122,10 +125,6 @@ class GerarRastroDialog(BasePluginMTL):
                 self.spin_tam.setValue(float(last_tam))
             except Exception:
                 pass
-        if last_id:
-            layer = QgsProject.instance().mapLayer(last_id)
-            if layer:
-                self.cmb_layers.setLayer(layer)
 
         try:
             self.chk_save_file.setChecked(bool(save_to_folder))
@@ -138,22 +137,18 @@ class GerarRastroDialog(BasePluginMTL):
         
     def _save_prefs(self):       
         LogUtils.debug("Salvando preferências da ferramenta", tool=self.TOOL_KEY)
-        layer = self.cmb_layers.currentLayer()
-        data = {
-            'last_input_layer_id': layer.id() if layer else None,
-            'last_tamanhoimplemento': float(self.spin_tam.value())
-        }
+        data['last_implement_length'] = float(self.spin_tam.value())
         data['save_to_folder'] = bool(self.chk_save_file.isChecked())
         data['last_output_file'] = self.txt_output_file.text().strip()
         data['apply_style'] = bool(self.chk_apply_style.isChecked())
         data['last_qml_path'] = self.txt_qml.text().strip()
         
         save_tool_prefs(self.TOOL_KEY, data)
-        LogUtils.debug(f"Preferências salvas: tamanho={data['last_tamanhoimplemento']}m, salvar_arquivo={data['save_to_folder']}", tool=self.TOOL_KEY)
+        LogUtils.debug(f"Preferências salvas: tamanho={data['last_implement_length']}m, salvar_arquivo={data['save_to_folder']}", tool=self.TOOL_KEY)
 
     def on_run(self):
         LogUtils.info("Iniciando processamento: Gerar Rastro Implemento", tool=self.TOOL_KEY)
-        layer = self.cmb_layers.currentLayer()
+        layer = self.layer_input.current_layer()
 
         if not isinstance(layer, QgsVectorLayer):
             LogUtils.warning("Nenhuma camada de linhas válida selecionada", tool=self.TOOL_KEY)
@@ -166,7 +161,7 @@ class GerarRastroDialog(BasePluginMTL):
         tam = float(self.spin_tam.value())
         save_to_folder = self.chk_save_file.isChecked()
         out_file = self.txt_output_file.text().strip() if save_to_folder else None
-        only_selected = self.chk_only_selected.isChecked()
+        only_selected = self.layer_input.only_selected_enabled()
         LogUtils.info(f"Parâmetros: camada='{layer.name()}', tamanho={tam}m, selecionadas={only_selected}, salvar_arquivo={save_to_folder}", tool=self.TOOL_KEY)
         
         # executar
