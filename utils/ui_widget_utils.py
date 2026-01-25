@@ -44,7 +44,7 @@ class _LayerComboEventFilter(QObject):
 
         # Atualiza lista ao clicar no combo
         if event.type() == QEvent.MouseButtonPress:
-            UiWidgetUtils.populate_vector_layers(self.combo)
+            OldUiWidgetUtils.populate_vector_layers(self.combo)
 
         # DRAG ENTER / MOVE → só aceita se for camada vetorial
         if event.type() in (QEvent.DragEnter, QEvent.DragMove):
@@ -77,7 +77,7 @@ class _LayerComboEventFilter(QObject):
 # ==========================================================
 # UI WIDGET UTILS
 # ==========================================================
-class UiWidgetUtils:
+class OldUiWidgetUtils:
     """
     Utilitários estáticos para widgets Qt usados em plugins QGIS.
 
@@ -112,7 +112,7 @@ class UiWidgetUtils:
         main_layout = QVBoxLayout()
 
         if separator_top:
-            main_layout.addWidget(UiWidgetUtils.create_separator())
+            main_layout.addWidget(OldUiWidgetUtils.create_separator())
 
         if title:
             main_layout.addWidget(QLabel(title))
@@ -138,7 +138,7 @@ class UiWidgetUtils:
         main_layout.addLayout(btn_layout)
 
         if separator_bottom:
-            main_layout.addWidget(UiWidgetUtils.create_separator())
+            main_layout.addWidget(OldUiWidgetUtils.create_separator())
 
         # =========================
         # BINDINGS
@@ -146,13 +146,13 @@ class UiWidgetUtils:
         chk_all.toggled.connect(list_widget.setDisabled)
 
         btn_select.clicked.connect(
-            lambda: UiWidgetUtils.set_checked_state(
+            lambda: OldUiWidgetUtils.set_checked_state(
                 list_widget, Qt.Checked
             )
         )
 
         btn_unselect.clicked.connect(
-            lambda: UiWidgetUtils.set_checked_state(
+            lambda: OldUiWidgetUtils.set_checked_state(
                 list_widget, Qt.Unchecked
             )
         )
@@ -265,7 +265,7 @@ class UiWidgetUtils:
 
         layout = QVBoxLayout()
         if separtator_top:          
-            layout.addWidget(UiWidgetUtils.create_separator())
+            layout.addWidget(OldUiWidgetUtils.create_separator())
 
         # Label
         lbl = QLabel(label_text)
@@ -333,7 +333,7 @@ class UiWidgetUtils:
             combo.layerChanged.connect(on_layer_changed)
             on_layer_changed()
         if separtator_bottom:          
-            layout.addWidget(UiWidgetUtils.create_separator())
+            layout.addWidget(OldUiWidgetUtils.create_separator())
         return layout, combo, chk
     
     @staticmethod
@@ -416,7 +416,7 @@ class UiWidgetUtils:
 
         main_layout = QVBoxLayout()
         if separator:          
-            main_layout.addWidget(UiWidgetUtils.create_separator())
+            main_layout.addWidget(OldUiWidgetUtils.create_separator())
         # 🔹 Título opcional
         if title:
             lbl = QLabel(title)
@@ -446,7 +446,7 @@ class UiWidgetUtils:
         main_layout.addLayout(grid)
         
         if separator:          
-            main_layout.addWidget(UiWidgetUtils.create_separator())
+            main_layout.addWidget(OldUiWidgetUtils.create_separator())
 
         
 
@@ -519,7 +519,7 @@ class UiWidgetUtils:
 
         main_layout = QVBoxLayout()
         if separtator_top:          
-            main_layout.addWidget(UiWidgetUtils.create_separator())
+            main_layout.addWidget(OldUiWidgetUtils.create_separator())
 
         # Linha 1 — Checkbox
         chk_apply = QCheckBox(checkbox_text)
@@ -544,10 +544,10 @@ class UiWidgetUtils:
         main_layout.addLayout(file_layout)
 
         # Bind checkbox → widgets
-        UiWidgetUtils._bind_checkbox_enable_widget(chk_apply, txt_qml)
-        UiWidgetUtils._bind_checkbox_enable_widget(chk_apply, btn_qml)
+        OldUiWidgetUtils._bind_checkbox_enable_widget(chk_apply, txt_qml)
+        OldUiWidgetUtils._bind_checkbox_enable_widget(chk_apply, btn_qml)
         if separtator_bottom:          
-            main_layout.addWidget(UiWidgetUtils.create_separator())
+            main_layout.addWidget(OldUiWidgetUtils.create_separator())
 
         return main_layout, chk_apply, txt_qml
     
@@ -571,7 +571,7 @@ class UiWidgetUtils:
 
         main_layout = QVBoxLayout()
         if separtator_top:          
-            main_layout.addWidget(UiWidgetUtils.create_separator())
+            main_layout.addWidget(OldUiWidgetUtils.create_separator())
 
         # Linha 1 — Checkbox
         chk_save = QCheckBox(checkbox_text)
@@ -596,10 +596,10 @@ class UiWidgetUtils:
         main_layout.addLayout(file_layout)
 
         # Bind checkbox → widgets
-        UiWidgetUtils._bind_checkbox_enable_widget(chk_save, txt_output)
-        UiWidgetUtils._bind_checkbox_enable_widget(chk_save, btn_file)
+        OldUiWidgetUtils._bind_checkbox_enable_widget(chk_save, txt_output)
+        OldUiWidgetUtils._bind_checkbox_enable_widget(chk_save, btn_file)
         if separtator_bottom:          
-            main_layout.addWidget(UiWidgetUtils.create_separator())
+            main_layout.addWidget(OldUiWidgetUtils.create_separator())
 
         return main_layout, chk_save, txt_output
 
@@ -644,7 +644,7 @@ class UiWidgetUtils:
     @staticmethod
     def _bind_checkbox_enable_widget(chk: QCheckBox, widget):
         """
-        Habilita/desabilita um widget com base no estado do checkbox.
+        Habilita/desabilita um widgets com base no estado do checkbox.
         """
         def _update_state():
             widget.setEnabled(chk.isChecked())

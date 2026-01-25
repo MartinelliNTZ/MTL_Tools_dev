@@ -13,7 +13,7 @@ from ..utils.vector_utils import VectorUtils
 from ..utils.tool_keys import ToolKey
 from ..utils.log_utils import LogUtilsOld
 from ..utils.qgis_messagem_util import QgisMessageUtil
-from ..utils.ui_widget_utils import UiWidgetUtils
+from ..utils.ui_widget_utils import OldUiWidgetUtils
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
 from .base_plugin import BasePluginMTL
 
@@ -45,14 +45,14 @@ class CopyAttributes(BasePluginMTL):
         )
 
         # CAMADA DESTINO
-        tgt_layout, self.cmb_target, _ = UiWidgetUtils.create_layer_input(
+        tgt_layout, self.cmb_target, _ = OldUiWidgetUtils.create_layer_input(
             "Camada destino:",
             QgsMapLayerProxyModel.VectorLayer, enable_selected_checkbox=False
         )
         layout.addLayout(tgt_layout)
 
         # CAMADA ORIGEM
-        src_layout, self.cmb_source, _ = UiWidgetUtils.create_layer_input(
+        src_layout, self.cmb_source, _ = OldUiWidgetUtils.create_layer_input(
             "Camada origem:",
             QgsMapLayerProxyModel.VectorLayer, enable_selected_checkbox=False
         )
@@ -65,7 +65,7 @@ class CopyAttributes(BasePluginMTL):
             self.lst_fields,
             _,
             _, _
-        ) = UiWidgetUtils.create_attribute_selector(
+        ) = OldUiWidgetUtils.create_attribute_selector(
             title="Atributos da camada origem"
         )
 
@@ -73,7 +73,7 @@ class CopyAttributes(BasePluginMTL):
 
         # BOTÕES
         layout.addLayout(
-            UiWidgetUtils.create_run_close_buttons(
+            OldUiWidgetUtils.create_run_close_buttons(
                 self._run,
                 self.close,
                 info_callback=lambda: self.show_info_dialog(

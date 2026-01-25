@@ -339,7 +339,7 @@ class LogcatDialog(QDialog):
         else:
             return
         
-        # Criar lista widget
+        # Criar lista widgets
         list_widget = QListWidget()
         for value in unique_values:
             item = QListWidgetItem(value)
@@ -614,7 +614,7 @@ class LogcatDialog(QDialog):
             event.accept()
     
     def _on_destroyed(self):
-        """Slot chamado quando o widget é destruído (mesmo não-modal)."""
+        """Slot chamado quando o widgets é destruído (mesmo não-modal)."""
         # Executar mesma limpeza de closeEvent
         try:
             if self.file_watcher:

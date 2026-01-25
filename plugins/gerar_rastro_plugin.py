@@ -17,7 +17,7 @@ from ..utils.preferences import load_tool_prefs, save_tool_prefs
 from ..utils.tool_keys import ToolKey
 from ..plugins.base_plugin import BasePluginMTL
 from ..utils.qgis_messagem_util import QgisMessageUtil
-from ..utils.ui_widget_utils import  UiWidgetUtils
+from ..utils.ui_widget_utils import  OldUiWidgetUtils
 from ..utils.project_utils import  ProjectUtils
 from ..utils.string_utils import StringUtils
 from ..utils.vector.VectorLayerGeometry import VectorLayerGeometry
@@ -56,19 +56,19 @@ class GerarRastroDialog(BasePluginMTL):
         layout = QVBoxLayout()
         LogUtils.info("Construindo interface da ferramenta", tool=self.TOOL_KEY)
 
-        # input layer
+
         #novo
-        self.layer_input = WidgetFactory.create_layer_input(
+        l1, self.layer_input = WidgetFactory.create_layer_input(
             label_text="Camada de Linhas (INPUT):",
             filters=[QgsMapLayerProxyModel.LineLayer],
-            parent=self
+            parent=self, separator_top=True
         )
-        layout.addWidget(self.layer_input)
+        layout.addLayout(l1)
 
         LogUtils.debug("Componente de camada de entrada adicionado", tool=self.TOOL_KEY)
 
         # tamanhoimplemento
-        h2, self.spin_tam = UiWidgetUtils.create_double_spin_input(
+        h2, self.spin_tam = WidgetFactory.create_double_spin_input(
             "Tamanho implemento: (sempre em metros)"
         )
         layout.addLayout(h2)
@@ -79,7 +79,7 @@ class GerarRastroDialog(BasePluginMTL):
 
         # salvar em arquivo ou temporário (campo único: arquivo completo)
         save_layout, self.chk_save_file, self.txt_output_file = (
-            UiWidgetUtils.create_save_file_selector(
+            OldUiWidgetUtils.create_save_file_selector(
                 parent=self
             )
         )
@@ -87,10 +87,19 @@ class GerarRastroDialog(BasePluginMTL):
         LogUtils.debug("Componente de salvamento de arquivo adicionado", tool=self.TOOL_KEY)
 
         # aplicar estilo QML
-        h_qml, self.chk_apply_style, self.txt_qml = UiWidgetUtils.create_qml_selector(
+        h_qml, self.chk_apply_style, self.txt_qml = OldUiWidgetUtils.create_qml_selector(
             parent=self
         )
         layout.addLayout(h_qml)
+        #novo
+        qml_layout, self.qml_selector = WidgetFactory.create_qml_selector(
+            parent=self
+        )
+        layout.addLayout(qml_layout)
+
+        #----
+
+
         LogUtils.debug("Componente de estilo QML adicionado", tool=self.TOOL_KEY)      
 
         # instruções
@@ -100,7 +109,7 @@ class GerarRastroDialog(BasePluginMTL):
          
         # buttons
         layout.addLayout(
-            UiWidgetUtils.create_run_close_buttons(
+            OldUiWidgetUtils.create_run_close_buttons(
                 self.on_run,
                 self.close,
                 info_callback=lambda: self.show_info_dialog(
@@ -137,6 +146,7 @@ class GerarRastroDialog(BasePluginMTL):
         
     def _save_prefs(self):       
         LogUtils.debug("Salvando preferências da ferramenta", tool=self.TOOL_KEY)
+        data = []
         data['last_implement_length'] = float(self.spin_tam.value())
         data['save_to_folder'] = bool(self.chk_save_file.isChecked())
         data['last_output_file'] = self.txt_output_file.text().strip()

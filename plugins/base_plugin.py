@@ -17,7 +17,7 @@ from ..utils.qgis_messagem_util import QgisMessageUtil
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
 from ..utils.tool_keys import ToolKey
 from ..utils.qgis_messagem_util import QgisMessageUtil
-from ..utils.ui_widget_utils import  UiWidgetUtils
+from ..utils.ui_widget_utils import  OldUiWidgetUtils
 from ..utils.project_utils import  ProjectUtils
 from ..utils.string_utils import StringUtils
 from ..utils.vector_utils import VectorUtils

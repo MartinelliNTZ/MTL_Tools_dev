@@ -554,7 +554,7 @@ class MTL_Tools:
         button.setPopupMode(QToolButton.MenuButtonPopup)
         #button.clicked.connect(main_action.trigger)
 
-        # 4️⃣ Transformar em widget e adicionar à toolbar
+        # 4️⃣ Transformar em widgets e adicionar à toolbar
         widget_action = QWidgetAction(self.toolbar)
         widget_action.setDefaultWidget(button)
         self.toolbar.addAction(widget_action)

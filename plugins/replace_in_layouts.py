@@ -13,7 +13,7 @@ from qgis.PyQt.QtGui import QDesktopServices
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
 from ..utils.info_dialog import InfoDialog
 from ..utils.qgis_messagem_util import QgisMessageUtil
-from ..utils.ui_widget_utils import UiWidgetUtils
+from ..utils.ui_widget_utils import OldUiWidgetUtils
 from ..utils.layouts_utils import LayoutsUtils
 from ..utils.project_utils import ProjectUtils
 from ..utils.tool_keys import ToolKey
