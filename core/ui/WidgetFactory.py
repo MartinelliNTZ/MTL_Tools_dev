@@ -9,6 +9,10 @@ from ...utils.string_utils import StringUtils
 from ...resources.widgets.LayerInputWidget import LayerInputWidget
 from ...resources.widgets.FileSelectorWidget import FileSelectorWidget
 from ...resources.widgets.BottomActionButtonsWidget import BottomActionButtonsWidget
+from ...resources.widgets.MainLayout import MainLayout
+from ...resources.styles.Styles import Styles
+from ...resources.widgets.AppBarWidget import AppBarWidget
+
 
 
 class WidgetFactory:
@@ -16,6 +20,43 @@ class WidgetFactory:
         super().__init__(combo)
         self.combo = combo
         self.iface = iface
+
+
+class WidgetFactory:
+
+    @staticmethod
+    def create_app_bar(
+        *,
+        parent,
+        title: str,
+        on_run=None,
+        on_info=None,
+        on_close=None,
+        show_run=False,
+        show_info=False,
+        show_close=True,
+    ):
+        app_bar = AppBarWidget(
+            title=title,
+            show_run=show_run,
+            show_info=show_info,
+            show_close=show_close,
+            parent=parent,
+        )
+
+        app_bar.setStyleSheet(Styles.app_bar())
+
+        if on_run:
+            app_bar.runClicked.connect(on_run)
+
+        if on_info:
+            app_bar.infoClicked.connect(on_info)
+
+        if on_close:
+            app_bar.closeClicked.connect(on_close)
+
+        return app_bar
+
     @staticmethod
     def create_bottom_action_buttons(
         *,
@@ -38,6 +79,7 @@ class WidgetFactory:
             close_callback=close_callback,
             info_callback=info_callback,
             tool_key=tool_key,
+            style = Styles.buttons()
         )
 
         layout.addWidget(widget)
@@ -77,6 +119,19 @@ class WidgetFactory:
 
         return layout, widget
     
+    def create_main_layout(self, title: str="Title"):
+        #ha implementar
+        layout = MainLayout(self)      
+
+        app_bar = WidgetFactory.create_app_bar(
+            parent=self,
+            title=title,
+        )
+        layout.addWidget(app_bar)
+
+        self.setStyleSheet(Styles.main_application())
+        return layout
+
     @staticmethod
     def create_save_file_selector(
             *,
@@ -266,5 +321,5 @@ class WidgetFactory:
         qframe.setFrameShape(shape)
         qframe.setFrameShadow(shadow)
         qframe.setFixedHeight(height)
-        qframe.setStyleSheet(f"background-color: {color};")
+        qframe.setStyleSheet(Styles.separator())
         return qframe

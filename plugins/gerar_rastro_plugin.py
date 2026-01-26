@@ -6,6 +6,7 @@ from qgis.PyQt.QtWidgets import (
 from qgis.gui import QgsMapLayerComboBox
 from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes, QgsMapLayerProxyModel, QgsFeatureRequest
 from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtCore import Qt
 import os
 from pathlib import Path
 from typing import Optional
@@ -31,11 +32,13 @@ class GerarRastroDialog(BasePluginMTL):
     TOOL_KEY = ToolKey.GERAR_RASTRO_IMPLEMENTO
 
     def __init__(self, iface):
-        super().__init__(iface.mainWindow())
+        super().__init__(iface.mainWindow())        
         self.iface = iface
         LogUtils.log("Inicializando diálogo Gerar Rastro Implemento", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         self.setWindowTitle("MTL Tools — Gerar Rastro Implemento")
         self.setMinimumWidth(360)
+        self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint)
+       # self.setAttribute(Qt.WA_TranslucentBackground, True)
         icon_path = os.path.join(os.path.dirname(__file__), "..", "resources","icons", "gerar_rastro.ico")
         if os.path.exists(icon_path):
             self.setWindowIcon(QIcon(icon_path))
@@ -52,7 +55,7 @@ class GerarRastroDialog(BasePluginMTL):
         # -------------------------------------------------------
         # LAYOUT
         # -------------------------------------------------------
-        layout = QVBoxLayout()
+        layout = WidgetFactory.create_main_layout(self, title="Gerar Rastro de Máquinas")
         LogUtils.log("Construindo interface da ferramenta", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
 
 
@@ -68,7 +71,7 @@ class GerarRastroDialog(BasePluginMTL):
 
         # tamanhoimplemento
         h2, self.spin_tam = WidgetFactory.create_double_spin_input(
-            "Tamanho implemento: (sempre em metros)"
+            "Tamanho implemento: (sempre em metros)",separator_bottom=False,
         )
         layout.addLayout(h2)
         LogUtils.log("Componente de tamanho de implemento adicionado", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
@@ -83,6 +86,7 @@ class GerarRastroDialog(BasePluginMTL):
         save_layout, self.save_selector = WidgetFactory.create_save_file_selector(
             parent=self,
             file_filter=StringUtils.FILTER_VECTOR,
+            separator_top=True
         )
         layout.addLayout(save_layout)
         LogUtils.log("Componente de salvamento de arquivo adicionado", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")

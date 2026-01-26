@@ -57,9 +57,13 @@ ferramentas = name                              tipo                            
 
 
 changelog=
-    1.4.0.9  --- proximo passo desacoplar vectorutils de BasePluginMTL
+    1.4.0.10 --- proximo passo desacoplar vectorutils de BasePluginMTL
+
+    1.4.0.9  
     - uiwidget util desacoplada de gerar rastro
     - craida WidgetFactory
+    - CRIADO sTYLES
+    - Aplicado novo styles
     1.4.0.8
     - iniciando VectorLayerGeometry
     - VectorUtils desacoplada de gerar rastro

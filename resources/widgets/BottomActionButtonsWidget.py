@@ -19,7 +19,8 @@ class BottomActionButtonsWidget(QWidget):
         close_text="Fechar",
         height=24,
         tool_key=None,
-        parent=None
+        parent=None,
+        style=None,
     ):
         super().__init__(parent)
 
@@ -37,13 +38,13 @@ class BottomActionButtonsWidget(QWidget):
         self._btn_close = QPushButton(close_text)
         self._btn_info = QPushButton("ℹ️")
 
-        self._build_ui(height)
+        self._build_ui(height, style)
         self._bind_callbacks(run_callback, close_callback, info_callback)
 
     # --------------------------------------------------
     # UI
     # --------------------------------------------------
-    def _build_ui(self, height: int):
+    def _build_ui(self, height: int,style=None):
         layout = QHBoxLayout(self)
         layout.addStretch()
 
@@ -51,6 +52,10 @@ class BottomActionButtonsWidget(QWidget):
         self._btn_close.setFixedHeight(height)
         self._btn_info.setFixedWidth(height)
         self._btn_info.setFixedHeight(height)
+        if style:
+            self._btn_run.setStyleSheet(style)
+            self._btn_close.setStyleSheet(style)
+            self._btn_info.setStyleSheet(style)
 
         layout.addWidget(self._btn_run)
         layout.addWidget(self._btn_close)
