@@ -15,14 +15,12 @@ from ..core.config.LogUtils import LogUtils
 
 from ..utils.crs_utils import get_coord_info
 from ..utils.info_dialog import InfoDialog
-from ..utils.log_utils import LogUtilsOld
 from ..utils.qgis_messagem_util import QgisMessageUtil
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
 from ..utils.tool_keys import ToolKey
 from ..utils.qgis_messagem_util import QgisMessageUtil
 from ..utils.project_utils import  ProjectUtils
 from ..utils.string_utils import StringUtils
-from ..utils.vector_utils import VectorUtils
 
 
 
