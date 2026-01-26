@@ -51,7 +51,8 @@ class GerarRastroDialog(BasePluginMTL):
         layer_layout, self.layer_input = WidgetFactory.create_layer_input(
             label_text="Camada de Linhas (INPUT):",
             filters=[QgsMapLayerProxyModel.LineLayer],
-            parent=self
+            parent=self,
+            allow_empty=False
         )
         LogUtils.log("Componente de camada de entrada adicionado", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
 

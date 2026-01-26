@@ -5,7 +5,7 @@ import os
 from qgis.PyQt.QtWidgets import QAction
 from qgis.core import QgsVectorLayer, QgsWkbTypes, QgsFeedback
 
-from ..utils.vector_utils import VectorUtils
+from ..utils.vector.VectorLayerGeometry import VectorLayerGeometry
 from ..utils.qgis_messagem_util import QgisMessageUtil
 from .base_plugin import BasePluginMTL
 
@@ -63,7 +63,7 @@ class VectorMultipartPlugin(BasePluginMTL):
         feedback = QgsFeedback()
         
         only_selected = layer.selectedFeatureCount() > 0
-        ok = VectorUtils.singleparts_to_multparts(
+        ok = VectorLayerGeometry.singleparts_to_multparts(
             layer,
             feedback,
             only_selected=only_selected

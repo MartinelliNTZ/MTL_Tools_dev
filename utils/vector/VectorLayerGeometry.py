@@ -187,3 +187,64 @@ class VectorLayerGeometry:
     def convert_geometry_type(self, layer, target_type, external_tool_key="untraceable"):
         """Converte geometrias para um tipo diferente quando possível."""
         pass
+    @staticmethod
+    def singleparts_to_multparts(layer, feedback=None, only_selected=False):
+        """
+        Separa feições MULTIPART em feições simples (explode multipart)
+        - mesma camada
+        - respeita seleção
+        """
+
+        if not isinstance(layer, QgsVectorLayer):
+            return False
+
+        if not QgsWkbTypes.isMultiType(layer.wkbType()):
+            # camada não é multipart
+            return True
+
+        # 🔀 decide fonte das feições
+        if only_selected and layer.selectedFeatureCount() > 0:
+            feats = list(layer.selectedFeatures())
+        else:
+            feats = list(layer.getFeatures())
+
+        total = len(feats)
+
+        new_features = []
+        ids_to_delete = []
+
+        for i, feat in enumerate(feats):
+
+            if feedback and feedback.isCanceled():
+                return False
+
+            geom = feat.geometry()
+            if not geom or geom.isEmpty():
+                continue
+
+            if not geom.isMultipart():
+                continue
+
+            parts = geom.constGet()
+
+            for part in parts:
+                new_feat = QgsFeature(layer.fields())
+                new_feat.setAttributes(feat.attributes())
+                new_feat.setGeometry(QgsGeometry(part.clone()))
+                new_features.append(new_feat)
+
+            ids_to_delete.append(feat.id())
+
+            if feedback:
+                feedback.setProgress(int((i + 1) / total * 100))
+
+        # 🔥 Remove multipart
+        if ids_to_delete:
+            layer.deleteFeatures(ids_to_delete)
+
+        # ➕ Adiciona singleparts
+        if new_features:
+            layer.addFeatures(new_features)
+
+        layer.updateExtents()
+        return True

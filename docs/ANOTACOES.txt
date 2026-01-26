@@ -34,7 +34,6 @@ BUGS CONHECIDOS
     - calculo automatico de campos trava em kmls ( nem deve ser permitido em kml)
     - impedir multipla instancias dos codigos
     - impedir que os plugins trave o qgis em todas as ferramentas
-    - Ferramenta de calculo ta deixando a camda edital realizando e ainda dando msg de erro
     - Arquivo shp precisa sempre executar 2 vezes para substituir(impossivel de resolver )
     - ferramenta de carregamento de pastas trava ao 
     - logcat trava as vezes pq ta escrevendo e lendo os logs em tempo real
@@ -56,7 +55,7 @@ ferramentas = name                              tipo                            
     - 14:
     - 15:
 
-PADRONIZADOS = 5 , 11 
+PADRONIZADOS = 5 , 10, 11 
 Documentação de cenarios: 8 e 10 e 11
 changelog=
     1.4.0.10 --- proximo passo desacoplar vectorutils de BasePluginMTL
