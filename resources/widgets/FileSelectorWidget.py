@@ -5,29 +5,29 @@ from qgis.PyQt.QtWidgets import (
     QLabel, QCheckBox, QLineEdit, QPushButton
 )
 from ...utils.string_utils import StringUtils
+from qgis.PyQt.QtWidgets import QFileDialog
 
 
 class FileSelectorWidget(QWidget):
     """
-    Widget exclusivo para seleção opcional de arquivo QML.
-    """
+
+    """    
+    MODE_OPEN = "open"
+    MODE_SAVE = "save"
 
     def __init__(
         self,
         *,
         checkbox_text="Arquivo?",
         label_text="Arquivo:",
-        file_filter=StringUtils.FILTER_ALL,
-        file_dialog_callback=None,
+        file_filter=StringUtils.FILTER_ALL,        
+        mode=MODE_OPEN,
         parent=None
     ):
         super().__init__(parent)
 
-        if file_dialog_callback is None:
-            raise ValueError("file_dialog_callback é obrigatório")
-
-        self._file_dialog_callback = file_dialog_callback
         self._file_filter = file_filter
+        self._mode = mode
 
         self._chk = QCheckBox(checkbox_text)
         self._txt = QLineEdit()
@@ -61,13 +61,16 @@ class FileSelectorWidget(QWidget):
         self._chk.toggled.connect(self._update_enabled_state)
 
         self._btn.clicked.connect(
-            lambda: self._file_dialog_callback(
+            lambda: self.select_file(
                 self._txt,
-                self._file_filter
+                self._file_filter,
+                self._mode
             )
         )
 
+
         self._update_enabled_state()
+
 
     def _update_enabled_state(self):
         enabled = self._chk.isChecked()
@@ -88,3 +91,22 @@ class FileSelectorWidget(QWidget):
 
     def set_file_path(self, path: str):
         self._txt.setText(path or "")
+        
+    def select_file(self, line_edit, file_filter, mode):
+        if mode == FileSelectorWidget.MODE_SAVE:
+            path, _ = QFileDialog.getSaveFileName(
+                self,
+                "Salvar arquivo",
+                line_edit.text(),
+                file_filter
+            )
+        else:
+            path, _ = QFileDialog.getOpenFileName(
+                self,
+                "Selecionar arquivo",
+                line_edit.text(),
+                file_filter
+            )
+
+        if path:
+            line_edit.setText(path)

@@ -78,6 +78,7 @@ class ProjectUtils:
             return False
 
     @staticmethod
+    
     def remove_layer_from_project(layer: QgsMapLayer) -> bool:
         """
         Remove a camada informada do projeto QGIS aberto.
@@ -100,6 +101,16 @@ class ProjectUtils:
         except Exception as e:
             LogUtilsOld.log("project_utils", f"Erro ao remover camada do projeto: {e}")
             return False
+        
+    
+    @staticmethod
+    def remove_layer_from_project2(layer: QgsMapLayer):
+        if not layer:
+            return
+        project = QgsProject.instance()
+        if project.mapLayer(layer.id()):
+            project.removeMapLayer(layer.id())
+    
     @staticmethod
     def is_file_in_project(file_path: str) -> bool:
         """

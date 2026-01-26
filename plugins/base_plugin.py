@@ -9,6 +9,9 @@ from pathlib import Path
 from typing import Optional
 import time
 
+from ..utils.vector.VectorLayerSource import VectorLayerSource
+from ..core.config.LogUtils import LogUtils
+
 
 from ..utils.crs_utils import get_coord_info
 from ..utils.info_dialog import InfoDialog
@@ -17,7 +20,6 @@ from ..utils.qgis_messagem_util import QgisMessageUtil
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
 from ..utils.tool_keys import ToolKey
 from ..utils.qgis_messagem_util import QgisMessageUtil
-from ..utils.ui_widget_utils import  OldUiWidgetUtils
 from ..utils.project_utils import  ProjectUtils
 from ..utils.string_utils import StringUtils
 from ..utils.vector_utils import VectorUtils
@@ -42,31 +44,23 @@ class BasePluginMTL(QDialog):
     Deve ser herdada por plugins específicos.
     """
     def _build_ui(self):
+        LogUtils.log(f"Construindo UI para plugin: {self.PLUGIN_NAME}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
         self.setWindowTitle(f"{self.APP_NAME} — {self.PLUGIN_NAME}")
         self.setMinimumWidth(460)
 
     def open_file(self, path):
+        LogUtils.log(f"Abrindo arquivo: {path}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
         if path and os.path.exists(path):
             QDesktopServices.openUrl(QUrl.fromLocalFile(path))
 
     def open_folder(self, path):
-        
+        LogUtils.log(f"Abrindo pasta: {path}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
         if path and os.path.exists(path):
             QDesktopServices.openUrl(QUrl.fromLocalFile(path))
     
     def create_action(self, icon_rel_path, text, callback):
-        """
-        Cria uma QAction, adiciona ao menu do plugin e registra internamente.
-
-        :param icon_rel_path: Caminho relativo do ícone dentro do plugin
-        :type icon_rel_path: str
-
-        :param text: Texto exibido no menu
-        :type text: str
-
-        :param callback: Função chamada ao acionar a ação
-        :type callback: callable
-        """
+        """Cria uma QAction e adiciona ao menu do plugin."""
+        LogUtils.log(f"Criando ação: {text}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
         icon_path = os.path.join(
             os.path.dirname(self.__class__.__module__.replace('.', os.sep)),
             icon_rel_path
@@ -79,18 +73,12 @@ class BasePluginMTL(QDialog):
         self.actions.append(action)
 
     def get_active_vector_layer(self, require_editable=False):
-        """
-        Retorna a camada vetorial ativa no QGIS, validando tipo e estado.
-
-        :param require_editable: Se True, exige que a camada esteja em modo edição
-        :type require_editable: bool
-
-        :return: Camada vetorial ativa ou None se inválida
-        :rtype: QgsVectorLayer | None
-        """
+        """Retorna a camada vetorial ativa, opcionalmente exigindo que esteja em edição."""
+        LogUtils.log(f"Obtendo camada vetorial ativa. Require editable: {require_editable}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
         layer = self.iface.activeLayer()
 
         if not layer or not isinstance(layer, QgsVectorLayer):
+            LogUtils.log("Camada ativa inválida ou não é vetorial", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
             QgisMessageUtil.bar_critical(
                 self.iface,
                 "Selecione uma camada vetorial"
@@ -105,15 +93,8 @@ class BasePluginMTL(QDialog):
         return layer
 
     def ensure_has_features(self, layer):
-        """
-        Verifica se a camada possui feições.
-
-        :param layer: Camada vetorial a ser validada
-        :type layer: QgsVectorLayer
-
-        :return: True se houver feições, False caso contrário
-        :rtype: bool
-        """
+        """Verifica se a camada possui feições."""
+        LogUtils.log(f"Verificando feições na camada: {layer.name()}. Total: {layer.featureCount()}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
         if layer.featureCount() == 0:
             QgisMessageUtil.bar_warning(
                 self.iface,
@@ -127,6 +108,7 @@ class BasePluginMTL(QDialog):
         return QgsProject.instance().mapLayer(combo.currentData())
     
     def ensure_editable(self, layer):
+        LogUtils.log(f"Verificando se camada está em edição: {layer.name()}. Editável: {layer.isEditable()}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
         if not layer.isEditable():
             QgisMessageUtil.bar_critical(
                 self.iface,
@@ -159,12 +141,14 @@ class BasePluginMTL(QDialog):
         )
     
     def select_file_to_save(self,  target_line_edit: QLineEdit, filters: str):
-        # filters include common vector formats; QGIS will add drivers as available        
+        LogUtils.log(f"Abrindo diálogo para salvar arquivo", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
         f, _ = QFileDialog.getSaveFileName(self, 'Salvar como', target_line_edit.text() or '', filters)
         if f:
+            LogUtils.log(f"Arquivo selecionado para salvar: {f}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
             target_line_edit.setText(f)
 
     def select_file(self, target_line_edit: QLineEdit, filters: str):
+        LogUtils.log(f"Abrindo diálogo para selecionar arquivo", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
         f, _ = QFileDialog.getOpenFileName(
             self,
             "Selecionar arquivo",
@@ -172,6 +156,7 @@ class BasePluginMTL(QDialog):
             filters
         )
         if f:
+            LogUtils.log(f"Arquivo selecionado: {f}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
             target_line_edit.setText(f)
               
     def apply_qml_style(
@@ -179,11 +164,13 @@ class BasePluginMTL(QDialog):
         layer: QgsVectorLayer,
         qml_path: str
     ) -> bool:
+        LogUtils.log(f"Aplicando estilo QML à camada: {layer.name() if isinstance(layer, QgsVectorLayer) else 'inválida'}. Caminho: {qml_path}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
 
         if not isinstance(layer, QgsVectorLayer):
             return False
 
         if not qml_path or not os.path.exists(qml_path):
+            LogUtils.log(f"Caminho QML inválido ou não existe: {qml_path}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
             return False
 
         ok = layer.loadNamedStyle(qml_path)
@@ -192,10 +179,12 @@ class BasePluginMTL(QDialog):
 
         if ok:
             layer.triggerRepaint()
+            LogUtils.log(f"Estilo QML aplicado com sucesso", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
 
         return bool(ok)
     
     def save_vector_layer(self,layer, output_path, save_to_folder, output_name = "LAYER_OUTPUT"):
+        LogUtils.log(f"Iniciando salvamento de camada. Output: {output_path}. Save to folder: {save_to_folder}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
         # -------------------------------------------------
         # 6) salvar em disco (se solicitado)
         # -------------------------------------------------
@@ -205,8 +194,8 @@ class BasePluginMTL(QDialog):
         layer = None  # liberar memória 
 
 
-        if save_to_folder and output_path:
-
+        if save_to_folder:
+ 
             decision = None
             if os.path.exists(output_path):
                 decision = QgisMessageUtil.ask_overwrite(
@@ -219,24 +208,29 @@ class BasePluginMTL(QDialog):
                 
 
             if decision == "overwrite":
-                ProjectUtils.remove_file_from_project_hard(output_path)  
-                LogUtilsOld.log("toolkey", "Overwrite solicitado pelo usuário.")
+                ProjectUtils.remove_file_from_project_hard(output_path)
+                LogUtils.log(f"Overwrite solicitado pelo usuário para: {output_path}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
             
-            #-------------------------------------------------
-        
-            saved_path = VectorUtils.save_layer(
+            #-------------------------------------------------       
+         
+            LogUtils.log(f"Salvando camada em disco: {output_path} Existe: {os.path.exists(output_path)}. Save to folder: {save_to_folder}. Decision: {decision}. Final layer: {final_layer}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
+            saved_path = VectorLayerSource.save_vector_layer_to_file(            
                 layer=final_layer,
-                output_path=output_path,
-                decision=decision
+                output_path=output_path,                
+                decision=decision,
+                external_tool_key=ToolKey.BASE_TOOL
+    
             )
 
             if not saved_path:
+                LogUtils.log(f"Falha ao salvar camada em: {output_path}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
                 QgisMessageUtil.bar_critical(
                     self.iface,
-                    f'Operação cancelada ou falha ao salvar. Vefifique se o arquivo esta carregado no projeto e tenten novamente.'                    
+                    f'Operação cancelada ou falha ao salvar. Vefifique se o arquivo esta carregado no projeto e tenten novamente.'
                 )
                 return None
             #---------------------------------------------------
+            LogUtils.log(f"Carregando camada salva: {saved_path}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
             final_layer = QgsVectorLayer(
                 saved_path,
                 Path(saved_path).stem,
@@ -245,6 +239,7 @@ class BasePluginMTL(QDialog):
 
 
         if not isinstance(final_layer, QgsVectorLayer) or not final_layer.isValid():
+            LogUtils.log(f"Camada salva é inválida", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
             QgisMessageUtil.modal_error(
                 self.iface,
                 "Camada salva é inválida."
@@ -255,11 +250,11 @@ class BasePluginMTL(QDialog):
         # -------------------------------------------------
         # 7) adicionar ao projeto
         # -------------------------------------------------
-        # garantir que o QGIS liberou o lock do arquivo
         if save_to_folder:
             output_name = Path(output_path).stem
         final_layer.setName(output_name)
         QgsProject.instance().addMapLayer(final_layer)
+        LogUtils.log(f"Camada adicionada ao projeto com nome: {output_name}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
 
         return final_layer
 

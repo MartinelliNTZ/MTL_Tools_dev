@@ -16,7 +16,8 @@ IMPLEMENTACOES
     - melhoria no drone cordinates gerar a area concave hull 0,025000
     aplicar buffer e so entao reprojetar novamente para evitar erros
     - nova ferramenta que aplica buffer negativo e positivo
-    - nova ferramenta que faz geometria por expressao e gera a diferenca entre dois pontos make_line(
+    - nova ferramenta que faz geometria por expressao e gera a diferenca entre dois pontos 
+    make_line(
     $geometry,
     geometry(
         get_feature(
@@ -58,6 +59,7 @@ ferramentas = name                              tipo                            
 
 changelog=
     1.4.0.10 --- proximo passo desacoplar vectorutils de BasePluginMTL
+    - colocar estilos no checkbox para checado marrom
 
     1.4.0.9  
     - uiwidget util desacoplada de gerar rastro

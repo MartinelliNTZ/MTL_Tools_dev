@@ -34,10 +34,16 @@ class GerarRastroDialog(BasePluginMTL):
     def __init__(self, iface):
         super().__init__(iface.mainWindow())        
         self.iface = iface
-        LogUtils.log("Inicializando diálogo Gerar Rastro Implemento", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
+        LogUtils.log("Inicializando diálogo Gerar Rastro Implemento", level="INFO", tool=self.TOOL_KEY)
         self.setWindowTitle("MTL Tools — Gerar Rastro Implemento")
         self.setMinimumWidth(360)
-        self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint)
+        self.setWindowFlags(
+            Qt.Dialog |
+            Qt.FramelessWindowHint
+        )
+
+        self.setAttribute(Qt.WA_TranslucentBackground, True)
+        #self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint)
        # self.setAttribute(Qt.WA_TranslucentBackground, True)
         icon_path = os.path.join(os.path.dirname(__file__), "..", "resources","icons", "gerar_rastro.ico")
         if os.path.exists(icon_path):
@@ -162,6 +168,7 @@ class GerarRastroDialog(BasePluginMTL):
         LogUtils.log(f"Preferências salvas: tamanho={data['last_implement_length']}m, salvar_arquivo={data['save_to_folder']}", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
 
     def on_run(self):
+        self._save_prefs()
         LogUtils.log("Iniciando processamento: Gerar Rastro Implemento", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         layer = self.layer_input.current_layer()
 

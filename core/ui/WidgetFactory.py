@@ -106,11 +106,13 @@ class WidgetFactory:
 
         widget = FileSelectorWidget(
             parent=parent,
-            file_dialog_callback=parent.select_file,
             file_filter=file_filter,
             checkbox_text=checkbox_text,
             label_text=label_text,
+            mode=FileSelectorWidget.MODE_OPEN
         )
+
+        widget.setStyleSheet(Styles.file_selector())
 
         layout.addWidget(widget)
 
@@ -149,11 +151,13 @@ class WidgetFactory:
 
         widget = FileSelectorWidget(
             parent=parent,
-            file_dialog_callback=parent.select_file,
             file_filter=file_filter,
             checkbox_text=checkbox_text,
             label_text=label_text,
+            mode=FileSelectorWidget.MODE_SAVE
         )
+
+        widget.setStyleSheet(Styles.file_selector())
 
         layout.addWidget(widget)
 
