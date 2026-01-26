@@ -56,10 +56,12 @@ ferramentas = name                              tipo                            
     - 14:
     - 15:
 
-
+PADRONIZADOS = 5 , 11 
+Documentação de cenarios: 8 e 10 e 11
 changelog=
     1.4.0.10 --- proximo passo desacoplar vectorutils de BasePluginMTL
     - colocar estilos no checkbox para checado marrom
+    - Iniciado o VectorLayerAttributes
 
     1.4.0.9  
     - uiwidget util desacoplada de gerar rastro

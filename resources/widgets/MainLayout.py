@@ -2,6 +2,7 @@ from qgis.PyQt.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
     QLineEdit, QMessageBox, QCheckBox, QTextEdit, QComboBox, QListWidget, QDoubleSpinBox, QGridLayout, QFrame
 )
+from qgis.PyQt.QtWidgets import QLayout, QWidget
 from ..styles.Styles import Styles
 class MainLayout(QVBoxLayout):
     def __init__(self, parent=None):
@@ -36,3 +37,26 @@ class MainLayout(QVBoxLayout):
 
     def addSpacing(self, *args, **kwargs):
         self._inner_layout.addSpacing(*args, **kwargs)
+        
+    def add_items(self, items):
+        """
+        Adiciona widgets e/ou layouts ao layout interno,
+        respeitando a ordem da lista.
+
+        Parameters
+        ----------
+        items : iterable
+            Lista ou tupla contendo QLayout e/ou QWidget
+        """
+        if not items:
+            return
+
+        for item in items:
+            if isinstance(item, QLayout):
+                self._inner_layout.addLayout(item)
+            elif isinstance(item, QWidget):
+                self._inner_layout.addWidget(item)
+            else:
+                raise TypeError(
+                    f"Tipo inválido em MainLayout.add_items: {type(item)}"
+                )

@@ -4,6 +4,7 @@ from qgis.PyQt.QtWidgets import (
     QLineEdit, QMessageBox, QCheckBox, QTextEdit, QComboBox, QListWidget, QDoubleSpinBox, QGridLayout, QFrame
 )
 from qgis.PyQt.QtCore import QObject, QEvent, Qt
+from qgis.PyQt.QtWidgets import QLayout, QWidget
 from qgis.gui import QgsMapLayerComboBox
 from ...utils.string_utils import StringUtils
 from ...resources.widgets.LayerInputWidget import LayerInputWidget
@@ -12,6 +13,7 @@ from ...resources.widgets.BottomActionButtonsWidget import BottomActionButtonsWi
 from ...resources.widgets.MainLayout import MainLayout
 from ...resources.styles.Styles import Styles
 from ...resources.widgets.AppBarWidget import AppBarWidget
+from ...resources.widgets.AttributeSelectorWidget import AttributeSelectorWidget
 
 
 
@@ -23,6 +25,35 @@ class WidgetFactory:
 
 
 class WidgetFactory:
+    
+    
+    @staticmethod
+    def create_attribute_selector(
+        *,
+        parent=None,
+        title="Atributos",
+        check_all_text="Usar todos os atributos",        
+        separator_top=False,
+        separator_bottom=True,
+    ):
+        layout = QVBoxLayout()
+
+        if separator_top:
+            layout.addWidget(WidgetFactory.create_separator())
+
+        widget = AttributeSelectorWidget(
+            title=title,
+            check_all_text=check_all_text,
+            parent=parent
+        )
+
+        layout.addWidget(widget)
+
+        if separator_bottom:
+            layout.addWidget(WidgetFactory.create_separator())
+
+        widget.setStyleSheet(Styles.attribute_selector())
+        return layout, widget
 
     @staticmethod
     def create_app_bar(

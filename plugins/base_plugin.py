@@ -1,21 +1,18 @@
 from qgis.PyQt.QtWidgets import (
-    QDialog, QAction,QFileDialog, QLineEdit
+    QDialog, QAction,QFileDialog, QLineEdit,QSizeGrip
 )
 from qgis.core import QgsVectorLayer, QgsWkbTypes, QgsApplication, QgsProject,QgsFeatureRequest
-from qgis.PyQt.QtGui import QDesktopServices
-from qgis.PyQt.QtCore import QUrl
+from qgis.PyQt.QtGui import QDesktopServices, QIcon
+from qgis.PyQt.QtCore import QUrl, Qt
+
 import os
 from pathlib import Path
 from typing import Optional
-import time
 
 from ..utils.vector.VectorLayerSource import VectorLayerSource
 from ..core.config.LogUtils import LogUtils
-
-
-from ..utils.crs_utils import get_coord_info
+from ..core.ui.WidgetFactory import WidgetFactory
 from ..utils.info_dialog import InfoDialog
-from ..utils.qgis_messagem_util import QgisMessageUtil
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
 from ..utils.tool_keys import ToolKey
 from ..utils.qgis_messagem_util import QgisMessageUtil
@@ -31,6 +28,7 @@ from ..utils.string_utils import StringUtils
 class BasePluginMTL(QDialog):
     APP_NAME = StringUtils.APP_NAME
     PLUGIN_NAME = ""
+    layout = None
     """
     Classe base para plugins do MTL Tools.
 
@@ -41,10 +39,60 @@ class BasePluginMTL(QDialog):
 
     Deve ser herdada por plugins específicos.
     """
-    def _build_ui(self):
-        LogUtils.log(f"Construindo UI para plugin: {self.PLUGIN_NAME}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
-        self.setWindowTitle(f"{self.APP_NAME} — {self.PLUGIN_NAME}")
-        self.setMinimumWidth(460)
+
+
+    def _build_ui(
+        self,
+        title: Optional[str] = None,
+        icon_path: Optional[str] = "mtl_agro.ico",
+        instructions_file: Optional[str] = "standard.md"
+    ):
+        if title is not None:
+            self.PLUGIN_NAME = title
+            self.layout = WidgetFactory.create_main_layout(self, title=title)
+
+        LogUtils.log(
+            f"Construindo UI para plugin: {self.PLUGIN_NAME}",
+            level="DEBUG",
+            tool=ToolKey.BASE_TOOL,
+            class_name="BasePluginMTL"
+        )
+
+        self.setWindowFlags(Qt.Dialog | Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground, True)
+        self.setMinimumSize(460, 320)
+        self.setWindowTitle(f"MTL Tools — {self.PLUGIN_NAME}")
+
+        # Size grip (resize)
+        self.size_grip = QSizeGrip(self.layout._frame)
+        self.size_grip.setFixedSize(16, 16)
+        self.layout.addWidget(
+            self.size_grip,
+            alignment=Qt.AlignBottom | Qt.AlignRight
+        )
+
+        # Ícone
+        icon_path = os.path.join(
+            os.path.dirname(__file__), "..", "resources", "icons", icon_path
+        )
+        if os.path.exists(icon_path):
+            self.setWindowIcon(QIcon(icon_path))
+            LogUtils.log(
+                f"Ícone carregado de: {icon_path}",
+                level="DEBUG",
+                tool=self.TOOL_KEY,
+                class_name="GerarRastroDialog"
+            )
+
+        # instruções
+        self.instructions_file = os.path.join(
+            os.path.dirname(__file__),
+            "..",
+            "resources",
+            "instructions",
+            instructions_file
+        )
+
 
     def open_file(self, path):
         LogUtils.log(f"Abrindo arquivo: {path}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
@@ -117,6 +165,7 @@ class BasePluginMTL(QDialog):
 
     def show_info_dialog(self, title="📘 Instruções"):
         if hasattr(self, "instructions_file"):
+            title = f"📘 Instruções – {self.PLUGIN_NAME}"
             InfoDialog(self.instructions_file, self, title).exec() 
             
     def show_project_file(self):

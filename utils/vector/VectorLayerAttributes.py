@@ -1,3 +1,30 @@
+# -*- coding: utf-8 -*-
+from pathlib import Path
+from qgis.core import (
+            QgsVectorFileWriter,
+            QgsProject,
+            QgsVectorLayer,
+            QgsCoordinateReferenceSystem,
+            QgsCoordinateTransform,
+            QgsFeature,
+            QgsGeometry, 
+            QgsPointXY,  
+            QgsWkbTypes,
+            QgsFeatureRequest,
+            QgsField
+        )
+from qgis.core import (
+    QgsVectorLayer,
+    QgsVectorFileWriter,
+    QgsProject,
+    QgsCoordinateTransformContext
+)
+from pathlib import Path
+import os
+from typing import Optional
+import processing
+
+
 class VectorLayerAttributes:
     """
     Responsável por campos e atributos de camadas vetoriais.
@@ -24,6 +51,72 @@ class VectorLayerAttributes:
     def get_layer_fields(self, layer, external_tool_key="untraceable"):
         """Retorna lista com todos os campos da camada e seus tipos."""
         pass
+
+    @staticmethod
+    def copy_attributes(
+        target_layer,
+        source_layer,
+        field_names=None,
+        conflict_resolver=None
+    ):
+        """
+        Copia estrutura de atributos da camada source para target.
+
+        conflict_resolver(field_name) -> "skip" | "rename" | "cancel"
+        """
+
+        if not target_layer.isEditable():
+            target_layer.startEditing()
+
+        for field in source_layer.fields():
+
+            if field_names and field.name() not in field_names:
+                continue
+
+            idx = target_layer.fields().indexOf(field.name())
+
+            # campo não existe
+            if idx == -1:
+                target_layer.addAttribute(QgsField(
+                    field.name(),
+                    field.type(),
+                    field.typeName(),
+                    field.length(),
+                    field.precision()
+                ))
+                continue
+
+            # conflito
+            action = "skip"
+            if conflict_resolver:
+                action = conflict_resolver(field.name())
+
+            if action == "cancel":
+                return False
+
+            if action == "rename":
+                new_name = VectorLayerAttributes._generate_field_name(
+                    target_layer, field.name()
+                )
+                target_layer.addAttribute(QgsField(
+                    new_name,
+                    field.type(),
+                    field.typeName(),
+                    field.length(),
+                    field.precision()
+                ))
+
+        target_layer.updateFields()
+        return True
+    
+    @staticmethod
+    def _generate_field_name(layer, base):
+        i = 1
+        while layer.fields().indexOf(f"{base}_{i}") != -1:
+            i += 1
+        return f"{base}_{i}"
+
+
 
     def create_new_field(self, layer, field_name, field_type, field_width, external_tool_key="untraceable"):
         """Cria um novo campo na camada com tipo e tamanho especificados."""

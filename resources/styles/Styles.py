@@ -30,8 +30,8 @@ class Styles:
 
     FONT_FAMILY_DEFAULT = "'Segoe UI', Arial, sans-serif"
     FONT_SIZE_TITLE = "20pt"
-    FONT_SIZE_NORMAL = "9.5pt"
-    FONT_SIZE_SMALL = "8.5pt"
+    FONT_SIZE_NORMAL = "9.0pt"
+    FONT_SIZE_SMALL = "8.0pt"
 
     # ==========================================================
     # ESTILOS GERAIS (APLICAÇÃO INTEIRA)
@@ -186,7 +186,7 @@ class Styles:
                 stop:1 {Styles.COLOR_PRIMARY});
             border-bottom: 1px solid {Styles.COLOR_BORDER};
             border-radius: 8px;
-            min-height: 42px;
+            min-height: 35px;
         }}
 
         #app_bar_title {{
@@ -287,6 +287,7 @@ class Styles:
             padding: 8px;
         }}
         """
+    
     @staticmethod
     def file_selector():
         return f"""
@@ -344,5 +345,140 @@ class Styles:
             height: 3px;
             border: none;
             margin: 4px 0px;
+        }}
+        """
+
+
+    @staticmethod
+    def attribute_selector():
+        """
+        Estilo exclusivo para AttributeSelectorWidget
+        """
+        return f"""
+        /* =========================
+        TÍTULO
+        ========================= */
+        QLabel {{
+            color: {Styles.COLOR_TEXT_PRIMARY};
+            font-family: {Styles.FONT_FAMILY_DEFAULT};
+            font-size: {Styles.FONT_SIZE_NORMAL};
+            font-weight: bold;
+            background: transparent;
+        }}
+
+        /* =========================
+        CHECKBOX "USAR TODOS"
+        ========================= */
+        QCheckBox {{
+            color: {Styles.COLOR_TEXT_PRIMARY};
+            font-family: {Styles.FONT_FAMILY_DEFAULT};
+            font-size: {Styles.FONT_SIZE_NORMAL};
+            spacing: 6px;
+            background: transparent;
+        }}
+
+        QCheckBox::indicator {{
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            border: 1px solid {Styles.COLOR_BORDER};
+            background: {Styles.COLOR_BACKGROUND_PANEL};
+        }}
+
+        QCheckBox::indicator:checked {{
+            background: {Styles.COLOR_PRIMARY};
+            border: 1px solid {Styles.COLOR_PRIMARY_DARK};
+        }}
+
+        QCheckBox::indicator:checked:hover {{
+            background: {Styles.COLOR_PRIMARY_LIGHT};
+        }}
+
+        QCheckBox:disabled {{
+            color: {Styles.COLOR_TEXT_SECONDARY};
+        }}
+
+        /* =========================
+        LISTA DE ATRIBUTOS
+        ========================= */
+        QListWidget {{
+            background: {Styles.COLOR_BACKGROUND_PANEL};
+            color: {Styles.COLOR_TEXT_PRIMARY};
+            font-family: {Styles.FONT_FAMILY_DEFAULT};
+            font-size: {Styles.FONT_SIZE_NORMAL};
+            border: 1px solid {Styles.COLOR_BORDER};
+            border-radius: 6px;
+            padding: 4px;
+            outline: none;
+        }}
+
+        QListWidget:disabled {{
+            background: {Styles.COLOR_BACKGROUND_SOFT};
+            color: {Styles.COLOR_TEXT_SECONDARY};
+        }}
+
+        QListWidget::item {{
+            padding: 4px 6px;
+            border-radius: 3px;
+        }}
+
+        QListWidget::item:selected {{
+            background: rgba(166, 120, 79, 120);
+            color: {Styles.COLOR_TEXT_PRIMARY};
+        }}
+
+        QListWidget::item:hover {{
+            background: rgba(166, 120, 79, 60);
+        }}
+
+        /* =========================
+        CHECKBOX DOS ITENS
+        ========================= */
+        QListWidget::indicator {{
+            width: 14px;
+            height: 14px;
+        }}
+
+        QListWidget::indicator:unchecked {{
+            border: 1px solid {Styles.COLOR_BORDER};
+            background: transparent;
+        }}
+
+        QListWidget::indicator:checked {{
+            background: {Styles.COLOR_PRIMARY};
+            border: 1px solid {Styles.COLOR_PRIMARY_DARK};
+        }}
+
+        /* =========================
+        BOTÕES (Selecionar / Remover / Inverter)
+        ========================= */
+        QPushButton {{
+            background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                stop:0 {Styles.COLOR_PRIMARY},
+                stop:1 {Styles.COLOR_PRIMARY_DARK});
+            color: #ffffff;
+            font-family: {Styles.FONT_FAMILY_DEFAULT};
+            font-size: {Styles.FONT_SIZE_SMALL};
+            font-weight: bold;
+            border: 1px solid {Styles.COLOR_PRIMARY_DARK};
+            border-radius: 6px;
+            padding: 4px 10px;
+            min-height: 26px;
+        }}
+
+        QPushButton:hover {{
+            background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                stop:0 {Styles.COLOR_PRIMARY_LIGHT},
+                stop:1 {Styles.COLOR_PRIMARY});
+        }}
+
+        QPushButton:pressed {{
+            background: {Styles.COLOR_PRIMARY_DARK};
+        }}
+
+        QPushButton:disabled {{
+            background: {Styles.COLOR_BACKGROUND_SOFT};
+            color: {Styles.COLOR_TEXT_SECONDARY};
+            border: 1px solid {Styles.COLOR_BORDER};
         }}
         """

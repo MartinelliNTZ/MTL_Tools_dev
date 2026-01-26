@@ -34,22 +34,7 @@ class GerarRastroDialog(BasePluginMTL):
     def __init__(self, iface):
         super().__init__(iface.mainWindow())        
         self.iface = iface
-        LogUtils.log("Inicializando diálogo Gerar Rastro Implemento", level="INFO", tool=self.TOOL_KEY)
-        self.setWindowTitle("MTL Tools — Gerar Rastro Implemento")
-        self.setMinimumWidth(360)
-        self.setWindowFlags(
-            Qt.Dialog |
-            Qt.FramelessWindowHint
-        )
-
-        self.setAttribute(Qt.WA_TranslucentBackground, True)
-        #self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint)
-       # self.setAttribute(Qt.WA_TranslucentBackground, True)
-        icon_path = os.path.join(os.path.dirname(__file__), "..", "resources","icons", "gerar_rastro.ico")
-        if os.path.exists(icon_path):
-            self.setWindowIcon(QIcon(icon_path))
-            LogUtils.log(f"Ícone carregado de: {icon_path}", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
-
+        LogUtils.log("Inicializando diálogo Gerar Rastro Implemento", level="INFO", tool=self.TOOL_KEY)  
         LogUtils.log("Construindo interface de usuário", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         self._build_ui()
         LogUtils.log("Carregando preferências do usuário", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
@@ -58,76 +43,46 @@ class GerarRastroDialog(BasePluginMTL):
         
         
     def _build_ui(self):
-        # -------------------------------------------------------
-        # LAYOUT
-        # -------------------------------------------------------
-        layout = WidgetFactory.create_main_layout(self, title="Gerar Rastro de Máquinas")
+        super()._build_ui(title = "Gerar Rastro de Máquinas",icon_path="gerar_rastro.ico",instructions_file="generate_trail_help.md")  
         LogUtils.log("Construindo interface da ferramenta", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
 
 
         #novo
-        l1, self.layer_input = WidgetFactory.create_layer_input(
+        layer_layout, self.layer_input = WidgetFactory.create_layer_input(
             label_text="Camada de Linhas (INPUT):",
             filters=[QgsMapLayerProxyModel.LineLayer],
             parent=self
         )
-        layout.addLayout(l1)
-
         LogUtils.log("Componente de camada de entrada adicionado", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
 
         # tamanhoimplemento
-        h2, self.spin_tam = WidgetFactory.create_double_spin_input(
+        tam_layout, self.spin_tam = WidgetFactory.create_double_spin_input(
             "Tamanho implemento: (sempre em metros)",separator_bottom=False,
         )
-        layout.addLayout(h2)
         LogUtils.log("Componente de tamanho de implemento adicionado", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         
 
         #---------------------------------------
 
         # salvar em arquivo ou temporário (campo único: arquivo completo)
-   
-        
-        #novo
         save_layout, self.save_selector = WidgetFactory.create_save_file_selector(
-            parent=self,
-            file_filter=StringUtils.FILTER_VECTOR,
-            separator_top=True
+            parent=self,            file_filter=StringUtils.FILTER_VECTOR,            separator_top=True
         )
-        layout.addLayout(save_layout)
         LogUtils.log("Componente de salvamento de arquivo adicionado", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
 
 
         # aplicar estilo QML
-        #novo
-        qml_layout, self.qml_selector = WidgetFactory.create_qml_selector(
-            parent=self
-        )
-        layout.addLayout(qml_layout)
+        qml_layout, self.qml_selector = WidgetFactory.create_qml_selector(            parent=self        )       
+        LogUtils.log("Componente de estilo QML adicionado", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")     
 
-        #----
-
-
-        LogUtils.log("Componente de estilo QML adicionado", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")      
-
-        # instruções
-        self.instructions_file = os.path.join(
-            os.path.dirname(__file__),"..","resources", "instructions", "generate_trail_help.md"# Caminho do arquivo de instruções
-        )      
-         
         # buttons
         buttons_layout, self.action_buttons = WidgetFactory.create_bottom_action_buttons(
-            parent=self,
-            run_callback=self.on_run,
-            close_callback=self.close,
-            info_callback=lambda: self.show_info_dialog(
-                "📘 Instruções – Gerar Rastro de Máquinas"
-            ),
-            tool_key=self.TOOL_KEY,
-        )
-
-        layout.addLayout(buttons_layout)
-        self.setLayout(layout)
+            parent=self,            run_callback=self.on_run,            close_callback=self.close, 
+            info_callback=self.show_info_dialog,            tool_key=self.TOOL_KEY,        ) 
+        
+        #-----------------------------------------------------------------------       
+        self.layout.add_items([layer_layout,tam_layout, save_layout, qml_layout,  buttons_layout])
+        self.setLayout(self.layout)
         LogUtils.log("Interface da ferramenta construída com sucesso", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
 
     def _load_prefs(self):
@@ -174,10 +129,7 @@ class GerarRastroDialog(BasePluginMTL):
 
         if not isinstance(layer, QgsVectorLayer):
             LogUtils.log("Nenhuma camada de linhas válida selecionada", level="WARNING", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
-            QgisMessageUtil.bar_warning(
-                self.iface,
-                "Selecione uma camada de linhas válida."
-            )
+            QgisMessageUtil.bar_warning(                self.iface,                "Selecione uma camada de linhas válida."            )
             return
         #receber valores
         tam = float(self.spin_tam.value())
@@ -237,7 +189,6 @@ class GerarRastroDialog(BasePluginMTL):
         output_path: Optional[str] = None,
         output_name: str = "Rastro_Implemento",
         only_selected: bool = False,
-        feedback=None
     ) -> Optional[QgsVectorLayer]:
 
 

@@ -9,12 +9,12 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.core import QgsVectorLayer, QgsWkbTypes, QgsMapLayerProxyModel
 from qgis.gui import QgsMapLayerComboBox
 
-from ..utils.vector_utils import VectorUtils
 from ..utils.tool_keys import ToolKey
-from ..utils.log_utils import LogUtilsOld
+from ..core.config.LogUtils import LogUtils
 from ..utils.qgis_messagem_util import QgisMessageUtil
-from ..utils.ui_widget_utils import OldUiWidgetUtils
+from ..core.ui.WidgetFactory import WidgetFactory
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
+from ..utils.vector.VectorLayerAttributes import VectorLayerAttributes
 from .base_plugin import BasePluginMTL
 
 
@@ -24,10 +24,7 @@ class CopyAttributes(BasePluginMTL):
     def __init__(self, iface):
         super().__init__(iface.mainWindow())
         self.iface = iface
-        icon_path = os.path.join(os.path.dirname(__file__), "..", "resources","icons", "copy_attributes.ico")
-        if os.path.exists(icon_path):
-            self.setWindowIcon(QIcon(icon_path))
-        self.PLUGIN_NAME = "Copiar Atributos"
+
         self._build_ui()
         self._load_prefs()
 
@@ -35,121 +32,118 @@ class CopyAttributes(BasePluginMTL):
     # UI
     # =========================
     def _build_ui(self):
-        super()._build_ui()       
-        layout = QVBoxLayout(self)
-        
-        self.instructions_file = os.path.join(
-            os.path.dirname(__file__),
-            "..","resources", "instructions",
-            "copy_attributes_help.md"
-        )
+        super()._build_ui("Copiar Atributos de Vetor","copy_attributes.ico","copy_attributes_help.md")       
+              
+        LogUtils.log("Construindo interface da ferramenta", level="INFO", tool=self.TOOL_KEY, class_name="CopyAttributtes")
+
 
         # CAMADA DESTINO
-        tgt_layout, self.cmb_target, _ = OldUiWidgetUtils.create_layer_input(
-            "Camada destino:",
-            QgsMapLayerProxyModel.VectorLayer, enable_selected_checkbox=False
+        tgt_layout, self.target_layer_input = WidgetFactory.create_layer_input(
+            label_text="Camada de Destino:",
+            filters=[QgsMapLayerProxyModel.VectorLayer],
+            parent=self
         )
-        layout.addLayout(tgt_layout)
-
+        LogUtils.log("Componente de camada de target adicionado", level="DEBUG", tool=self.TOOL_KEY, class_name="CopyAttributtes")        
         # CAMADA ORIGEM
-        src_layout, self.cmb_source, _ = OldUiWidgetUtils.create_layer_input(
-            "Camada origem:",
-            QgsMapLayerProxyModel.VectorLayer, enable_selected_checkbox=False
-        )
-        layout.addLayout(src_layout)
+        src_layout, self.source_layer_input = WidgetFactory.create_layer_input(
+            label_text="Camada de Origem:",
+            filters=[QgsMapLayerProxyModel.VectorLayer],
+            parent=self
+        )        
+        self.source_layer_input.layerChanged.connect(self._populate_fields)
+
+        LogUtils.log("Componente de camada de origem adicionado", level="DEBUG", tool=self.TOOL_KEY, class_name="CopyAttributtes")    
+
+
 
         # ATRIBUTOS
-        (
-            attr_layout,
-            self.chk_all,
-            self.lst_fields,
-            _,
-            _, _
-        ) = OldUiWidgetUtils.create_attribute_selector(
-            title="Atributos da camada origem"
-        )
+        attr_layout, self.attr_widget = WidgetFactory.create_attribute_selector(
+            parent=self,
+            title="Atributos da camada origem"       )
 
-        layout.addLayout(attr_layout)
 
         # BOTÕES
-        layout.addLayout(
-            OldUiWidgetUtils.create_run_close_buttons(
-                self._run,
-                self.close,
-                info_callback=lambda: self.show_info_dialog(
-            "📘 Instruções – Copiar Atributos"
-        )
-            )
-        )
+        buttons_layout, self.action_buttons = WidgetFactory.create_bottom_action_buttons(
+            parent=self,            run_callback=self.on_run,        
+            close_callback=self.close, 
+            info_callback=self.show_info_dialog,            tool_key=self.TOOL_KEY,        ) 
+        
 
         # SIGNALS
-        self.cmb_source.layerChanged.connect(self._populate_fields)
+        #self.cmb_source.layerChanged.connect(self._populate_fields)
 
         # AUTO SETUP
-        self._auto_select_layers()
+        self.layout.add_items([tgt_layout,src_layout,attr_layout, buttons_layout])        
         self._populate_fields()
 
-    # =========================
-    # UI HELPERS
-    # =========================
-    def _auto_select_layers(self):
-        layer = self.iface.activeLayer()
-        if isinstance(layer, QgsVectorLayer):
-            self.cmb_target.setLayer(layer)
 
     def _populate_fields(self):
-        self.lst_fields.clear()
-
-        layer = self.cmb_source.currentLayer()
+        layer = self.source_layer_input.current_layer()
         if not isinstance(layer, QgsVectorLayer):
+            self.attr_widget.set_fields([])
             return
 
-        for field in layer.fields():
-            item = QListWidgetItem(field.name())
-            item.setCheckState(Qt.Checked)
-            self.lst_fields.addItem(item)
+        self.attr_widget.set_fields(
+            [f.name() for f in layer.fields()]
+        )
+
             
     def _load_prefs(self):
         prefs = load_tool_prefs(self.TOOL_KEY)
-        self.chk_all.setChecked(prefs.get("chk_all", False))
+        self.attr_widget.set_checked_all(prefs.get("chk_all", False))
         
 
     def _save_prefs(self):       
         data = {}
-        data['chk_all'] = bool(self.chk_all.isChecked())
+        data['chk_all'] = bool(self.attr_widget.use_all_fields())
         save_tool_prefs(self.TOOL_KEY, data)
     # =========================
     # CONTROLLER
     # =========================
-    def _run(self):
-        target = self.cmb_target.currentLayer()
-        source = self.cmb_source.currentLayer()
+    def on_run(self):
+        self._save_prefs()
+        LogUtils.log(
+            "Execução iniciada",
+            level="INFO",
+            tool=self.TOOL_KEY,
+            class_name="CopyAttributes"
+        )
 
-        if not isinstance(target, QgsVectorLayer):
-            return
+        source = self.source_layer_input.current_layer()
+        target = self.target_layer_input.current_layer()
 
         if not isinstance(source, QgsVectorLayer):
+            QgisMessageUtil.bar_warning(self.iface, "Camada de origem inválida")
+            LogUtils.log("Camada de origem inválida", level="WARNING", tool=self.TOOL_KEY, class_name="CopyAttributes")
+            return
+
+        if not isinstance(target, QgsVectorLayer):
+            QgisMessageUtil.bar_warning(self.iface, "Camada de destino inválida")
+            LogUtils.log("Camada de destino inválida", level="WARNING", tool=self.TOOL_KEY, class_name="CopyAttributes")
             return
 
         if not self.ensure_editable(target):
+            LogUtils.log("Camada de destino não editável", level="WARNING", tool=self.TOOL_KEY, class_name="CopyAttributes")
             return
 
         fields = None
-        if not self.chk_all.isChecked():
-            fields = [
-                self.lst_fields.item(i).text()
-                for i in range(self.lst_fields.count())
-                if self.lst_fields.item(i).checkState() == Qt.Checked
-            ]
+        if not self.attr_widget.use_all_fields():
+            fields = self.attr_widget.get_selected_fields()
 
-        LogUtilsOld.log(self.TOOL_KEY, "Iniciando cópia de atributos")
+            if not fields:
+                QgisMessageUtil.bar_warning(self.iface, "Nenhum atributo selecionado")
+                LogUtils.log("Execução abortada: nenhum atributo selecionado", level="WARNING", tool=self.TOOL_KEY, class_name="CopyAttributes")
+                return
+
+
 
         def conflict_resolver(field_name):
             return QgisMessageUtil.ask_field_conflict(
-                self.iface, field_name
+                self.iface,
+                field_name
             )
 
-        ok = VectorUtils.copy_attributes(
+        ok = VectorLayerAttributes.copy_attributes(
             target_layer=target,
             source_layer=source,
             field_names=fields,
@@ -157,11 +151,10 @@ class CopyAttributes(BasePluginMTL):
         )
 
         if ok:
-            QgisMessageUtil.bar_success(
-                self.iface,
-                "Atributos copiados (alterações não salvas)"
-            )
-        self._save_prefs()
+            QgisMessageUtil.bar_success(self.iface, "Atributos copiados com sucesso (alterações não salvas)")
+            LogUtils.log("Cópia de atributos finalizada com sucesso", level="INFO", tool=self.TOOL_KEY, class_name="CopyAttributes")
+        else:
+            LogUtils.log("Falha na cópia de atributos", level="ERROR", tool=self.TOOL_KEY, class_name="CopyAttributes")
 
 def run_copy_attributes(iface):
     dlg = CopyAttributes(iface)
