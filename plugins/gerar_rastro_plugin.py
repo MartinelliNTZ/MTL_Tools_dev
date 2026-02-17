@@ -9,7 +9,7 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtCore import Qt
 import os
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Tuple
 import tempfile
 
 from ..utils.vector.VectorLayerSource import VectorLayerSource
@@ -187,7 +187,7 @@ class GerarRastroDialog(BasePluginMTL):
 
         self._save_prefs()
         
-    def _resolve_input_layer(self, input_layer, tamanhoimplemento: float) -> tuple[Optional[QgsVectorLayer], float]:
+    def _resolve_input_layer(self, input_layer, tamanhoimplemento: float) -> Tuple[Optional[QgsVectorLayer], float]:
         """Etapa 1: Resolver camada de entrada e converter tamanho se necessário"""
         LogUtils.log("1/6] Resolvendo camada de entrada", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         layer = (

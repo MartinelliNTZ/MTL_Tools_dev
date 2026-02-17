@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 
-from shapely import points
+#from shapely import points
 from qgis.PyQt.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel,
     QPushButton, QCheckBox, QLineEdit, QFileDialog

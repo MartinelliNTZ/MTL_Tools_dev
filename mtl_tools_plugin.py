@@ -41,7 +41,7 @@ class MTL_Tools:
             LogUtils.info("Processing Provider carregado com sucesso", tool=self.TOOL_KEY)
         except Exception as e:
             LogUtils.error(f"Erro ao carregar Processing Provider: {str(e)}", tool=self.TOOL_KEY)
-            QgisMessageUtil.bar_critical(self.iface.mainWindow(),f"Erro ao carregar provider. Erro: {e}")
+            QgisMessageUtil.bar_critical(self.iface,f"Erro ao carregar provider. Erro: {e}")
         # -------------------------
         # 2) CRIAR TOOLBAR EXCLUSIVA
         # -------------------------
@@ -342,7 +342,7 @@ class MTL_Tools:
             LogUtils.info("Plugin Restart QGIS executado com sucesso", tool=self.TOOL_KEY)
         except Exception as e:
             LogUtils.error(f"Erro ao executar Restart QGIS: {str(e)}", tool=self.TOOL_KEY)
-            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro no plugin Restart QGIS:\n{str(e)}")
+            QgisMessageUtil.bar_critical(self.iface, f"Erro no plugin Restart QGIS:\n{str(e)}")
 
 #===========================FERRAMENTAS INSTANTANEAS===================================================================
     # =====================================================
@@ -358,7 +358,7 @@ class MTL_Tools:
             LogUtils.info("Plugin Calcular Campos Vetoriais executado com sucesso", tool=self.TOOL_KEY)
         except Exception as e:
             LogUtils.error(f"Erro ao executar Calcular Campos Vetoriais: {str(e)}", tool=self.TOOL_KEY)
-            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro no plugin Calcular Campos Vetoriais:\n{str(e)}")
+            QgisMessageUtil.bar_critical(self.iface, f"Erro no plugin Calcular Campos Vetoriais:\n{str(e)}")
         
     # =====================================================
     # EXECUTAR: Converter para Multipart
@@ -373,7 +373,7 @@ class MTL_Tools:
             LogUtils.info("Plugin Converter para Multipart executado com sucesso", tool=self.TOOL_KEY)
         except Exception as e:
             LogUtils.error(f"Erro ao executar Converter para Multipart: {str(e)}", tool=self.TOOL_KEY)
-            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro no plugin Converter para Multipart:\n{str(e)}")
+            QgisMessageUtil.bar_critical(self.iface, f"Erro no plugin Converter para Multipart:\n{str(e)}")
  
 #===========================FERRAMENTAS INSTANTANEA COM JANELA DE RESULTADOS=======================================================================
        
@@ -389,7 +389,7 @@ class MTL_Tools:
             LogUtils.info("Ferramenta Capturar Coordenadas ativada com sucesso", tool=self.TOOL_KEY)
         except Exception as e:
             LogUtils.error(f"Erro ao ativar Capturar Coordenadas: {str(e)}", tool=self.TOOL_KEY)
-            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro na ferramenta Capturar Coordenadas:\n{str(e)}")
+            QgisMessageUtil.bar_critical(self.iface, f"Erro na ferramenta Capturar Coordenadas:\n{str(e)}")
         
 
 #===========================FERRAMENTAS DE JANELA COM SAIDA QGIS=======================================================================
@@ -405,7 +405,7 @@ class MTL_Tools:
             LogUtils.info("Diálogo Exportar Layouts fechado", tool=self.TOOL_KEY)
         except Exception as e:
             LogUtils.error(f"Erro ao executar Exportar Layouts: {str(e)}", tool=self.TOOL_KEY)
-            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro no plugin Exportar Layouts:\n{str(e)}")
+            QgisMessageUtil.bar_critical(self.iface, f"Erro no plugin Exportar Layouts:\n{str(e)}")
 
     # =====================================================
     # EXECUTAR: Gerar Rastro Implemento (painel)
@@ -418,7 +418,7 @@ class MTL_Tools:
             LogUtils.info("Diálogo Gerar Rastro Implemento aberto com sucesso", tool=self.TOOL_KEY)
         except Exception as e:
             LogUtils.error(f"Erro ao executar Gerar Rastro Implemento: {str(e)}", tool=self.TOOL_KEY)
-            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro no plugin Gerar Rastro Implemento:\n{str(e)}")
+            QgisMessageUtil.bar_critical(self.iface, f"Erro no plugin Gerar Rastro Implemento:\n{str(e)}")
     # =====================================================
     # EXECUTAR: Logcat Tool
     # =====================================================
@@ -430,7 +430,7 @@ class MTL_Tools:
             LogUtils.info("Diálogo Logcat aberto com sucesso", tool=self.TOOL_KEY)
         except Exception as e:
             LogUtils.error(f"Erro ao executar Logcat: {str(e)}", tool=self.TOOL_KEY)
-            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro no plugin Logcat:\n{str(e)}")
+            QgisMessageUtil.bar_critical(self.iface, f"Erro no plugin Logcat:\n{str(e)}")
 
 
 
@@ -446,7 +446,7 @@ class MTL_Tools:
             LogUtils.info("Diálogo Obter Coordenadas de Drone aberto com sucesso", tool=self.TOOL_KEY)
         except Exception as e:
             LogUtils.error(f"Erro ao executar Obter Coordenadas de Drone: {str(e)}", tool=self.TOOL_KEY)
-            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro no plugin Obter Coordenadas de Drone:\n{str(e)}")
+            QgisMessageUtil.bar_critical(self.iface, f"Erro no plugin Obter Coordenadas de Drone:\n{str(e)}")
 
 
        
@@ -464,7 +464,7 @@ class MTL_Tools:
             LogUtils.info("Diálogo Substituir Layouts aberto com sucesso", tool=self.TOOL_KEY)
         except Exception as e:
             LogUtils.error(f"Erro ao executar Substituir Layouts: {str(e)}", tool=self.TOOL_KEY)
-            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro no plugin Substituir Layouts:\n{str(e)}")
+            QgisMessageUtil.bar_critical(self.iface, f"Erro no plugin Substituir Layouts:\n{str(e)}")
 
 
     # =====================================================
@@ -478,7 +478,7 @@ class MTL_Tools:
             LogUtils.info("Plugin Carregar pasta de arquivos executado com sucesso", tool=self.TOOL_KEY)
         except Exception as e:
             LogUtils.error(f"Erro ao executar Carregar pasta de arquivos: {str(e)}", tool=self.TOOL_KEY)
-            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro no plugin Carregar pasta:\n{str(e)}")
+            QgisMessageUtil.bar_critical(self.iface, f"Erro no plugin Carregar pasta:\n{str(e)}")
 
  
     # =====================================================
@@ -492,7 +492,7 @@ class MTL_Tools:
             LogUtils.info("Diálogo Sobre MTL Tools fechado", tool=self.TOOL_KEY)
         except Exception as e:
             LogUtils.error(f"Erro ao executar Sobre o MTL Tools: {str(e)}", tool=self.TOOL_KEY)
-            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro ao abrir Sobre MTL Tools:\n{str(e)}")
+            QgisMessageUtil.bar_critical(self.iface, f"Erro ao abrir Sobre MTL Tools:\n{str(e)}")
         
     # =====================================================
     # EXECUTAR: Base Tool
@@ -505,7 +505,7 @@ class MTL_Tools:
             LogUtils.info("Plugin Base Tool executado com sucesso", tool=self.TOOL_KEY)
         except Exception as e:
             LogUtils.error(f"Erro ao executar Base Tool: {str(e)}", tool=self.TOOL_KEY)
-            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro no plugin Base Tool:\n{str(e)}")
+            QgisMessageUtil.bar_critical(self.iface, f"Erro no plugin Base Tool:\n{str(e)}")
         
     # =====================================================
     # EXECUTAR: Copiar Atributos entre Camadas
@@ -518,7 +518,7 @@ class MTL_Tools:
             LogUtils.info("Diálogo Copiar Atributos aberto com sucesso", tool=self.TOOL_KEY)
         except Exception as e:
             LogUtils.error(f"Erro ao executar Copiar Atributos: {str(e)}", tool=self.TOOL_KEY)
-            QgisMessageUtil.bar_critical(self.iface.mainWindow(), f"Erro no plugin Copiar Atributos:\n{str(e)}")
+            QgisMessageUtil.bar_critical(self.iface, f"Erro no plugin Copiar Atributos:\n{str(e)}")
 
         
 

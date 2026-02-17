@@ -57,7 +57,19 @@ ferramentas = name                              tipo                            
 
 PADRONIZADOS = 5 , 10, 11 
 Documentação de cenarios: 8 e 10 e 11
+OQUE EU TAVA FAZENDO? 
+eu tava padronizando todas os plugins para usarem a nova widgetfactory, novas classes de manipulacao de vetor, novos estilos, baseplugin,
+uma porrada de coisa, a gerar e a mais padrao de tudo 
+porem percebi que deveria colocar as coisas em task para deixa mais eficiente ainda entao na gerar rastro a explode linhas ja ta em task
+porem preciso ter a buffer em task e entao ir passando plugin/plugin 
+antes de criar qualquer ferramtne preciso analisar melhor criar primeiramente a ui e depois vir gerando metodos SEMPRE
 changelog=
+    1.4.0.12 2026/02/17
+    - compatibilidade com 3.16 do gerar rastro
+    - Tirei bug de markdown no 3.16
+    - Bug de shapely no drone cordinates
+    1.4.0.11
+    - criei task de explode linhas 
     1.4.0.10 --- proximo passo desacoplar vectorutils de BasePluginMTL
     - colocar estilos no checkbox para checado marrom
     - Iniciado o VectorLayerAttributes
