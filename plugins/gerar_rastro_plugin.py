@@ -1,30 +1,27 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
-    QComboBox, QDoubleSpinBox, QMessageBox, QCheckBox, QLineEdit, QFileDialog, 
-)
-from qgis.gui import QgsMapLayerComboBox
-from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes, QgsMapLayerProxyModel, QgsFeatureRequest, QgsApplication
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtCore import Qt
+from ..core.task.SaveVectorLayerTask import SaveVectorLayerTask
+from ..core.engine_tasks.BufferStep import BufferStep
+from ..core.engine_tasks.ExecutionContext import ExecutionContext
+from ..core.engine_tasks.ExplodeStep import ExplodeStep
+from ..core.engine_tasks.SaveVectorStep import SaveVectorStep
+from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes, QgsMapLayerProxyModel, QgsApplication
 import os
-from pathlib import Path
 from typing import Optional, Tuple
 import tempfile
 
-from ..utils.vector.VectorLayerSource import VectorLayerSource
-
-from ..utils.qgis_messagem_util import QgisMessageUtil
-from ..utils.preferences import load_tool_prefs, save_tool_prefs
-from ..utils.tool_keys import ToolKey
 from ..plugins.base_plugin import BasePluginMTL
 from ..utils.qgis_messagem_util import QgisMessageUtil
-from ..utils.project_utils import  ProjectUtils
 from ..utils.string_utils import StringUtils
 from ..utils.vector.VectorLayerGeometry import VectorLayerGeometry
+from ..utils.vector.VectorLayerProjection import VectorLayerProjection
+from ..utils.vector.VectorLayerSource import VectorLayerSource
+from ..utils.preferences import load_tool_prefs, save_tool_prefs
+from ..utils.tool_keys import ToolKey
 from ..core.config.LogUtils import LogUtils
 from ..core.ui.WidgetFactory import WidgetFactory
+from ..core.engine_tasks.AsyncPipelineEngine import AsyncPipelineEngine
 from ..core.task.ExplodeHugeLayerTask import ExplodeHugeLayerTask
+from ..core.task.BufferLayerTask import BufferLayerTask
 
 
 class GerarRastroDialog(BasePluginMTL):
@@ -42,10 +39,8 @@ class GerarRastroDialog(BasePluginMTL):
         LogUtils.log("Carregando preferências do usuário", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         self._load_prefs()
         LogUtils.log("Diálogo Gerar Rastro Implemento inicializado com sucesso", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
-        self._tasks = []
 
-        
-        
+            
     def _build_ui(self):
         super()._build_ui(title = "Gerar Rastro de Máquinas",icon_path="gerar_rastro.ico",instructions_file="generate_trail_help.md")  
         LogUtils.log("Construindo interface da ferramenta", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
@@ -196,10 +191,12 @@ class GerarRastroDialog(BasePluginMTL):
             else QgsProject.instance().mapLayer(input_layer)
         )
         LogUtils.log(f"Camada resolvida: {layer.name() if layer else 'None'}", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
-        
+        tamanhoimplemento = VectorLayerProjection.convert_distance_to_layer_units(
+            layer,
+            tamanhoimplemento
+        )
         if layer.crs().authid() == "EPSG:4326":
             original_tam = tamanhoimplemento
-            tamanhoimplemento = tamanhoimplemento / 111120.0
             LogUtils.log(f"CRS em WGS84 detectado. Tamanho convertido: {original_tam}m → {tamanhoimplemento:.6f}°", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
 
         if not isinstance(layer, QgsVectorLayer):
@@ -211,22 +208,6 @@ class GerarRastroDialog(BasePluginMTL):
             return None, tamanhoimplemento
         
         return layer, tamanhoimplemento
-
-    def _validate_layer_type(self, layer: QgsVectorLayer) -> bool:
-        """Etapa 2: Validar tipo de camada (deve ser LINE)"""
-        LogUtils.log("2/6] Validando tipo de camada", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
-        layer_type = VectorLayerGeometry.get_layer_type(layer)
-        LogUtils.log(f"Tipo de camada detectado: {layer_type}", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
-
-        if layer_type != QgsWkbTypes.LineGeometry:
-            LogUtils.log(f"Tipo de camada inválido. Esperado: LINE, Obtido: {layer_type}", level="ERROR", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
-            QgisMessageUtil.modal_error(
-                self.iface,
-                "A camada de entrada deve ser do tipo LINHA."
-            )
-            return False
-        LogUtils.log("Camada validada como tipo LINE", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
-        return True
 
     def _process_selection(self, layer: QgsVectorLayer, only_selected: bool) -> Optional[QgsVectorLayer]:
         """Etapa 3: Processar seleção de feições"""
@@ -244,49 +225,6 @@ class GerarRastroDialog(BasePluginMTL):
             LogUtils.log(f"Processando todas as feições da camada. Total: {layer.featureCount()}", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         
         return layer
-
-    def _explode_lines(self, layer: QgsVectorLayer) -> Optional[QgsVectorLayer]:
-        """Etapa 4: Explodir linhas em segmentos"""
-        LogUtils.log("4/6] Explodindo linhas em segmentos", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
-        LogUtils.log(f"Iniciando explosão de {layer.featureCount()} feições...", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
-        
-        exploded = VectorLayerGeometry.explode_multipart_features(
-            layer=layer , external_tool_key=self.TOOL_KEY           
-        )
-
-        if exploded is None:
-            LogUtils.log("Falha ao explodir linhas", level="ERROR", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
-            QgisMessageUtil.modal_error(
-                self.iface,
-                "Falha ao explodir linhas."
-            )
-            return None
-        
-        LogUtils.log(f"Linhas explodidas com sucesso. Total de segmentos: {exploded.featureCount()}", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
-        return exploded
-
-    def _generate_buffer(self, exploded: QgsVectorLayer, tamanhoimplemento: float) -> Optional[QgsVectorLayer]:
-        """Etapa 5: Gerar buffer (rastro)"""
-        LogUtils.log("5/6] Gerando buffer (rastro)", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
-        distance = float(tamanhoimplemento) / 2.0
-        LogUtils.log(f"Distância de buffer: {distance}m (metade do tamanho: {tamanhoimplemento}m)", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
-
-        buffer_layer = VectorLayerGeometry.create_buffer_geometry(
-            layer=exploded,
-            distance=distance,
-            output_path=None,  # 👈 SEMPRE memory aqui            
-        )
-
-        if buffer_layer is None:
-            LogUtils.log("Falha ao gerar buffer", level="ERROR", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
-            QgisMessageUtil.modal_error(
-                self.iface,
-                "Falha ao gerar buffer."
-            )
-            return None
-        
-        LogUtils.log(f"Buffer gerado com sucesso. Total de polígonos: {buffer_layer.featureCount()}", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
-        return buffer_layer
 
     def _save_result(self, buffer_layer: QgsVectorLayer, output_path: Optional[str], save_to_folder: bool, output_name: str) -> Optional[QgsVectorLayer]:
         """Etapa 6: Salvar resultado"""
@@ -311,164 +249,76 @@ class GerarRastroDialog(BasePluginMTL):
         only_selected: bool = False,
     ) -> Optional[QgsVectorLayer]:
 
-        # Etapa 1: Resolver camada
         layer, tamanhoimplemento = self._resolve_input_layer(input_layer, tamanhoimplemento)
         if layer is None:
             return None
 
-        # Etapa 2: Validar tipo
-        if not self._validate_layer_type(layer):
+        ok, error = VectorLayerSource.validate_layer(
+            layer,
+            expected_geometry=QgsWkbTypes.LineGeometry
+        )
+
+        if not ok:
+            QgisMessageUtil.modal_error(self.iface, error)
             return None
 
-        # Etapa 3: Processar seleção
         layer = self._process_selection(layer, only_selected)
         if layer is None:
             return None
         
-        # Etapa 4: Explodir linhas (ASYNC)
-        self._explode_lines_async(
-            layer=layer,
-            tamanhoimplemento=tamanhoimplemento,
-            output_path=output_path,
-            save_to_folder=save_to_folder,
-            output_name=output_name,
+
+        context = ExecutionContext()
+        context.set("layer", layer)
+        context.set("tamanhoimplemento", tamanhoimplemento)
+        context.set("save_to_folder", save_to_folder)
+        context.set("output_path", output_path)
+        context.set("output_name", output_name)
+        context.set("tool_key", self.TOOL_KEY)
+
+        buffer_distance = float(tamanhoimplemento) / 2.0
+
+        context.set("buffer_distance", buffer_distance)
+        context.set("buffer_dissolve", False)
+
+        engine = AsyncPipelineEngine(
+            steps=[
+                ExplodeStep(),
+                BufferStep(),
+                SaveVectorStep()
+            ],
+            context=context,
+          #  iface=self.iface,
+            on_finished=self._on_pipeline_finished,
+            on_error=self._on_pipeline_error
         )
 
-        return None  # fluxo continua no callback
+        engine.start()
+        return None
 
-    def _load_exploded_layer(self, path: str) -> Optional[QgsVectorLayer]:
-        if not path or not os.path.exists(path):
-            LogUtils.log(
-                f"Arquivo explodido não encontrado: {path}",
-                level="ERROR",
-                tool=self.TOOL_KEY,
-                class_name="GerarRastroDialog"
-            )
-            return None
+    def _on_pipeline_finished(self, context):
 
-        layer = QgsVectorLayer(path, "exploded_lines", "ogr")
-        if not layer.isValid():
-            LogUtils.log(
-                f"Camada explodida inválida: {path}",
-                level="ERROR",
-                tool=self.TOOL_KEY,
-                class_name="GerarRastroDialog"
-            )
-            return None
+        final_path = context.get("current_path")
 
-        LogUtils.log(
-            f"Camada explodida carregada com sucesso: {layer.featureCount()} feições",
-            level="DEBUG",
-            tool=self.TOOL_KEY,
-            class_name="GerarRastroDialog"
-        )
-        return layer
+        buffer_layer = QgsVectorLayer(final_path, "buffer_tmp", "ogr")
 
-    def _explode_lines_async(
-        self,
-        layer: QgsVectorLayer,
-        tamanhoimplemento: float,
-        output_path: Optional[str],
-        save_to_folder: bool,
-        output_name: str,
-    ) -> None:
-
-        """Etapa 4: Explodir linhas em segmentos (ASYNC)"""
-
-        LogUtils.log(
-            "4/6] Explodindo linhas em segmentos (async)",
-            level="INFO",
-            tool=self.TOOL_KEY,
-            class_name="GerarRastroDialog"
-        )
-
-        tmp_dir = tempfile.mkdtemp(prefix="explode_")
-        input_path = os.path.join(tmp_dir, "input.gpkg")
-        output_path = os.path.join(tmp_dir, "exploded.gpkg")
-
-        input_path = VectorLayerSource.save_vector_layer_to_file(
-            layer=layer,
-            output_path=input_path,
-            decision="overwrite",
-            external_tool_key=self.TOOL_KEY
-        )
-        LogUtils.log(
-                f"Camada de entrada exportada para arquivo temporário: {input_path}, output_path={output_path}, tmp_dir={tmp_dir}",
-                level="DEBUG",
-                tool=self.TOOL_KEY,
-                class_name="GerarRastroDialog"
-            )
-
-        if input_path is None:
-            LogUtils.log(
-                "Falha ao exportar camada de entrada para processamento",
-                level="CRITICAL",
-                tool=self.TOOL_KEY,
-                class_name="GerarRastroDialog"
-            )
-            return None
-
-        task = ExplodeHugeLayerTask(
-            input_path=input_path,
-            output_path=output_path,
-            tool_key=self.TOOL_KEY
-        )
-        
-
-
-        task.on_success = lambda out_path: self._continue_after_explode(
-            exploded=self._load_exploded_layer(out_path),
-            tamanhoimplemento=tamanhoimplemento,
-            output_path=output_path,
-            save_to_folder=save_to_folder,
-            output_name=output_name
-        )
-        task.on_error = lambda exc: QgisMessageUtil.modal_error(
-            self.iface,
-            f"Falha ao explodir linhas:\n{exc}"
-        )
-        self._tasks.append(task)  
-        QgsApplication.taskManager().addTask(task)    
-        
-    def _continue_after_explode(
-        self,
-        exploded: Optional[QgsVectorLayer],
-        tamanhoimplemento: float,
-        output_path: Optional[str],
-        save_to_folder: bool,
-        output_name: str
-    ):
-        if exploded is None:
-            QgisMessageUtil.modal_error(
-                self.iface,
-                "Falha ao carregar camada explodida."
-            )
-            return
-
-
-        LogUtils.log(
-            "Explosão concluída, continuando processamento",
-            level="INFO",
-            tool=self.TOOL_KEY,
-            class_name="GerarRastroDialog"
-        )
-
-        buffer_layer = self._generate_buffer(exploded, tamanhoimplemento)
-        if buffer_layer is None:
-            return
-
-        result = self._save_result(
+        final_layer = self._save_result(
             buffer_layer,
-            output_path,
-            save_to_folder,
-            output_name
+            context.get("output_path"),
+            context.get("save_to_folder"),
+            context.get("output_name")
         )
 
-        if result:
-            QgisMessageUtil.bar_success(
-                self.iface,
-                "Processamento executado com sucesso."
-            )
+        if final_layer and self.qml_selector.is_enabled():
+            qml = self.qml_selector.get_file_path()
+            if qml:
+                self.apply_qml_style(final_layer, qml)
+
+        QgisMessageUtil.bar_success(
+            self.iface,
+            "Processamento executado com sucesso."
+        )
+
+
 
 
 def run_gerar_rastro(iface):

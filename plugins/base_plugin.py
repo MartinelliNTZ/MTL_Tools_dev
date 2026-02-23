@@ -230,78 +230,25 @@ class BasePluginMTL(QDialog):
 
         return bool(ok)
     
-    def save_vector_layer(self,layer, output_path, save_to_folder, output_name = "LAYER_OUTPUT"):
-        LogUtils.log(f"Iniciando salvamento de camada. Output: {output_path}. Save to folder: {save_to_folder}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
-        # -------------------------------------------------
-        # 6) salvar em disco (se solicitado)
-        # -------------------------------------------------
-        final_layer = layer.materialize(
-            QgsFeatureRequest()
+    def save_vector_layer(
+        self,
+        buffer_layer: QgsVectorLayer,
+        output_path: Optional[str],
+        save_to_folder: bool,
+        output_name: str
+    ) -> Optional[QgsVectorLayer]:
+
+        return VectorLayerSource.save_layer(
+            layer=buffer_layer,
+            output_path=output_path,
+            save_to_folder=save_to_folder,
+            output_name=output_name,
+            external_tool_key=self.TOOL_KEY
+        )    
+    def _on_pipeline_error(self, errors):
+        exc = errors[0] if errors else Exception("Erro desconhecido")
+
+        QgisMessageUtil.modal_error(
+            self.iface,
+            f"Erro durante processamento:\n{exc}"
         )
-        layer = None  # liberar memória 
-
-
-        if save_to_folder:
- 
-            decision = None
-            if os.path.exists(output_path):
-                decision = QgisMessageUtil.ask_overwrite(
-                    self.iface,
-                    output_path
-                )
-
-                if decision == "cancel":
-                    return None
-                
-
-            if decision == "overwrite":
-                ProjectUtils.remove_file_from_project_hard(output_path)
-                LogUtils.log(f"Overwrite solicitado pelo usuário para: {output_path}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
-            
-            #-------------------------------------------------       
-         
-            LogUtils.log(f"Salvando camada em disco: {output_path} Existe: {os.path.exists(output_path)}. Save to folder: {save_to_folder}. Decision: {decision}. Final layer: {final_layer}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
-            saved_path = VectorLayerSource.save_vector_layer_to_file(            
-                layer=final_layer,
-                output_path=output_path,                
-                decision=decision,
-                external_tool_key=ToolKey.BASE_TOOL
-    
-            )
-
-            if not saved_path:
-                LogUtils.log(f"Falha ao salvar camada em: {output_path}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
-                QgisMessageUtil.bar_critical(
-                    self.iface,
-                    f'Operação cancelada ou falha ao salvar. Vefifique se o arquivo esta carregado no projeto e tenten novamente.'
-                )
-                return None
-            #---------------------------------------------------
-            LogUtils.log(f"Carregando camada salva: {saved_path}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
-            final_layer = QgsVectorLayer(
-                saved_path,
-                Path(saved_path).stem,
-                "ogr"
-            )
-
-
-        if not isinstance(final_layer, QgsVectorLayer) or not final_layer.isValid():
-            LogUtils.log(f"Camada salva é inválida", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
-            QgisMessageUtil.modal_error(
-                self.iface,
-                "Camada salva é inválida."
-            )
-            return None
-
-
-        # -------------------------------------------------
-        # 7) adicionar ao projeto
-        # -------------------------------------------------
-        if save_to_folder:
-            output_name = Path(output_path).stem
-        final_layer.setName(output_name)
-        QgsProject.instance().addMapLayer(final_layer)
-        LogUtils.log(f"Camada adicionada ao projeto com nome: {output_name}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
-
-        return final_layer
-

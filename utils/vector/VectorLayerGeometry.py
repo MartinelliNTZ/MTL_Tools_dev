@@ -84,6 +84,55 @@ class VectorLayerGeometry:
 
         return result.get('OUTPUT')
 
+    @staticmethod
+    def create_buffer_to_path_safe(
+        *,
+        input_path: str,
+        output_path: str,
+        distance: float,
+        segments: int = 5,
+        end_cap_style: int = 1,
+        join_style: int = 1,
+        miter_limit: float = 2.0,
+        dissolve: bool = False,
+        external_tool_key="untraceable"
+    ) -> str:
+        """
+        Executa buffer usando arquivo físico (GPKG).
+        Seguro para execução em QgsTask.
+        """
+
+        LogUtils.log(
+            f"create_buffer_to_path_safe start: {input_path} -> {output_path}, distance={distance}",
+            level="INFO",
+            tool=external_tool_key,
+            class_name="VectorLayerGeometry"
+        )
+
+        if not input_path or not output_path:
+            raise ValueError("input_path e output_path são obrigatórios")
+
+        params = {
+            "INPUT": input_path,
+            "DISTANCE": distance,
+            "SEGMENTS": segments,
+            "END_CAP_STYLE": end_cap_style,
+            "JOIN_STYLE": join_style,
+            "MITER_LIMIT": miter_limit,
+            "DISSOLVE": dissolve,
+            "OUTPUT": output_path
+        }
+
+        processing.run("native:buffer", params)
+
+        LogUtils.log(
+            "create_buffer_to_path_safe completed",
+            level="INFO",
+            tool=external_tool_key,
+            class_name="VectorLayerGeometry"
+        )
+
+        return output_path
 
 
     def explode_multipart_features(        *, 

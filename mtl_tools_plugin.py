@@ -139,7 +139,7 @@ class MTL_Tools:
             self.action_about_dialog.triggered.connect(self.run_about_dialog)
             
             # 12-Logcat Tool
-            logcat_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "mtl_agro.ico")
+            logcat_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "logcat.ico")
             self.action_logcat = QAction(QIcon(logcat_icon), "Logcat - Viewer de Logs", self.iface.mainWindow())
             self.action_logcat.triggered.connect(self.run_logcat)
             

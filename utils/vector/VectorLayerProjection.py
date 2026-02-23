@@ -1,37 +1,80 @@
+# -*- coding: utf-8 -*-
+
+from typing import Optional
+
+from qgis.core import (
+    QgsVectorLayer,
+    QgsCoordinateReferenceSystem,
+    QgsCoordinateTransform,
+    QgsProject,
+    QgsUnitTypes,
+    QgsFeature,
+    QgsGeometry
+)
+
+
 class VectorLayerProjection:
     """
-    Responsável pelo CRS, reprojeção e unidades de camadas vetoriais.
-    
-    Escopo:
-    - Gerenciar sistemas de referência de coordenadas
-    - Reprojetar camadas entre CRS diferentes
-    - Converter unidades de medida
-    - Validar compatibilidade de CRS
-    - Gerenciar transformações de coordenadas
-    
-    Responsabilidade Principal:
-    - Orquestrar operações de reprojeção e conversão de CRS
-    - Garantir consistência espacial entre camadas
-    - Converter entre sistemas de unidades
-    
-    NÃO é Responsabilidade:
-    - Alterar atributos da camada (use VectorLayerAttributes)
-    - Calcular métricas espaciais (use VectorLayerMetrics)
-    - Transformar geometria além de reprojeção (use VectorLayerGeometry)
-    - Carregar ou salvar camadas (use VectorLayerSource)
+    Responsável por:
+
+    - CRS
+    - Conversão de unidades
+    - Reprojeção
+
+    NÃO salva camada.
+    NÃO valida regra de negócio.
+    NÃO altera atributos.
     """
 
-    def get_layer_crs(self, layer, external_tool_key="untraceable"):
-        """Obtém o CRS atual da camada."""
-        pass
-
-    def set_layer_crs(self, layer, target_crs, external_tool_key="untraceable"):
-        """Define o CRS da camada sem reprojetar (apenas muda a definição)."""
-        pass
-
-    def reproject_layer_to_crs(self, layer, target_crs, external_tool_key="untraceable"):
+    # ---------------------------------------------------------
+    # CONVERSÃO DE DISTÂNCIA
+    # ---------------------------------------------------------
+    @staticmethod
+    def convert_distance_to_layer_units(
+        layer: QgsVectorLayer,
+        distance_meters: float
+    ) -> float:
         """
-        Cria uma camada reprojetada em memória.
+        Converte uma distância em METROS
+        para a unidade da camada.
+
+        Dialog nunca deve saber se é grau, metro ou pé.
+        """
+
+        if not layer or not layer.isValid():
+            return distance_meters
+
+        crs = layer.crs()
+        unit = crs.mapUnits()
+
+        # Se já estiver em metros
+        if unit == QgsUnitTypes.DistanceMeters:
+            return distance_meters
+
+        # Se estiver em graus (ex: EPSG:4326)
+        if unit == QgsUnitTypes.DistanceDegrees:
+            # Conversão média aproximada
+            # 1 grau ≈ 111320 metros
+            return distance_meters / 111320.0
+
+        # Outras unidades (feet, etc.)
+        factor = QgsUnitTypes.fromUnitToUnitFactor(
+            QgsUnitTypes.DistanceMeters,
+            unit
+        )
+
+        return distance_meters * factor
+
+    # ---------------------------------------------------------
+    # REPROJEÇÃO EM MEMÓRIA
+    # ---------------------------------------------------------
+    @staticmethod
+    def reproject_layer(
+        layer: QgsVectorLayer,
+        target_crs: QgsCoordinateReferenceSystem
+    ) -> Optional[QgsVectorLayer]:
+        """
+        Cria uma nova camada em memória reprojetada.
         """
 
         if not layer or not layer.isValid():
@@ -41,13 +84,15 @@ class VectorLayerProjection:
             return None
 
         source_crs = layer.crs()
+
         if source_crs == target_crs:
             return layer
 
-        uri = f"{layer.geometryType()}?crs={target_crs.authid()}"
+        uri = f"{layer.wkbType()}?crs={target_crs.authid()}"
         new_layer = QgsVectorLayer(uri, f"{layer.name()}_reprojected", "memory")
 
-        new_layer.dataProvider().addAttributes(layer.fields())
+        provider = new_layer.dataProvider()
+        provider.addAttributes(layer.fields())
         new_layer.updateFields()
 
         transform = QgsCoordinateTransform(
@@ -57,6 +102,7 @@ class VectorLayerProjection:
         )
 
         feats = []
+
         for feat in layer.getFeatures():
             new_feat = QgsFeature(layer.fields())
             new_feat.setAttributes(feat.attributes())
@@ -69,11 +115,39 @@ class VectorLayerProjection:
 
             feats.append(new_feat)
 
-        new_layer.dataProvider().addFeatures(feats)
+        provider.addFeatures(feats)
         new_layer.updateExtents()
 
         return new_layer
 
+    # ---------------------------------------------------------
+    # GARANTIR CRS ESPECÍFICO
+    # ---------------------------------------------------------
+    @staticmethod
+    def ensure_crs(
+        layer: QgsVectorLayer,
+        target_crs: QgsCoordinateReferenceSystem
+    ) -> Optional[QgsVectorLayer]:
+        """
+        Garante que a camada esteja no CRS desejado.
+        Se já estiver, retorna ela mesma.
+        Caso contrário, reprojeta.
+        """
+
+        if not layer or not layer.isValid():
+            return None
+
+        if layer.crs() == target_crs:
+            return layer
+
+        return VectorLayerProjection.reproject_layer(layer, target_crs)
+    def get_layer_crs(self, layer, external_tool_key="untraceable"):
+        """Obtém o CRS atual da camada."""
+        pass
+
+    def set_layer_crs(self, layer, target_crs, external_tool_key="untraceable"):
+        """Define o CRS da camada sem reprojetar (apenas muda a definição)."""
+        pass
     def validate_crs_compatibility(self, layer1, layer2, external_tool_key="untraceable"):
         """Verifica se duas camadas possuem CRS compatíveis ou próximos."""
         pass

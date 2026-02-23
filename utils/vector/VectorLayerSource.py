@@ -3,22 +3,15 @@ from qgis.core import (
             QgsVectorFileWriter,
             QgsProject,
             QgsVectorLayer,
-            QgsCoordinateReferenceSystem,
-            QgsCoordinateTransform,
-            QgsFeature,
-            QgsGeometry, 
-            QgsPointXY,  
             QgsWkbTypes,
             QgsFeatureRequest,
-            QgsField
+            QgsVectorLayer,
+        QgsVectorFileWriter,
+        QgsProject,
         )
-from qgis.core import (
-    QgsVectorLayer,
-    QgsVectorFileWriter,
-    QgsProject,
-    QgsCoordinateTransformContext
-)
+from typing import Optional, Tuple 
 import os
+import tempfile 
 import time
 from ...utils.string_utils import StringUtils
 from ...utils.project_utils import ProjectUtils
@@ -45,18 +38,6 @@ class VectorLayerSource:
     - Manipular atributos (use VectorLayerAttributes)
     - Renderizar ou exibir dados
     """
-
-    def load_vector_layer_from_file(self, file_path, external_tool_key="untraceable"):
-        """Carrega uma camada vetorial de um arquivo no disco."""
-        pass
-
-    def load_vector_layer_from_database(self, connection_string, layer_name, external_tool_key="untraceable"):
-        """Carrega uma camada vetorial de um banco de dados."""
-        pass
-
-    def create_memory_layer(self, layer_name, geometry_type, crs, external_tool_key="untraceable"):
-        """Cria uma camada vetorial em memória com geometria e CRS especificados."""
-        pass
 
     @staticmethod
     def save_vector_layer_to_file(
@@ -231,10 +212,83 @@ class VectorLayerSource:
             class_name=class_name
         )
 
-        return final_path
+        return final_path  
+    
+    # ------------------------------------------------------------------
+    # SALVAMENTO CENTRALIZADO
+    # ------------------------------------------------------------------
+    @staticmethod
+    def save_layer(
+        layer: QgsVectorLayer,
+        *,
+        output_path: Optional[str],
+        save_to_folder: bool,
+        output_name: str,
+        decision: Optional[str] = None,
+        external_tool_key: str = "untraceable"
+    ) -> Optional[QgsVectorLayer]:
 
-    
-    
+        if not layer or not layer.isValid():
+            return None
+
+        final_layer = layer.materialize(QgsFeatureRequest())
+        layer = None  # libera memória
+
+        # -------------------------------------------------
+        # salvar em disco
+        # -------------------------------------------------
+        if save_to_folder:
+
+            saved_path = VectorLayerSource.save_vector_layer_to_file(
+                layer=final_layer,
+                output_path=output_path,
+                decision=decision or "rename",
+                external_tool_key=external_tool_key
+            )
+
+            if not saved_path:
+                return None
+
+            final_layer = QgsVectorLayer(
+                saved_path,
+                Path(saved_path).stem,
+                "ogr"
+            )
+
+            if not final_layer.isValid():
+                return None
+
+        # -------------------------------------------------
+        # adicionar ao projeto
+        # -------------------------------------------------
+        if save_to_folder:
+            output_name = Path(output_path).stem
+
+        final_layer.setName(output_name)
+        QgsProject.instance().addMapLayer(final_layer)
+
+        return final_layer
+
+    @staticmethod
+    def export_temp_layer(
+        layer: QgsVectorLayer,
+        prefix: str = "tmp_layer",
+        external_tool_key: str = "untraceable"
+    ) -> Optional[str]:
+
+        if not layer or not layer.isValid():
+            return None
+
+        tmp_dir = tempfile.mkdtemp(prefix=prefix)
+        output_path = os.path.join(tmp_dir, f"{prefix}.gpkg")
+
+        return VectorLayerSource.save_vector_layer_to_file(
+            layer=layer,
+            output_path=output_path,
+            decision="overwrite",
+            external_tool_key=external_tool_key
+        )
+
     @staticmethod
     def delete_shapefile_set(base_path, retries=5, delay=0.3):
         """
@@ -272,6 +326,65 @@ class VectorLayerSource:
             counter += 1
 
         return new_path
+
+
+    # ------------------------------------------------------------------
+    # VALIDAÇÃO CENTRALIZADA
+    # ------------------------------------------------------------------
+    @staticmethod
+    def validate_layer(
+        layer: QgsVectorLayer,
+        *,
+        expected_geometry: Optional[int] = None,
+        require_editable: bool = False
+    ) -> Tuple[bool, Optional[str]]:
+        """
+        Valida camada vetorial com regras padronizadas.
+
+        Retorna:
+            (True, None) se OK
+            (False, "mensagem erro") se inválida
+        """
+
+        if not layer:
+            return False, "Nenhuma camada foi informada."
+
+        if not isinstance(layer, QgsVectorLayer):
+            return False, "Objeto informado não é uma camada vetorial."
+
+        if not layer.isValid():
+            return False, "Camada inválida."
+
+        if expected_geometry is not None:
+            if layer.geometryType() != expected_geometry:
+                expected_name = QgsWkbTypes.displayString(expected_geometry)
+                current_name = QgsWkbTypes.displayString(layer.geometryType())
+                return False, (
+                    f"Tipo de geometria inválido.\n"
+                    f"Esperado: {expected_name}\n"
+                    f"Atual: {current_name}"
+                )
+
+        if require_editable and not layer.isEditable():
+            return False, "A camada precisa estar em modo de edição."
+
+        return True, None
+
+
+
+
+    def load_vector_layer_from_file(self, file_path, external_tool_key="untraceable"):
+        """Carrega uma camada vetorial de um arquivo no disco."""
+        pass
+
+    def load_vector_layer_from_database(self, connection_string, layer_name, external_tool_key="untraceable"):
+        """Carrega uma camada vetorial de um banco de dados."""
+        pass
+
+    def create_memory_layer(self, layer_name, geometry_type, crs, external_tool_key="untraceable"):
+        """Cria uma camada vetorial em memória com geometria e CRS especificados."""
+        pass
+
 
     def save_vector_layer_to_database(self, layer, connection_string, table_name, external_tool_key="untraceable"):
         """Salva uma camada vetorial em um banco de dados."""
