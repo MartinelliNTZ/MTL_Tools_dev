@@ -39,25 +39,65 @@ class VectorLayerSource:
     - Renderizar ou exibir dados
     """
 
-    @staticmethod
-    def save_vector_layer_to_file(
-        layer: QgsVectorLayer,
-        output_path,
-        decision="rename",
-        external_tool_key="untraceable"
-    ):
-        class_name = "VectorLayerSource"
 
-        LogUtils.log(
-            f"Iniciando salvamento da camada: {layer.name() if layer else 'None'}",
-            level="INFO",
-            tool=external_tool_key,
-            class_name=class_name
-        )
+    # ------------------------------------------------------------------
+    # SAVE VECTOR LAYER (UNIFICADO E BIG-DATA SAFE)
+    # ------------------------------------------------------------------
+    @staticmethod
+    def save_vector_layer(
+            layer: QgsVectorLayer,
+            *,
+            save_to_folder: bool = False,
+            output_path: Optional[str] = None,
+            output_name: Optional[str] = None,
+            decision: str = "rename",
+            external_tool_key: str = "untraceable"
+    ) -> Optional[QgsVectorLayer]:
+
+        class_name = "VectorLayerSource"
 
         if not layer or not layer.isValid():
             LogUtils.log(
-                "Camada inválida",
+                "Camada inválida para salvamento.",
+                level="CRITICAL",
+                tool=external_tool_key,
+                class_name=class_name
+            )
+            return None
+
+        # ==========================================================
+        # CASO 1 — MEMÓRIA
+        # ==========================================================
+        if not save_to_folder:
+            layer_name = output_name or layer.name()
+
+            LogUtils.log(
+                f"Criando camada em memória: {layer_name}",
+                level="INFO",
+                tool=external_tool_key,
+                class_name=class_name
+            )
+
+            memory_layer = QgsVectorLayer(
+                f"{QgsWkbTypes.displayString(layer.wkbType())}?crs={layer.crs().authid()}",
+                layer_name,
+                "memory"
+            )
+
+            provider = memory_layer.dataProvider()
+            provider.addAttributes(layer.fields())
+            memory_layer.updateFields()
+            provider.addFeatures(layer.getFeatures())
+            memory_layer.updateExtents()
+
+            return memory_layer
+
+        # ==========================================================
+        # CASO 2 — DISCO (NOME VEM DO USUÁRIO VIA output_path)
+        # ==========================================================
+        if not output_path:
+            LogUtils.log(
+                "output_path é obrigatório quando save_to_folder=True.",
                 level="CRITICAL",
                 tool=external_tool_key,
                 class_name=class_name
@@ -76,116 +116,44 @@ class VectorLayerSource:
             )
             return None
 
-        # garante que a pasta existe
-        output_dir = os.path.dirname(output_path)
-        if output_dir and not os.path.exists(output_dir):
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+        final_path = output_path
+
+        # ----------------------------
+        # Rename
+        # ----------------------------
+        if decision == "rename" and os.path.exists(final_path):
+            final_path = VectorLayerSource.generate_incremental_path(final_path)
+
+        # ----------------------------
+        # Overwrite
+        # ----------------------------
+        elif decision == "overwrite" and os.path.exists(final_path):
             try:
-                os.makedirs(output_dir, exist_ok=True)
+                os.remove(final_path)
             except Exception as e:
                 LogUtils.log(
-                    f"Falha ao criar diretório: {e}",
+                    f"Erro ao remover arquivo existente: {e}",
                     level="CRITICAL",
                     tool=external_tool_key,
                     class_name=class_name
                 )
                 return None
 
-        final_path = output_path
-
-        # =====================
-        # RENAME
-        # =====================
-        if decision == "rename" and os.path.exists(output_path):
-            final_path = VectorLayerSource.generate_incremental_path(output_path)
-            LogUtils.log(
-                f"Arquivo já existe, novo nome: {final_path}",
-                level="INFO",
-                tool=external_tool_key,
-                class_name=class_name
-            )
-
-        # =====================
-        # OVERWRITE
-        # =====================
-        elif decision == "overwrite" and os.path.exists(output_path):
-
-            if ProjectUtils.is_layer_in_project(layer):
-                LogUtils.log(
-                    "Camada está no projeto, removendo para liberar lock",
-                    level="WARNING",
-                    tool=external_tool_key,
-                    class_name=class_name
-                )
-                ProjectUtils.remove_layer_from_project(layer)
-
-            if ext == ".shp":
-                if not VectorLayerSource.delete_shapefile_set(output_path):
-                    LogUtils.log(
-                        "Falha ao remover arquivos do Shapefile",
-                        level="CRITICAL",
-                        tool=external_tool_key,
-                        class_name=class_name
-                    )
-                    return None
-            else:
-                try:
-                    os.remove(output_path)
-                except Exception as e:
-                    LogUtils.log(
-                        f"Erro ao remover arquivo existente: {e}",
-                        level="CRITICAL",
-                        tool=external_tool_key,
-                        class_name=class_name
-                    )
-                    return None
-
-        # =====================
-        # SALVAMENTO
-        # =====================
-        LogUtils.log(
-            f"Salvando arquivo em: {final_path}",
-            level="INFO",
-            tool=external_tool_key,
-            class_name=class_name
-        )
-
+        # ----------------------------
+        # Escrita (Compatível 3.16)
+        # ----------------------------
         options = QgsVectorFileWriter.SaveVectorOptions()
         options.driverName = driver
         options.fileEncoding = "UTF-8"
 
-        # AQUI ESTAVA O ERRO CRÍTICO
-        if ext == ".gpkg":
-            LogUtils.log(
-                f"Extensão é GeoPackage, aplicando opções específicas. {ext}",
-                level="INFO",
-                tool=external_tool_key,
-                class_name=class_name
-            )
+        # IMPORTANTE:
+        # Nome da camada dentro do arquivo vem do nome original
+        # (não sobrescrevemos com output_name)
+        options.layerName = layer.name()
 
-            layer_name = layer.name() or Path(final_path).stem
-            #layer_name = layer_name.replace(" ", "_")
-            options.layerName = layer_name
-
-            if os.path.exists(final_path):
-                options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
-                LogUtils.log(
-                    f"GPKG existente | sobrescrevendo camada: {layer_name}",
-                    level="DEBUG",
-                    tool=external_tool_key,
-                    class_name=class_name
-                )
-            else:
-                options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteFile
-                LogUtils.log(
-                    f"GPKG não existe | criando arquivo e camada: {layer_name}",
-                    level="DEBUG",
-                    tool=external_tool_key,
-                    class_name=class_name
-                )
-        else:
-            options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteFile
-
-
+        options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteFile
 
         transform_context = QgsProject.instance().transformContext()
 
@@ -205,70 +173,29 @@ class VectorLayerSource:
             )
             return None
 
+        saved_layer = QgsVectorLayer(
+            final_path,
+            Path(final_path).stem,  # nome vem do arquivo escolhido pelo usuário
+            "ogr"
+        )
+
+        if not saved_layer.isValid():
+            LogUtils.log(
+                "Camada salva mas não carregou corretamente.",
+                level="CRITICAL",
+                tool=external_tool_key,
+                class_name=class_name
+            )
+            return None
+
         LogUtils.log(
-            "Camada salva com sucesso",
+            "Camada salva com sucesso.",
             level="INFO",
             tool=external_tool_key,
             class_name=class_name
         )
 
-        return final_path  
-    
-    # ------------------------------------------------------------------
-    # SALVAMENTO CENTRALIZADO
-    # ------------------------------------------------------------------
-    @staticmethod
-    def save_layer(
-        layer: QgsVectorLayer,
-        *,
-        output_path: Optional[str],
-        save_to_folder: bool,
-        output_name: str,
-        decision: Optional[str] = None,
-        external_tool_key: str = "untraceable"
-    ) -> Optional[QgsVectorLayer]:
-
-        if not layer or not layer.isValid():
-            return None
-
-        final_layer = layer.materialize(QgsFeatureRequest())
-        layer = None  # libera memória
-
-        # -------------------------------------------------
-        # salvar em disco
-        # -------------------------------------------------
-        if save_to_folder:
-
-            saved_path = VectorLayerSource.save_vector_layer_to_file(
-                layer=final_layer,
-                output_path=output_path,
-                decision=decision or "rename",
-                external_tool_key=external_tool_key
-            )
-
-            if not saved_path:
-                return None
-
-            final_layer = QgsVectorLayer(
-                saved_path,
-                Path(saved_path).stem,
-                "ogr"
-            )
-
-            if not final_layer.isValid():
-                return None
-
-        # -------------------------------------------------
-        # adicionar ao projeto
-        # -------------------------------------------------
-        if save_to_folder:
-            output_name = Path(output_path).stem
-
-        final_layer.setName(output_name)
-        #QgsProject.instance().addMapLayer(final_layer)
-
-        return final_layer
-
+        return saved_layer
     @staticmethod
     def export_temp_layer(
         layer: QgsVectorLayer,
@@ -282,7 +209,7 @@ class VectorLayerSource:
         tmp_dir = tempfile.mkdtemp(prefix=prefix)
         output_path = os.path.join(tmp_dir, f"{prefix}.gpkg")
 
-        return VectorLayerSource.save_vector_layer_to_file(
+        return VectorLayerSource.save_vector_layer(
             layer=layer,
             output_path=output_path,
             decision="overwrite",

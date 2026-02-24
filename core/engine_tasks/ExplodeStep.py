@@ -28,7 +28,7 @@ class ExplodeStep(BaseStep):
         input_path = os.path.join(tmp_dir, "input.gpkg")
         exploded_path = os.path.join(tmp_dir, "exploded.gpkg")
 
-        input_path = VectorLayerSource.save_vector_layer_to_file(
+        input_path = VectorLayerSource.save_vector_layer(
             layer=layer,
             output_path=input_path,
             decision="overwrite",
@@ -36,8 +36,12 @@ class ExplodeStep(BaseStep):
         )
 
         if not input_path:
-            raise RuntimeError("Falha ao exportar camada para explode.")
-
+            raise RuntimeError(
+                f"Falha ao exportar camada para explode.\n"
+                f"Layer valid: {layer.isValid()}\n"
+                f"Provider: {layer.providerType()}\n"
+                f"Path: {input_path}"
+            )
         return ExplodeHugeLayerTask(
             input_path=input_path,
             output_path=exploded_path,

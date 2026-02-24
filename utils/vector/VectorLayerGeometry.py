@@ -95,7 +95,8 @@ class VectorLayerGeometry:
         join_style: int = 1,
         miter_limit: float = 2.0,
         dissolve: bool = False,
-        external_tool_key="untraceable"
+        external_tool_key="untraceable",
+        feedback = None
     ) -> str:
         """
         Executa buffer usando arquivo físico (GPKG).
@@ -123,7 +124,7 @@ class VectorLayerGeometry:
             "OUTPUT": output_path
         }
 
-        processing.run("native:buffer", params)
+        processing.run("native:buffer", params,feedback = feedback)
 
         LogUtils.log(
             "create_buffer_to_path_safe completed",

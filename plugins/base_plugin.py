@@ -238,7 +238,7 @@ class BasePluginMTL(QDialog):
         output_name: str
     ) -> Optional[QgsVectorLayer]:
 
-        return VectorLayerSource.save_layer(
+        return VectorLayerSource.save_vector_layer(
             layer=buffer_layer,
             output_path=output_path,
             save_to_folder=save_to_folder,

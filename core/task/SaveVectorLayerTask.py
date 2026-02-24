@@ -36,7 +36,7 @@ class SaveVectorLayerTask(BaseTask):
             return False
 
         try:
-            result_layer = VectorLayerSource.save_layer(
+            result_layer = VectorLayerSource.save_vector_layer(
                 layer=self.layer,
                 output_path=self.output_path,
                 save_to_folder=self.save_to_folder,

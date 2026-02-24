@@ -1,6 +1,9 @@
 from .BaseTask import BaseTask
+from .TaskFeedback import TaskFeedback
 from ..config.LogUtils import LogUtils
 from ...utils.vector.VectorLayerGeometry import VectorLayerGeometry
+import time
+
 
 
 class BufferLayerTask(BaseTask):
@@ -57,6 +60,7 @@ class BufferLayerTask(BaseTask):
             tool=self.tool_key,
             class_name=self.__class__.__name__
         )
+        feedback = TaskFeedback(self)
 
         try:
             VectorLayerGeometry.create_buffer_to_path_safe(
@@ -68,8 +72,10 @@ class BufferLayerTask(BaseTask):
                 join_style=self.join_style,
                 miter_limit=self.miter_limit,
                 dissolve=self.dissolve,
-                external_tool_key=self.tool_key
+                external_tool_key=self.tool_key,
+                feedback = feedback,
             )
+            #            time.sleep(10)
 
         except Exception as e:
             LogUtils.log(
