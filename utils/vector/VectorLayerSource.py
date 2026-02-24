@@ -265,7 +265,7 @@ class VectorLayerSource:
             output_name = Path(output_path).stem
 
         final_layer.setName(output_name)
-        QgsProject.instance().addMapLayer(final_layer)
+        #QgsProject.instance().addMapLayer(final_layer)
 
         return final_layer
 

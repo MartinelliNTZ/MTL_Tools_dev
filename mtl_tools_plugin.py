@@ -412,7 +412,7 @@ class MTL_Tools:
     # =====================================================
     def run_gerar_rastro(self):
         try:
-            from .plugins.gerar_rastro_plugin import run_gerar_rastro
+            from .plugins.GenerateTrailPlugin import run_gerar_rastro
             LogUtils.info("Abrindo diálogo: Gerar Rastro Implemento", tool=self.TOOL_KEY)
             self.gerar_rastro_dlg = run_gerar_rastro(self.iface)
             LogUtils.info("Diálogo Gerar Rastro Implemento aberto com sucesso", tool=self.TOOL_KEY)

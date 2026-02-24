@@ -2,6 +2,7 @@
 
 from .BaseStep import BaseStep
 from ..task.SaveVectorLayerTask import SaveVectorLayerTask
+from qgis.core import QgsVectorLayer
 
 
 class SaveVectorStep(BaseStep):
@@ -11,14 +12,18 @@ class SaveVectorStep(BaseStep):
 
     def create_task(self, context):
 
-        layer = context.get("layer")
+        context.require(["current_path", "tool_key"])
+
+        current_path = context.get("current_path")
         save_to_folder = context.get("save_to_folder", False)
         output_path = context.get("output_path")
         output_name = context.get("output_name")
         tool_key = context.get("tool_key")
 
-        if not layer:
-            raise ValueError("SaveVectorStep: 'layer' não encontrado no contexto.")
+        layer = QgsVectorLayer(current_path, output_name, "ogr")
+
+        if not layer.isValid():
+            raise RuntimeError("SaveVectorStep: falha ao carregar camada do current_path.")
 
         return SaveVectorLayerTask(
             layer=layer,

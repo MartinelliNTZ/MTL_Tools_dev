@@ -3,6 +3,7 @@
 from .BaseTask import BaseTask
 from ...utils.vector.VectorLayerSource import VectorLayerSource
 from ...core.config.LogUtils import LogUtils
+from typing import Any, Dict, List, Optional
 
 
 class SaveVectorLayerTask(BaseTask):
@@ -15,7 +16,7 @@ class SaveVectorLayerTask(BaseTask):
         self,
         *,
         layer,
-        output_path: str | None,
+        output_path: Optional[str],
         save_to_folder: bool,
         output_name: str,
         decision: str = "rename",

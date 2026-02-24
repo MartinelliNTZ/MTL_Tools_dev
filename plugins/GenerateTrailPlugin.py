@@ -20,11 +20,10 @@ from ..utils.tool_keys import ToolKey
 from ..core.config.LogUtils import LogUtils
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..core.engine_tasks.AsyncPipelineEngine import AsyncPipelineEngine
-from ..core.task.ExplodeHugeLayerTask import ExplodeHugeLayerTask
-from ..core.task.BufferLayerTask import BufferLayerTask
 
 
-class GerarRastroDialog(BasePluginMTL):
+
+class GenerateTrailPlugin(BasePluginMTL):
     #Essa é uma ferramenta de janela com geracao de produtos: do tipo vetoriais.
    
    
@@ -297,6 +296,51 @@ class GerarRastroDialog(BasePluginMTL):
 
     def _on_pipeline_finished(self, context):
 
+        final_layer = context.get("layer")
+
+        LogUtils.log(
+            f"Layer: {final_layer}",
+            level="WARNING",
+            tool=self.TOOL_KEY,
+            class_name="GerarRastroDialog"
+        )
+
+        LogUtils.log(
+            f"Is valid: {final_layer.isValid() if final_layer else None}",
+            level="WARNING",
+            tool=self.TOOL_KEY,
+            class_name="GerarRastroDialog"
+        )
+
+        LogUtils.log(
+            f"Provider: {final_layer.providerType() if final_layer else None}",
+            level="WARNING",
+            tool=self.TOOL_KEY,
+            class_name="GerarRastroDialog"
+        )
+        if not final_layer:
+            QgisMessageUtil.modal_error(
+                self.iface,
+                "Erro: camada final não encontrada no contexto."
+            )
+            return
+
+        # Garantir que está no projeto
+        if not QgsProject.instance().mapLayer(final_layer.id()):
+            QgsProject.instance().addMapLayer(final_layer)
+
+        # Aplicar estilo se necessário
+        if self.qml_selector.is_enabled():
+            qml = self.qml_selector.get_file_path()
+            if qml:
+                self.apply_qml_style(final_layer, qml)
+
+        QgisMessageUtil.bar_success(
+            self.iface,
+            "Processamento executado com sucesso."
+        )
+    def _on_pipeline_finished2(self, context):
+
         final_path = context.get("current_path")
 
         buffer_layer = QgsVectorLayer(final_path, "buffer_tmp", "ogr")
@@ -322,7 +366,7 @@ class GerarRastroDialog(BasePluginMTL):
 
 
 def run_gerar_rastro(iface):
-    dlg = GerarRastroDialog(iface)
+    dlg = GenerateTrailPlugin(iface)
     dlg.setModal(False)
     dlg.show()
     return dlg  # 👈 ESSENCIAL
