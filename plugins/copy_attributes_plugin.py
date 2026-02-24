@@ -15,7 +15,7 @@ from ..utils.qgis_messagem_util import QgisMessageUtil
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
 from ..utils.vector.VectorLayerAttributes import VectorLayerAttributes
-from .base_plugin import BasePluginMTL
+from .BasePlugin import BasePluginMTL
 
 
 class CopyAttributes(BasePluginMTL):

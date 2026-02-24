@@ -31,12 +31,7 @@ class VectorLayerSource:
     - Orquestrar operações de I/O de camadas vetoriais
     - Garantir que camadas sejam carregadas e salvas corretamente
     - Validar antes de operações críticas
-    
-    NÃO é Responsabilidade:
-    - Reprojetar camadas (use VectorLayerProjection)
-    - Calcular geometria ou métricas (use VectorLayerGeometry/VectorLayerMetrics)
-    - Manipular atributos (use VectorLayerAttributes)
-    - Renderizar ou exibir dados
+
     """
 
 
@@ -196,6 +191,7 @@ class VectorLayerSource:
         )
 
         return saved_layer
+    
     @staticmethod
     def export_temp_layer(
         layer: QgsVectorLayer,

@@ -17,7 +17,7 @@ from ..utils.ui_widget_utils import OldUiWidgetUtils
 from ..utils.layouts_utils import LayoutsUtils
 from ..utils.project_utils import ProjectUtils
 from ..utils.tool_keys import ToolKey
-from .base_plugin import BasePluginMTL
+from .BasePlugin import BasePluginMTL
 
 
 class ReplaceInLayoutsDialog(BasePluginMTL):

@@ -7,7 +7,7 @@ from ..processing.model.vector_field_calculator import VectorFieldCalculator
 from ..utils.altimetry_task import AltimetriaTask
 from ..utils.qgis_messagem_util import QgisMessageUtil
 from ..utils.crs_utils import get_coord_info
-from .base_plugin import BasePluginMTL
+from .BasePlugin import BasePluginMTL
 
 
 class VectorFieldPlugin(BasePluginMTL):

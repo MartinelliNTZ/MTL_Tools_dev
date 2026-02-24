@@ -7,7 +7,7 @@ from qgis.core import QgsVectorLayer, QgsWkbTypes, QgsFeedback
 
 from ..utils.vector.VectorLayerGeometry import VectorLayerGeometry
 from ..utils.qgis_messagem_util import QgisMessageUtil
-from .base_plugin import BasePluginMTL
+from .BasePlugin import BasePluginMTL
 
 class VectorMultipartPlugin(BasePluginMTL):
 

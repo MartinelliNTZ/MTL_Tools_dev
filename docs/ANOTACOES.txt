@@ -64,9 +64,16 @@ porem percebi que deveria colocar as coisas em task para deixa mais eficiente ai
 porem preciso ter a buffer em task e entao ir passando plugin/plugin 
 antes de criar qualquer ferramtne preciso analisar melhor criar primeiramente a ui e depois vir gerando metodos SEMPRE
 changelog=
+    1.5.0 2026/02/24
+    -
+    1.4.0.14
+    - ExplodeStep e SaveVectorStep
+    - coreecao de bugs
+    - bugs de compatibilidade 3.16
     1.4.0.13 2026/02/23
     - icons do logcat
-    
+    - geracao de pipeline e steps para encademanto de tasks
+    - BaseStep, BufferStep
     1.4.0.12 2026/02/17
     - compatibilidade com 3.16 do gerar rastro
     - Tirei bug de markdown no 3.16

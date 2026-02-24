@@ -1,15 +1,7 @@
 # -*- coding: utf-8 -*-
-from ..core.task.SaveVectorLayerTask import SaveVectorLayerTask
-from ..core.engine_tasks.BufferStep import BufferStep
-from ..core.engine_tasks.ExecutionContext import ExecutionContext
-from ..core.engine_tasks.ExplodeStep import ExplodeStep
-from ..core.engine_tasks.SaveVectorStep import SaveVectorStep
 from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes, QgsMapLayerProxyModel, QgsApplication
-import os
 from typing import Optional, Tuple
-import tempfile
-
-from ..plugins.base_plugin import BasePluginMTL
+from ..plugins.BasePlugin import BasePluginMTL
 from ..utils.qgis_messagem_util import QgisMessageUtil
 from ..utils.string_utils import StringUtils
 from ..utils.vector.VectorLayerGeometry import VectorLayerGeometry
@@ -20,6 +12,10 @@ from ..utils.tool_keys import ToolKey
 from ..core.config.LogUtils import LogUtils
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..core.engine_tasks.AsyncPipelineEngine import AsyncPipelineEngine
+from ..core.engine_tasks.BufferStep import BufferStep
+from ..core.engine_tasks.ExecutionContext import ExecutionContext
+from ..core.engine_tasks.ExplodeStep import ExplodeStep
+from ..core.engine_tasks.SaveVectorStep import SaveVectorStep
 
 
 
@@ -38,8 +34,7 @@ class GenerateTrailPlugin(BasePluginMTL):
         LogUtils.log("Carregando preferências do usuário", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         self._load_prefs()
         LogUtils.log("Diálogo Gerar Rastro Implemento inicializado com sucesso", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
-
-            
+ 
     def _build_ui(self):
         super()._build_ui(title = "Gerar Rastro de Máquinas",icon_path="gerar_rastro.ico",instructions_file="generate_trail_help.md")  
         LogUtils.log("Construindo interface da ferramenta", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
@@ -76,7 +71,7 @@ class GenerateTrailPlugin(BasePluginMTL):
 
         # buttons
         buttons_layout, self.action_buttons = WidgetFactory.create_bottom_action_buttons(
-            parent=self,            run_callback=self.on_run,            close_callback=self.close, 
+            parent=self,            run_callback=self.execute_tool,            close_callback=self.close, 
             info_callback=self.show_info_dialog,            tool_key=self.TOOL_KEY,        ) 
         
         #-----------------------------------------------------------------------       
@@ -121,7 +116,7 @@ class GenerateTrailPlugin(BasePluginMTL):
         save_tool_prefs(self.TOOL_KEY, data)
         LogUtils.log(f"Preferências salvas: tamanho={data['last_implement_length']}m, salvar_arquivo={data['save_to_folder']}", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
 
-    def on_run(self):
+    def execute_tool(self):
         self._save_prefs()
         LogUtils.log("Iniciando processamento: Gerar Rastro Implemento", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         layer = self.layer_input.current_layer()
@@ -183,7 +178,6 @@ class GenerateTrailPlugin(BasePluginMTL):
         
     def _resolve_input_layer(self, input_layer, tamanhoimplemento: float) -> Tuple[Optional[QgsVectorLayer], float]:
         """Etapa 1: Resolver camada de entrada e converter tamanho se necessário"""
-        LogUtils.log("1/6] Resolvendo camada de entrada", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         layer = (
             input_layer
             if isinstance(input_layer, QgsVectorLayer)
@@ -194,10 +188,6 @@ class GenerateTrailPlugin(BasePluginMTL):
             layer,
             tamanhoimplemento
         )
-        if layer.crs().authid() == "EPSG:4326":
-            original_tam = tamanhoimplemento
-            LogUtils.log(f"CRS em WGS84 detectado. Tamanho convertido: {original_tam}m → {tamanhoimplemento:.6f}°", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
-
         if not isinstance(layer, QgsVectorLayer):
             LogUtils.log("Camada de entrada inválida - não é QgsVectorLayer", level="ERROR", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
             QgisMessageUtil.modal_error(
@@ -224,18 +214,6 @@ class GenerateTrailPlugin(BasePluginMTL):
             LogUtils.log(f"Processando todas as feições da camada. Total: {layer.featureCount()}", level="DEBUG", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
         
         return layer
-
-    def _save_result(self, buffer_layer: QgsVectorLayer, output_path: Optional[str], save_to_folder: bool, output_name: str) -> Optional[QgsVectorLayer]:
-        """Etapa 6: Salvar resultado"""
-        LogUtils.log("6/6] Salvando resultado", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
-        result = self.save_vector_layer(buffer_layer, output_path, save_to_folder, output_name)
-        
-        if result:
-            LogUtils.log(f"Rastro salvo com sucesso: {result.name()}", level="INFO", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
-        else:
-            LogUtils.log("Resultado em memória (camada não persistida)", level="WARNING", tool=self.TOOL_KEY, class_name="GerarRastroDialog")
-        
-        return result
 
     def run(
         self,
@@ -339,31 +317,6 @@ class GenerateTrailPlugin(BasePluginMTL):
             self.iface,
             "Processamento executado com sucesso."
         )
-    def _on_pipeline_finished2(self, context):
-
-        final_path = context.get("current_path")
-
-        buffer_layer = QgsVectorLayer(final_path, "buffer_tmp", "ogr")
-
-        final_layer = self._save_result(
-            buffer_layer,
-            context.get("output_path"),
-            context.get("save_to_folder"),
-            context.get("output_name")
-        )
-
-        if final_layer and self.qml_selector.is_enabled():
-            qml = self.qml_selector.get_file_path()
-            if qml:
-                self.apply_qml_style(final_layer, qml)
-
-        QgisMessageUtil.bar_success(
-            self.iface,
-            "Processamento executado com sucesso."
-        )
-
-
-
 
 def run_gerar_rastro(iface):
     dlg = GenerateTrailPlugin(iface)

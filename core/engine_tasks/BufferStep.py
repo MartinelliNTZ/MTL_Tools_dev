@@ -4,6 +4,7 @@ import os
 from .BaseStep import BaseStep
 from .ExecutionContext import ExecutionContext
 from ..task.BufferLayerTask import BufferLayerTask
+from ...utils.vector.VectorLayerSource import VectorLayerSource
 
 
 class BufferStep(BaseStep):
