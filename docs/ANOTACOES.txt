@@ -64,8 +64,10 @@ porem percebi que deveria colocar as coisas em task para deixa mais eficiente ai
 porem preciso ter a buffer em task e entao ir passando plugin/plugin 
 antes de criar qualquer ferramtne preciso analisar melhor criar primeiramente a ui e depois vir gerando metodos SEMPRE
 changelog=
-    1.5.0 2026/02/24
+    1.5.1 2026/02/04
     -
+    1.5.0 2026/02/24
+    - FERRAMENTAS NORMALIZADAS: 5
     1.4.0.14
     - ExplodeStep e SaveVectorStep
     - coreecao de bugs

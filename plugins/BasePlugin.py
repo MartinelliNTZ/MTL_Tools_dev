@@ -215,6 +215,7 @@ class BasePluginMTL(QDialog):
         return True
     
     def get_layer_from_combo(self, combo):
+        """DEPRECADO: """
         """Retorna camada a partir de um combo (QComboBox).
 
         Recebe: combo (widget com currentData() contendo id de camada).
