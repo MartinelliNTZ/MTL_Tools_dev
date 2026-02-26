@@ -191,7 +191,24 @@ class VectorLayerSource:
         )
 
         return saved_layer
-    
+
+    @staticmethod
+    def get_layer_file_size( layer: QgsVectorLayer) -> int:
+        """Retorna tamanho em bytes do datasource se for arquivo"""
+        try:
+            src = layer.source()
+            if not src:
+                return 0
+
+            # remover parâmetros tipo "|layername="
+            path = src.split("|")[0]
+
+            if os.path.exists(path):
+                return os.path.getsize(path)
+        except Exception:
+            pass
+        return 0
+
     @staticmethod
     def export_temp_layer(
         layer: QgsVectorLayer,

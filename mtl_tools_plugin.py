@@ -12,6 +12,8 @@ from .utils.qgis_messagem_util import QgisMessageUtil
 from .processing.provider import MTLProvider
 from .core.config.LogCleanupUtils import LogCleanupUtils
 from .core.config.LogUtils import LogUtils
+from .core.config.LogUtilsNew import LogUtilsNew
+
 
 
 
@@ -29,6 +31,7 @@ class MTL_Tools:
     def initGui(self):
         plugin_root = Path(__file__).resolve().parent
         LogUtils.init(plugin_root)
+        LogUtilsNew.init(plugin_root)
         # mantém só os últimos 15 logs
         LogCleanupUtils.keep_last_n(plugin_root, keep=15)
         LogUtils.info("Plugin inicializado", tool=self.TOOL_KEY)
@@ -232,8 +235,9 @@ class MTL_Tools:
             # ==================================================
             self._add_toolbar_dropdown(
                 title="Layouts",
-                main_action=self.action_export_all,
-                secondary_actions=[self.action_replace_layouts]
+                main_action=self.action_replace_layouts,
+               # main_action=self.action_export_all,
+                secondary_actions=[self.action_replace_layouts, self.action_export_all]
             )
 
             # ==================================================
@@ -365,7 +369,7 @@ class MTL_Tools:
     # =====================================================
     def run_multpart(self):
         try:
-            from .plugins.vector_multpart_plugin import VectorMultipartPlugin
+            from .plugins.VectorMultipartPlugin import VectorMultipartPlugin
             LogUtils.info("Iniciando plugin: Converter para Multipart", tool=self.TOOL_KEY)
             # manter referência viva
             self.vector_multpart_plugin = VectorMultipartPlugin(self.iface)
@@ -512,7 +516,7 @@ class MTL_Tools:
     # =====================================================
     def run_copy_atributes(self):
         try:
-            from .plugins.copy_attributes_plugin import run_copy_attributes
+            from .plugins.CopyAttributesPlugin import run_copy_attributes
             LogUtils.info("Abrindo diálogo: Copiar Atributos", tool=self.TOOL_KEY)
             self.copy_attributes_dlg = run_copy_attributes(self.iface)
             LogUtils.info("Diálogo Copiar Atributos aberto com sucesso", tool=self.TOOL_KEY)

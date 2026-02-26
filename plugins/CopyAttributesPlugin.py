@@ -7,7 +7,6 @@ from qgis.PyQt.QtWidgets import (
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import QgsVectorLayer, QgsWkbTypes, QgsMapLayerProxyModel
-from qgis.gui import QgsMapLayerComboBox
 
 from ..utils.tool_keys import ToolKey
 from ..core.config.LogUtils import LogUtils
@@ -64,7 +63,7 @@ class CopyAttributes(BasePluginMTL):
 
         # BOTÕES
         buttons_layout, self.action_buttons = WidgetFactory.create_bottom_action_buttons(
-            parent=self,            run_callback=self.on_run,        
+            parent=self,            run_callback=self.execute_tool,
             close_callback=self.close, 
             info_callback=self.show_info_dialog,            tool_key=self.TOOL_KEY,        ) 
         
@@ -100,7 +99,7 @@ class CopyAttributes(BasePluginMTL):
     # =========================
     # CONTROLLER
     # =========================
-    def on_run(self):
+    def execute_tool(self):
         self._save_prefs()
         LogUtils.log(
             "Execução iniciada",

@@ -55,19 +55,21 @@ ferramentas = name                              tipo                            
     - 14:
     - 15:
 
-PADRONIZADOS = 5 , 10, 11 
-Documentação de cenarios: 8 e 10 e 11
+PADRONIZADOS = 5,10 11
+Documentação de cenarios: 5, 8 e 10 e 11
+Instrucoes: 5, 11
 OQUE EU TAVA FAZENDO? 
 eu tava padronizando todas os plugins para usarem a nova widgetfactory, novas classes de manipulacao de vetor, novos estilos, baseplugin,
 uma porrada de coisa, a gerar e a mais padrao de tudo 
 porem percebi que deveria colocar as coisas em task para deixa mais eficiente ainda entao na gerar rastro a explode linhas ja ta em task
 porem preciso ter a buffer em task e entao ir passando plugin/plugin 
 antes de criar qualquer ferramtne preciso analisar melhor criar primeiramente a ui e depois vir gerando metodos SEMPRE
+
 changelog=
-    1.5.1 2026/02/04
+    1.5.1 2026/02/25
     -
     1.5.0 2026/02/24
-    - FERRAMENTAS NORMALIZADAS: 5
+    - FERRAMENTAS NORMALIZADAS: 5, 10, 11
     1.4.0.14
     - ExplodeStep e SaveVectorStep
     - coreecao de bugs

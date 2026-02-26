@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from sys import exception
 
 from qgis.PyQt.QtWidgets import (
     QDialog, QAction,QFileDialog, QLineEdit,QSizeGrip
@@ -10,9 +11,12 @@ from qgis.PyQt.QtCore import QUrl, Qt
 import os
 from pathlib import Path
 from typing import Optional
-
+import time
+from ..utils.project_utils import ProjectUtils
+from ..utils.FormatUtils import FormatUtils
 from ..utils.vector.VectorLayerSource import VectorLayerSource
 from ..core.config.LogUtils import LogUtils
+from ..core.config.LogUtilsNew import LogUtilsNew
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..utils.info_dialog import InfoDialog
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
@@ -29,8 +33,29 @@ from ..utils.string_utils import StringUtils
 # -------------------------------------------------------------
 class BasePluginMTL(QDialog):
     APP_NAME = StringUtils.APP_NAME
+    TOOL_KEY = ToolKey.BASE_TOOL
     PLUGIN_NAME = ""
     layout = None
+    prefs = None
+    """obsolet"""
+    logger = None
+    preferences = {}
+    """Dicionario de status"""
+
+
+
+    def init(self,tool_key = "ToolKey.BASE_TOOL", class_name = "BasePluginMTL"):
+        self.TOOL_KEY = tool_key
+        self.logger = LogUtilsNew(tool=self.TOOL_KEY, class_name=class_name, level=LogUtilsNew.DEBUG)
+        self.preferences = {}
+        self.preferences.clear()
+        self.preferences = load_tool_prefs(self.TOOL_KEY)
+        self.logger.debug("Construindo interface de usuário")
+        self._build_ui()
+        self.logger.debug("Carregando preferências do usuário. xxd")
+        self._load_prefs()
+        self.logger.info("Diálogo Gerar Rastro Implemento inicializado com sucesso. xxd")
+
     """
     Classe base para plugins do MTL Tools.
 
@@ -59,7 +84,7 @@ class BasePluginMTL(QDialog):
             self.PLUGIN_NAME = title
             self.layout = WidgetFactory.create_main_layout(self, title=title)
 
-        LogUtils.log(
+        self.logger.log(
             f"Construindo UI para plugin: {self.PLUGIN_NAME}",
             level="DEBUG",
             tool=ToolKey.BASE_TOOL,
@@ -85,7 +110,7 @@ class BasePluginMTL(QDialog):
         )
         if os.path.exists(icon_path):
             self.setWindowIcon(QIcon(icon_path))
-            LogUtils.log(
+            self.logger.log(
                 f"Ícone carregado de: {icon_path}",
                 level="DEBUG",
                 tool=self.TOOL_KEY,
@@ -100,7 +125,59 @@ class BasePluginMTL(QDialog):
             "instructions",
             instructions_file
         )
-    
+
+    def start_stats(self, input_obj=None,modal_info = "NO"):
+        try:
+            self.preferences["t0"] = time.time()
+            self.preferences["current_size"] = ProjectUtils.compute_size(input_obj)
+            self.preferences["eta"] = 0
+            if self.preferences["total_time"] > 0:
+                self.preferences["avg_speed"] = self.preferences["total_bytes"] / self.preferences["total_time"]
+            if self.preferences["avg_speed"] > 0 and self.preferences["current_size"] > 0:
+                self.preferences["eta"] = (self.preferences["current_size"] / self.preferences["avg_speed"])+time.time()
+            msg = (
+                f"  Velocidade média: {FormatUtils.speed(self.preferences['avg_speed'])} \n"
+                f"  Tamanho do arquivo: {FormatUtils.bytes(self.preferences["current_size"])} \n"
+                f"  Hora inicial: {FormatUtils.clock(self.preferences['t0'],)} \n"
+                f"  Hora final: {FormatUtils.clock(self.preferences.get('eta',0))}\n"
+            )
+
+            if modal_info != "NO":
+                QgisMessageUtil.bar_info(self.iface, msg, "Estatisticas",duration=10)
+            else:
+                self.logger.info(msg)
+        except Exception as e:
+            self.logger.error(e)
+
+    def finish_stats(self, processed_obj=None):
+        self.logger.debug("finish_stats")
+        try:
+            dt = time.time() - self.preferences["t0"]
+            size = self.preferences["current_size"]
+            self.logger.info("")
+            self.preferences["total_bytes"] = self.preferences.get("total_bytes", 0) + size
+            self.preferences["total_time"] = self.preferences.get("total_time", 0) + dt
+            self.preferences["runs"] = self.preferences.get("runs", 0) + 1
+
+            if self.preferences["total_time"] > 0:
+                self.preferences["avg_speed"] = (
+                        self.preferences["total_bytes"] / self.preferences["total_time"]
+                )
+
+            msg = (
+                f"+{FormatUtils.bytes(size)} "
+                f"{dt:.1f}s "
+                f"avg={FormatUtils.speed(self.preferences['avg_speed'])}"
+            )
+
+            if getattr(self, "iface", None):
+                QgisMessageUtil.bar_success(self.iface, msg, "Stats")
+            else:
+                self.logger.info(msg)
+        except Exception as e:
+            self.logger.error(f"Erro: {e} Preferences: {self.preferences}")
+
+
     #@abstractmethod
     def execute_tool(self):
         """
@@ -138,7 +215,7 @@ class BasePluginMTL(QDialog):
         Retorna: None.
         Faz: registra e abre o arquivo se existir.
         """
-        LogUtils.log(f"Abrindo arquivo: {path}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
+        self.logger.log(f"Abrindo arquivo: {path}", level="DEBUG")
         if path and os.path.exists(path):
             QDesktopServices.openUrl(QUrl.fromLocalFile(path))
 
@@ -149,7 +226,7 @@ class BasePluginMTL(QDialog):
         Retorna: None.
         Faz: registra e abre a pasta se existir.
         """
-        LogUtils.log(f"Abrindo pasta: {path}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
+        self.logger.log(f"Abrindo pasta: {path}", level="DEBUG")
         if path and os.path.exists(path):
             QDesktopServices.openUrl(QUrl.fromLocalFile(path))
     
@@ -160,7 +237,7 @@ class BasePluginMTL(QDialog):
         Retorna: QAction criado.
         Faz: cria a QAction, conecta o callback e adiciona ao menu.
         """
-        LogUtils.log(f"Criando ação: {text}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
+        self.logger.log(f"Criando ação: {text}", level="DEBUG")
         icon_path = os.path.join(
             os.path.dirname(self.__class__.__module__.replace('.', os.sep)),
             icon_rel_path
@@ -179,11 +256,11 @@ class BasePluginMTL(QDialog):
         Retorna: QgsVectorLayer ou None.
         Faz: valida tipo da camada e, se solicitado, se está em edição.
         """
-        LogUtils.log(f"Obtendo camada vetorial ativa. Require editable: {require_editable}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
+        self.logger.log(f"Obtendo camada vetorial ativa. Require editable: {require_editable}", level="DEBUG")
         layer = self.iface.activeLayer()
 
         if not layer or not isinstance(layer, QgsVectorLayer):
-            LogUtils.log("Camada ativa inválida ou não é vetorial", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
+            self.logger.log("Camada ativa inválida ou não é vetorial", level="DEBUG")
             QgisMessageUtil.bar_critical(
                 self.iface,
                 "Selecione uma camada vetorial"
@@ -204,7 +281,7 @@ class BasePluginMTL(QDialog):
         Retorna: bool.
         Faz: verifica contagem de feições e mostra aviso se estiver vazia.
         """
-        LogUtils.log(f"Verificando feições na camada: {layer.name()}. Total: {layer.featureCount()}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
+        self.logger.log(f"Verificando feições na camada: {layer.name()}. Total: {layer.featureCount()}", level="DEBUG")
         if layer.featureCount() == 0:
             QgisMessageUtil.bar_warning(
                 self.iface,
@@ -231,7 +308,7 @@ class BasePluginMTL(QDialog):
         Retorna: bool.
         Faz: mostra erro e retorna False se não estiver em edição.
         """
-        LogUtils.log(f"Verificando se camada está em edição: {layer.name()}. Editável: {layer.isEditable()}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
+        self.logger.log(f"Verificando se camada está em edição: {layer.name()}. Editável: {layer.isEditable()}", level="DEBUG")
         if not layer.isEditable():
             QgisMessageUtil.bar_critical(
                 self.iface,
@@ -283,10 +360,10 @@ class BasePluginMTL(QDialog):
         Retorna: None.
         Faz: atualiza `target_line_edit` com o caminho escolhido.
         """
-        LogUtils.log(f"Abrindo diálogo para salvar arquivo", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
+        self.logger.log(f"Abrindo diálogo para salvar arquivo", level="DEBUG")
         f, _ = QFileDialog.getSaveFileName(self, 'Salvar como', target_line_edit.text() or '', filters)
         if f:
-            LogUtils.log(f"Arquivo selecionado para salvar: {f}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
+            self.logger.log(f"Arquivo selecionado para salvar: {f}", level="DEBUG")
             target_line_edit.setText(f)
 
     def select_file(self, target_line_edit: QLineEdit, filters: str):
@@ -296,7 +373,7 @@ class BasePluginMTL(QDialog):
         Retorna: None.
         Faz: atualiza `target_line_edit` com o arquivo selecionado.
         """
-        LogUtils.log(f"Abrindo diálogo para selecionar arquivo", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
+        self.logger.log(f"Abrindo diálogo para selecionar arquivo", level="DEBUG")
         f, _ = QFileDialog.getOpenFileName(
             self,
             "Selecionar arquivo",
@@ -304,7 +381,7 @@ class BasePluginMTL(QDialog):
             filters
         )
         if f:
-            LogUtils.log(f"Arquivo selecionado: {f}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
+            self.logger.log(f"Arquivo selecionado: {f}", level="DEBUG")
             target_line_edit.setText(f)
               
     def apply_qml_style(
@@ -318,13 +395,13 @@ class BasePluginMTL(QDialog):
         Retorna: bool (sucesso).
         Faz: valida entrada, carrega estilo e repinta a camada.
         """
-        LogUtils.log(f"Aplicando estilo QML à camada: {layer.name() if isinstance(layer, QgsVectorLayer) else 'inválida'}. Caminho: {qml_path}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
+        self.logger.log(f"Aplicando estilo QML à camada: {layer.name() if isinstance(layer, QgsVectorLayer) else 'inválida'}. Caminho: {qml_path}", level="DEBUG")
 
         if not isinstance(layer, QgsVectorLayer):
             return False
 
         if not qml_path or not os.path.exists(qml_path):
-            LogUtils.log(f"Caminho QML inválido ou não existe: {qml_path}", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
+            self.logger.log(f"Caminho QML inválido ou não existe: {qml_path}", level="DEBUG")
             return False
 
         ok = layer.loadNamedStyle(qml_path)
@@ -333,7 +410,7 @@ class BasePluginMTL(QDialog):
 
         if ok:
             layer.triggerRepaint()
-            LogUtils.log(f"Estilo QML aplicado com sucesso", level="DEBUG", tool=ToolKey.BASE_TOOL, class_name="BasePluginMTL")
+            self.logger.log(f"Estilo QML aplicado com sucesso", level="DEBUG")
 
         return bool(ok)
     

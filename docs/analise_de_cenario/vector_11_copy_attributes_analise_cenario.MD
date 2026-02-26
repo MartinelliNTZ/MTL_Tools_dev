@@ -1,163 +1,52 @@
-# 📘 Análise de Cenário – Ferramenta Copiar Atributos
+# Análise de Cenário – Copiar Atributos
 
-## Visão Geral
-A ferramenta **Copiar Atributos** foi desenvolvida para transferir campos entre camadas vetoriais de forma segura, previsível e integrada ao fluxo do **MTL Tools**, atuando diretamente sobre a camada destino e mantendo controle explícito sobre edição e salvamento.
+**Visão Geral**
 
----
+A ferramenta copia campos de uma camada origem para uma camada destino, oferecendo controle sobre quais campos copiar, resolução de conflitos e integração com o fluxo de edição do QGIS.
 
-## Objetivo da Ferramenta
-Resolver cenários em que:
+**Objetivo**
 
-- É necessário replicar atributos entre camadas semelhantes
-- Camadas possuem estruturas parcialmente compatíveis
-- O usuário precisa decidir manualmente quais campos copiar
-- Conflitos de nomes de campos precisam ser tratados de forma interativa
+Permitir transferência segura de atributos entre camadas similares, preservando geometrias e CRS, e evitando operações irreversíveis sem confirmação do usuário.
 
-A ferramenta evita duplicações de camadas e operações irreversíveis.
+**Fluxo resumido**
 
----
+- Entrada: seleção de camada origem e destino na UI.
+- Opções: copiar todos os atributos ou selecionar subset de campos.
+- Conflitos: resolução interativa campo a campo quando necessário.
+- Edição: respeita estado de edição da camada destino (mantém edição aberta ou solicita salvar/descartar).
 
-## Cenários de Uso
+**Cenários de Uso (exemplos)**
 
-### 1️⃣ Execução com seleção manual de atributos
+- Copiar subset de campos: usuário seleciona campos específicos e executa cópia.
+- Copiar todos os campos: opção "Usar todos os atributos" ativa.
+- Conflito de nomes: usuário decide sobrescrever/renomear/pular campo.
 
-**Situação**
-- O usuário desmarca a opção “Usar todos os atributos”
-- Seleciona manualmente os campos desejados
+**Tipos de dados**
 
-**Comportamento**
-- Apenas os campos marcados são copiados
-- A ordem e o tipo dos campos são preservados
+- Funciona com camadas vetoriais compatíveis em termos de atributos (campos compatíveis por tipo).
 
-**Resultado**
-- Controle total sobre os dados transferidos
-- Evita poluição de atributos desnecessários
+**Impactos nos dados**
 
----
+- Preservado: geometrias, CRS, campos existentes não modificados (a menos que o usuário opte sobrescrever).
+- Alterado: estrutura de campos da camada destino e valores dos campos copiados.
 
-### 2️⃣ Execução usando todos os atributos
+**Riscos e controles**
 
-**Situação**
-- A opção “Usar todos os atributos” está marcada
+- Sobrescrita de campos: mitigado com confirmação interativa.
+- Alterações acidentais: mantêm-se não salvas até confirmação do usuário.
+- Erro de seleção: UI com feedback e possibilidade de reverter antes do salvamento.
 
-**Comportamento**
-- Todos os campos da camada origem são copiados
-- A lista de atributos é ignorada
+**Observações sobre classes-chave**
 
-**Resultado**
-- Execução mais rápida
-- Ideal para camadas com estruturas compatíveis
+- Validar compatibilidade de tipos entre campos origem e destino antes da cópia.
+- Garantir que o processo respeite locks e estado de edição da camada destino.
 
----
+**Evoluções recomendadas**
 
-### 3️⃣ Conflito de nomes de campos
+- Pré-visualização das alterações antes de aplicar.
+- Execução em background para grandes volumes de feições.
+- Relatório final com resumo de campos copiados e conflitos resolvidos.
 
-**Situação**
-- Um campo da origem já existe na camada destino
+**Conclusão**
 
-**Comportamento**
-- A ferramenta solicita ao usuário uma decisão
-- A resolução é feita campo a campo
-
-**Resultado**
-- Evita sobrescritas acidentais
-- Garante previsibilidade da estrutura final
-
----
-
-### 4️⃣ Camada destino já em modo de edição
-
-**Situação**
-- A camada destino já estava em edição
-
-**Comportamento**
-- A ferramenta respeita o estado atual
-- Nenhuma tentativa automática de salvamento é feita
-
-**Resultado**
-- Integração segura com fluxos manuais de edição
-
----
-
-### 5️⃣ Camada destino fora do modo de edição
-
-**Situação**
-- A camada destino não estava em edição
-
-**Comportamento**
-- A ferramenta inicia a edição
-- O usuário decide salvar ou descartar ao final
-
-**Resultado**
-- Proteção contra alterações não intencionais
-
----
-
-## Comportamento da Interface (UI)
-
-### Seleção de camadas
-- Camada ativa é automaticamente sugerida como destino
-- Drag & drop permite troca rápida de camadas
-- Clique no campo atualiza dinamicamente a lista
-
----
-
-### Seleção de atributos
-- Lista suporta seleção múltipla (Ctrl / Shift)
-- Botões de seleção seguem padrão do QGIS:
-  - Ação aplicada apenas aos itens selecionados
-  - Caso nenhum esteja selecionado, aplica a todos
-
-Essa abordagem melhora significativamente a usabilidade em listas extensas.
-
----
-
-## Impactos nos Dados
-
-### O que é preservado
-- Geometrias
-- Sistema de referência espacial
-- Campos existentes da camada destino
-- Estado de edição da camada
-
-### O que é alterado
-- Estrutura de campos da camada destino
-- Conteúdo dos atributos copiados
-
----
-
-## Riscos e Controles
-
-| Risco Potencial | Mitigação |
-|----------------|-----------|
-| Sobrescrita de campos | Confirmação interativa |
-| Alteração indesejada | Alterações não salvas automaticamente |
-| Erro de seleção | UI com feedback visual |
-| Listas grandes | Controles de seleção em lote |
-
----
-
-## Diferença em Relação a Abordagens Simples
-
-Diferente de scripts diretos ou cópias automáticas, esta ferramenta:
-
-- Permite seleção manual e visual de campos
-- Trata conflitos de forma controlada
-- Integra drag & drop de camadas
-- Mantém compatibilidade com QGIS 3.16+
-
----
-
-## Possíveis Evoluções Futuras
-
-- Exibição de prévia dos dados copiados
-- Execução em background para grandes volumes
-- Relatório detalhado de campos copiados
-- Persistência de seleção de atributos por camada
-
----
-
-## Conclusão
-
-A ferramenta **Copiar Atributos** oferece um fluxo robusto, seguro e alinhado às práticas profissionais do QGIS, equilibrando automação e controle manual.  
-Sua arquitetura e UI foram projetadas para reutilização em futuras ferramentas do **MTL Tools**, especialmente aquelas que envolvem seleção de camadas e campos.
+Ferramenta prática e controlada para transferências de atributos; foco em validação de tipos e feedback ao usuário melhora segurança do processo.

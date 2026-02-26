@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 
+from ..core.config.LogUtils import LogUtils
 from qgis.core import QgsProject
 from qgis.PyQt.QtWidgets import (
     QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
@@ -28,8 +29,8 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
         super().__init__(iface.mainWindow())
         self.iface = iface
 
-        self.setWindowTitle("MTL Tools — Replace Text in Layouts")
-        self.setMinimumWidth(520)
+       # self.setWindowTitle("MTL Tools — Replace Text in Layouts")
+       # self.setMinimumWidth(520)
 
         icon_path = os.path.join(
             os.path.dirname(__file__), "..", "resources","icons", "mtl_tools_icon.png"
@@ -43,11 +44,16 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
             "replace_in_layouts_help.md"
         )
 
-        self._build_ui()
-        self._load_saved_preferences()
+        self._build_ui2()
+       # self._load_saved_preferences()
 
     # -------------------------------------------------
     def _build_ui(self):
+        super()._build_ui(title = "Gerar Rastro de Máquinas",icon_path="gerar_rastro.ico",instructions_file="generate_trail_help.md")  
+        LogUtils.log("Construindo interface da ferramenta", level="INFO", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
+    
+    
+    def _build_ui2(self):
         main = QVBoxLayout()
 
         # INFO
@@ -102,7 +108,7 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
         h_buttons.addWidget(btn_show_proj)
 
         btn_run = QPushButton("Executar substituição")
-        btn_run.clicked.connect(self.on_run_clicked)
+        btn_run.clicked.connect(self.execute_tool)
         h_buttons.addWidget(btn_run)
 
         main.addLayout(h_buttons)
@@ -144,7 +150,7 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
 
 
     # -------------------------------------------------
-    def on_run_clicked(self):
+    def execute_tool(self):
         old_text = self.txt_old.text().strip()
         new_text = self.txt_new.text()
         case_sensitive = self.chk_case_sensitive.isChecked()

@@ -8,6 +8,9 @@ from qgis.PyQt.QtWidgets import QApplication
 from ..utils.log_utils import LogUtilsOld
 from pathlib import Path
 import gc
+from pathlib import Path
+from typing import Union, Optional
+from qgis.core import QgsMapLayer
 
 
 
@@ -56,7 +59,55 @@ class ProjectUtils:
         shutil.copy2(project_file, backup_path)
 
         return str(backup_path)
-    
+
+    @staticmethod
+    def compute_size(obj: Optional[Union[str, Path, QgsMapLayer]]) -> int:
+        if obj is None:
+            return 0
+
+        # QgsMapLayer
+        if isinstance(obj, QgsMapLayer):
+            src = obj.source() or ""
+
+            # memory layer → estimar
+            if src.startswith("memory:"):
+                try:
+                    feat_count = obj.featureCount()
+                    geom_type = obj.wkbType()
+                    # estimativa simples: 200 bytes por feature + geometria
+                    return feat_count * 200
+                except Exception:
+                    return 0
+
+            # arquivo real
+            if "|" in src:
+                src = src.split("|", 1)[0]
+
+            obj = src
+
+        p = Path(str(obj))
+        if not p.exists():
+            return 0
+
+        if p.is_dir():
+            total = 0
+            for f in p.rglob("*"):
+                if f.is_file():
+                    try:
+                        total += f.stat().st_size
+                    except Exception:
+                        pass
+            return total
+
+        if p.suffix.lower() == ".shp":
+            total = 0
+            for ext in (".shp", ".dbf", ".shx", ".prj", ".cpg", ".qix", ".sbn", ".sbx"):
+                f = p.with_suffix(ext)
+                if f.exists():
+                    total += f.stat().st_size
+            return total
+
+        return p.stat().st_size
     
     @staticmethod
     def is_layer_in_project(layer: QgsMapLayer) -> bool:

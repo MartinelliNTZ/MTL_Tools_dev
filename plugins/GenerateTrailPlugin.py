@@ -9,7 +9,6 @@ from ..utils.vector.VectorLayerProjection import VectorLayerProjection
 from ..utils.vector.VectorLayerSource import VectorLayerSource
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
 from ..utils.tool_keys import ToolKey
-from ..core.config.LogUtils import LogUtils
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..core.engine_tasks.AsyncPipelineEngine import AsyncPipelineEngine
 from ..core.engine_tasks.BufferStep import BufferStep
@@ -21,23 +20,17 @@ from ..core.engine_tasks.SaveVectorStep import SaveVectorStep
 
 class GenerateTrailPlugin(BasePluginMTL):
     #Essa é uma ferramenta de janela com geracao de produtos: do tipo vetoriais.
-   
-   
-    TOOL_KEY = ToolKey.GERAR_RASTRO_IMPLEMENTO
 
     def __init__(self, iface):
         super().__init__(iface.mainWindow())        
         self.iface = iface
-        LogUtils.log("Inicializando diálogo Gerar Rastro Implemento", level="INFO", tool=self.TOOL_KEY)  
-        LogUtils.log("Construindo interface de usuário", level="DEBUG", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
-        self._build_ui()
-        LogUtils.log("Carregando preferências do usuário", level="DEBUG", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
-        self._load_prefs()
-        LogUtils.log("Diálogo Gerar Rastro Implemento inicializado com sucesso", level="INFO", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
- 
+        self.init(ToolKey.GERAR_RASTRO_IMPLEMENTO,"GenerateTrailPlugin")
+
+
     def _build_ui(self):
+        self.logger.debug("Inicializando PLUGIN Gerar Rastro Implemento")
         super()._build_ui(title = "Gerar Rastro de Máquinas",icon_path="gerar_rastro.ico",instructions_file="generate_trail_help.md")  
-        LogUtils.log("Construindo interface da ferramenta", level="INFO", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
+        self.logger.info("Construindo interface da ferramenta")
 
 
         #novo
@@ -47,14 +40,14 @@ class GenerateTrailPlugin(BasePluginMTL):
             parent=self,
             allow_empty=False
         )
-        LogUtils.log("Componente de camada de entrada adicionado", level="DEBUG", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
+        self.logger.debug("Componente de camada de entrada adicionado")
 
         # implement_lenght
         tam_layout, self.spin_tam = WidgetFactory.create_double_spin_input(
             "Tamanho implemento: (sempre em metros)",separator_bottom=False,
         )
-        LogUtils.log("Componente de tamanho de implemento adicionado", level="DEBUG", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
-        
+        self.logger.debug("Componente de tamanho de implemento adicionado")
+
 
         #---------------------------------------
 
@@ -62,12 +55,12 @@ class GenerateTrailPlugin(BasePluginMTL):
         save_layout, self.save_selector = WidgetFactory.create_save_file_selector(
             parent=self,            file_filter=StringUtils.FILTER_VECTOR,            separator_top=True
         )
-        LogUtils.log("Componente de salvamento de arquivo adicionado", level="DEBUG", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
+        self.logger.debug("Componente de salvamento de arquivo adicionado")
 
 
         # aplicar estilo QML
         qml_layout, self.qml_selector = WidgetFactory.create_qml_selector(            parent=self        )       
-        LogUtils.log("Componente de estilo QML adicionado", level="DEBUG", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
+        self.logger.debug("Componente de estilo QML adicionado")
 
         # buttons
         buttons_layout, self.action_buttons = WidgetFactory.create_bottom_action_buttons(
@@ -77,16 +70,16 @@ class GenerateTrailPlugin(BasePluginMTL):
         #-----------------------------------------------------------------------       
         self.layout.add_items([layer_layout,tam_layout, save_layout, qml_layout,  buttons_layout])
         self.setLayout(self.layout)
-        LogUtils.log("Interface da ferramenta construída com sucesso", level="INFO", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
+        self.logger.info("Interface da ferramenta construída com sucesso")
 
     def _load_prefs(self):
-        LogUtils.log(f"Carregando preferências salvas da ferramenta. Self={self}", level="DEBUG", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
-        prefs = load_tool_prefs(self.TOOL_KEY)
-        last_tam = prefs.get('last_implement_length')
-        save_to_folder = prefs.get('save_to_folder', False)
-        last_file = prefs.get('last_output_file', '')
-        apply_style = prefs.get('apply_style', False)
-        last_qml = prefs.get('last_qml_path', '')
+        self.logger.debug(f"Carregando preferências salvas da ferramenta. Self={self}")
+        self.preferences = load_tool_prefs(self.TOOL_KEY)
+        last_tam = self.preferences.get('last_implement_length')
+        save_to_folder = self.preferences.get('save_to_folder', False)
+        last_file = self.preferences.get('last_output_file', '')
+        apply_style = self.preferences.get('apply_style', False)
+        last_qml = self.preferences.get('last_qml_path', '')
         self.qml_selector.set_file_path(last_qml)
         self.qml_selector.set_enabled(bool(apply_style))
 
@@ -100,29 +93,29 @@ class GenerateTrailPlugin(BasePluginMTL):
             self.save_selector.set_enabled(bool(save_to_folder))
 
             self.save_selector.set_file_path(last_file)
-            LogUtils.log("Preferências carregadas e aplicadas com sucesso", level="DEBUG", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
+            self.logger.debug("Preferências carregadas e aplicadas com sucesso")
         except Exception as e:
-            LogUtils.log(f"Erro ao restaurar algumas preferências: {str(e)}", level="WARNING", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
+            self.logger.warning(f"Erro ao restaurar algumas preferências: {str(e)}")
         
     def _save_prefs(self):       
-        LogUtils.log("Salvando preferências da ferramenta", level="DEBUG", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
-        data = {}
-        data['last_implement_length'] = float(self.spin_tam.value())
-        data['save_to_folder'] = bool(self.save_selector.is_enabled())
-        data['last_output_file'] = self.save_selector.get_file_path()
-        data['apply_style'] = bool(self.qml_selector.is_enabled())
-        data['last_qml_path'] = self.qml_selector.get_file_path()
+        self.logger.debug("Salvando preferências da ferramenta")
+        self.preferences['last_implement_length'] = float(self.spin_tam.value())
+        self.preferences['save_to_folder'] = bool(self.save_selector.is_enabled())
+        self.preferences['last_output_file'] = self.save_selector.get_file_path()
+        self.preferences['apply_style'] = bool(self.qml_selector.is_enabled())
+        self.preferences['last_qml_path'] = self.qml_selector.get_file_path()
         
-        save_tool_prefs(self.TOOL_KEY, data)
-        LogUtils.log(f"Preferências salvas: tamanho={data['last_implement_length']}m, salvar_arquivo={data['save_to_folder']}", level="DEBUG", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
+        save_tool_prefs(self.TOOL_KEY, self.preferences)
+        self.logger.debug(f"Preferências salvas: tamanho={self.preferences['last_implement_length']}m, salvar_arquivo={self.preferences['save_to_folder']}")
 
     def execute_tool(self):
-        self._save_prefs()
-        LogUtils.log("Iniciando processamento: Gerar Rastro Implemento", level="INFO", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
+        self.logger.info("Iniciando processamento: Gerar Rastro Implemento")
+
         layer = self.layer_input.current_layer()
+        self.start_stats(layer,"yes")
 
         if not isinstance(layer, QgsVectorLayer):
-            LogUtils.log("Nenhuma camada de linhas válida selecionada", level="WARNING", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
+            self.logger.warning("Nenhuma camada de linhas válida selecionada")
             QgisMessageUtil.bar_warning(                self.iface,                "Selecione uma camada de linhas válida."            )
             return
         #receber valores
@@ -139,7 +132,7 @@ class GenerateTrailPlugin(BasePluginMTL):
             output_path = None
         
         only_selected = self.layer_input.only_selected_enabled()
-        LogUtils.log(f"Parâmetros: camada='{layer.name()}', tamanho={tam}m, selecionadas={only_selected}, salvar_arquivo={save_to_folder}", level="INFO", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
+        self.logger.info(f"Parâmetros: camada='{layer.name()}', tamanho={tam}m, selecionadas={only_selected}, salvar_arquivo={save_to_folder}")
         
         # executar
         out_layer = self.run(
@@ -152,13 +145,12 @@ class GenerateTrailPlugin(BasePluginMTL):
 
         # se cancelou ou falhou
         if out_layer is None:
-            LogUtils.log(
-                "Processamento iniciado em background",
-                level="INFO", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin"
+            self.logger.info(
+                "Processamento iniciado em background"
             )
             return
 
-        LogUtils.log("Processamento executado com sucesso", level="INFO", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
+        self.logger.info("Processamento executado com sucesso")
         QgisMessageUtil.bar_success(
             self.iface,
             "Processamento executado com sucesso."
@@ -173,12 +165,11 @@ class GenerateTrailPlugin(BasePluginMTL):
             if isinstance(input_layer, QgsVectorLayer)
             else QgsProject.instance().mapLayer(input_layer)
         )
-        LogUtils.log(f"Camada resolvida: {layer.name() if layer else 'None'}", level="DEBUG", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
+        self.logger.debug(f"Camada resolvida: {layer.name() if layer else 'None'}")
 
         if not isinstance(layer, QgsVectorLayer):
-            LogUtils.log("Camada de entrada inválida - não é QgsVectorLayer", level="ERROR", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
-            QgisMessageUtil.modal_error(
-                self.iface,
+            self.logger.error("Camada de entrada inválida - não é QgsVectorLayer")
+            QgisMessageUtil.modal_error(                self.iface,
                 "Camada de entrada inválida."
             )
             return None, implement_lenght
@@ -191,18 +182,18 @@ class GenerateTrailPlugin(BasePluginMTL):
 
     def _process_selection(self, layer: QgsVectorLayer, only_selected: bool) -> Optional[QgsVectorLayer]:
         """Etapa 3: Processar seleção de feições"""
-        LogUtils.log("3/6] Processando seleção de feições", level="INFO", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
+        self.logger.info("3/6] Processando seleção de feições")
         if only_selected:
-            LogUtils.log(f"Filtrando apenas feições selecionadas. Total selecionadas: {layer.selectedFeatureCount()}", level="DEBUG", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
+            self.logger.debug(f"Filtrando apenas feições selecionadas. Total selecionadas: {layer.selectedFeatureCount()}")
             layer_sel, err = VectorLayerGeometry.get_selected_features(layer)
             if err:
-                LogUtils.log(f"Erro ao obter feições selecionadas: {err}", level="ERROR", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
+                self.logger.error(f"Erro ao obter feições selecionadas: {err}")
                 QgisMessageUtil.modal_error(self.iface, err)
                 return None
             layer = layer_sel
-            LogUtils.log(f"Usando camada com feições selecionadas: {layer.name()}", level="DEBUG", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
+            self.logger.debug(f"Usando camada com feições selecionadas: {layer.name()}")
         else:
-            LogUtils.log(f"Processando todas as feições da camada. Total: {layer.featureCount()}", level="DEBUG", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
+            self.logger.debug(f"Processando todas as feições da camada. Total: {layer.featureCount()}")
         
         return layer
 
@@ -217,8 +208,10 @@ class GenerateTrailPlugin(BasePluginMTL):
         only_selected: bool = False,
     ) -> Optional[QgsVectorLayer]:
 
+        self.logger.info(f"run called, implement_lenght={implement_lenght}, only_selected={only_selected}, save_to_folder={save_to_folder}, output_path={output_path}")
         layer, implement_lenght = self._resolve_input_layer(input_layer, implement_lenght)
         if layer is None:
+            self.logger.warning("_resolve_input_layer returned None, aborting run")
             return None
 
         ok, error = VectorLayerSource.validate_layer(
@@ -226,12 +219,17 @@ class GenerateTrailPlugin(BasePluginMTL):
         )
 
         if not ok:
+            self.logger.error(f"Layer validation failed: {error}")
             QgisMessageUtil.modal_error(self.iface, error)
             return None
+        else:
+            self.logger.debug("Layer validation passed")
 
         layer = self._process_selection(layer, only_selected)
         if layer is None:
+            self.logger.warning("_process_selection returned None, aborting run")
             return None
+        self.logger.debug("Selection processing complete, layer ready")
         
 
         context = ExecutionContext()
@@ -242,7 +240,8 @@ class GenerateTrailPlugin(BasePluginMTL):
         context.set("tool_key", self.TOOL_KEY)
 
         if implement_lenght ==0:
-            QgisMessageUtil.modal_error(self,"Buffer não pode ser 0")
+            self.logger.error("implement_lenght is zero, aborting")
+            QgisMessageUtil.modal_error(                self,                "Buffer não pode ser 0"            )
             return None
 
         buffer_distance = float(implement_lenght) / 2.0
@@ -250,6 +249,7 @@ class GenerateTrailPlugin(BasePluginMTL):
         context.set("buffer_distance", buffer_distance)
         context.set("buffer_dissolve", False)
 
+        self.logger.debug(f"Context prepared: {{'buffer_distance':{buffer_distance}, 'output_name':{output_name}}}")
         engine = AsyncPipelineEngine(
             steps=[
                 ExplodeStep(),
@@ -261,6 +261,7 @@ class GenerateTrailPlugin(BasePluginMTL):
             on_error=self._on_pipeline_error
         )
 
+        self.logger.info("Starting AsyncPipelineEngine")
         engine.start()
         return None
 
@@ -268,47 +269,49 @@ class GenerateTrailPlugin(BasePluginMTL):
 
         final_layer = context.get("layer")
 
-        LogUtils.log(
-            f"Layer: {final_layer}",
-            level="WARNING",
-            tool=self.TOOL_KEY,
-            class_name="GenerateTrailPlugin"
+
+        self.logger.warning(
+            f"Layer: {final_layer}"
         )
 
-        LogUtils.log(
-            f"Is valid: {final_layer.isValid() if final_layer else None}",
-            level="WARNING",
-            tool=self.TOOL_KEY,
-            class_name="GenerateTrailPlugin"
+        self.logger.warning(
+            f"Is valid: {final_layer.isValid() if final_layer else None}"
         )
 
-        LogUtils.log(
-            f"Provider: {final_layer.providerType() if final_layer else None}",
-            level="WARNING",
-            tool=self.TOOL_KEY,
-            class_name="GenerateTrailPlugin"
+        self.logger.warning(
+            f"Provider: {final_layer.providerType() if final_layer else None}"
         )
         if not final_layer:
-            QgisMessageUtil.modal_error(
-                self.iface,
-                "Erro: camada final não encontrada no contexto."
-            )
+            QgisMessageUtil.modal_error(       self.iface,"Erro: camada final não encontrada no contexto."            )
             return
 
         # Garantir que está no projeto
         if not QgsProject.instance().mapLayer(final_layer.id()):
+            self.logger.debug("Final layer not in project, adding")
             QgsProject.instance().addMapLayer(final_layer)
+        else:
+            self.logger.debug("Final layer already in project")
 
         # Aplicar estilo se necessário
         if self.qml_selector.is_enabled():
             qml = self.qml_selector.get_file_path()
+            self.logger.debug(f"QML style enabled, path={qml}")
             if qml:
                 self.apply_qml_style(final_layer, qml)
+                self.logger.info("QML style applied to final layer")
+        else:
+            self.logger.debug("QML style not enabled")
+            
+        QgisMessageUtil.bar_success(  self.iface,     "Processamento executado com sucesso."        )
+        output_path = context.get("output_path")
 
-        QgisMessageUtil.bar_success(
-            self.iface,
-            "Processamento executado com sucesso."
-        )
+        if output_path:
+            size_obj = output_path
+        else:
+            size_obj = final_layer
+
+        self.finish_stats(size_obj)
+        self._save_prefs()
 
 def run_gerar_rastro(iface):
     dlg = GenerateTrailPlugin(iface)

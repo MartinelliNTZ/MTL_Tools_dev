@@ -1,157 +1,51 @@
-# Análise de Cenário – Ferramenta Converter Multipart
+# Análise de Cenário – Converter Multipart
 
-## Visão Geral
+**Visão Geral**
 
-A ferramenta **Converter Multipart** foi desenvolvida para separar feições compostas (multipartes) em feições individuais, atuando diretamente sobre a **camada original**, sem criação de camadas temporárias ou cópias intermediárias.
+A ferramenta separa geometrias multipart em feições individuais, preservando atributos e CRS. Pode operar sobre toda a camada ou apenas sobre feições selecionadas.
 
-Seu comportamento é equivalente à ferramenta nativa do QGIS que separa geometrias multipartes, porém integrada ao fluxo do plugin **MTL Tools**, oferecendo maior controle ao usuário.
+**Objetivo**
 
----
+Transformar feições multipart em feições simples independentes, sem perda de atributos e respeitando o fluxo de edição do QGIS.
 
-## Objetivo da Ferramenta
+**Fluxo resumido**
 
-A ferramenta resolve situações comuns em que:
-- camadas vetoriais foram unificadas ou mescladas,
-- resultando em feições que contêm múltiplas partes desconectadas,
-- e essas partes precisam voltar a ser feições independentes.
+- Entrada: camada vetorial (qualquer tipo que suporte multipart).
+- Identificação: detectar feições multipart.
+- Operação: dividir cada multipart em feições separadas, preservando campos.
+- Finalização: manter edição aberta ou solicitar salvamento conforme estado inicial da camada.
 
-O foco é garantir a reorganização correta das geometrias sem alterar atributos, sistema de referência ou estrutura da camada.
+**Cenários de Uso (exemplos)**
 
----
+- Sem seleção: processa toda a camada e separa feições multipart.
+- Com seleção: processa apenas feições selecionadas.
+- Camada em edição: alterações ficam pendentes para revisão.
+- Camada fora de edição: ferramenta inicia edição e solicita salvar/descartar ao final.
 
-## Cenários de Uso
+**Tipos de geometria**
 
-### 1️⃣ Execução sem feições selecionadas
+- Suporta pontos, linhas e polígonos multipart onde aplicável.
 
-**Situação**
-- Nenhuma feição está selecionada na camada ativa.
+**Impactos nos dados**
 
-**Comportamento**
-- A ferramenta atua sobre todas as feições da camada.
-- Apenas feições compostas são processadas.
-- Feições simples permanecem inalteradas.
+- Preservado: atributos, CRS e estrutura de campos.
+- Alterado: número de feições e organização geométrica; pode aumentar significativamente o total de feições.
 
-**Resultado**
-- Cada feição composta é separada em múltiplas feições individuais.
-- A quantidade total de feições na camada pode aumentar.
+**Riscos e controles**
 
----
+- Alteração indesejada em larga escala: confirmar ação antes de processar toda a camada.
+- Processamento pesado: permitir cancelamento e apresentar aviso de tempo/impacto.
+- Perda de dados: manter alterações só após confirmação do usuário.
 
-### 2️⃣ Execução com feições selecionadas
+**Observações sobre classes-chave**
 
-**Situação**
-- Uma ou mais feições estão selecionadas.
+- Confirmar que a implementação respeita o estado de edição da camada e que mantém o esquema de atributos intacto.
 
-**Comportamento**
-- Apenas as feições selecionadas são analisadas.
-- Feições não selecionadas não sofrem qualquer modificação.
+**Evoluções recomendadas**
 
-**Resultado**
-- Permite controle preciso da operação.
-- Evita alterações globais indesejadas na camada.
+- Execução em background para grandes camadas.
+- Progresso visual e relatório de feições afetadas.
 
----
+**Conclusão**
 
-### 3️⃣ Camada já em modo de edição
-
-**Situação**
-- A camada já está em modo de edição no momento da execução.
-
-**Comportamento**
-- As alterações permanecem abertas para revisão.
-- Nenhuma edição é salva automaticamente.
-
-**Resultado**
-- O usuário mantém total controle sobre quando salvar ou descartar as alterações realizadas.
-
----
-
-### 4️⃣ Camada fora do modo de edição
-
-**Situação**
-- A camada não estava em edição ao iniciar a ferramenta.
-
-**Comportamento**
-- A ferramenta prepara a camada para edição.
-- Ao final, o usuário escolhe se deseja salvar ou descartar as alterações.
-
-**Resultado**
-- Garante segurança contra modificações acidentais.
-- Nenhuma alteração é aplicada sem confirmação explícita.
-
----
-
-### 5️⃣ Cancelamento da operação
-
-**Situação**
-- O usuário decide interromper a execução antes da conclusão.
-
-**Comportamento**
-- A operação é interrompida imediatamente.
-- Todas as alterações realizadas até aquele momento são descartadas.
-
-**Resultado**
-- A camada retorna exatamente ao estado anterior à execução da ferramenta.
-
----
-
-## Tipos de Geometria Considerados
-
-A ferramenta opera corretamente com:
-- pontos compostos,
-- linhas compostas,
-- polígonos compostos.
-
-Feições simples e geometrias vazias são automaticamente ignoradas.
-
----
-
-## Impactos nos Dados
-
-### O que é preservado
-- Atributos das feições
-- Sistema de referência espacial
-- Estrutura de campos da camada
-- Ordem e integridade dos dados existentes
-
-### O que é alterado
-- Quantidade total de feições
-- Organização geométrica das feições multipartes
-
----
-
-## Riscos e Controles
-
-| Risco Potencial | Mitigação |
-|-----------------|-----------|
-| Alteração indesejada de toda a camada | Confirmação antes da execução |
-| Processamento excessivo | Possibilidade de cancelar |
-| Perda de dados | Alterações só são mantidas mediante confirmação |
-| Erros operacionais | Execução restrita à camada ativa |
-
----
-
-## Diferença em Relação a Abordagens Simples
-
-Diferente de abordagens que apenas convertem o tipo geométrico, esta ferramenta:
-- realiza a separação física real das geometrias,
-- cria feições independentes para cada parte,
-- replica o comportamento esperado em fluxos profissionais de SIG.
-
----
-
-## Possíveis Evoluções Futuras
-
-- Execução em segundo plano para grandes volumes de dados
-- Exibição de progresso visual
-- Relatório de feições afetadas
-- Registro automático das operações realizadas
-- Opção para processar apenas feições multipartes
-
----
-
-## Conclusão
-
-A ferramenta **Converter Multipart** oferece uma solução segura, previsível e alinhada às práticas do QGIS para reorganização de geometrias compostas, permitindo que o usuário mantenha total controle sobre seus dados em todas as etapas do processo.
-
-Ela está preparada para uso em ambientes produtivos e integrada de forma consistente ao ecossistema **MTL Tools**.
+Ferramenta essencial para limpeza de geometrias multipart; design alinhado ao comportamento esperado do QGIS. Garantir controles de confirmação e feedback de progresso para grandes volumes.
