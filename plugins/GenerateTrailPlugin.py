@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes, QgsMapLayerProxyModel, QgsApplication
 from typing import Optional, Tuple
+
+from ..utils.project_utils import ProjectUtils
 from ..plugins.BasePlugin import BasePluginMTL
 from ..utils.qgis_messagem_util import QgisMessageUtil
 from ..utils.string_utils import StringUtils
@@ -20,6 +22,7 @@ from ..core.engine_tasks.SaveVectorStep import SaveVectorStep
 
 class GenerateTrailPlugin(BasePluginMTL):
     #Essa é uma ferramenta de janela com geracao de produtos: do tipo vetoriais.
+    ASYNC_THRESHOLD_BYTES = 20 * 1024 * 1024  # 20 MB
 
     def __init__(self, iface):
         super().__init__(iface.mainWindow())        
@@ -112,7 +115,7 @@ class GenerateTrailPlugin(BasePluginMTL):
         self.logger.info("Iniciando processamento: Gerar Rastro Implemento")
 
         layer = self.layer_input.current_layer()
-        self.start_stats(layer,"yes")
+        self.start_stats(layer,)
 
         if not isinstance(layer, QgsVectorLayer):
             self.logger.warning("Nenhuma camada de linhas válida selecionada")
@@ -241,7 +244,7 @@ class GenerateTrailPlugin(BasePluginMTL):
 
         if implement_lenght ==0:
             self.logger.error("implement_lenght is zero, aborting")
-            QgisMessageUtil.modal_error(                self,                "Buffer não pode ser 0"            )
+            QgisMessageUtil.modal_error(     self, "Buffer não pode ser 0"    )
             return None
 
         buffer_distance = float(implement_lenght) / 2.0
@@ -250,6 +253,86 @@ class GenerateTrailPlugin(BasePluginMTL):
         context.set("buffer_dissolve", False)
 
         self.logger.debug(f"Context prepared: {{'buffer_distance':{buffer_distance}, 'output_name':{output_name}}}")
+
+        size = ProjectUtils.compute_size(layer) if layer else 0
+        self.logger.debug(
+            f"Comparando tamanho arquivo: {size} versus {self.ASYNC_THRESHOLD_BYTES}")
+        if size > self.ASYNC_THRESHOLD_BYTES:
+            self._run_async_pipeline(context)
+        else:
+            self._run_sync_pipeline(   context )
+        return None
+
+    def _run_sync_pipeline(self, context: ExecutionContext) -> Optional[QgsVectorLayer]:
+        """
+        Executa a pipeline de forma síncrona:
+        Explode → Buffer → Save
+        Retorna camada final.
+        """
+
+        try:
+            layer: QgsVectorLayer = context.get("layer")
+            if not layer or not layer.isValid():
+                raise RuntimeError("Camada inválida no contexto")
+
+            save_to_folder: bool = context.get("save_to_folder")
+            output_path: Optional[str] = context.get("output_path")
+            output_name: str = context.get("output_name")
+            buffer_distance: float = context.get("buffer_distance")
+            dissolve: bool = context.get("buffer_dissolve")
+
+            # ---------------------------
+            # 1) EXPLODE
+            # ---------------------------
+            self.logger.debug("SYNC: ExplodeStep")
+
+            exploded = VectorLayerGeometry.explode_multipart_features(
+                layer=layer,
+                external_tool_key=self.TOOL_KEY
+            )
+
+            if not exploded or not exploded.isValid():
+                raise RuntimeError("Falha no explode")
+
+            # ---------------------------
+            # 2) BUFFER
+            # ---------------------------
+            self.logger.debug("SYNC: BufferStep")
+
+            buffered = VectorLayerGeometry.create_buffer_geometry(
+                layer=exploded,
+                distance=buffer_distance,
+                dissolve=dissolve,
+                external_tool_key=self.TOOL_KEY
+            )
+
+            if not buffered or not buffered.isValid():
+                raise RuntimeError("Falha no buffer")
+
+            # ---------------------------
+            # 3) SAVE
+            # ---------------------------
+            self.logger.debug("SYNC: SaveVectorStep")
+
+            final_layer = VectorLayerSource.save_vector_layer(
+                layer=buffered,
+                output_path=output_path,
+                save_to_folder=save_to_folder,
+                output_name=output_name,
+                external_tool_key=self.TOOL_KEY
+            )
+
+            if not final_layer or not final_layer.isValid():
+                raise RuntimeError("Falha ao salvar camada")
+
+            context.set("layer", final_layer)
+            self._on_pipeline_finished(context)
+        except Exception as e:
+            self.logger.error(f"Erro pipeline SYNC: {e}. Contexto: {context}.")
+            QgisMessageUtil.modal_error(self.iface, str(e))
+            return None
+
+    def _run_async_pipeline(self, context: ExecutionContext):
         engine = AsyncPipelineEngine(
             steps=[
                 ExplodeStep(),
@@ -303,14 +386,8 @@ class GenerateTrailPlugin(BasePluginMTL):
             self.logger.debug("QML style not enabled")
             
         QgisMessageUtil.bar_success(  self.iface,     "Processamento executado com sucesso."        )
-        output_path = context.get("output_path")
 
-        if output_path:
-            size_obj = output_path
-        else:
-            size_obj = final_layer
-
-        self.finish_stats(size_obj)
+        self.finish_stats()
         self._save_prefs()
 
 def run_gerar_rastro(iface):

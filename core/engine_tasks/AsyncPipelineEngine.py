@@ -5,12 +5,16 @@ from qgis.core import QgsApplication
 
 from .ExecutionContext import ExecutionContext
 from .BaseStep import BaseStep
+from ..config.LogUtilsNew import LogUtilsNew
+from ..task.BaseTask import BaseTask
+from qgis.core import QgsTask
 
 
 class AsyncPipelineEngine:
     """
     Orquestrador genérico de Steps e QgsTasks.
     """
+    logger = LogUtilsNew(tool="AsyncPipelineEngine", class_name="AsyncPipelineEngine", level=LogUtilsNew.DEBUG)
 
     def __init__(
         self,
@@ -21,6 +25,7 @@ class AsyncPipelineEngine:
         on_error=None,
         on_cancelled=None,
     ):
+        self._pipeline_task = None
         self._steps = steps
         self._context = context
 
@@ -44,7 +49,21 @@ class AsyncPipelineEngine:
         self._is_cancelled = False
         self._current_index = 0
 
+
+        self._pipeline_task = PipelineTask("Processando trilha")
+        QgsApplication.taskManager().addTask(self._pipeline_task)
         self._run_next_step()
+
+    def _set_global_progress(self, step_progress: float):
+        total_steps = len(self._steps)
+        step_index = self._current_index
+
+        step_progress = max(0.0, min(100.0, float(step_progress)))
+
+        global_progress = ((step_index + step_progress / 100.0) / total_steps) * 100.0
+
+        if self._pipeline_task:
+            self._pipeline_task.setProgress(global_progress)
 
     def cancel(self) -> None:
         self._is_cancelled = True
@@ -56,14 +75,14 @@ class AsyncPipelineEngine:
             except RuntimeError:
                 pass
 
+        if self._pipeline_task:
+            self._pipeline_task.cancel()
+
         self._finish_cancelled()
 
     def is_running(self) -> bool:
         return self._is_running
 
-    # -------------------------------------------------
-    # Internal Flow
-    # -------------------------------------------------
 
     def _run_next_step(self) -> None:
 
@@ -91,6 +110,7 @@ class AsyncPipelineEngine:
 
         task.on_success = self._handle_task_success
         task.on_error = self._handle_task_error
+        task.progressChanged.connect(self._set_global_progress)
 
         QgsApplication.taskManager().addTask(task)
 
@@ -127,27 +147,58 @@ class AsyncPipelineEngine:
         self._is_running = False
         self._current_task = None
 
+        if self._pipeline_task:
+            self._pipeline_task.setProgress(100)
+            self._pipeline_task.mark_done()
+
         if self._on_finished:
             try:
                 self._on_finished(self._context)
-            except Exception:
-                pass
+            except Exception as e:
+                self.logger.error(f"Error:{e}")
+
     def _finish_error(self):
         self._is_running = False
         self._current_task = None
 
+        if self._pipeline_task:
+            self._pipeline_task.mark_done()
+
         if self._on_error:
             try:
                 self._on_error(self._context.get_errors())
-            except Exception:
-                pass
+            except Exception as e:
+                self.logger.error(f"Error:{e}")
 
     def _finish_cancelled(self):
         self._is_running = False
         self._current_task = None
 
+        if self._pipeline_task:
+            self._pipeline_task.mark_done()
+
         if self._on_cancelled:
             try:
                 self._on_cancelled(self._context)
-            except Exception:
-                pass
+            except Exception as e:
+                self.logger.error(f"Error:{e}")
+
+class PipelineTask(QgsTask):
+
+    def __init__(self, description="Pipeline"):
+        super().__init__(description, QgsTask.CanCancel)
+        self._done = False
+
+    def run(self):
+        # mantém task viva até engine marcar done
+        while not self._done:
+            if self.isCanceled():
+                return False
+            QgsApplication.processEvents()
+        return True
+
+    def mark_done(self):
+        self._done = True
+
+    def finished(self, result):
+        pass

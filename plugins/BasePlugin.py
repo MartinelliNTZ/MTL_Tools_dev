@@ -1,6 +1,3 @@
-from abc import abstractmethod
-from sys import exception
-
 from qgis.PyQt.QtWidgets import (
     QDialog, QAction,QFileDialog, QLineEdit,QSizeGrip
 )
@@ -126,30 +123,36 @@ class BasePluginMTL(QDialog):
             instructions_file
         )
 
-    def start_stats(self, input_obj=None,modal_info = "NO"):
+    def start_stats(self, input_obj=None,modal_info = "YES"):
         try:
             self.preferences["t0"] = time.time()
-            self.preferences["current_size"] = ProjectUtils.compute_size(input_obj)
+            self.preferences["current_size"] = ProjectUtils.compute_size(input_obj) if input_obj else 0
             self.preferences["eta"] = 0
+            self.preferences["avg_speed"] = self.preferences.get("avg_speed", 0)
+            self.preferences["total_bytes"] = self.preferences.get("total_bytes", 0)
+            self.preferences["total_time"] = self.preferences.get("total_time", 0)
+
             if self.preferences["total_time"] > 0:
                 self.preferences["avg_speed"] = self.preferences["total_bytes"] / self.preferences["total_time"]
             if self.preferences["avg_speed"] > 0 and self.preferences["current_size"] > 0:
                 self.preferences["eta"] = (self.preferences["current_size"] / self.preferences["avg_speed"])+time.time()
-            msg = (
-                f"  Velocidade média: {FormatUtils.speed(self.preferences['avg_speed'])} \n"
-                f"  Tamanho do arquivo: {FormatUtils.bytes(self.preferences["current_size"])} \n"
-                f"  Hora inicial: {FormatUtils.clock(self.preferences['t0'],)} \n"
-                f"  Hora final: {FormatUtils.clock(self.preferences.get('eta',0))}\n"
-            )
 
-            if modal_info != "NO":
-                QgisMessageUtil.bar_info(self.iface, msg, "Estatisticas",duration=10)
-            else:
+            msg = ""
+            if self.preferences["eta"] > 0 and self.preferences["current_size"] > 0 and self.preferences["avg_speed"] > 0 :                
+                msg = (
+                    f"  Velocidade média: {FormatUtils.speed(self.preferences['avg_speed'])} \n"
+                    f"  Tamanho do arquivo: {FormatUtils.bytes(self.preferences["current_size"])} \n"
+                    f"  Hora inicial: {FormatUtils.clock(self.preferences['t0'],)} \n"
+                    f"  Hora final: {FormatUtils.clock(self.preferences.get('eta',0))}\n"
+                )
+
+                if modal_info == "YES":
+                    QgisMessageUtil.bar_info(self.iface, msg, "Estatisticas",duration=10)
                 self.logger.info(msg)
         except Exception as e:
             self.logger.error(e)
 
-    def finish_stats(self, processed_obj=None):
+    def finish_stats(self,modal_info = "YES"):
         self.logger.debug("finish_stats")
         try:
             dt = time.time() - self.preferences["t0"]
@@ -170,10 +173,9 @@ class BasePluginMTL(QDialog):
                 f"avg={FormatUtils.speed(self.preferences['avg_speed'])}"
             )
 
-            if getattr(self, "iface", None):
-                QgisMessageUtil.bar_success(self.iface, msg, "Stats")
-            else:
-                self.logger.info(msg)
+            if modal_info == "YES":
+                QgisMessageUtil.bar_success(self.iface,f"Estatistivas: {msg} ")
+            self.logger.info(msg)
         except Exception as e:
             self.logger.error(f"Erro: {e} Preferences: {self.preferences}")
 

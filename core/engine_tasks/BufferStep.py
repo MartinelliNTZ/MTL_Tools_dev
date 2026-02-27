@@ -5,6 +5,7 @@ from .BaseStep import BaseStep
 from .ExecutionContext import ExecutionContext
 from ..task.BufferLayerTask import BufferLayerTask
 from ...utils.vector.VectorLayerSource import VectorLayerSource
+from qgis.core import QgsTask
 
 
 class BufferStep(BaseStep):
@@ -40,3 +41,4 @@ class BufferStep(BaseStep):
 
     def on_success(self, context: ExecutionContext, result):
         context.set("current_path", result)
+
