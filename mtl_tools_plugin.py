@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
+import sys
+import traceback
 from qgis.PyQt.QtWidgets import QAction, QMenu
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import QgsApplication
@@ -15,6 +17,39 @@ from .core.config.LogUtils import LogUtils
 from .core.config.LogUtilsNew import LogUtilsNew
 
 
+# ========================================================================
+# PROTEÇÃO GLOBAL CONTRA CRASHES
+# ========================================================================
+# Sistema para capturar e registrar erros não capturados em todo o plugin
+_original_excepthook = sys.excepthook
+_logger_global = None
+
+def _install_global_error_handler():
+    """Instala handler global para capturar exceções não tratadas."""
+    global _logger_global
+    
+    def handle_exception(exc_type, exc_value, exc_traceback):
+        # Log em arquivo de sistema se possível
+        try:
+            if _logger_global is None:
+                from .core.config.LogUtilsNew import LogUtilsNew
+                _logger_global = LogUtilsNew(tool="system", class_name="GlobalErrorHandler")
+            
+            error_msg = "".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
+            _logger_global.critical(
+                f"UNCAUGHT EXCEPTION (possibly crash): {exc_type.__name__}: {str(exc_value)}",
+                error_type=exc_type.__name__,
+                traceback=error_msg
+            )
+        except Exception as log_error:
+            # Se falhar em logar, apenas print
+            print(f"GLOBAL ERROR HANDLER FAILED: {log_error}", file=sys.stderr)
+            print(error_msg, file=sys.stderr)
+        
+        # Chamar handler original
+        _original_excepthook(exc_type, exc_value, exc_traceback)
+    
+    sys.excepthook = handle_exception
 
 
 class MTL_Tools:
@@ -29,12 +64,16 @@ class MTL_Tools:
     # INICIAR GUI E PROCESSING
     # =====================================================
     def initGui(self):
+        # Instalar proteção global contra crashes
+        _install_global_error_handler()
+        
         plugin_root = Path(__file__).resolve().parent
         LogUtils.init(plugin_root)
         LogUtilsNew.init(plugin_root)
         # mantém só os últimos 15 logs
         LogCleanupUtils.keep_last_n(plugin_root, keep=15)
         LogUtils.info("Plugin inicializado", tool=self.TOOL_KEY)
+        LogUtils.info("SYSTEM: Global error handler instalado para capturar crashes", tool="system")
         # -------------------------
         # 1) ATIVAR PROCESSING PROVIDER
         # -------------------------
@@ -146,6 +185,11 @@ class MTL_Tools:
             self.action_logcat = QAction(QIcon(logcat_icon), "Logcat - Viewer de Logs", self.iface.mainWindow())
             self.action_logcat.triggered.connect(self.run_logcat)
             
+            # 13-Settings
+            settings_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "system.ico")
+            self.action_settings = QAction(QIcon(settings_icon), "Configurações", self.iface.mainWindow())
+            self.action_settings.triggered.connect(self.run_settings)
+            
             # null-base tool
             base_tool_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "mtl_agro.ico")
             self.action_base_tool = QAction(QIcon(base_tool_icon), "Base Tool", self.iface.mainWindow())
@@ -202,6 +246,7 @@ class MTL_Tools:
             # Sistema
             self.system_menu.addAction(self.action_restart_qgis)
             self.system_menu.addAction(self.action_logcat)
+            self.system_menu.addAction(self.action_settings)
 
             # Vetores
             self.vectors_menu.addAction(self.action_coord_click)
@@ -227,6 +272,7 @@ class MTL_Tools:
                 main_action=self.action_restart_qgis,
                 secondary_actions=[self.action_restart_qgis,
                                    self.action_logcat,
+                                   self.action_settings,
                                    self.action_about_dialog]
             )       
 
@@ -291,6 +337,7 @@ class MTL_Tools:
                 self.action_gerar_rastro,
                 self.action_about_dialog,
                 self.action_logcat,
+                self.action_settings,
                 self.action_coord_click,
                 self.action_vector_fields,
                 self.action_drone_coords,
@@ -427,14 +474,56 @@ class MTL_Tools:
     # EXECUTAR: Logcat Tool
     # =====================================================
     def run_logcat(self):
+        """
+        Abre o Logcat com proteção MÁXIMA contra crashes.
+        Qualquer erro será capturado e registrado em arquivo de log.
+        """
         try:
-            from .plugins.logcat.logcat_plugin import run
+            LogUtils.info("=" * 60, tool="system")
+            LogUtils.info("LOGCAT: Iniciando abertura de diálogo (PROTEGIDO)", tool="system")
+            
+            # Import isolado
+            try:
+                from .plugins.logcat.logcat_plugin import run
+                LogUtils.info("LOGCAT: Módulo logcat_plugin importado", tool="system")
+            except ImportError as import_err:
+                error_msg = f"LOGCAT: Erro ao importar logcat_plugin: {str(import_err)}"
+                LogUtils.critical(error_msg, tool="system")
+                QgisMessageUtil.bar_critical(self.iface, f"Erro de importação:\n{str(import_err)}")
+                return
+            
             LogUtils.info("Abrindo diálogo: Logcat - Viewer de Logs", tool=self.TOOL_KEY)
-            self.logcat_dlg = run(self.iface)
-            LogUtils.info("Diálogo Logcat aberto com sucesso", tool=self.TOOL_KEY)
-        except Exception as e:
-            LogUtils.error(f"Erro ao executar Logcat: {str(e)}", tool=self.TOOL_KEY)
-            QgisMessageUtil.bar_critical(self.iface, f"Erro no plugin Logcat:\n{str(e)}")
+            
+            # Execução com proteção adicional
+            try:
+                self.logcat_dlg = run(self.iface)
+                LogUtils.info("LOGCAT: Diálogo aberto com sucesso (sem crashes detectados)", tool="system")
+                LogUtils.info("=" * 60, tool="system")
+            except Exception as run_error:
+                # Erro na execução do Logcat
+                error_msg = f"LOGCAT: Erro ao executar logcat_plugin.run(): {str(run_error)}"
+                LogUtils.critical(error_msg, tool="system")
+                error_trace = traceback.format_exc()
+                LogUtils.critical(f"Stack trace:\n{error_trace}", tool="system")
+                QgisMessageUtil.bar_critical(self.iface, f"Erro ao abrir Logcat:\n{str(run_error)}")
+                LogUtils.info("=" * 60, tool="system")
+                
+        except Exception as outer_error:
+            # Erro na própria função run_logcat
+            error_msg = f"LOGCAT: Erro CRÍTICO em run_logcat(): {str(outer_error)}"
+            try:
+                LogUtils.critical(error_msg, tool="system")
+                error_trace = traceback.format_exc()
+                LogUtils.critical(f"Stack trace:\n{error_trace}", tool="system")
+                LogUtils.info("=" * 60, tool="system")
+            except:
+                print(error_msg, file=sys.stderr)
+            
+            # Mensagem ao usuário
+            try:
+                QgisMessageUtil.bar_critical(self.iface, f"Erro crítico no Logcat:\n{str(outer_error)}")
+            except:
+                pass
 
 
 
@@ -571,4 +660,15 @@ class MTL_Tools:
         if separator:
             self.toolbar.addSeparator()
 
-        return widget_action
+    # =====================================================
+    # EXECUTAR: Configurações
+    # =====================================================
+    def run_settings(self):
+        try:
+            from .plugins.SettingsPlugin import run_settings
+            LogUtils.info("Abrindo diálogo: Configurações", tool=self.TOOL_KEY)
+            self.settings_dlg = run_settings(self.iface)
+            LogUtils.info("Diálogo de configurações aberto com sucesso", tool=self.TOOL_KEY)
+        except Exception as e:
+            LogUtils.error(f"Erro ao executar Configurações: {str(e)}", tool=self.TOOL_KEY)
+            QgisMessageUtil.bar_critical(self.iface, f"Erro no diálogo de Configurações:\n{str(e)}")

@@ -136,12 +136,12 @@ class BasePluginMTL(QDialog):
                 self.preferences["avg_speed"] = self.preferences["total_bytes"] / self.preferences["total_time"]
             if self.preferences["avg_speed"] > 0 and self.preferences["current_size"] > 0:
                 self.preferences["eta"] = (self.preferences["current_size"] / self.preferences["avg_speed"])+time.time()
-
+            TAM = FormatUtils.bytes(self.preferences["current_size"])
             msg = ""
             if self.preferences["eta"] > 0 and self.preferences["current_size"] > 0 and self.preferences["avg_speed"] > 0 :                
                 msg = (
                     f"  Velocidade média: {FormatUtils.speed(self.preferences['avg_speed'])} \n"
-                    f"  Tamanho do arquivo: {FormatUtils.bytes(self.preferences["current_size"])} \n"
+                    f"  Tamanho do arquivo: {TAM} \n"
                     f"  Hora inicial: {FormatUtils.clock(self.preferences['t0'],)} \n"
                     f"  Hora final: {FormatUtils.clock(self.preferences.get('eta',0))}\n"
                 )

@@ -66,9 +66,14 @@ porem preciso ter a buffer em task e entao ir passando plugin/plugin
 antes de criar qualquer ferramtne preciso analisar melhor criar primeiramente a ui e depois vir gerando metodos SEMPRE
 
 changelog=
+    1.5.7 2026/02/27
+    - Logcat: Removido DEBUG logs excessivos; proteção anti-crash via desconexão de proxy model durante troca de sessão; corrigido bug de índice em duplo clique (mapToSource)
+    - Plugin principal: Adicionado sys.excepthook handler global para capturar exceções não tratadas; proteção massiva em run_logcat() com logging detalhado de cada etapa
+    - SettingsPlugin: Novo plugin no grupo Sistema com acesso a preferências e configuração de cálculo vetorial (Elipsoidal/Cartesiana/Ambos)
+    - RadioButtonGridWidget: Novo widget exclusivo de radios com grid configurável (linhas/colunas), integrado via WidgetFactory
     1.5.1 2026/02/25
     - coloque a linha async como so rodar a cima de determinado limite pq costuma demorar mais.
-    - sistema de exibicao de media de tempo 
+    - sistema de exibicao de media de tempo
     1.5.0 2026/02/24
     - FERRAMENTAS NORMALIZADAS: 5, 10, 11
     1.4.0.14

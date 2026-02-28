@@ -22,7 +22,7 @@ from ..core.engine_tasks.SaveVectorStep import SaveVectorStep
 
 class GenerateTrailPlugin(BasePluginMTL):
     #Essa é uma ferramenta de janela com geracao de produtos: do tipo vetoriais.
-    ASYNC_THRESHOLD_BYTES = 20 * 1024 * 1024  # 20 MB
+    ASYNC_THRESHOLD_BYTES = 10 * 1024 * 1024  # 20 MB
 
     def __init__(self, iface):
         super().__init__(iface.mainWindow())        
@@ -114,15 +114,16 @@ class GenerateTrailPlugin(BasePluginMTL):
     def execute_tool(self):
         self.logger.info("Iniciando processamento: Gerar Rastro Implemento")
 
-        layer = self.layer_input.current_layer()
-        self.start_stats(layer,)
+        input_layer = self.layer_input.current_layer()
+        self.start_stats(input_layer,)
 
-        if not isinstance(layer, QgsVectorLayer):
+        if not isinstance(input_layer, QgsVectorLayer):
             self.logger.warning("Nenhuma camada de linhas válida selecionada")
             QgisMessageUtil.bar_warning(                self.iface,                "Selecione uma camada de linhas válida."            )
             return
-        #receber valores
-        tam = float(self.spin_tam.value())
+        
+        # Receber valores dos componentes
+        implement_lenght = float(self.spin_tam.value())
         save_to_folder = self.save_selector.is_enabled()
         out_file = self.save_selector.get_file_path().strip() if save_to_folder else ""
         
@@ -135,29 +136,71 @@ class GenerateTrailPlugin(BasePluginMTL):
             output_path = None
         
         only_selected = self.layer_input.only_selected_enabled()
-        self.logger.info(f"Parâmetros: camada='{layer.name()}', tamanho={tam}m, selecionadas={only_selected}, salvar_arquivo={save_to_folder}")
+        output_name = "Rastro_implemento"
+        self.logger.info(f"Parâmetros: camada='{input_layer.name()}', tamanho={implement_lenght}m, selecionadas={only_selected}, salvar_arquivo={save_to_folder}")
         
-        # executar
-        out_layer = self.run(
-            layer,
-            tam,
-            only_selected=only_selected,
-            save_to_folder=save_to_folder,
-            output_path=output_path
-        )
-
-        # se cancelou ou falhou
-        if out_layer is None:
-            self.logger.info(
-                "Processamento iniciado em background"
-            )
+        # ========== INÍCIO DA LÓGICA DE RUN() ==========
+        
+        self.logger.info(f"execute_tool: implement_lenght={implement_lenght}, only_selected={only_selected}, save_to_folder={save_to_folder}, output_path={output_path}")
+        
+        # Etapa 1: Resolver camada de entrada
+        layer, implement_lenght = self._resolve_input_layer(input_layer, implement_lenght)
+        if layer is None:
+            self.logger.warning("_resolve_input_layer returned None, aborting")
             return
 
-        self.logger.info("Processamento executado com sucesso")
-        QgisMessageUtil.bar_success(
-            self.iface,
-            "Processamento executado com sucesso."
+        # Etapa 2: Validar camada
+        ok, error = VectorLayerSource.validate_layer(
+            layer,            expected_geometry=QgsWkbTypes.LineGeometry
         )
+
+        if not ok:
+            self.logger.error(f"Layer validation failed: {error}")
+            QgisMessageUtil.modal_error(self.iface, error)
+            return
+        else:
+            self.logger.debug("Layer validation passed")
+
+        # Etapa 3: Processar seleção
+        layer = self._process_selection(layer, only_selected)
+        if layer is None:
+            self.logger.warning("_process_selection returned None, aborting")
+            return
+        self.logger.debug("Selection processing complete, layer ready")
+        
+        # Etapa 4: Validar tamanho do implemento
+        if implement_lenght == 0:
+            self.logger.error("implement_lenght is zero, aborting")
+            QgisMessageUtil.modal_error(self.iface, "Buffer não pode ser 0")
+            return
+
+        buffer_distance = float(implement_lenght) / 2.0
+
+        # Etapa 5: Preparar contexto de execução
+        context = ExecutionContext()
+        context.set("layer", layer)
+        context.set("save_to_folder", save_to_folder)
+        context.set("output_path", output_path)
+        context.set("output_name", output_name)
+        context.set("tool_key", self.TOOL_KEY)
+        context.set("buffer_distance", buffer_distance)
+        context.set("buffer_dissolve", False)
+
+        self.logger.debug(f"Context prepared: {{'buffer_distance':{buffer_distance}, 'output_name':{output_name}}}")
+
+        # Etapa 6: Decidir entre execução síncrona ou assíncrona
+        size = ProjectUtils.compute_size(layer) if layer else 0
+        self.logger.debug(
+            f"Comparando tamanho arquivo: {size} versus {self.ASYNC_THRESHOLD_BYTES}")
+        
+        if size > self.ASYNC_THRESHOLD_BYTES:
+            self.logger.info("Processamento iniciado em background (assíncrono)")
+            self._run_async_pipeline(context)
+        else:
+            self.logger.info("Executando processamento de forma síncrona")
+            self._run_sync_pipeline(context)
+        
+        # ========== FIM DA LÓGICA DE RUN() ==========
 
 
         
@@ -200,68 +243,6 @@ class GenerateTrailPlugin(BasePluginMTL):
         
         return layer
 
-    def run(
-        self,
-        input_layer,
-        implement_lenght: float,
-        *,
-        save_to_folder: bool = False,
-        output_path: Optional[str] = None,
-        output_name: str = "Rastro_Implemento",
-        only_selected: bool = False,
-    ) -> Optional[QgsVectorLayer]:
-
-        self.logger.info(f"run called, implement_lenght={implement_lenght}, only_selected={only_selected}, save_to_folder={save_to_folder}, output_path={output_path}")
-        layer, implement_lenght = self._resolve_input_layer(input_layer, implement_lenght)
-        if layer is None:
-            self.logger.warning("_resolve_input_layer returned None, aborting run")
-            return None
-
-        ok, error = VectorLayerSource.validate_layer(
-            layer,            expected_geometry=QgsWkbTypes.LineGeometry
-        )
-
-        if not ok:
-            self.logger.error(f"Layer validation failed: {error}")
-            QgisMessageUtil.modal_error(self.iface, error)
-            return None
-        else:
-            self.logger.debug("Layer validation passed")
-
-        layer = self._process_selection(layer, only_selected)
-        if layer is None:
-            self.logger.warning("_process_selection returned None, aborting run")
-            return None
-        self.logger.debug("Selection processing complete, layer ready")
-        
-
-        context = ExecutionContext()
-        context.set("layer", layer)
-        context.set("save_to_folder", save_to_folder)
-        context.set("output_path", output_path)
-        context.set("output_name", output_name)
-        context.set("tool_key", self.TOOL_KEY)
-
-        if implement_lenght ==0:
-            self.logger.error("implement_lenght is zero, aborting")
-            QgisMessageUtil.modal_error(     self, "Buffer não pode ser 0"    )
-            return None
-
-        buffer_distance = float(implement_lenght) / 2.0
-
-        context.set("buffer_distance", buffer_distance)
-        context.set("buffer_dissolve", False)
-
-        self.logger.debug(f"Context prepared: {{'buffer_distance':{buffer_distance}, 'output_name':{output_name}}}")
-
-        size = ProjectUtils.compute_size(layer) if layer else 0
-        self.logger.debug(
-            f"Comparando tamanho arquivo: {size} versus {self.ASYNC_THRESHOLD_BYTES}")
-        if size > self.ASYNC_THRESHOLD_BYTES:
-            self._run_async_pipeline(context)
-        else:
-            self._run_sync_pipeline(   context )
-        return None
 
     def _run_sync_pipeline(self, context: ExecutionContext) -> Optional[QgsVectorLayer]:
         """

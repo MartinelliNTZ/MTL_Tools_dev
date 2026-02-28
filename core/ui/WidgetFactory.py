@@ -14,6 +14,7 @@ from ...resources.widgets.MainLayout import MainLayout
 from ...resources.styles.Styles import Styles
 from ...resources.widgets.AppBarWidget import AppBarWidget
 from ...resources.widgets.AttributeSelectorWidget import AttributeSelectorWidget
+from ...resources.widgets.RadioButtonGridWidget import RadioButtonGridWidget
 
 
 
@@ -98,6 +99,8 @@ class WidgetFactory:
         separator_top=False,
         separator_bottom=False,
         tool_key=None,
+        run_text="Executar",
+        close_text="Fechar",
     ):
         layout = QVBoxLayout()
 
@@ -110,7 +113,9 @@ class WidgetFactory:
             close_callback=close_callback,
             info_callback=info_callback,
             tool_key=tool_key,
-            style = Styles.buttons()
+            style = Styles.buttons(),
+            run_text=run_text,
+            close_text=close_text,
         )
 
         layout.addWidget(widget)
@@ -351,6 +356,74 @@ class WidgetFactory:
 
         return main_layout, checkbox_map
 
+    @staticmethod
+    def create_radio_button_grid(
+        *,
+        items: list,
+        columns: int = 3,
+        title: str = None,
+        checked_index: int = -1,
+        tool_key: str = None,
+        separator_top: bool = False,
+        separator_bottom: bool = True,
+        parent=None,
+    ):
+        """
+        Cria um grid de radio buttons exclusivos (apenas um pode estar selecionado).
+        
+        Parameters
+        ----------
+        items : list
+            Lista de textos para os radio buttons
+        
+        columns : int
+            Número de colunas no grid (padrão: 3)
+        
+        title : str
+            Título do grupo (opcional)
+        
+        checked_index : int
+            Índice do item pré-selecionado (-1 para nenhum)
+        
+        tool_key : str
+            Chave da ferramenta para logging
+        
+        separator_top : bool
+            Adicionar separador no topo
+        
+        separator_bottom : bool
+            Adicionar separador no rodapé
+        
+        parent : QWidget
+            Widget pai
+        
+        Returns
+        -------
+        tuple:
+            (layout_principal, widget_radios)
+        """
+        layout = QVBoxLayout()
+        
+        if separator_top:
+            layout.addWidget(WidgetFactory.create_separator())
+        
+        widget = RadioButtonGridWidget(
+            items=items,
+            columns=columns,
+            title=title,
+            checked_index=checked_index,
+            tool_key=tool_key,
+            parent=parent
+        )
+        
+        layout.addWidget(widget)
+        
+        if separator_bottom:
+            layout.addWidget(WidgetFactory.create_separator())
+        
+        return layout, widget
+
+    @staticmethod
     def create_separator(shape=QFrame.HLine, shadow=QFrame.Sunken, height=1, color="palette(mid)"):
         qframe = QFrame()
         qframe.setFrameShape(shape)
@@ -358,3 +431,4 @@ class WidgetFactory:
         qframe.setFixedHeight(height)
         qframe.setStyleSheet(Styles.separator())
         return qframe
+

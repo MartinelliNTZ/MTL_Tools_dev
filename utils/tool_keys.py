@@ -13,6 +13,7 @@ class ToolKey:
     COORD_CLICK_TOOL = "coord_click_tool"    
     BASE_TOOL = "base_tool"
     COPY_ATTRIBUTES = "copy_attributes"
+    SETTINGS = "settings"
 
     # model3 / panel tool
     # processing/
@@ -36,6 +37,7 @@ class ToolKey:
         COORD_CLICK_TOOL: "#85C1E9",  # azul céu → map tool
         BASE_TOOL: "#AED6F1",  # azul gelo → base / neutro
         COPY_ATTRIBUTES: "#DDA0DD",  # plum → dados / atributos
+        SETTINGS: "#95A5A6",  # cinza → configurações / sistema
 
         # === Processing / análises ===
         ATTRIBUTE_STATISTICS: "#F7DC6F",  # amarelo → estatística

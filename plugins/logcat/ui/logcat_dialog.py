@@ -7,6 +7,7 @@ Inspirada no Logcat do Android Studio.
 from pathlib import Path
 from typing import Optional, Set, List
 from datetime import datetime, timedelta
+import os
 
 from qgis.PyQt.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QTableView, QLineEdit, QPushButton,
@@ -53,6 +54,11 @@ class LogcatDialog(QDialog):
             parent: Widget pai
         """
         super().__init__(parent)
+        
+        # Setup de logging
+        self._logger = self._get_logger()
+        self._logger.info("LogcatDialog inicialização começando")
+        
         # Calcular plugin_root: vai 5 níveis acima (ui -> logcat -> plugins -> MTL_Tools)
         plugin_root = Path(__file__).resolve().parent.parent.parent.parent
         self.plugin_root = Path(plugin_root)
@@ -75,6 +81,12 @@ class LogcatDialog(QDialog):
         self.update_timer = QTimer()
         self.update_timer.timeout.connect(self._on_update_timer)
         
+        # Timer para debounce de busca (evitar múltiplos recálculos enquanto digita)
+        self.search_debounce_timer = QTimer()
+        self.search_debounce_timer.setSingleShot(True)
+        self.search_debounce_timer.timeout.connect(self._on_search_debounce_timeout)
+        self.search_debounce_timeout_ms = 300  # Esperar 300ms sem digitação para aplicar filtro
+        
         # Configuração da janela
         self.setWindowTitle("MTL Tools - Logcat")
         self.setMinimumSize(1000, 600)
@@ -94,6 +106,22 @@ class LogcatDialog(QDialog):
         
         # Iniciar timer de atualização em tempo real
         self.update_timer.start(1000)  # Atualizar a cada 1 segundo
+    
+    @staticmethod
+    def _get_logger():
+        """Obtém logger para este módulo."""
+        try:
+            from ....core.config.LogUtilsNew import LogUtilsNew
+            return LogUtilsNew(tool="logcat", class_name="LogcatDialog")
+        except:
+            # Fallback - logger fake
+            class FakeLogger:
+                def debug(self, msg, **kwargs): pass
+                def info(self, msg, **kwargs): pass
+                def warning(self, msg, **kwargs): pass
+                def error(self, msg, **kwargs): pass
+                def critical(self, msg, **kwargs): pass
+            return FakeLogger()
     
     def _build_ui(self):
         """Constrói a interface do usuário."""
@@ -121,7 +149,9 @@ class LogcatDialog(QDialog):
         filter_layout.addWidget(QLabel("Search:"))
         self.edit_search = QLineEdit()
         self.edit_search.setPlaceholderText("Search in all fields...")
-        self.edit_search.textChanged.connect(self._on_filter_changed)
+        # CRÍTICO: Não conectar direto ao _on_filter_changed para evitar múltiplos recálculos
+        # Usar debounce timer em vez disso
+        self.edit_search.textChanged.connect(self._on_search_text_changed)
         filter_layout.addWidget(self.edit_search)
         
         # Separador
@@ -159,7 +189,9 @@ class LogcatDialog(QDialog):
         # Criar proxy model para sort
         self.proxy_model = LogSortFilterProxyModel()
         self.proxy_model.setSourceModel(self.table_model)
-        self.proxy_model.setDynamicSortFilter(True)  # Aplicar sort dinamicamente ao atualizar dados
+        # CRÍTICO: Desabilitar dynamic sort durante atualizações em massa (QGIS 3.16 é muito lento)
+        # Habilitar apenas quando necessário sorting via UI
+        self.proxy_model.setDynamicSortFilter(False)
         
         self.table_view = QTableView()
         self.table_view.setModel(self.proxy_model)
@@ -258,49 +290,130 @@ class LogcatDialog(QDialog):
         """
         Carrega uma sessão de log.
         
+        ESTRATÉGIA ANTI-CRASH: Desabilitar proxy model durante mudança para evitar
+        que Qt tente sincronizar durante reorganização de dados.
+        
         Args:
             session: LogSession a carregar
         """
-        # PARAR watcher antigo se existir (evita múltiplas threads)
-        if self.file_watcher:
-            self.file_watcher.stop()
-            self.file_watcher = None
-        
-        # Carregar nova sessão
-        self.current_session = session
-        self.current_loader = LogLoader(session.log_file_path)
-        
-        # Carregar entradas
-        self.all_entries = self.current_loader.load_all()
-        
-        # Atualizar tabela
-        self._apply_filters()
-        
-        # Iniciar watcher para atualizações em tempo real
-        # Callback emite signal (thread-safe) em vez de chamar diretamente
-        self.file_watcher = LogFileWatcher(
-            session.log_file_path,
-            on_change=lambda: self.file_changed.emit()
-        )
-        self.file_watcher.start()
-        
-        # Atualizar status
-        self._update_status()
+        try:
+            # PARAR watcher antigo se existir (evita múltiplas threads)
+            if self.file_watcher:
+                try:
+                    self.file_watcher.stop()
+                    self.file_watcher = None
+                except Exception as e:
+                    self._logger.error(f"Erro ao parar watcher antigo: {str(e)}")
+            
+            # CRÍTICO: Desabilitar proxy model ANTES de mudar dados
+            # Isso evita que Qt tente sincronizar durante reorganização
+            try:
+                self.table_view.setModel(None)  # REMOVE proxy do tableview
+                self.proxy_model.setSourceModel(None)  # DESCONECTA modelo fonte
+            except Exception as e:
+                self._logger.error(f"Erro ao desabilitar proxy: {str(e)}")
+            
+            # Carregar nova sessão
+            self.current_session = session
+            self.current_loader = LogLoader(session.log_file_path)
+            
+            # Carregar entradas
+            self.all_entries = self.current_loader.load_all()
+            
+            # CRÍTICO: Limpar modelo antes de popular
+            try:
+                self.table_model.set_entries([])
+            except Exception as e:
+                self._logger.error(f"Erro ao limpar modelo: {str(e)}")
+            
+            # Aplicar filtros (popula table_model com novos dados)
+            self._apply_filters()
+            
+            # CRÍTICO: Reconectar proxy model DEPOIS que dados estão carregados
+            try:
+                self.proxy_model.setSourceModel(self.table_model)
+                self.table_view.setModel(self.proxy_model)
+                self.table_view.resizeColumnsToContents()
+            except Exception as e:
+                self._logger.error(f"Erro ao reconectar proxy: {str(e)}")
+            
+            # Iniciar watcher para atualizações em tempo real
+            # MAS NÃO monitorar o arquivo do próprio processo (evita loop infinito)
+            if not str(session.log_file_path).endswith(f"_pid{os.getpid()}.log"):
+                # Arquivo é de outro processo - monitorar com segurança
+                self.file_watcher = LogFileWatcher(
+                    session.log_file_path,
+                    on_change=lambda: self.file_changed.emit(),
+                    check_interval=1.0  # Aumentar intervalo para reduzir overhead
+                )
+                self.file_watcher.start()
+            else:
+                # Arquivo é do próprio processo - NÃO monitorar (evita loop infinito)
+                self.file_watcher = None
+            
+            # Atualizar status
+            self._update_status()
+            
+        except Exception as e:
+            self._logger.critical(
+                f"CRASH PROTECTED: Erro em _load_session: {str(e)}",
+                error_type=type(e).__name__,
+                session_path=str(session.log_file_path) if hasattr(session, 'log_file_path') else "unknown"
+            )
     
     def _on_file_changed(self):
         """Slot chamado de forma thread-safe quando arquivo é modificado."""
-        # Carregar novas linhas
-        if self.current_loader:
-            new_entries = self.current_loader.load_incremental()
-            if new_entries:
-                self.all_entries.extend(new_entries)
-                self._apply_filters()
+        try:
+            # Carregar novas linhas
+            if self.current_loader:
+                new_entries = self.current_loader.load_incremental()
+                
+                if new_entries:
+                    self.all_entries.extend(new_entries)
+                    
+                    # Usar append_entries para inserções incrementais
+                    try:
+                        self.table_view.blockSignals(True)
+                        try:
+                            self.table_model.append_entries(new_entries)
+                        finally:
+                            self.table_view.blockSignals(False)
+                    
+                    except Exception as e:
+                        # Fallback: aplicar todos os filtros
+                        try:
+                            self.table_view.blockSignals(False)
+                        except:
+                            pass
+                        self._apply_filters()
+        
+        except Exception as e:
+            self._logger.error(
+                f"Erro em _on_file_changed: {str(e)}",
+                error_type=type(e).__name__
+            )
     
     def _on_update_timer(self):
         """Timer para atualizar UI periodicamente."""
         # Verificar novas sessões
         if self.session_manager.has_changed():
             self._refresh_session_list()
+    
+    def _on_search_text_changed(self):
+        """
+        Chamado quando texto de busca muda (textChanged signal).
+        Implementa debounce para evitar múltiplos recálculos enquanto digita.
+        """
+        try:
+            # Reiniciar timer de debounce
+            self.search_debounce_timer.stop()
+            self.search_debounce_timer.start(self.search_debounce_timeout_ms)
+        except Exception as e:
+            self._logger.error(f"Erro em _on_search_text_changed: {str(e)}")
+    
+    def _on_search_debounce_timeout(self):
+        """Chamado quando timeout de debounce expira (300ms sem digitação)."""
+        self._on_filter_changed()
     
     def _on_filter_changed(self):
         """Chamado quando filtros são alterados."""
@@ -397,21 +510,56 @@ class LogcatDialog(QDialog):
     
     def _apply_filters(self):
         """Aplica filtros e atualiza tabela, preservando seleção."""
-        # Obter texto de busca
-        search_text = self.edit_search.text()
-        self.filter_engine.set_text_filter(search_text)
-        
-        # Aplicar filtros
-        filtered = self.filter_engine.apply(self.all_entries)
-        
-        # Atualizar tabela
-        self.table_model.set_entries(filtered)
-        
-        # Atualizar botões de filtro
-        self._update_filter_buttons(filtered)
-        
-        # Atualizar status
-        self._update_status()
+        try:
+            # Obter texto de busca
+            search_text = self.edit_search.text()
+            self.filter_engine.set_text_filter(search_text)
+            
+            # Aplicar filtros
+            filtered = self.filter_engine.apply(self.all_entries)
+            
+            # CRÍTICO: Bloquear signals da table_view durante atualizações para evitar
+            # que QTableView tente acessar índices durante sincronização de modelo
+            self.table_view.blockSignals(True)
+            try:
+                # MÁXIMA PROTEÇÃO: Envolver model update em try/except
+                try:
+                    self.table_model.set_entries(filtered)
+                except Exception as model_e:
+                    self._logger.critical(
+                        f"CRASH PROTECTED: Erro crítico em set_entries: {str(model_e)}",
+                        error_type=type(model_e).__name__
+                    )
+                    # Tentar recovery: limpar modelo
+                    try:
+                        self.table_model.set_entries([])
+                    except:
+                        pass
+                    raise
+            finally:
+                try:
+                    self.table_view.blockSignals(False)
+                except:
+                    pass
+            
+            # Atualizar botões de filtro
+            try:
+                self._update_filter_buttons(filtered)
+            except Exception as e:
+                self._logger.error(f"Erro ao atualizar filter buttons: {str(e)}")
+            
+            # Atualizar status
+            try:
+                self._update_status()
+            except Exception as e:
+                self._logger.error(f"Erro ao atualizar status: {str(e)}")
+            
+        except Exception as e:
+            self._logger.critical(
+                f"CRASH PROTECTED: Erro em _apply_filters: {str(e)}",
+                error_type=type(e).__name__,
+                all_entries_count=len(self.all_entries) if self.all_entries else 0
+            )
     
     def _update_filter_buttons(self, entries: List[LogEntry]):
         """Atualiza rótulos dos botões de filtro."""
@@ -430,11 +578,32 @@ class LogcatDialog(QDialog):
         )
     
     def _on_table_double_click(self, index: QModelIndex):
-        """Chamado ao duplo-clique na tabela."""
-        entry = self.table_model.get_entry(index)
-        if entry:
-            dialog = LogDetailDialog(entry, self)
-            dialog.exec_()
+        """
+        Chamado ao duplo-clique na tabela.
+        
+        CRÍTICO: O índice recebido é do PROXY MODEL (após sorting/filtering).
+        Precisa converter para índice do SOURCE MODEL (table_model original).
+        """
+        try:
+            # O index aqui é do proxy_model, converter para source model
+            source_index = self.proxy_model.mapToSource(index)
+            
+            if not source_index.isValid():
+                self._logger.warning(f"Índice inválido após mapToSource: proxy_index={index.row()}")
+                return
+            
+            # Agora usar o índice correto do modelo original
+            entry = self.table_model.get_entry(source_index)
+            if entry:
+                self._logger.info(f"Abrindo detalhe: row={source_index.row()}, entry_id={id(entry)}")
+                dialog = LogDetailDialog(entry, self)
+                dialog.exec_()
+            else:
+                self._logger.warning(f"Entrada não encontrada em source_index: {source_index.row()}")
+        except Exception as e:
+            self._logger.error(f"Erro em _on_table_double_click: {str(e)}")
+            import traceback
+            self._logger.error(f"Stack: {traceback.format_exc()}")
     
     def _on_clear_session(self):
         """Limpa logs da sessão atual."""
@@ -510,15 +679,18 @@ class LogcatDialog(QDialog):
     
     def _update_status(self):
         """Atualiza barra de status."""
-        total = len(self.all_entries)
-        displayed = self.table_model.rowCount()
-        
-        if self.current_session:
-            status_text = f"Showing {displayed}/{total} entries | Session: {self.current_session.display_name}"
-        else:
-            status_text = f"No session loaded"
-        
-        self.label_status.setText(status_text)
+        try:
+            total = len(self.all_entries)
+            displayed = self.table_model.rowCount()
+            
+            if self.current_session:
+                status_text = f"Showing {displayed}/{total} entries | Session: {self.current_session.display_name}"
+            else:
+                status_text = f"No session loaded"
+            
+            self.label_status.setText(status_text)
+        except Exception as e:
+            self._logger.error(f"Erro ao atualizar status: {str(e)}")
     
     def _on_export_selection(self):
         """Exporta as linhas selecionadas para LogMultipleDetailDialog."""
@@ -594,6 +766,13 @@ class LogcatDialog(QDialog):
             except Exception:
                 pass
             
+            # PRIORIDADE 2b: Parar debounce timer
+            try:
+                if self.search_debounce_timer and self.search_debounce_timer.isActive():
+                    self.search_debounce_timer.stop()
+            except Exception:
+                pass
+            
             # PRIORIDADE 3: Desconectar signals
             try:
                 self.file_changed.disconnect()
@@ -628,6 +807,13 @@ class LogcatDialog(QDialog):
                 try:
                     if self.update_timer.isActive():
                         self.update_timer.stop()
+                except Exception:
+                    pass
+            
+            if self.search_debounce_timer:
+                try:
+                    if self.search_debounce_timer.isActive():
+                        self.search_debounce_timer.stop()
                 except Exception:
                     pass
         except Exception:
