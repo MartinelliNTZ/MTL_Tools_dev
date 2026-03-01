@@ -30,7 +30,7 @@ class GenerateTrailPlugin(BasePluginMTL):
         self.init(ToolKey.GERAR_RASTRO_IMPLEMENTO,"GenerateTrailPlugin")
 
 
-    def _build_ui(self):
+    def _build_ui(self, **kwargs):
         self.logger.debug("Inicializando PLUGIN Gerar Rastro Implemento")
         super()._build_ui(title = "Gerar Rastro de Máquinas",icon_path="gerar_rastro.ico",instructions_file="generate_trail_help.md")  
         self.logger.info("Construindo interface da ferramenta")

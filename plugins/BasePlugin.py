@@ -2,8 +2,8 @@ from qgis.PyQt.QtWidgets import (
     QDialog, QAction,QFileDialog, QLineEdit,QSizeGrip
 )
 from qgis.core import QgsVectorLayer, QgsWkbTypes, QgsApplication, QgsProject,QgsFeatureRequest
-from qgis.PyQt.QtGui import QDesktopServices, QIcon
-from qgis.PyQt.QtCore import QUrl, Qt
+from qgis.PyQt.QtGui import QDesktopServices, QIcon, QCursor
+from qgis.PyQt.QtCore import QUrl, Qt, QRect, QPoint
 
 import os
 from pathlib import Path
@@ -41,14 +41,14 @@ class BasePluginMTL(QDialog):
 
 
 
-    def init(self,tool_key = "ToolKey.BASE_TOOL", class_name = "BasePluginMTL"):
+    def init(self, tool_key="ToolKey.BASE_TOOL", class_name="BasePluginMTL", min_width=320, min_height=320):
         self.TOOL_KEY = tool_key
         self.logger = LogUtilsNew(tool=self.TOOL_KEY, class_name=class_name, level=LogUtilsNew.DEBUG)
         self.preferences = {}
         self.preferences.clear()
         self.preferences = load_tool_prefs(self.TOOL_KEY)
         self.logger.debug("Construindo interface de usuário")
-        self._build_ui()
+        self._build_ui(min_width=min_width, min_height=min_height)
         self.logger.debug("Carregando preferências do usuário. xxd")
         self._load_prefs()
         self.logger.info("Diálogo Gerar Rastro Implemento inicializado com sucesso. xxd")
@@ -69,11 +69,13 @@ class BasePluginMTL(QDialog):
         self,
         title: Optional[str] = None,
         icon_path: Optional[str] = "mtl_agro.ico",
-        instructions_file: Optional[str] = "standard.md"
+        instructions_file: Optional[str] = "standard.md",
+        min_width: int = 460,
+        min_height: int = 320
     ):
         """Constrói a interface do plugin.
 
-        Recebe: title (str|None), icon_path (str), instructions_file (str).
+        Recebe: title (str|None), icon_path (str), instructions_file (str), min_width (int), min_height (int).
         Retorna: None.
         Faz: configura layout, ícone, tamanho da janela e caminho de instruções.
         """
@@ -90,10 +92,10 @@ class BasePluginMTL(QDialog):
 
         self.setWindowFlags(Qt.Dialog | Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground, True)
-        self.setMinimumSize(460, 320)
+        self.setMinimumSize(min_width, min_height)
         self.setWindowTitle(f"MTL Tools — {self.PLUGIN_NAME}")
 
-        # Size grip (resize)
+        # Size grip (resize visual indicator)
         self.size_grip = QSizeGrip(self.layout._frame)
         self.size_grip.setFixedSize(16, 16)
         self.layout.addWidget(
@@ -122,6 +124,26 @@ class BasePluginMTL(QDialog):
             "instructions",
             instructions_file
         )
+
+    def mousePressEvent(self, event):
+        """Delega resize para MainLayout."""
+        if self.layout and hasattr(self.layout, 'handle_mouse_press'):
+            if self.layout.handle_mouse_press(event):
+                return
+        super().mousePressEvent(event)
+
+    def mouseMoveEvent(self, event):
+        """Delega resize para MainLayout."""
+        if self.layout and hasattr(self.layout, 'handle_mouse_move'):
+            self.layout.handle_mouse_move(event)
+        super().mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        """Delega resize para MainLayout."""
+        if self.layout and hasattr(self.layout, 'handle_mouse_release'):
+            if self.layout.handle_mouse_release(event):
+                return
+        super().mouseReleaseEvent(event)
 
     def start_stats(self, input_obj=None,modal_info = "YES"):
         try:

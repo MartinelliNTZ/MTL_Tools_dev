@@ -5,5 +5,7 @@
         "ForEach-Object": true,
         "Move-Item": true
     },
-    "chat.agent.maxRequests": 150
+    "chat.agent.maxRequests": 150,
+    "python-envs.defaultEnvManager": "ms-python.python:conda",
+    "python-envs.defaultPackageManager": "ms-python.python:conda"
 }

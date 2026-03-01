@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import os
-from qgis.PyQt.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QListWidgetItem
-)
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import QgsVectorLayer, QgsWkbTypes, QgsMapLayerProxyModel
 
 from ..utils.tool_keys import ToolKey
-from ..core.config.LogUtils import LogUtils
+from ..core.config.LogUtilsNew import LogUtilsNew
 from ..utils.qgis_messagem_util import QgisMessageUtil
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
@@ -23,17 +20,15 @@ class CopyAttributes(BasePluginMTL):
     def __init__(self, iface):
         super().__init__(iface.mainWindow())
         self.iface = iface
-
-        self._build_ui()
-        self._load_prefs()
+        self.init(ToolKey.COPY_ATTRIBUTES, "CopyAttributes", min_width=320, min_height=450)
 
     # =========================
     # UI
     # =========================
-    def _build_ui(self):
-        super()._build_ui("Copiar Atributos de Vetor","copy_attributes.ico","copy_attributes_help.md")       
+    def _build_ui(self, **kwargs):
+        super()._build_ui("Copiar Atributos de Vetor","copy_attributes.ico","copy_attributes_help.md", **kwargs)       
               
-        LogUtils.log("Construindo interface da ferramenta", level="INFO", tool=self.TOOL_KEY, class_name="CopyAttributtes")
+        self.logger.info("Construindo interface da ferramenta")
 
 
         # CAMADA DESTINO
@@ -42,7 +37,7 @@ class CopyAttributes(BasePluginMTL):
             filters=[QgsMapLayerProxyModel.VectorLayer],
             parent=self
         )
-        LogUtils.log("Componente de camada de target adicionado", level="DEBUG", tool=self.TOOL_KEY, class_name="CopyAttributtes")        
+        self.logger.debug("Componente de camada de target adicionado")        
         # CAMADA ORIGEM
         src_layout, self.source_layer_input = WidgetFactory.create_layer_input(
             label_text="Camada de Origem:",
@@ -51,7 +46,7 @@ class CopyAttributes(BasePluginMTL):
         )        
         self.source_layer_input.layerChanged.connect(self._populate_fields)
 
-        LogUtils.log("Componente de camada de origem adicionado", level="DEBUG", tool=self.TOOL_KEY, class_name="CopyAttributtes")    
+        self.logger.debug("Componente de camada de origem adicionado")    
 
 
 
@@ -101,28 +96,23 @@ class CopyAttributes(BasePluginMTL):
     # =========================
     def execute_tool(self):
         self._save_prefs()
-        LogUtils.log(
-            "Execução iniciada",
-            level="INFO",
-            tool=self.TOOL_KEY,
-            class_name="CopyAttributes"
-        )
+        self.logger.info("Execução iniciada")
 
         source = self.source_layer_input.current_layer()
         target = self.target_layer_input.current_layer()
 
         if not isinstance(source, QgsVectorLayer):
             QgisMessageUtil.bar_warning(self.iface, "Camada de origem inválida")
-            LogUtils.log("Camada de origem inválida", level="WARNING", tool=self.TOOL_KEY, class_name="CopyAttributes")
+            self.logger.warning("Camada de origem inválida")
             return
 
         if not isinstance(target, QgsVectorLayer):
             QgisMessageUtil.bar_warning(self.iface, "Camada de destino inválida")
-            LogUtils.log("Camada de destino inválida", level="WARNING", tool=self.TOOL_KEY, class_name="CopyAttributes")
+            self.logger.warning("Camada de destino inválida")
             return
 
         if not self.ensure_editable(target):
-            LogUtils.log("Camada de destino não editável", level="WARNING", tool=self.TOOL_KEY, class_name="CopyAttributes")
+            self.logger.warning("Camada de destino não editável")
             return
 
         fields = None
@@ -131,7 +121,7 @@ class CopyAttributes(BasePluginMTL):
 
             if not fields:
                 QgisMessageUtil.bar_warning(self.iface, "Nenhum atributo selecionado")
-                LogUtils.log("Execução abortada: nenhum atributo selecionado", level="WARNING", tool=self.TOOL_KEY, class_name="CopyAttributes")
+                self.logger.warning("Execução abortada: nenhum atributo selecionado")
                 return
 
 
@@ -151,9 +141,9 @@ class CopyAttributes(BasePluginMTL):
 
         if ok:
             QgisMessageUtil.bar_success(self.iface, "Atributos copiados com sucesso (alterações não salvas)")
-            LogUtils.log("Cópia de atributos finalizada com sucesso", level="INFO", tool=self.TOOL_KEY, class_name="CopyAttributes")
+            self.logger.info("Cópia de atributos finalizada com sucesso")
         else:
-            LogUtils.log("Falha na cópia de atributos", level="ERROR", tool=self.TOOL_KEY, class_name="CopyAttributes")
+            self.logger.error("Falha na cópia de atributos")
 
 def run_copy_attributes(iface):
     dlg = CopyAttributes(iface)

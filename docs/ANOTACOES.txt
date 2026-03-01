@@ -66,6 +66,13 @@ porem preciso ter a buffer em task e entao ir passando plugin/plugin
 antes de criar qualquer ferramtne preciso analisar melhor criar primeiramente a ui e depois vir gerando metodos SEMPRE
 
 changelog=
+    1.5.10 2026/03/01
+    - CopyAttributesPlugin: Migrado de LogUtils para LogUtilsNew, padronizando sistema de logging
+    - BasePluginMTL: Adicionado suporte a parâmetros `min_width` e `min_height` no método `init()` para configuração customizável de tamanho mínimo de janelas
+    - Redimensionamento de janelas: Implementado sistema de resize com mouse drag nas bordas, mantendo FramelessWindowHint para estilo customizado e bordas arredondadas
+    - MainLayout: Transferida lógica de redimensionamento do BasePluginMTL para MainLayout, aplicando separação de responsabilidades (padrão arquitetônico)
+    - Mouse tracking: Implementado rastreamento contínuo de mouse com `setMouseTracking(True)` em parent e frame para atualização dinâmica de cursor
+    - Cursor visual: Ícone do cursor agora muda dinamicamente ao aproximar-se das bordas (SizeVerCursor, SizeHorCursor, SizeFDiagCursor) indicando direções de resize
     1.5.7 2026/02/27
     - Logcat: Removido DEBUG logs excessivos; proteção anti-crash via desconexão de proxy model durante troca de sessão; corrigido bug de índice em duplo clique (mapToSource)
     - Plugin principal: Adicionado sys.excepthook handler global para capturar exceções não tratadas; proteção massiva em run_logcat() com logging detalhado de cada etapa
