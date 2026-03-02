@@ -13,7 +13,9 @@ class ToolKey:
     COORD_CLICK_TOOL = "coord_click_tool"    
     BASE_TOOL = "base_tool"
     COPY_ATTRIBUTES = "copy_attributes"
+    CONVERTER_MULTIPART = "converter_multipart"
     SETTINGS = "settings"
+    VECTOR_FIELDS = "vector_fields"
 
     # model3 / panel tool
     # processing/
@@ -37,7 +39,9 @@ class ToolKey:
         COORD_CLICK_TOOL: "#85C1E9",  # azul céu → map tool
         BASE_TOOL: "#AED6F1",  # azul gelo → base / neutro
         COPY_ATTRIBUTES: "#DDA0DD",  # plum → dados / atributos
+        CONVERTER_MULTIPART: "#F5A962",  # laranja-pêssego → conversão geométrica
         SETTINGS: "#95A5A6",  # cinza → configurações / sistema
+        VECTOR_FIELDS: "#C39BD3",  # púrpura → cálculos vetoriais
 
         # === Processing / análises ===
         ATTRIBUTE_STATISTICS: "#F7DC6F",  # amarelo → estatística

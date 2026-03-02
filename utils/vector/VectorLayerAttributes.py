@@ -23,6 +23,7 @@ from pathlib import Path
 import os
 from typing import Optional
 import processing
+from qgis.PyQt.QtCore import QVariant
 
 
 class VectorLayerAttributes:
@@ -161,3 +162,149 @@ class VectorLayerAttributes:
     def export_attributes_to_table(self, layer, output_path, external_tool_key="untraceable"):
         """Exporta todos os atributos da camada para um arquivo tabular."""
         pass
+
+    @staticmethod
+    def create_point_coordinate_fields(layer, field_map):
+        """
+        Cria campos double para armazenar coordenadas de ponto.
+        
+        Parameters
+        ----------
+        layer : QgsVectorLayer
+            Camada vetorial para adicionar campos
+        field_map : dict
+            Mapeamento {"x": "x", "y": "y", "z": "z_1"} (z é opcional)
+        
+        Returns
+        -------
+        bool
+            True se sucesso, False caso contrário
+        """
+        if not layer or not layer.isValid():
+            return False
+            
+        if not layer.isEditable():
+            layer.startEditing()
+        
+        try:
+            for name in field_map.values():
+                if layer.fields().lookupField(name) == -1:
+                    layer.addAttribute(
+                        QgsField(name, QVariant.Double, len=20, prec=8)
+                    )
+            layer.updateFields()
+            return True
+        except Exception as e:
+            return False
+
+    @staticmethod
+    def update_point_xy_coordinates(layer, field_map):
+        """
+        Atualiza campos X e Y com coordenadas do ponto.
+        
+        Parameters
+        ----------
+        layer : QgsVectorLayer
+            Camada vetorial de pontos
+        field_map : dict
+            Mapeamento {"x": "x", "y": "y"} com nomes dos campos
+        """
+        if not layer or not layer.isValid():
+            return
+            
+        for feat in layer.getFeatures():
+            geom = feat.geometry()
+            if geom and not geom.isEmpty():
+                p = geom.asPoint()
+                feat[field_map["x"]] = round(p.x(), 8)
+                feat[field_map["y"]] = round(p.y(), 8)
+                layer.updateFeature(feat)
+
+    @staticmethod
+    def update_feature_values(layer, z_values, z_field):
+        """
+        Atualiza campo de altimetria com valores calculados.
+        
+        Parameters
+        ----------
+        layer : QgsVectorLayer
+            Camada vetorial
+        z_values : dict
+            Mapeamento {feature_id: altitude_value}
+        z_field : str
+            Nome do campo de altitude
+        """
+        if not layer or not layer.isValid():
+            return
+            
+        for fid, z in z_values.items():
+            if z is not None:
+                feat = layer.getFeature(fid)
+                if feat.isValid():
+                    feat[z_field] = z
+                    layer.updateFeature(feat)
+
+    @staticmethod
+    def generate_field_name_with_suffix(base_name, suffix, max_length=10):
+        """
+        Gera nome de campo com sufixo respeitando limite de caracteres (SHP = 10).
+        
+        Parameters
+        ----------
+        base_name : str
+            Nome base do campo (ex: 'length', 'area')
+        suffix : str
+            Sufixo a adicionar (ex: '_eli', '_car')
+        max_length : int
+            Comprimento máximo do nome (padrão: 10 para SHP)
+            
+        Returns
+        -------
+        str
+            Nome do campo truncado se necessário (ex: 'len_eli' ao invés de 'length_eli')
+        """
+        full_name = f"{base_name}{suffix}"
+        if len(full_name) <= max_length:
+            return full_name
+        
+        # Truncar nome base para caber sufixo
+        available_for_base = max_length - len(suffix)
+        if available_for_base < 1:
+            return full_name[:max_length]
+        
+        return f"{base_name[:available_for_base]}{suffix}"
+
+    @staticmethod
+    def resolve_field_names_for_calculation(layer, base_name, calculation_mode="Elipsoidal"):
+        """
+        Resolve nomes de campo baseado no modo de cálculo.
+        
+        Parameters
+        ----------
+        layer : QgsVectorLayer
+            Camada vetorial
+        base_name : str
+            Nome base do campo (ex: 'length', 'area')
+        calculation_mode : str
+            Modo de cálculo ('Elipsoidal', 'Cartesiana', 'Ambos')
+            
+        Returns
+        -------
+        dict
+            Mapeamento de modo -> nome_do_campo
+            Exemplo: {'Elipsoidal': 'length_eli'} ou 
+                    {'Elipsoidal': 'length_eli', 'Cartesiana': 'length_car'}
+        """
+        field_map = {}
+        
+        if calculation_mode == "Ambos":
+            # Criar campos para ambos os modos
+            eli_name = VectorLayerAttributes.generate_field_name_with_suffix(base_name, "_eli")
+            car_name = VectorLayerAttributes.generate_field_name_with_suffix(base_name, "_car")
+            field_map["Elipsoidal"] = eli_name
+            field_map["Cartesiana"] = car_name
+        else:
+            # Um único modo
+            field_map[calculation_mode] = base_name
+        
+        return field_map

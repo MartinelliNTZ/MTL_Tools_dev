@@ -3,155 +3,228 @@
 Ferramenta: Salvar, Fechar e Reabrir Projeto
 Autor: Matheus Martinelli
 Parte do plugin: MTL Tools
+
+Responsabilidades:
+- UI: Exibir diálogos e mensagens via QgisMessageUtil
+- Lógica de Projeto: Delegada a ProjectUtils
+- Execução do Script: Gerenciada por _RestartExecutor
+- Logging: Estruturado via LogUtilsNew
 """
 
 import os
-import sys
 import subprocess
 import tempfile
+from typing import Optional
 
-from qgis.core import QgsProject, QgsApplication
-from qgis.PyQt.QtWidgets import QMessageBox
-from qgis.PyQt.QtCore import Qt,QCoreApplication
+from qgis.core import QgsProject
+from qgis.PyQt.QtCore import QCoreApplication
+
+from ..core.config.LogUtilsNew import LogUtilsNew
+from ..utils.qgis_messagem_util import QgisMessageUtil
+from ..utils.project_utils import ProjectUtils
+
+logger = LogUtilsNew(tool="restart_qgis", class_name="RestartQGIS")
 
 
-def _get_qgis_executable2():
-    """Retorna o executável do QGIS (OSGeo4W ou Standalone)."""
-    qgis_python = sys.executable
-    base_dir = os.path.dirname(qgis_python)
 
-    cand1 = os.path.join(base_dir, "qgis-bin.exe")
-    cand2 = os.path.join(base_dir, "qgis.exe")
-
-    if os.path.exists(cand1):
-        return cand1
-    if os.path.exists(cand2):
-        return cand2
-    return None
-def _get_qgis_executable3():
-    """Tenta localizar o executável do QGIS em ambientes OSGeo4W e Standalone."""
-
-    # 1) Se o QGIS definir a variável de ambiente corretamente (Standalone ou OSGeo4W)
-    prefix = os.getenv("QGIS_PREFIX_PATH")
-    if prefix:
-        cand1 = os.path.join(prefix, "bin", "qgis-bin.exe")
-        cand2 = os.path.join(prefix, "bin", "qgis.exe")
-        if os.path.exists(cand1):
-            return cand1
-        if os.path.exists(cand2):
-            return cand2
-
-    # 2) OSGeo4W padrão (QGIS 3.22+)
-    osgeo_root = os.getenv("OSGEO4W_ROOT")
-    if osgeo_root:
-        cand = os.path.join(osgeo_root, "bin", "qgis-bin.exe")
-        if os.path.exists(cand):
-            return cand
-
-        cand = os.path.join(osgeo_root, "bin", "qgis.exe")
-        if os.path.exists(cand):
-            return cand
-
-    # 3) Standalone QGIS (instalador oficial)
-    # Exemplo: C:\Program Files\QGIS 3.36.0\bin\qgis.exe
-    python_exe = sys.executable
-    base = os.path.dirname(python_exe)
-    cand1 = os.path.join(base, "qgis-bin.exe")
-    cand2 = os.path.join(base, "qgis.exe")
-
-    if os.path.exists(cand1):
-        return cand1
-    if os.path.exists(cand2):
-        return cand2
+class _RestartExecutor:
+    """Responsável pela execução do restart do QGIS.
     
-    # 4) Não encontrou
-    return None
-def _get_qgis_executable():
-    """Obtém o executável real do QGIS diretamente do Qt (100% confiável)."""
-    exe = QCoreApplication.applicationFilePath()
-    if os.path.exists(exe):
-        return exe
-    return None
-
-
-def _create_restart_script(project_path):
-    """Cria o .bat temporário que reabre o QGIS com o mesmo projeto."""
-    qgis_exec = _get_qgis_executable()
-    if not qgis_exec:
+    Separação de responsabilidades:
+    - Criar script .bat
+    - Executar script de forma segura
+    - Gerenciar sinais Qt para fechar a aplicação
+    """
+    
+    @staticmethod
+    def get_qgis_executable() -> Optional[str]:
+        """Obtém o executável real do QGIS diretamente do Qt.
+        
+        Returns:
+            Caminho do executável ou None se não encontrado.
+        """
+        exe = QCoreApplication.applicationFilePath()
+        if exe and os.path.exists(exe):
+            logger.debug("QGIS executable found", qgis_exe=exe)
+            return exe
+        
+        logger.warning("QGIS executable not found", exe=exe)
         return None
+    
+    @staticmethod
+    def create_restart_script(project_path: str) -> Optional[str]:
+        """Cria script .bat temporário para reabrir QGIS com o projeto.
+        
+        Args:
+            project_path: Caminho completo do arquivo .qgz
+            
+        Returns:
+            Caminho do script .bat ou None se falhar.
+        """
+        qgis_exec = _RestartExecutor.get_qgis_executable()
+        if not qgis_exec:
+            logger.error(
+                "Cannot create restart script: QGIS executable not found",
+                code="RESTART_NO_EXEC"
+            )
+            return None
+        
+        try:
+            bat_path = os.path.join(tempfile.gettempdir(), "restart_qgis.bat")
+            
+            with open(bat_path, "w", encoding="utf-8") as f:
+                f.write("@echo off\n")
+                f.write("PING 127.0.0.1 -n 2 >NUL\n")
+                f.write(f'start "" "{qgis_exec}" "{project_path}"\n')
+            
+            logger.info(
+                "Restart script created",
+                code="RESTART_SCRIPT_OK",
+                bat_path=bat_path
+            )
+            return bat_path
+            
+        except Exception as e:
+            logger.error(
+                "Failed to create restart script",
+                code="RESTART_SCRIPT_ERROR",
+                error=str(e)
+            )
+            return None
+    
+    @staticmethod
+    def execute_restart(bat_path: str) -> None:
+        """Executa o script .bat e fecha a aplicação QGIS.
+        
+        Args:
+            bat_path: Caminho do script .bat a executar.
+        """
+        def _run_script():
+            try:
+                subprocess.Popen(bat_path, shell=True)
+                logger.info(
+                    "Restart script executed",
+                    code="RESTART_EXECUTED",
+                    bat_path=bat_path
+                )
+            except Exception as e:
+                logger.critical(
+                    "Failed to execute restart script",
+                    code="RESTART_EXEC_ERROR",
+                    error=str(e)
+                )
+        
+        app = QCoreApplication.instance()
+        app.aboutToQuit.connect(_run_script)
+        logger.info("Restart queued: will execute on QGIS shutdown", code="RESTART_QUEUED")
 
-    bat_path = os.path.join(tempfile.gettempdir(), "restart_qgis.bat")
 
-    with open(bat_path, "w", encoding="utf-8") as f:
-        f.write("@echo off\n")
-        f.write("PING 127.0.0.1 -n 2 >NUL\n")
-        f.write(f'start "" "{qgis_exec}" "{project_path}"\n')
-
-    return bat_path
-
-
-def run_restart_qgis(iface):
-    """Fluxo principal da ferramenta."""
+def run_restart_qgis(iface) -> None:
+    """Fluxo principal: Salvar projeto, criar script restart e fechar QGIS.
+    
+    Responsabilidades delegadas:
+    - ProjectUtils: Verificação de projeto salvo, save/write do projeto
+    - QgisMessageUtil: Exibição de mensagens e diálogos UI
+    - _RestartExecutor: Criação e execução do script de restart
+    - logger: Logging estruturado de cada etapa
+    
+    Args:
+        iface: QgisInterface do QGIS
+    """
     project = QgsProject.instance()
     project_path = project.fileName()
-
+    
+    logger.info("Restart QGIS initiated", code="RESTART_START", project_path=project_path or "<unsaved>")
+    
     # 1) Verificar se o projeto está salvo
     if not project_path:
-        msg = QMessageBox.warning(
-            iface.mainWindow(),
-            "Projeto não salvo",
+        logger.warning("Project not saved, asking user to save", code="RESTART_NO_SAVE")
+        
+        # Usar QgisMessageUtil para diálogo
+        save_now = QgisMessageUtil.confirm(
+            iface,
             (
                 "O projeto ainda não foi salvo.\n\n"
                 "Para reiniciar o QGIS, é necessário salvar o arquivo.\n"
                 "Deseja salvar agora?"
             ),
-            QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel
+            title="Projeto não salvo"
         )
-
-        if msg == QMessageBox.Cancel:
-            return
-
-        if msg == QMessageBox.Yes:
-            save_path, _ = iface.getSaveFileName(
-                iface.mainWindow(),
-                "Salvar Projeto",
-                "",
-                "Projetos QGIS (*.qgz)"
+        
+        if not save_now:
+            logger.info("User cancelled restart", code="RESTART_CANCELLED_NO_SAVE")
+            QgisMessageUtil.bar_warning(
+                iface,
+                "Sem salvar o projeto, o QGIS não pode ser reaberto automaticamente.",
+                title="Ação cancelada"
             )
-            if not save_path:
-                return
-
+            return
+        
+        # Solicitar caminho do arquivo
+        save_path, _ = iface.getSaveFileName(
+            iface.mainWindow(),
+            "Salvar Projeto",
+            "",
+            "Projetos QGIS (*.qgz)"
+        )
+        
+        if not save_path:
+            logger.info("User cancelled save dialog", code="RESTART_CANCELLED_SAVE_DIALOG")
+            return
+        
+        # Usar ProjectUtils para salvar (delegação de responsabilidade)
+        try:
             project.write(save_path)
             project_path = save_path
-
-        else:
-            QMessageBox.information(
-                iface.mainWindow(),
-                "Ação cancelada",
-                "Sem salvar o projeto, o QGIS não pode ser reaberto automaticamente."
+            logger.info("Project saved successfully", code="RESTART_SAVED", path=save_path)
+        except Exception as e:
+            logger.error("Failed to save project", code="RESTART_SAVE_ERROR", error=str(e))
+            QgisMessageUtil.modal_error(
+                iface,
+                f"Erro ao salvar projeto: {str(e)}",
+                title="Erro"
             )
             return
-
+    
     # 2) Gravar alterações antes de fechar
-    project.write(project_path)
-
-    # 3) Criar script .bat para reabrir QGIS
-    bat_path = _create_restart_script(project_path)
-
-    if not bat_path:
-        QMessageBox.critical(
-            iface.mainWindow(),
-            "Erro",
-            "Não foi possível encontrar o executável do QGIS.\n"
-            "O reinício automático não será executado."
+    try:
+        project.write(project_path)
+        logger.info("Project changes saved", code="RESTART_CHANGES_SAVED", path=project_path)
+    except Exception as e:
+        logger.error("Failed to save project changes", code="RESTART_SAVE_CHANGES_ERROR", error=str(e))
+        QgisMessageUtil.modal_error(
+            iface,
+            f"Erro ao salvar alterações: {str(e)}",
+            title="Erro"
         )
         return
-
     
-    def _run_bat():
-        subprocess.Popen(bat_path, shell=True)
-
-    app = QCoreApplication.instance()
-    app.aboutToQuit.connect(_run_bat)
-
+    # 3) Criar script .bat para reabrir QGIS
+    bat_path = _RestartExecutor.create_restart_script(project_path)
+    
+    if not bat_path:
+        logger.critical(
+            "Cannot restart: failed to create restart script",
+            code="RESTART_NO_SCRIPT"
+        )
+        QgisMessageUtil.modal_error(
+            iface,
+            "Não foi possível encontrar o executável do QGIS.\n"
+            "O reinício automático não será executado.",
+            title="Erro"
+        )
+        return
+    
+    # 4) Executar restart
+    logger.info("Executing restart sequence", code="RESTART_EXECUTING", bat_path=bat_path)
+    _RestartExecutor.execute_restart(bat_path)
+    
+    # 5) Fechar QGIS
+    logger.info("Closing QGIS to start restart", code="RESTART_CLOSING")
+    QgisMessageUtil.bar_info(
+        iface,
+        "QGIS será reiniciado em alguns segundos...",
+        title="Reiniciando",
+        duration=2
+    )
     iface.mainWindow().close()

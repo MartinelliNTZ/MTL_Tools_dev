@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+from qgis.core import QgsDistanceArea, QgsProject
+
+
 class VectorLayerMetrics:
     """
     Responsável pela leitura e cálculos espaciais de camadas vetoriais.
@@ -68,3 +72,125 @@ class VectorLayerMetrics:
     def analyze_spatial_distribution(self, layer, external_tool_key="untraceable"):
         """Analisa o padrão de distribuição espacial das feições."""
         pass
+
+    @staticmethod
+    def calculate_line_length(layer, field_name, use_ellipsoidal=True):
+        """
+        Calcula comprimento de linhas (elipsoidal ou cartesiano).
+        
+        Parameters
+        ----------
+        layer : QgsVectorLayer
+            Camada vetorial de linhas
+        field_name : str
+            Nome do campo para armazenar comprimento
+        use_ellipsoidal : bool
+            Se True usa modelo elipsoidal, False usa cartesiano (padrão: True)
+        """
+        if not layer or not layer.isValid():
+            return
+            
+        if not layer.isEditable():
+            layer.startEditing()
+        
+        from qgis.core import QgsField
+        from qgis.PyQt.QtCore import QVariant
+        
+        # Criar campo se não existir
+        if layer.fields().lookupField(field_name) == -1:
+            layer.addAttribute(
+                QgsField(field_name, QVariant.Double, len=16, prec=4)
+            )
+            layer.updateFields()
+        
+        if use_ellipsoidal:
+            # Configurar medidor elipsoidal
+            d = QgsDistanceArea()
+            d.setSourceCrs(
+                layer.crs(),
+                QgsProject.instance().transformContext()
+            )
+            
+            ellipsoid = layer.crs().ellipsoidAcronym()
+            if not ellipsoid:
+                ellipsoid = "WGS84"
+            
+            d.setEllipsoid(ellipsoid)
+            
+            # Calcular comprimento elipsoidal
+            for feat in layer.getFeatures():
+                geom = feat.geometry()
+                if geom and not geom.isEmpty():
+                    length_m = d.measureLength(geom)
+                    feat[field_name] = round(length_m, 4)
+                    layer.updateFeature(feat)
+        else:
+            # Calcular comprimento cartesiano (projetado)
+            for feat in layer.getFeatures():
+                geom = feat.geometry()
+                if geom and not geom.isEmpty():
+                    length = geom.length()
+                    feat[field_name] = round(length, 4)
+                    layer.updateFeature(feat)
+
+    @staticmethod
+    def calculate_polygon_area(layer, field_name, use_ellipsoidal=True):
+        """
+        Calcula área de polígonos em hectares (elipsoidal ou cartesiano).
+        
+        Parameters
+        ----------
+        layer : QgsVectorLayer
+            Camada vetorial de polígonos
+        field_name : str
+            Nome do campo para armazenar área em hectares
+        use_ellipsoidal : bool
+            Se True usa modelo elipsoidal, False usa cartesiano (padrão: True)
+        """
+        if not layer or not layer.isValid():
+            return
+            
+        if not layer.isEditable():
+            layer.startEditing()
+        
+        from qgis.core import QgsField
+        from qgis.PyQt.QtCore import QVariant
+        
+        # Criar campo se não existir
+        if layer.fields().lookupField(field_name) == -1:
+            layer.addAttribute(
+                QgsField(field_name, QVariant.Double, len=16, prec=4)
+            )
+            layer.updateFields()
+        
+        if use_ellipsoidal:
+            # Configurar medidor elipsoidal
+            d = QgsDistanceArea()
+            d.setSourceCrs(
+                layer.crs(),
+                QgsProject.instance().transformContext()
+            )
+            
+            ellipsoid = layer.crs().ellipsoidAcronym()
+            if not ellipsoid:
+                ellipsoid = "WGS84"
+            
+            d.setEllipsoid(ellipsoid)
+            
+            # Calcular área elipsoidal
+            for feat in layer.getFeatures():
+                geom = feat.geometry()
+                if geom and not geom.isEmpty():
+                    area_m2 = d.measureArea(geom)
+                    area_ha = area_m2 / 10000.0
+                    feat[field_name] = round(area_ha, 4)
+                    layer.updateFeature(feat)
+        else:
+            # Calcular área cartesiana (projetada)
+            for feat in layer.getFeatures():
+                geom = feat.geometry()
+                if geom and not geom.isEmpty():
+                    area_m2 = geom.area()
+                    area_ha = area_m2 / 10000.0
+                    feat[field_name] = round(area_ha, 4)
+                    layer.updateFeature(feat)

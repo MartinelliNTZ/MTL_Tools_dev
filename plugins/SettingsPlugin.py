@@ -34,7 +34,7 @@ class SettingsPlugin(BasePluginMTL):
         self.init(ToolKey.SETTINGS, "SettingsPlugin")
         self.logger.info("SettingsPlugin inicializado")
 
-    def _build_ui(self):
+    def _build_ui(self, **kwargs):
         """Constrói a interface de configurações."""
         self.logger.debug("Construindo interface de configurações")
         

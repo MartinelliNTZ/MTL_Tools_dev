@@ -20,7 +20,7 @@ from qgis.core import (
 )
 from pathlib import Path
 from ...utils.string_utils import StringUtils
-from ...core.config.LogUtils import LogUtils
+from ...core.config.LogUtilsNew import LogUtilsNew
 import os
 from typing import Optional
 import processing
@@ -45,7 +45,29 @@ class VectorLayerGeometry:
     - Reprojetar (use VectorLayerProjection)
     - Manipular atributos (use VectorLayerAttributes)
     - Carregar ou salvar (use VectorLayerSource)
+    
+    Logging Strategy (Métodos Estáticos):
+    - Cada método estático instancia LogUtilsNew com tool_key fornecido
+    - Padrão: external_tool_key='untraceable' como valor padrão
+    - Helper method: _get_logger(tool_key) centraliza criação de instâncias
+    - Benefícios: Thread-safe, flexível (tool_key customizável), sem estado global
     """
+    
+    @staticmethod
+    def _get_logger(tool_key: str = "untraceable") -> LogUtilsNew:
+        """Helper para obter logger com tool_key específico.
+        
+        Parameters
+        ----------
+        tool_key : str
+            Identificador da ferramenta (padrão: 'untraceable')
+            
+        Returns
+        -------
+        LogUtilsNew
+            Instância de logger configurada para a classe
+        """
+        return LogUtilsNew(tool=tool_key, class_name="VectorLayerGeometry")
 
     def create_buffer_geometry(        
              *,
@@ -60,7 +82,8 @@ class VectorLayerGeometry:
         external_tool_key="untraceable"        
     ) -> Optional[QgsVectorLayer]:
         """Cria buffer ao redor das geometrias com distância e número de segmentos especificados."""
-        LogUtils.log(f"create_buffer_geometry: distance={distance}, segments={segments}, dissolve={dissolve}", level="DEBUG", tool=external_tool_key, class_name="VectorLayerGeometry")
+        logger = VectorLayerGeometry._get_logger(external_tool_key)
+        logger.debug(f"create_buffer_geometry: distance={distance}, segments={segments}, dissolve={dissolve}")
         if VectorLayerGeometry.get_layer_type(layer) not in (
             QgsWkbTypes.PointGeometry,QgsWkbTypes.LineGeometry,QgsWkbTypes.PolygonGeometry
         ):
@@ -103,12 +126,8 @@ class VectorLayerGeometry:
         Seguro para execução em QgsTask.
         """
 
-        LogUtils.log(
-            f"create_buffer_to_path_safe start: {input_path} -> {output_path}, distance={distance}",
-            level="INFO",
-            tool=external_tool_key,
-            class_name="VectorLayerGeometry"
-        )
+        logger = VectorLayerGeometry._get_logger(external_tool_key)
+        logger.info(f"create_buffer_to_path_safe start: {input_path} -> {output_path}, distance={distance}")
 
         if not input_path or not output_path:
             raise ValueError("input_path e output_path são obrigatórios")
@@ -126,12 +145,7 @@ class VectorLayerGeometry:
 
         processing.run("native:buffer", params,feedback = feedback)
 
-        LogUtils.log(
-            "create_buffer_to_path_safe completed",
-            level="INFO",
-            tool=external_tool_key,
-            class_name="VectorLayerGeometry"
-        )
+        logger.info("create_buffer_to_path_safe completed")
 
         return output_path
 
@@ -165,7 +179,8 @@ class VectorLayerGeometry:
         Explode linhas usando arquivos físicos.
         Seguro para grandes volumes.
         """
-        LogUtils.log(f"explode_lines_to_path: {input_path} -> {output_path}", level="INFO", tool=external_tool_key, class_name="VectorLayerGeometry")
+        logger = VectorLayerGeometry._get_logger(external_tool_key)
+        logger.info(f"explode_lines_to_path: {input_path} -> {output_path}")
         if not input_path or not output_path:
             raise ValueError("input_path e output_path são obrigatórios")
 
@@ -176,7 +191,7 @@ class VectorLayerGeometry:
 
         processing.run("native:explodelines", params)
 
-        LogUtils.log("explode_lines_to_path completed", level="INFO", tool=external_tool_key, class_name="VectorLayerGeometry")
+        logger.info("explode_lines_to_path completed")
         return output_path
 
     @staticmethod
@@ -190,13 +205,14 @@ class VectorLayerGeometry:
         Explode linhas (LineString / MultiLineString) manualmente.
         Thread-safe. Compatível com QgsTask.
         """
-        LogUtils.log(f"explode_lines_to_path_safe start -> output: {output_path}", level="INFO", tool=external_tool_key, class_name="VectorLayerGeometry")
+        logger = VectorLayerGeometry._get_logger(external_tool_key)
+        logger.info(f"explode_lines_to_path_safe start -> output: {output_path}")
         if not layer or not layer.isValid():
-            LogUtils.log("Camada inválida para explode_lines_to_path_safe", level="CRITICAL", tool=external_tool_key, class_name="VectorLayerGeometry")
+            logger.critical("Camada inválida para explode_lines_to_path_safe")
             raise ValueError("Camada inválida")
 
         if layer.geometryType() != QgsWkbTypes.LineGeometry:
-            LogUtils.log("Camada não é do tipo linha em explode_lines_to_path_safe", level="CRITICAL", tool=external_tool_key, class_name="VectorLayerGeometry")
+            logger.critical("Camada não é do tipo linha em explode_lines_to_path_safe")
             raise ValueError("Camada não é do tipo linha")
 
         options = QgsVectorFileWriter.SaveVectorOptions()
@@ -217,10 +233,10 @@ class VectorLayerGeometry:
         )
 
         if writer.hasError() != QgsVectorFileWriter.NoError:
-            LogUtils.log(f"Erro ao criar writer: {writer.errorMessage()}", level="CRITICAL", tool=external_tool_key, class_name="VectorLayerGeometry")
+            logger.critical(f"Erro ao criar writer: {writer.errorMessage()}")
             raise RuntimeError(writer.errorMessage())
 
-        LogUtils.log("Writer criado com sucesso para explode_lines_to_path_safe", level="DEBUG", tool=external_tool_key, class_name="VectorLayerGeometry")
+        logger.debug("Writer criado com sucesso para explode_lines_to_path_safe")
 
         feat_out = QgsFeature(layer.fields())
 
@@ -247,54 +263,57 @@ class VectorLayerGeometry:
                     processed += 1
 
         del writer
-        LogUtils.log(f"explode_lines_to_path_safe completed, processed features (approx): {processed}", level="INFO", tool=external_tool_key, class_name="VectorLayerGeometry")
+        logger.info(f"explode_lines_to_path_safe completed, processed features (approx): {processed}")
         return output_path
 
 
     @staticmethod
     def get_layer_type(layer: QgsVectorLayer) -> Optional[str]:
-        LogUtils.log("get_layer_type called", level="DEBUG", tool="untraceable", class_name="VectorLayerGeometry")
+        logger = VectorLayerGeometry._get_logger()
+        logger.debug("get_layer_type called")
         if not isinstance(layer, QgsVectorLayer):
             return None
 
         geom_type = layer.geometryType()
 
         if geom_type == QgsWkbTypes.PointGeometry:
-            LogUtils.log("get_layer_type: PointGeometry", level="INFO", tool="untraceable", class_name="VectorLayerGeometry")
+            logger.info("get_layer_type: PointGeometry")
             return QgsWkbTypes.PointGeometry
         if geom_type == QgsWkbTypes.LineGeometry:
-            LogUtils.log("get_layer_type: LineGeometry", level="INFO", tool="untraceable", class_name="VectorLayerGeometry")
+            logger.info("get_layer_type: LineGeometry")
             return QgsWkbTypes.LineGeometry
         if geom_type == QgsWkbTypes.PolygonGeometry:
-            LogUtils.log("get_layer_type: PolygonGeometry", level="INFO", tool="untraceable", class_name="VectorLayerGeometry")
+            logger.info("get_layer_type: PolygonGeometry")
             return QgsWkbTypes.PolygonGeometry
 
         return None
 
     @staticmethod
     def get_selected_features( layer: QgsVectorLayer):
-            LogUtils.log("get_selected_features called", level="DEBUG", tool="untraceable", class_name="VectorLayerGeometry")
+            logger = VectorLayerGeometry._get_logger()
+            logger.debug("get_selected_features called")
             if not isinstance(layer, QgsVectorLayer):
                 return None, "Layer inválido"
 
             fids = layer.selectedFeatureIds()
             if not fids:
-                LogUtils.log("Nenhuma feição selecionada na camada", level="INFO", tool="untraceable", class_name="VectorLayerGeometry")
+                logger.info("Nenhuma feição selecionada na camada")
                 return None, "Nenhuma feição selecionada na camada."
 
             request = QgsFeatureRequest().setFilterFids(fids)
 
             mem_layer = layer.materialize(request)
             if not mem_layer or not mem_layer.isValid():
-                LogUtils.log("Falha ao materializar feições selecionadas", level="CRITICAL", tool="untraceable", class_name="VectorLayerGeometry")
+                logger.critical("Falha ao materializar feições selecionadas")
                 return None, "Falha ao materializar feições selecionadas."
 
-            LogUtils.log(f"get_selected_features: {len(fids)} features", level="INFO", tool="untraceable", class_name="VectorLayerGeometry")
+            logger.info(f"get_selected_features: {len(fids)} features")
             return mem_layer, None
 
     @staticmethod
     def singleparts_to_multparts(layer, feedback=None, only_selected=False):
-        LogUtils.log("singleparts_to_multparts start", level="DEBUG", tool="untraceable", class_name="VectorLayerGeometry")
+        logger = VectorLayerGeometry._get_logger()
+        logger.debug("singleparts_to_multparts start")
         if not isinstance(layer, QgsVectorLayer):
             return False
 
@@ -309,14 +328,14 @@ class VectorLayerGeometry:
             feats = list(layer.getFeatures())
 
         total = len(feats)
-        LogUtils.log(f"singleparts_to_multparts: total features to process {total}", level="INFO", tool="untraceable", class_name="VectorLayerGeometry")
+        logger.info(f"singleparts_to_multparts: total features to process {total}")
         new_features = []
         ids_to_delete = []
 
         for i, feat in enumerate(feats):
 
             if feedback and feedback.isCanceled():
-                LogUtils.log("singleparts_to_multparts canceled by feedback", level="INFO", tool="untraceable", class_name="VectorLayerGeometry")
+                logger.info("singleparts_to_multparts canceled by feedback")
                 return False
 
             geom = feat.geometry()
@@ -346,7 +365,7 @@ class VectorLayerGeometry:
         # ➕ Adiciona singleparts
         if new_features:
             layer.addFeatures(new_features)
-            LogUtils.log(f"singleparts_to_multparts added {len(new_features)} features and removed {len(ids_to_delete)}", level="INFO", tool="untraceable", class_name="VectorLayerGeometry")
+            logger.info(f"singleparts_to_multparts added {len(new_features)} features and removed {len(ids_to_delete)}")
         return True
 
 

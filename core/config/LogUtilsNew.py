@@ -8,6 +8,12 @@ from datetime import datetime
 import traceback
 from .log_sync import LOG_FILE_LOCK
 
+try:
+    from qgis.core import QgsMessageLog, Qgis
+    QGIS_AVAILABLE = True
+except ImportError:
+    QGIS_AVAILABLE = False
+
 class LogUtilsNew:
     #C:\Users\<usuario>\AppData\Roaming\QGIS\QGIS3\MTLTools
     DEBUG = "DEBUG"
@@ -139,6 +145,12 @@ class LogUtilsNew:
                     f.write("\n")
             except Exception:
                 pass
+
+        # Registrar CRITICAL e ERROR também no QgsMessageLog oficial do QGIS
+        if QGIS_AVAILABLE and level in (cls.CRITICAL, cls.ERROR):
+            full_msg = f"[{tool}:{class_name}] {msg}"
+            qgis_level = Qgis.Critical if level == cls.CRITICAL else Qgis.Warning
+            QgsMessageLog.logMessage(full_msg, cls._plugin_name, qgis_level)
 
     @staticmethod
     def _read_plugin_version(plugin_root: Path) -> str:

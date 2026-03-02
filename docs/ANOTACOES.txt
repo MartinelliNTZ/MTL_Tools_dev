@@ -1,61 +1,31 @@
-IMPLEMENTACOES
-
-    - Ferramenta Replace: colocar botao de trroccar campos de entrada e saida, 
-    -acrescentar centralizar tela de todos os layouts 
-    -Atribuir bandas 0 a todos raster 
-    -Recorte pela camada raster de múltiplas camadas 
-    -Todos scripts de colheita 
-    - matriz de linhas paralelas 
-    -Classificador de declividade 
-    -Amostrador de raster cálculo gerador de dif e gerador de estatística 
-    -Projeto padrão 
-    - Escolhe uma pasta ja salva um QGZ já cria pastas e carrega camadas base como UTM, google satélite, 
-    -Botão de adicionar estilos salvos no qgis meus como gradiente entre outros. 
-    - log viewere e melhorar o log
-    - melhoria no buffer de vector util verificar se a camada e 4326 reprojetar, 
-    - melhoria no drone cordinates gerar a area concave hull 0,025000
-    aplicar buffer e so entao reprojetar novamente para evitar erros
-    - nova ferramenta que aplica buffer negativo e positivo
-    - nova ferramenta que faz geometria por expressao e gera a diferenca entre dois pontos 
-    make_line(
-    $geometry,
-    geometry(
-        get_feature(
-            'Geometrias_corrigidas_58ac3c9a_7748_4042_b4a9_8ca309b0aca8',
-             'field_1' ,
-              "name" 
-        )
-    )
-)
-
 
 BUGS CONHECIDOS
-    - corrigir bug do calcular automatico, para ele trazer o z ou simplesmente tirar essa funcao(trava em grandes itrens)
-    - calculo automatico de campos trava em kmls ( nem deve ser permitido em kml)
-    - impedir multipla instancias dos codigos
-    - impedir que os plugins trave o qgis em todas as ferramentas
-    - Arquivo shp precisa sempre executar 2 vezes para substituir(impossivel de resolver )
-    - ferramenta de carregamento de pastas trava ao 
-    - logcat trava as vezes pq ta escrevendo e lendo os logs em tempo real
+    - VectorFieldPlugin: Altimetria (Z) trava em camadas com mais de 5000 feições - considerar remover funcionalidade
+    - VectorFieldPlugin: Cálculo automático trava em arquivos KML - não permitir em KML
+    - Geral: Impedir múltiplas instâncias de plugins rodando simultaneamente
+    - Geral: Impedir que plugins travem QGIS em exceções não capturadas
+    - VectorMultipartPlugin: Arquivo SHP requer 2 execuções para substituição (limitação do SHP - impossível resolver)
+    - LoadFolderLayersPlugin: Travamento ao carregar pastas muito grandes
+    - LogCatPlugin: Travamento ocasional ao ler/escrever logs em tempo real
 
-ferramentas = name                              tipo                            produto                     risco
-    - 01: Exportar Todos os Layouts             janela                          pdf/png                     substituir produtos antigos
-    - 02: Substituir Textos nos Layouts         janela                          alteracoes nos layouts      critico/alteracao QGZ
-    - 03: Salvar, Fechar e Reabrir Projeto      instantanea de sistema          nenhum                      critico/alteracao QGZ/perda de dados temporarios
-    - 04: Carregar Pasta de Arquivos            janela                          carregamento de produtos    alteracao QGZ
-    - 05: Gerar Rastro de Implemento            janela                          vetor                       nenhum
-    - 06: Sobre o MTL Tools                     janela                          nenhum                      nenhum
-    - 07: Capturar Coordenadas                  intantanea+janela de resultado  resultados na tela          travamento da task
-    - 08: Calcular Campos Vetoriais             instantanea                     atributos nos vetores       manipulacao de vetores/perda de dados por substituicao
-    - 09: Obter Coordenadas de Drone            janela                          vetor                       travamento do qgis por excesso de dados
-    - 10: Converter Multipart                   instantanea                     nenhum                      manipulacao de vetores/perda de dados 
-    - 11: Copiar Atributos de Vetores           janela                          atributos nos vetores       manipulacao de vetores/perda de dados por substituicao
-    - 12: Logcat viewere                        Janela multcore                 nenhum                      nenhum
-    - 13:
-    - 14:
-    - 15:
+ferramentas = name                              tipo                            plugin_class                risco
+    - 01: Exportar Todos os Layouts             janela                          ExportAllLayoutsPlugin      substituir produtos antigos
+    - 02: Substituir Textos nos Layouts         janela                          ReplaceInLayoutsPlugin      crítico/alteração QGZ
+    - 03: Salvar, Fechar e Reabrir Projeto      instantânea                     RestartQGISPlugin           crítico/alteração QGZ
+    - 04: Carregar Pasta de Arquivos            janela                          LoadFolderLayersPlugin      alteração QGZ
+    - 05: Gerar Rastro de Implemento            janela                          GenerateTrailPlugin         nenhum
+    - 06: Sobre o MTL Tools                     janela                          AboutDialog                 nenhum
+    - 07: Capturar Coordenadas                  instantânea+resultado           CoordClickTool              travamento da task
+    - 08: Calcular Campos Vetoriais             instantânea                     VectorFieldPlugin          manipulação de vetores
+    - 09: Obter Coordenadas de Drone            janela                          DroneCoordinatesPlugin      travamento por excesso de dados
+    - 10: Converter Multipart                   instantânea                     VectorMultipartPlugin       manipulação de vetores
+    - 11: Copiar Atributos de Vetores           janela                          CopyAttributesPlugin        manipulação de vetores
+    - 12: LogCat Viewer                         janela (multithread)            LogCatPlugin                nenhum
+    - 13: (em desenvolvimento)
+    - 14: (em desenvolvimento)
+    - 15: (em desenvolvimento)
 
-PADRONIZADOS = 5,10 11
+PADRONIZADOS = 3, 5, 8, 10 11
 Documentação de cenarios: 5, 8 e 10 e 11
 Instrucoes: 5, 11
 OQUE EU TAVA FAZENDO? 
@@ -66,13 +36,28 @@ porem preciso ter a buffer em task e entao ir passando plugin/plugin
 antes de criar qualquer ferramtne preciso analisar melhor criar primeiramente a ui e depois vir gerando metodos SEMPRE
 
 changelog=
+    1.5.11
+    #TODO: implemetar tasks para os calculos implementar os stats
     1.5.10 2026/03/01
-    - CopyAttributesPlugin: Migrado de LogUtils para LogUtilsNew, padronizando sistema de logging
-    - BasePluginMTL: Adicionado suporte a parâmetros `min_width` e `min_height` no método `init()` para configuração customizável de tamanho mínimo de janelas
-    - Redimensionamento de janelas: Implementado sistema de resize com mouse drag nas bordas, mantendo FramelessWindowHint para estilo customizado e bordas arredondadas
-    - MainLayout: Transferida lógica de redimensionamento do BasePluginMTL para MainLayout, aplicando separação de responsabilidades (padrão arquitetônico)
-    - Mouse tracking: Implementado rastreamento contínuo de mouse com `setMouseTracking(True)` em parent e frame para atualização dinâmica de cursor
-    - Cursor visual: Ícone do cursor agora muda dinamicamente ao aproximar-se das bordas (SizeVerCursor, SizeHorCursor, SizeFDiagCursor) indicando direções de resize
+    - LogUtilsNew: Adicionado suporte a CRITICAL/ERROR no QgsMessageLog oficial do QGIS com mapeamento de níveis automático
+    - CopyAttributesPlugin: Migrado de LogUtils para LogUtilsNew
+    - BasePluginMTL: Parâmetro build_ui=True adicionado - permite plugins sem UI configurarem logger/settings sem construir componentes visuais
+    - BasePluginMTL: Parâmetro load_settings_prefs=False adicionado - carregamento opcional de preferências globais
+    - BasePluginMTL: Variável settings_preferences={} para armazenar preferências globais acessíveis a todos os plugins
+    - BasePluginMTL: Lógica de resize centralizada em MainLayout com rastreamento de mouse e cursor dinâmico
+    - VectorFieldPlugin: CORRIGIDO bug crítico - logger não inicializado causando 'NoneType' object has no attribute 'debug'
+    - VectorFieldPlugin: REFATORAÇÃO COMPLETA - removido VectorFieldCalculator, lógica migrada para VectorLayerAttributes/VectorLayerMetrics
+    - VectorFieldPlugin: Implementado modo automático "Ambos" (elipsoidal+cartesiano) com detecção de CRS geográfico e fallback
+    - VectorFieldPlugin: Handlers implementados para ponto (_run_point_fields), linha (_run_line_fields) e polígono (_run_polygon_fields)
+    - VectorFieldPlugin: Migrado para usar init() com build_ui=False e load_settings_prefs=True
+    - VectorMultipartPlugin: Migrado para usar init() com build_ui=False, padronizando inicialização
+    - VectorLayerAttributes: CRIADA - centraliza operações de campo (create_point_coordinate_fields, update_point_xy_coordinates, generate_field_name_with_suffix com limite SHP 10-char)
+    - VectorLayerMetrics: Refatorado - unificado calculate_line_length() e calculate_polygon_area() com parâmetro use_ellipsoidal=True, removidos métodos deprecated
+    - VectorLayerProjection: Adicionado is_geographic_crs(layer) para detecção automática de CRS geográfico
+    - VectorLayerGeometry: Migrado para LogUtilsNew com helper method _get_logger() - thread-safe para métodos estáticos
+    - VectorLayerSource: Migrado para LogUtilsNew com helper method _get_logger()
+    - SettingsPlugin: Adicionada lista CALCULATION_METHODS=["Elipsoidal","Cartesiana","Ambos"] com persistência de configuração
+    - REFATORAÇÃO ARQUITETÔNICA: Separação de responsabilidades - cálculos vetoriais delegados a classes de domínio especializadas
     1.5.7 2026/02/27
     - Logcat: Removido DEBUG logs excessivos; proteção anti-crash via desconexão de proxy model durante troca de sessão; corrigido bug de índice em duplo clique (mapToSource)
     - Plugin principal: Adicionado sys.excepthook handler global para capturar exceções não tratadas; proteção massiva em run_logcat() com logging detalhado de cada etapa
@@ -83,49 +68,48 @@ changelog=
     - sistema de exibicao de media de tempo
     1.5.0 2026/02/24
     - FERRAMENTAS NORMALIZADAS: 5, 10, 11
-    1.4.0.14
-    - ExplodeStep e SaveVectorStep
-    - coreecao de bugs
-    - bugs de compatibilidade 3.16
+    1.4.0.14 2026/02/XX
+    - ExplodeStep e SaveVectorStep criados para pipeline de processamento
+    - Correção de bugs gerais
+    - Correção de bugs de compatibilidade com QGIS 3.16
     1.4.0.13 2026/02/23
-    - icons do logcat
-    - geracao de pipeline e steps para encademanto de tasks
-    - BaseStep, BufferStep
+    - Ícones adicionados ao LogCat Viewer
+    - Geração de pipeline e steps para encadeamento de tasks
+    - Classes BaseStep e BufferStep implementadas
     1.4.0.12 2026/02/17
-    - compatibilidade com 3.16 do gerar rastro
-    - Tirei bug de markdown no 3.16
-    - Bug de shapely no drone cordinates
-    1.4.0.11
-    - criei task de explode linhas 
-    1.4.0.10 --- proximo passo desacoplar vectorutils de BasePluginMTL
-    - colocar estilos no checkbox para checado marrom
-    - Iniciado o VectorLayerAttributes
-
-    1.4.0.9  
-    - uiwidget util desacoplada de gerar rastro
-    - craida WidgetFactory
-    - CRIADO sTYLES
-    - Aplicado novo styles
-    1.4.0.8
-    - iniciando VectorLayerGeometry
-    - VectorUtils desacoplada de gerar rastro
-    1.4.0.7
-    - mudanca na hierarquia das pastas.
-    - Novas classes para lidar com vetores (; - VectorLayerSource.py; - VectorLayerProjection.py; - VectorLayerGeometry.py; - VectorLayerMetrics.py; - VectorLayerAttributes.py)
-    - novas classes para lidar com raster; - RasterLayerSource.py; - RasterLayerProjection.py; - RasterLayerProcessing.py; - RasterLayerMetrics.py; - RasterLayerRendering.py_
-    - classe para fazer a transição entre dados vetoriais e raster. - RasterVectorBridge.py;
-    - Nova Ferramenta: logcat para depurtrcacao de erros (100% gpt nao e possivel dar manutencao)
-    - Documentação de cenarios: 8 e 10 e 11
-    1.4.0.6
-    -Ferramentas normalizadas = 5 e 11(novamente)- padronicao fracassada por
-    1.4.0 - 2026/01/19
-    - Nova ferramenta: transformação de multipart para part simples
-    - Documentação de cenarios: 8 e 10 e 11
-    - Alterada a infodialog para exibir markdown corretamente
-    - Nova ferramenta: Tranferidor de atributos entre camadas vetoriais
-    - Criação de BasePluginMTL para normalizacao do codigo: 
-    - Ferramentas normalizadas = 2, 8, 10 e 11   (3, 6 e 7 não sao padronizaveis)
-    - Criacao de Layouts utils e project utils
+    - Compatibilidade corrigida com QGIS 3.16 em Gerar Rastro de Implemento
+    - Bug de markdown corrigido para QGIS 3.16
+    - Bug de shapely corrigido em Obter Coordenadas de Drone
+    1.4.0.11 2026/02/XX
+    - Task ExplodeLinhasTask criada para explosão de linhas
+    1.4.0.10 2026/02/XX
+    - Estilos adicionados para checkbox marcado em marrom
+    - VectorLayerAttributes iniciado para refatoração de operações vetoriais
+    - Próximo passo: desacoplar VectorUtils de BasePluginMTL
+    1.4.0.9 2026/02/XX
+    - UIWidgetUtils desacoplado de GerGeometryTrailPlugin
+    - WidgetFactory criada para centralizar criação de componentes UI
+    - Sistema de Styles criado para gerenciamento de estilos
+    - Novos estilos aplicados a todos os plugins
+    1.4.0.8 2026/02/XX
+    - VectorLayerGeometry iniciado com métodos estáticos
+    - VectorUtils desacoplado de GerGeometryTrailPlugin
+    1.4.0.7 2026/02/XX
+    - Hierarquia de pastas reorganizada
+    - Classes para operações vetoriais criadas: VectorLayerSource, VectorLayerProjection, VectorLayerGeometry, VectorLayerMetrics, VectorLayerAttributes
+    - Classes para operações raster criadas: RasterLayerSource, RasterLayerProjection, RasterLayerProcessing, RasterLayerMetrics, RasterLayerRendering
+    - RasterVectorBridge criado para transição entre dados raster e vetoriais
+    - LogCat Viewer (ferramenta de debug) implementado
+    - Documentação de cenários adicionada para ferramentas 8, 10, 11
+    1.4.0.6 2026/02/XX
+    - Ferramentas 5 e 11 normalizadas novamente (padronização anterior tinha falhas)
+    1.4.0 2026/01/19
+    - Nova ferramenta: Converter Multipart para Singlepart
+    - Nova ferramenta: Copiar Atributos entre camadas vetoriais (com renomeação automática)
+    - BasePluginMTL criado para centralizar padrões de plugins
+    - Ferramentas padronizadas: 2, 8, 10, 11 (ferramentas 3, 6, 7 não padronizáveis)
+    - LayoutsUtils e ProjectUtils criados para operações comuns
+    - Documentação de cenários adicionada para ferramentas 8, 10, 11
 
     1.3.0 - 2026/01/16
     - retirado bug duplica instancia toda vez que fecho as ferramentas de janela
@@ -201,6 +185,36 @@ changelog=
     - Versão inicial
     - Ferramenta: Export All Layouts (PDF/PNG)
 
+
+IMPLEMENTACOES
+
+    - Ferramenta Replace: colocar botao de trroccar campos de entrada e saida, 
+    -acrescentar centralizar tela de todos os layouts 
+    -Atribuir bandas 0 a todos raster 
+    -Recorte pela camada raster de múltiplas camadas 
+    -Todos scripts de colheita 
+    - matriz de linhas paralelas 
+    -Classificador de declividade 
+    -Amostrador de raster cálculo gerador de dif e gerador de estatística 
+    -Projeto padrão 
+    - Escolhe uma pasta ja salva um QGZ já cria pastas e carrega camadas base como UTM, google satélite, 
+    -Botão de adicionar estilos salvos no qgis meus como gradiente entre outros. 
+    - log viewere e melhorar o log
+    - melhoria no buffer de vector util verificar se a camada e 4326 reprojetar, 
+    - melhoria no drone cordinates gerar a area concave hull 0,025000
+    aplicar buffer e so entao reprojetar novamente para evitar erros
+    - nova ferramenta que aplica buffer negativo e positivo
+    - nova ferramenta que faz geometria por expressao e gera a diferenca entre dois pontos 
+    make_line(
+    $geometry,
+    geometry(
+        get_feature(
+            'Geometrias_corrigidas_58ac3c9a_7748_4042_b4a9_8ca309b0aca8',
+             'field_1' ,
+              "name" 
+        )
+    )
+)
 
 
 

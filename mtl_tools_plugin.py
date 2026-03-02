@@ -287,7 +287,7 @@ class MTL_Tools:
             )
 
             # ==================================================
-            # BOTÃO CAMDAS NA TOOLBAR (com dropdown)
+            # BOTÃO CAMADAS NA TOOLBAR (com dropdown)
             # ==================================================
             self._add_toolbar_dropdown(
                 title="Vetores",
@@ -299,8 +299,8 @@ class MTL_Tools:
             # ==================================================
             self._add_toolbar_dropdown(
                 title="Vetores",
-                #main_action=self.action_vector_fields,#padrao
-                main_action=self.action_copy_atributes,#editavel para debug
+                main_action=self.action_vector_fields,#padrao
+                #main_action=self.action_copy_atributes,#editavel para debug
                 secondary_actions=[     self.action_vector_fields,
                                         self.action_coord_click,    
                                         self.action_copy_atributes,                                                         
@@ -311,8 +311,8 @@ class MTL_Tools:
             # ==================================================
             self._add_toolbar_dropdown(
                 title="Agricultura de Precisão",
-                #main_action=self.action_drone_coords,
-                main_action=self.action_gerar_rastro,
+                main_action=self.action_drone_coords,
+                #main_action=self.action_gerar_rastro,
                 secondary_actions=[
                     self.action_drone_coords,
                     self.action_gerar_rastro]

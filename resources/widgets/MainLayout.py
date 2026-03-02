@@ -9,6 +9,30 @@ from typing import Optional
 from ..styles.Styles import Styles
 
 class MainLayout(QVBoxLayout):
+    """Container layout customizado para plugins MTL Tools com suporte a resize.
+    
+    ARQUITETURA DE RESIZE (Separação de Responsabilidades):
+    ========================================================
+    
+    Recepção de Eventos:
+    - BasePlugin (QDialog) recebe eventos de mouse do Qt
+    - Layouts NÃO recebem eventos - apenas widgets
+    - Por isso os métodos mousePressEvent() etc ficam em BasePlugin
+    
+    Delegação de Lógica:
+    - BasePlugin delega para MainLayout.handle_mouse_press/move/release()
+    - MainLayout executa toda a lógica de resize:
+      * Detecta qual borda foi apontada (_get_resize_edge)
+      * Atualiza cursor dinamicamente (_update_cursor)
+      * Calcula novo tamanho com respeito ao mínimo
+      * Aplica geometria ao dialog parent
+    
+    Benefícios:
+    - Separação de responsabilidades: BasePlugin recebe, MainLayout executa
+    - Reutilizável: MainLayout pode ser usado em qualquer plugin
+    - Testável: Lógica concentrada em uma classe
+    - Limpo: BasePlugin tem apenas 3 métodos de delegação simples
+    """
     def __init__(self, parent=None):
         super().__init__(parent)
 

@@ -15,7 +15,7 @@ import tempfile
 import time
 from ...utils.string_utils import StringUtils
 from ...utils.project_utils import ProjectUtils
-from ...core.config.LogUtils import LogUtils
+from ...core.config.LogUtilsNew import LogUtilsNew
 class VectorLayerSource:
     """
     Responsável pela entrada, saída e origem de camadas vetoriais.
@@ -31,8 +31,27 @@ class VectorLayerSource:
     - Orquestrar operações de I/O de camadas vetoriais
     - Garantir que camadas sejam carregadas e salvas corretamente
     - Validar antes de operações críticas
-
+    
+    Logging Strategy (Métodos Estáticos):
+    - Helper method: _get_logger(tool_key) centraliza criação de instâncias LogUtilsNew
+    - Benefícios: Thread-safe, flexível (tool_key customizável), sem estado global
     """
+
+    @staticmethod
+    def _get_logger(tool_key: str = "untraceable") -> LogUtilsNew:
+        """Helper para obter logger com tool_key específico.
+        
+        Parameters
+        ----------
+        tool_key : str
+            Identificador da ferramenta (padrão: 'untraceable')
+            
+        Returns
+        -------
+        LogUtilsNew
+            Instância de logger configurada para a classe
+        """
+        return LogUtilsNew(tool=tool_key, class_name="VectorLayerSource")
 
 
     # ------------------------------------------------------------------
@@ -49,15 +68,10 @@ class VectorLayerSource:
             external_tool_key: str = "untraceable"
     ) -> Optional[QgsVectorLayer]:
 
-        class_name = "VectorLayerSource"
+        logger = VectorLayerSource._get_logger(external_tool_key)
 
         if not layer or not layer.isValid():
-            LogUtils.log(
-                "Camada inválida para salvamento.",
-                level="CRITICAL",
-                tool=external_tool_key,
-                class_name=class_name
-            )
+            logger.critical("Camada inválida para salvamento.")
             return None
 
         # ==========================================================
@@ -66,12 +80,7 @@ class VectorLayerSource:
         if not save_to_folder:
             layer_name = output_name or layer.name()
 
-            LogUtils.log(
-                f"Criando camada em memória: {layer_name}",
-                level="INFO",
-                tool=external_tool_key,
-                class_name=class_name
-            )
+            logger.info(f"Criando camada em memória: {layer_name}")
 
             memory_layer = QgsVectorLayer(
                 f"{QgsWkbTypes.displayString(layer.wkbType())}?crs={layer.crs().authid()}",
@@ -91,24 +100,14 @@ class VectorLayerSource:
         # CASO 2 — DISCO (NOME VEM DO USUÁRIO VIA output_path)
         # ==========================================================
         if not output_path:
-            LogUtils.log(
-                "output_path é obrigatório quando save_to_folder=True.",
-                level="CRITICAL",
-                tool=external_tool_key,
-                class_name=class_name
-            )
+            logger.critical("output_path é obrigatório quando save_to_folder=True.")
             return None
 
         ext = os.path.splitext(output_path)[1].lower()
         driver = StringUtils.VECTOR_DRIVERS.get(ext)
 
         if not driver:
-            LogUtils.log(
-                f"Formato não suportado: {ext}",
-                level="CRITICAL",
-                tool=external_tool_key,
-                class_name=class_name
-            )
+            logger.critical(f"Formato não suportado: {ext}")
             return None
 
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
@@ -128,12 +127,7 @@ class VectorLayerSource:
             try:
                 os.remove(final_path)
             except Exception as e:
-                LogUtils.log(
-                    f"Erro ao remover arquivo existente: {e}",
-                    level="CRITICAL",
-                    tool=external_tool_key,
-                    class_name=class_name
-                )
+                logger.critical(f"Erro ao remover arquivo existente: {e}")
                 return None
 
         # ----------------------------
@@ -160,12 +154,7 @@ class VectorLayerSource:
         )
 
         if result != QgsVectorFileWriter.NoError:
-            LogUtils.log(
-                f"Erro ao salvar camada | Código={result} | Msg={error_message}",
-                level="CRITICAL",
-                tool=external_tool_key,
-                class_name=class_name
-            )
+            logger.critical(f"Erro ao salvar camada | Código={result} | Msg={error_message}")
             return None
 
         saved_layer = QgsVectorLayer(
@@ -175,20 +164,10 @@ class VectorLayerSource:
         )
 
         if not saved_layer.isValid():
-            LogUtils.log(
-                "Camada salva mas não carregou corretamente.",
-                level="CRITICAL",
-                tool=external_tool_key,
-                class_name=class_name
-            )
+            logger.critical("Camada salva mas não carregou corretamente.")
             return None
 
-        LogUtils.log(
-            "Camada salva com sucesso.",
-            level="INFO",
-            tool=external_tool_key,
-            class_name=class_name
-        )
+        logger.info("Camada salva com sucesso.")
 
         return saved_layer
 

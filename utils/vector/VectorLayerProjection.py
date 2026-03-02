@@ -141,6 +141,27 @@ class VectorLayerProjection:
             return layer
 
         return VectorLayerProjection.reproject_layer(layer, target_crs)
+
+    @staticmethod
+    def is_geographic_crs(layer: QgsVectorLayer) -> bool:
+        """
+        Verifica se o CRS da camada é geográfico (WGS84, EPSG:4326, etc).
+        
+        Parameters
+        ----------
+        layer : QgsVectorLayer
+            Camada vetorial a verificar
+            
+        Returns
+        -------
+        bool
+            True se CRS é geográfico (lat/lon), False se projetado
+        """
+        if not layer or not layer.isValid():
+            return False
+        
+        crs = layer.crs()
+        return crs.isGeographic()
     def get_layer_crs(self, layer, external_tool_key="untraceable"):
         """Obtém o CRS atual da camada."""
         pass
