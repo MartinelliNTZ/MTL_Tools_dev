@@ -74,7 +74,7 @@ class VectorLayerMetrics:
         pass
 
     @staticmethod
-    def calculate_line_length(layer, field_name, use_ellipsoidal=True):
+    def calculate_line_length(layer, field_name, use_ellipsoidal=True, precision: int = 4):
         """
         Calcula comprimento de linhas (elipsoidal ou cartesiano).
         
@@ -86,6 +86,8 @@ class VectorLayerMetrics:
             Nome do campo para armazenar comprimento
         use_ellipsoidal : bool
             Se True usa modelo elipsoidal, False usa cartesiano (padrão: True)
+        precision : int
+            Casas decimais para arredondamento e definição de campo
         """
         if not layer or not layer.isValid():
             return
@@ -99,7 +101,7 @@ class VectorLayerMetrics:
         # Criar campo se não existir
         if layer.fields().lookupField(field_name) == -1:
             layer.addAttribute(
-                QgsField(field_name, QVariant.Double, len=16, prec=4)
+                QgsField(field_name, QVariant.Double, len=16, prec=precision)
             )
             layer.updateFields()
         
@@ -122,7 +124,7 @@ class VectorLayerMetrics:
                 geom = feat.geometry()
                 if geom and not geom.isEmpty():
                     length_m = d.measureLength(geom)
-                    feat[field_name] = round(length_m, 4)
+                    feat[field_name] = round(length_m, precision)
                     layer.updateFeature(feat)
         else:
             # Calcular comprimento cartesiano (projetado)
@@ -130,13 +132,16 @@ class VectorLayerMetrics:
                 geom = feat.geometry()
                 if geom and not geom.isEmpty():
                     length = geom.length()
-                    feat[field_name] = round(length, 4)
+                    feat[field_name] = round(length, precision)
                     layer.updateFeature(feat)
 
     @staticmethod
-    def calculate_polygon_area(layer, field_name, use_ellipsoidal=True):
+    def calculate_polygon_area(layer, field_name, use_ellipsoidal=True, precision: int = 4):
         """
         Calcula área de polígonos em hectares (elipsoidal ou cartesiano).
+        
+        precision : int
+            Casas decimais para arredondamento e definição de campo
         
         Parameters
         ----------
@@ -159,7 +164,7 @@ class VectorLayerMetrics:
         # Criar campo se não existir
         if layer.fields().lookupField(field_name) == -1:
             layer.addAttribute(
-                QgsField(field_name, QVariant.Double, len=16, prec=4)
+                QgsField(field_name, QVariant.Double, len=16, prec=precision)
             )
             layer.updateFields()
         
@@ -183,7 +188,7 @@ class VectorLayerMetrics:
                 if geom and not geom.isEmpty():
                     area_m2 = d.measureArea(geom)
                     area_ha = area_m2 / 10000.0
-                    feat[field_name] = round(area_ha, 4)
+                    feat[field_name] = round(area_ha, precision)
                     layer.updateFeature(feat)
         else:
             # Calcular área cartesiana (projetada)
@@ -192,5 +197,5 @@ class VectorLayerMetrics:
                 if geom and not geom.isEmpty():
                     area_m2 = geom.area()
                     area_ha = area_m2 / 10000.0
-                    feat[field_name] = round(area_ha, 4)
+                    feat[field_name] = round(area_ha, precision)
                     layer.updateFeature(feat)

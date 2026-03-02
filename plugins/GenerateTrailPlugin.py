@@ -21,13 +21,20 @@ from ..core.engine_tasks.SaveVectorStep import SaveVectorStep
 
 
 class GenerateTrailPlugin(BasePluginMTL):
-    #Essa é uma ferramenta de janela com geracao de produtos: do tipo vetoriais.
-    ASYNC_THRESHOLD_BYTES = 10 * 1024 * 1024  # 20 MB
+    # Essa é uma ferramenta de janela com geração de produtos: do tipo vetoriais.
+    # O valor inicial ainda existe como fallback caso as preferências globais
+    # não sejam carregadas. O padrão atualizado é 20 MB.
 
     def __init__(self, iface):
         super().__init__(iface.mainWindow())        
         self.iface = iface
-        self.init(ToolKey.GERAR_RASTRO_IMPLEMENTO,"GenerateTrailPlugin")
+        # precisamos das preferências globais (Settings) para ler o limiar
+        # assíncrono definido pelo usuário
+        self.init(
+            ToolKey.GERAR_RASTRO_IMPLEMENTO,
+            "GenerateTrailPlugin",
+            load_settings_prefs=True
+        )
 
 
     def _build_ui(self, **kwargs):
@@ -190,10 +197,13 @@ class GenerateTrailPlugin(BasePluginMTL):
 
         # Etapa 6: Decidir entre execução síncrona ou assíncrona
         size = ProjectUtils.compute_size(layer) if layer else 0
+        # buscar valor configurado nas preferências globais (MB -> bytes)
+        threshold = self.settings_preferences.get(
+            'async_threshold_bytes',        20*1024*1024)  # fallback para 20 MB em bytes)
         self.logger.debug(
-            f"Comparando tamanho arquivo: {size} versus {self.ASYNC_THRESHOLD_BYTES}")
+            f"Comparando tamanho arquivo: {size} versus {threshold} bytes (limiar)")
         
-        if size > self.ASYNC_THRESHOLD_BYTES:
+        if size > threshold:
             self.logger.info("Processamento iniciado em background (assíncrono)")
             self._run_async_pipeline(context)
         else:

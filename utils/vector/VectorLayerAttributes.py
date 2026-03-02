@@ -164,7 +164,7 @@ class VectorLayerAttributes:
         pass
 
     @staticmethod
-    def create_point_coordinate_fields(layer, field_map):
+    def create_point_coordinate_fields(layer, field_map, precision: int = 8):
         """
         Cria campos double para armazenar coordenadas de ponto.
         
@@ -174,6 +174,8 @@ class VectorLayerAttributes:
             Camada vetorial para adicionar campos
         field_map : dict
             Mapeamento {"x": "x", "y": "y", "z": "z_1"} (z é opcional)
+        precision : int
+            Casas decimais para o campo
         
         Returns
         -------
@@ -190,7 +192,7 @@ class VectorLayerAttributes:
             for name in field_map.values():
                 if layer.fields().lookupField(name) == -1:
                     layer.addAttribute(
-                        QgsField(name, QVariant.Double, len=20, prec=8)
+                        QgsField(name, QVariant.Double, len=20, prec=precision)
                     )
             layer.updateFields()
             return True
@@ -198,7 +200,7 @@ class VectorLayerAttributes:
             return False
 
     @staticmethod
-    def update_point_xy_coordinates(layer, field_map):
+    def update_point_xy_coordinates(layer, field_map, precision: int = 8):
         """
         Atualiza campos X e Y com coordenadas do ponto.
         
@@ -208,6 +210,8 @@ class VectorLayerAttributes:
             Camada vetorial de pontos
         field_map : dict
             Mapeamento {"x": "x", "y": "y"} com nomes dos campos
+        precision : int
+            Casas decimais para arredondamento das coordenadas
         """
         if not layer or not layer.isValid():
             return
@@ -216,8 +220,8 @@ class VectorLayerAttributes:
             geom = feat.geometry()
             if geom and not geom.isEmpty():
                 p = geom.asPoint()
-                feat[field_map["x"]] = round(p.x(), 8)
-                feat[field_map["y"]] = round(p.y(), 8)
+                feat[field_map["x"]] = round(p.x(), precision)
+                feat[field_map["y"]] = round(p.y(), precision)
                 layer.updateFeature(feat)
 
     @staticmethod

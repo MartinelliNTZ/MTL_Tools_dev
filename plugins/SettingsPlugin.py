@@ -75,6 +75,36 @@ class SettingsPlugin(BasePluginMTL):
         )
         self.layout.add_items([calc_layout])
         self.logger.debug("Widget de cálculo vetorial adicionado")
+                # ========== SEÇÃO 4: Precisão para campos vetoriais ==========
+        prec_layout, self.spin_precision = WidgetFactory.create_double_spin_input(
+            "🎯 Precisão de campos vetoriais (casas decimais):",
+            decimals=0,
+            step=1,
+            minimum=0,
+            maximum=10,
+            value=2,
+            separator_top=True,
+            separator_bottom=False,
+        )
+        self.layout.add_items([prec_layout])
+        self.logger.debug("Widget de precisão de campos vetoriais adicionado")
+
+        # ========== SEÇÃO 3: Limiar de processamento assíncrono ==========
+        # O valor é informado em megabytes e armazenado em bytes nas preferências.
+        thresh_layout, self.spin_threshold = WidgetFactory.create_double_spin_input(
+            "📦 Limiar assíncrono (MB):",
+            decimals=0,
+            step=1,
+            minimum=1,
+            maximum=1024 * 1024,  # até 1 TB por precaução
+            value=20,
+            separator_top=False,
+            separator_bottom=True,
+        )
+        self.layout.add_items([thresh_layout])
+        self.logger.debug("Widget de limiar assíncrono adicionado")
+
+
 
         # ========== BOTÕES DE AÇÃO ==========
         buttons_layout, self.action_buttons = WidgetFactory.create_bottom_action_buttons(
@@ -103,6 +133,23 @@ class SettingsPlugin(BasePluginMTL):
             self.logger.warning(f"Método de cálculo inválido: {calc_method}, usando padrão")
             self.radio_calc.set_selected_index(0)
 
+        # Carregar limiar assíncrono (armazenado em bytes)
+        async_bytes = self.preferences.get('async_threshold_bytes', 20 * 1024 * 1024)
+        try:
+            mb_value = float(async_bytes) / (1024 * 1024)
+            self.spin_threshold.setValue(mb_value)
+            self.logger.debug(f"Limiar assíncrono carregado: {mb_value} MB")
+        except Exception:
+            self.logger.warning(f"Erro ao carregar limiar assíncrono: {async_bytes}")
+
+        # Carregar precisão de campos vetoriais
+        prec = self.preferences.get('vector_field_precision', 2)
+        try:
+            self.spin_precision.setValue(int(prec))
+            self.logger.debug(f"Precisão de campos vetoriais carregada: {prec}")
+        except Exception:
+            self.logger.warning(f"Erro ao carregar precisão de campos vetoriais: {prec}")
+
     def _save_prefs(self):
         """Salva preferências."""
         self.logger.debug("Salvando preferências")
@@ -110,7 +157,17 @@ class SettingsPlugin(BasePluginMTL):
         # Salvar método de cálculo selecionado
         selected_text = self.radio_calc.get_selected_text()
         self.preferences['calculation_method'] = selected_text
-        
+
+        # Salvar limiar assíncrono (convertendo MB -> bytes)
+        mb_value = float(self.spin_threshold.value())
+        self.preferences['async_threshold_bytes'] = int(mb_value * 1024 * 1024)
+        self.logger.debug(f"Limiar assíncrono convertido e salvo: {mb_value} MB -> {self.preferences['async_threshold_bytes']} bytes")
+
+        # Salvar precisão de campos vetoriais
+        precision_val = int(self.spin_precision.value())
+        self.preferences['vector_field_precision'] = precision_val
+        self.logger.debug(f"Precisão de campos vetoriais salva: {precision_val} casas")
+
         save_tool_prefs(ToolKey.SETTINGS, self.preferences)
         self.logger.info(f"Preferências salvas: cálculo={selected_text}")
 

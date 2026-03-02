@@ -36,8 +36,16 @@ porem preciso ter a buffer em task e entao ir passando plugin/plugin
 antes de criar qualquer ferramtne preciso analisar melhor criar primeiramente a ui e depois vir gerando metodos SEMPRE
 
 changelog=
-    1.5.11
-    #TODO: implemetar tasks para os calculos implementar os stats
+    1.5.11 2026/03/02
+    - VectorFieldPlugin: Implementado cálculos assíncronos baseados em Tasks (compute-only). Tasks retornam mapeamentos de atualizações e campos faltantes; Steps aplicam alterações no thread principal.
+    - VectorFieldPlugin: Adicionadas preferências `async_threshold_bytes` (limiar assíncrono, ~20MB) e `vector_field_precision` (precisão default 2) para controlar execução e formatação de valores.
+    - Refatoração: Point/Line/Polygon Tasks/Steps atualizados para evitar escritas em threads de worker; Steps agora aplicam valores no edit buffer usando `layer.addAttribute` + `layer.changeAttributeValue` em lotes, sem chamar `commitChanges()` automaticamente.
+    - Comportamento: alterações permanecem em modo de edição para que o usuário decida salvar/descartar. Camadas de memória (`memory:`) e camadas com tamanho estimado <=0 são forçadas para o caminho assíncrono.
+    - Performance: documentado comportamento observado com GPKG (mais lento em edit-buffer); sugerido ajuste do tamanho de chunk e opção futura para modo provider-batched com backup/aviso ao usuário.
+    - Correções: evita crashes causados por escrita em threads de worker; adicionados checagens de cancelamento em loops e chamadas a `QApplication.processEvents()` entre batches.
+    - Outros: limpeza de logs ruidosos em loops de batch e atualizações na documentação de cenários para orientar testes comparativos (shp vs gpkg).
+
+    1.5.10 2026/03/01
     1.5.10 2026/03/01
     - LogUtilsNew: Adicionado suporte a CRITICAL/ERROR no QgsMessageLog oficial do QGIS com mapeamento de níveis automático
     - CopyAttributesPlugin: Migrado de LogUtils para LogUtilsNew
