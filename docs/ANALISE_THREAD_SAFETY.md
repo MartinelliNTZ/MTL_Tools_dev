@@ -48,11 +48,13 @@ for feat in layer.getFeatures():
 ### O Problema
 
 ```python
-size = ProjectUtils.compute_size(layer)  # Retorna tamanho do arquivo
-threshold = self.settings_preferences.get('async_threshold_bytes', 20 * 1024 * 1024)
+# deci­são originalmente baseada no tamanho do arquivo
+feature_count = layer.featureCount()
+threshold = self.settings_preferences.get('async_threshold_features', 1000)
 
-# ❌ FALHA: compute_size não reflete adequadamente a complexidade
-if is_memory or size > threshold:
+# ❌ FALHA: o valor anterior não existia, usava compute_size() e bytes
+#         que não refletia número de feições nem complexidade
+if is_memory or feature_count >= threshold:
     self._start_async_calculation(...)  # Assíncrono
 else:
     self._execute_sync_calculation(...)  # BLOQUEADOR!
@@ -75,8 +77,9 @@ else:
    - Arquivo pequeno (2 MB) + geometrias complexas = travamento garantido
 
 3. **Threshold fixo inadequado**:
-   - 20 MB é arbitrary
-   - Não considera CPU, velocidade de I/O, complexidade geométrica
+   - Número de megabytes não diz nada sobre quantas feições serão iteradas
+   - Usar uma contagem de feições (p.ex. 1 000) é muito mais direto
+   - Ainda assim, complexidade das geometrias compõe parte do custo
 
 ### Cenários de Travamento
 

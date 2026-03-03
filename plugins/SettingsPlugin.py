@@ -90,19 +90,20 @@ class SettingsPlugin(BasePluginMTL):
         self.logger.debug("Widget de precisão de campos vetoriais adicionado")
 
         # ========== SEÇÃO 3: Limiar de processamento assíncrono ==========
-        # O valor é informado em megabytes e armazenado em bytes nas preferências.
+        # Agora o valor é o número máximo de feições que podem ser processadas
+        # de forma síncrona; tudo acima irá disparar execução em segundo plano.
         thresh_layout, self.spin_threshold = WidgetFactory.create_double_spin_input(
-            "📦 Limiar assíncrono (MB):",
-            decimals=4,
+            "📦 Limiar assíncrono (nº de feições):",
+            decimals=0,
             step=1,
-            minimum=0.0001,
-            maximum=1024 * 1024,  # até 1 TB por precaução
-            value=20,
+            minimum=1,
+            maximum=100000000,  # valor alto para não limitar demais
+            value=1000,
             separator_top=False,
             separator_bottom=True,
         )
         self.layout.add_items([thresh_layout])
-        self.logger.debug("Widget de limiar assíncrono adicionado")
+        self.logger.debug("Widget de limiar assíncrono por feições adicionado")
 
 
 
@@ -133,14 +134,20 @@ class SettingsPlugin(BasePluginMTL):
             self.logger.warning(f"Método de cálculo inválido: {calc_method}, usando padrão")
             self.radio_calc.set_selected_index(0)
 
-        # Carregar limiar assíncrono (armazenado em bytes)
-        async_bytes = self.preferences.get('async_threshold_bytes', 20 * 1024 * 1024)
+        # Carregar limiar assíncrono (número de feições)
+        # suporte retrocompatível: se usuário ainda tiver threshold em bytes, avisar e usar padrão
+        if 'async_threshold_features' in self.preferences:
+            thresh_feats = self.preferences.get('async_threshold_features', 1000)
+        else:
+            old_bytes = self.preferences.get('async_threshold_bytes')
+            if old_bytes is not None:
+                self.logger.warning("Preferência antiga 'async_threshold_bytes' encontrada, substituindo por limite de feições padrão")
+            thresh_feats = 1000
         try:
-            mb_value = float(async_bytes) / (1024 * 1024)
-            self.spin_threshold.setValue(mb_value)
-            self.logger.debug(f"Limiar assíncrono carregado: {mb_value} MB")
+            self.spin_threshold.setValue(int(thresh_feats))
+            self.logger.debug(f"Limiar assíncrono carregado: {thresh_feats} feições")
         except Exception:
-            self.logger.warning(f"Erro ao carregar limiar assíncrono: {async_bytes}")
+            self.logger.warning(f"Erro ao carregar limiar assíncrono: {thresh_feats}")
 
         # Carregar precisão de campos vetoriais
         prec = self.preferences.get('vector_field_precision', 2)
@@ -158,10 +165,10 @@ class SettingsPlugin(BasePluginMTL):
         selected_text = self.radio_calc.get_selected_text()
         self.preferences['calculation_method'] = selected_text
 
-        # Salvar limiar assíncrono (convertendo MB -> bytes)
-        mb_value = float(self.spin_threshold.value())
-        self.preferences['async_threshold_bytes'] = int(mb_value * 1024 * 1024)
-        self.logger.debug(f"Limiar assíncrono convertido e salvo: {mb_value} MB -> {self.preferences['async_threshold_bytes']} bytes")
+        # Salvar limiar assíncrono (número de feições)
+        feats_value = int(self.spin_threshold.value())
+        self.preferences['async_threshold_features'] = feats_value
+        self.logger.debug(f"Limiar assíncrono por feições salvo: {feats_value} feições")
 
         # Salvar precisão de campos vetoriais
         precision_val = int(self.spin_precision.value())

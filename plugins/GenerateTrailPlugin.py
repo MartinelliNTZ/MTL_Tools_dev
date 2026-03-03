@@ -196,14 +196,13 @@ class GenerateTrailPlugin(BasePluginMTL):
         self.logger.debug(f"Context prepared: {{'buffer_distance':{buffer_distance}, 'output_name':{output_name}}}")
 
         # Etapa 6: Decidir entre execução síncrona ou assíncrona
-        size = ProjectUtils.compute_size(layer) if layer else 0
-        # buscar valor configurado nas preferências globais (MB -> bytes)
-        threshold = self.settings_preferences.get(
-            'async_threshold_bytes',        20*1024*1024)  # fallback para 20 MB em bytes)
+        feature_count = layer.featureCount() if layer else 0
+        # buscar valor configurado nas preferências globais (nº de feições)
+        threshold = int(self.settings_preferences.get('async_threshold_features', 1000))
         self.logger.debug(
-            f"Comparando tamanho arquivo: {size} versus {threshold} bytes (limiar)")
+            f"Comparando feições: {feature_count} versus {threshold} (limiar)")
         
-        if size > threshold:
+        if feature_count > threshold:
             self.logger.info("Processamento iniciado em background (assíncrono)")
             self._run_async_pipeline(context)
         else:

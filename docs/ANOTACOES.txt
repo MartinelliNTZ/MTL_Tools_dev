@@ -52,7 +52,7 @@ changelog=
 
     1.5.11 2026/03/02
     - VectorFieldPlugin: Implementado cálculos assíncronos baseados em Tasks (compute-only). Tasks retornam mapeamentos de atualizações e campos faltantes; Steps aplicam alterações no thread principal.
-    - VectorFieldPlugin: Adicionadas preferências `async_threshold_bytes` (limiar assíncrono, ~20MB) e `vector_field_precision` (precisão default 2) para controlar execução e formatação de valores.
+    - VectorFieldPlugin: Preferência `async_threshold_features` (número de feições para trigger async); antiga `async_threshold_bytes` removida.
     - Refatoração: Point/Line/Polygon Tasks/Steps atualizados para evitar escritas em threads de worker; Steps agora aplicam valores no edit buffer usando `layer.addAttribute` + `layer.changeAttributeValue` em lotes, sem chamar `commitChanges()` automaticamente.
     - Comportamento: alterações permanecem em modo de edição para que o usuário decida salvar/descartar. Camadas de memória (`memory:`) e camadas com tamanho estimado <=0 são forçadas para o caminho assíncrono.
     - Performance: documentado comportamento observado com GPKG (mais lento em edit-buffer); sugerido ajuste do tamanho de chunk e opção futura para modo provider-batched com backup/aviso ao usuário.

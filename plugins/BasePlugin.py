@@ -170,7 +170,16 @@ class BasePluginMTL(QDialog):
     def start_stats(self, input_obj=None,modal_info = "YES"):
         try:
             self.preferences["t0"] = time.time()
+            # compute both size and feature count when possible
             self.preferences["current_size"] = ProjectUtils.compute_size(input_obj) if input_obj else 0
+            if hasattr(input_obj, "featureCount"):
+                try:
+                    self.preferences["current_features"] = input_obj.featureCount()
+                except Exception:
+                    self.preferences["current_features"] = 0
+            else:
+                self.preferences["current_features"] = 0
+
             self.preferences["eta"] = 0
             self.preferences["avg_speed"] = self.preferences.get("avg_speed", 0)
             self.preferences["total_bytes"] = self.preferences.get("total_bytes", 0)
@@ -181,11 +190,13 @@ class BasePluginMTL(QDialog):
             if self.preferences["avg_speed"] > 0 and self.preferences["current_size"] > 0:
                 self.preferences["eta"] = (self.preferences["current_size"] / self.preferences["avg_speed"])+time.time()
             TAM = FormatUtils.bytes(self.preferences["current_size"])
+            feats = self.preferences.get("current_features", 0)
             msg = ""
             if self.preferences["eta"] > 0 and self.preferences["current_size"] > 0 and self.preferences["avg_speed"] > 0 :                
                 msg = (
                     f"  Velocidade média: {FormatUtils.speed(self.preferences['avg_speed'])} \n"
                     f"  Tamanho do arquivo: {TAM} \n"
+                    f"  Feições: {feats} \n"
                     f"  Hora inicial: {FormatUtils.clock(self.preferences['t0'],)} \n"
                     f"  Hora final: {FormatUtils.clock(self.preferences.get('eta',0))}\n"
                 )
@@ -201,6 +212,7 @@ class BasePluginMTL(QDialog):
         try:
             dt = time.time() - self.preferences["t0"]
             size = self.preferences["current_size"]
+            feats = self.preferences.get("current_features", 0)
             self.logger.info("")
             self.preferences["total_bytes"] = self.preferences.get("total_bytes", 0) + size
             self.preferences["total_time"] = self.preferences.get("total_time", 0) + dt
@@ -214,12 +226,23 @@ class BasePluginMTL(QDialog):
             msg = (
                 f"+{FormatUtils.bytes(size)} "
                 f"{dt:.1f}s "
+                f"feats={feats} "
                 f"avg={FormatUtils.speed(self.preferences['avg_speed'])}"
             )
 
             if modal_info == "YES":
                 QgisMessageUtil.bar_success(self.iface,f"Estatistivas: {msg} ")
             self.logger.info(msg)
+            # atualizar agregados de features e limpar dados transitórios antes de persistir
+            feats = self.preferences.get("current_features", 0)
+            self.preferences["total_features"] = self.preferences.get("total_features", 0) + feats
+            # campos que não devem ser salvos entre execuções
+            for key in ("t0", "current_size", "current_features", "eta", "avg_speed"):
+                self.preferences.pop(key, None)
+            try:
+                save_tool_prefs(self.TOOL_KEY, self.preferences)
+            except Exception as se:
+                self.logger.debug(f"Falha ao salvar prefs estatísticas: {se}")
         except Exception as e:
             self.logger.error(f"Erro: {e} Preferences: {self.preferences}")
 

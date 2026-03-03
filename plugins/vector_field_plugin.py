@@ -51,6 +51,13 @@ class VectorFieldPlugin(BasePluginMTL):
             self.logger.warning("Nenhuma camada vetorial editável disponível")
             return
 
+        # estatísticas iniciais (agrega contagem de feições em relatórios)
+        try:
+            self.start_stats(layer)
+        except Exception:
+            # se houver problema, apenas continue, não deve quebrar a ferramenta
+            self.logger.debug("Falha ao iniciar estatísticas")
+
         # Verificar se a camada é KML (não editável)
         source = layer.source().lower()
         if source.endswith('.kml') or '|layername=' in source and source.startswith('file://') and '.kml' in source:
@@ -95,7 +102,8 @@ class VectorFieldPlugin(BasePluginMTL):
         # Feature count é muito mais confiável que compute_size() para decidir
         # Threshold: 1000 features = sempre assíncrono (evita UI travada)
         feature_count = layer.featureCount()
-        threshold_features = 1000
+        # valor padrão de segurança
+        threshold_features = int(self.settings_preferences.get('async_threshold_features', 1000))
         
         self.logger.debug(f"Feature count: {feature_count}, Threshold: {threshold_features} features")
 
@@ -117,6 +125,11 @@ class VectorFieldPlugin(BasePluginMTL):
                 self._execute_sync_calculation(
                     layer, field_map, mode_altered, precision
                 )
+                # estatísticas finais após término síncrono
+                try:
+                    self.finish_stats()
+                except Exception:
+                    self.logger.debug("Falha ao finalizar estatísticas")
         except Exception as e:
             self.logger.error(f"Erro: {str(e)}")
             QgisMessageUtil.bar_critical(self.iface, f"Erro: {str(e)}")
@@ -318,17 +331,30 @@ class VectorFieldPlugin(BasePluginMTL):
             else:
                 msg = "Área calculada"
             QgisMessageUtil.bar_success(self.iface, msg)
+        # terminar estatísticas
+        try:
+            self.finish_stats()
+        except Exception:
+            self.logger.debug("Falha ao finalizar estatísticas após cálculo assíncrono")
 
     def _on_async_error(self, errors):
         """Callback de erro da pipeline assíncrona."""
         error_msg = "\n".join(str(e) for e in errors) if errors else "Erro desconhecido"
         self.logger.error(f"ERRO na pipeline: {error_msg}")
         QgisMessageUtil.bar_critical(self.iface, f"Erro: {error_msg}")
+        try:
+            self.finish_stats()
+        except Exception:
+            self.logger.debug("Falha ao finalizar estatísticas após erro")
 
     def _on_async_cancelled(self, context):
         """Callback de cancelamento da pipeline assíncrona."""
         self.logger.warning("Pipeline assíncrona CANCELADA pelo usuário")
         QgisMessageUtil.bar_warning(self.iface, "Operação cancelada!")
+        try:
+            self.finish_stats()
+        except Exception:
+            self.logger.debug("Falha ao finalizar estatísticas após cancelamento")
 
 
 def run_vector_field(iface):

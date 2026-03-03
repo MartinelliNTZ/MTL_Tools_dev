@@ -33,7 +33,7 @@ Centralizar configurações em um único ponto de acesso, eliminando necessidade
 
 - `calculation_method`: string (Elipsoidal | Cartesiana | Ambos), padrão Elipsoidal.
 - `vector_field_precision`: int (0-10), padrão 2.
-- `async_threshold_bytes`: int (bytes), padrão 20 * 1024 * 1024 = 20971520 bytes.
+- `async_threshold_features`: int (feições), padrão 1000.
 
 **Impactos nos dados**
 

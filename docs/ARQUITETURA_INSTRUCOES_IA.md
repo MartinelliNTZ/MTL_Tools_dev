@@ -119,15 +119,16 @@ feature_count = layer.featureCount()  # Instant
 if feature_count >= 1000:  # Threshold empiricamente testado
     self._start_async_calculation(...)
 
-# ❌ NUNCA: compute_size() para decidir sync/async
-size = ProjectUtils.compute_size(layer)  # Varre filesystem, não-confiável
+# ❌ NUNCA: usar compute_size() para decidir sync/async — utilize featureCount()
+# ao invés de usar tamanho de arquivo, conte feições
+feature_count = layer.featureCount()  # rápido e determinista
 if size > 20 * 1024 * 1024:  # 20MB? Pode ser 50k features em memória!
     self._start_async_calculation(...)
 ```
 
 **POR QUÊ**: 
 - featureCount() = O(1), valor exato
-- compute_size() = O(n), varre filesystem, memory layers retornam 0
+- featureCount() = O(1), confiável; compute_size() pode falhar em camadas em memória
 - Memory layer com 50k features = 10MB estimado, deveria ser async, rodia sync ❌
 
 ---
@@ -202,7 +203,7 @@ def on_success(self, context, result):
 - [ ] Step usa try/finally para desbloquear
 - [ ] Step chama QApplication.processEvents() em cada batch
 - [ ] Step usa break para cancelamento (não return)
-- [ ] Decisão sync/async usa featureCount(), NÃO compute_size()
+- [x] Decisão sync/async agora baseia-se em featureCount() e limiar de feições
 - [ ] Detecção CRS geográfico + warning se Cartesiana
 - [ ] Batch size é 2000 (empiricamente testado)
 - [ ] Logs incluem feature_count e modo (sync/async)
@@ -330,7 +331,7 @@ MyStep.py (core/engine_tasks/)
 - ❌ sem blockSignals() (overhead massivo)
 - ❌ Sem try/finally (layer fica bloqueada)
 - ❌ return em loop de cancelamento (pula finally)
-- ❌ compute_size() para decisão sync/async (não-confiável)
+- ✅ usar featureCount() para decisão sync/async, limiar nas preferências
 
 **FAÇA**:
 - ✅ featureCount() >= 1000 → AsyncPipelineEngine
