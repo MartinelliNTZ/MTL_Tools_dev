@@ -93,9 +93,9 @@ class SettingsPlugin(BasePluginMTL):
         # O valor é informado em megabytes e armazenado em bytes nas preferências.
         thresh_layout, self.spin_threshold = WidgetFactory.create_double_spin_input(
             "📦 Limiar assíncrono (MB):",
-            decimals=0,
+            decimals=4,
             step=1,
-            minimum=1,
+            minimum=0.0001,
             maximum=1024 * 1024,  # até 1 TB por precaução
             value=20,
             separator_top=False,

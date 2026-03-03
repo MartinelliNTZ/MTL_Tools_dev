@@ -268,14 +268,15 @@ class LogcatDialog(QDialog):
         for session in sessions:
             self.combo_sessions.addItem(session.display_name, session)
         
-        self.combo_sessions.blockSignals(False)
-        
-        # Reselecionar sessão atual se existir
+        # Reselecionar sessão atual se existir (BLOQUEANDO signals para evitar loop!)
         if self.current_session:
             for i in range(self.combo_sessions.count()):
                 if self.combo_sessions.itemData(i).log_file_path == self.current_session.log_file_path:
-                    self.combo_sessions.setCurrentIndex(i)
+                    self.combo_sessions.setCurrentIndex(i)  # Seguro porque blockSignals está True
                     break
+        
+        # CRUCIAL: Desbloquear APENAS no final
+        self.combo_sessions.blockSignals(False)
     
     def _on_session_changed(self, index: int):
         """Chamado quando a sessão é mudada no combo."""
@@ -290,14 +291,11 @@ class LogcatDialog(QDialog):
         """
         Carrega uma sessão de log.
         
-        ESTRATÉGIA ANTI-CRASH: Desabilitar proxy model durante mudança para evitar
-        que Qt tente sincronizar durante reorganização de dados.
-        
         Args:
             session: LogSession a carregar
         """
         try:
-            # PARAR watcher antigo se existir (evita múltiplas threads)
+            # Parar watcher antigo se existir (evita múltiplas threads)
             if self.file_watcher:
                 try:
                     self.file_watcher.stop()
@@ -305,11 +303,14 @@ class LogcatDialog(QDialog):
                 except Exception as e:
                     self._logger.error(f"Erro ao parar watcher antigo: {str(e)}")
             
+            # Limpar saved scroll ao mudar sessão (esperado resetar para topo)
+            self._saved_scroll_value = None
+            
             # CRÍTICO: Desabilitar proxy model ANTES de mudar dados
             # Isso evita que Qt tente sincronizar durante reorganização
             try:
-                self.table_view.setModel(None)  # REMOVE proxy do tableview
-                self.proxy_model.setSourceModel(None)  # DESCONECTA modelo fonte
+                self.table_view.setModel(None)
+                self.proxy_model.setSourceModel(None)
             except Exception as e:
                 self._logger.error(f"Erro ao desabilitar proxy: {str(e)}")
             
@@ -320,16 +321,22 @@ class LogcatDialog(QDialog):
             # Carregar entradas
             self.all_entries = self.current_loader.load_all()
             
-            # CRÍTICO: Limpar modelo antes de popular
+            # Limpar modelo antes de popular
             try:
                 self.table_model.set_entries([])
             except Exception as e:
                 self._logger.error(f"Erro ao limpar modelo: {str(e)}")
             
             # Aplicar filtros (popula table_model com novos dados)
-            self._apply_filters()
+            try:
+                search_text = self.edit_search.text()
+                self.filter_engine.set_text_filter(search_text)
+                filtered = self.filter_engine.apply(self.all_entries)
+                self.table_model.set_entries(filtered)
+            except Exception as e:
+                self._logger.error(f"Erro ao aplicar filtros: {str(e)}")
             
-            # CRÍTICO: Reconectar proxy model DEPOIS que dados estão carregados
+            # Reconectar proxy model DEPOIS que dados estão carregados
             try:
                 self.proxy_model.setSourceModel(self.table_model)
                 self.table_view.setModel(self.proxy_model)
@@ -340,15 +347,14 @@ class LogcatDialog(QDialog):
             # Iniciar watcher para atualizações em tempo real
             # MAS NÃO monitorar o arquivo do próprio processo (evita loop infinito)
             if not str(session.log_file_path).endswith(f"_pid{os.getpid()}.log"):
-                # Arquivo é de outro processo - monitorar com segurança
+                # Arquivo é de outro processo - monitorar
                 self.file_watcher = LogFileWatcher(
                     session.log_file_path,
                     on_change=lambda: self.file_changed.emit(),
-                    check_interval=1.0  # Aumentar intervalo para reduzir overhead
+                    check_interval=1.0
                 )
                 self.file_watcher.start()
             else:
-                # Arquivo é do próprio processo - NÃO monitorar (evita loop infinito)
                 self.file_watcher = None
             
             # Atualizar status
@@ -371,21 +377,41 @@ class LogcatDialog(QDialog):
                 if new_entries:
                     self.all_entries.extend(new_entries)
                     
-                    # Usar append_entries para inserções incrementais
+                    # Salvar posição do scroll ANTES de atualizar
+                    self._save_scroll_position()
+                    
+                    # SOLUÇÃO: Desconectar models antes de atualizar (evita scroll reset)
                     try:
+                        # Bloquear signals
                         self.table_view.blockSignals(True)
+                        self.proxy_model.blockSignals(True)
+                        
+                        # Desconectar models
+                        self.table_view.setModel(None)
+                        self.proxy_model.setSourceModel(None)
+                        
+                        # Adicionar entradas
                         try:
                             self.table_model.append_entries(new_entries)
-                        finally:
-                            self.table_view.blockSignals(False)
-                    
-                    except Exception as e:
-                        # Fallback: aplicar todos os filtros
+                        except Exception as model_e:
+                            self._logger.error(f"Erro em append_entries: {str(model_e)}")
+                            # Fallback: aplicar todos os filtros
+                            self._apply_filters()
+                            return
+                        
+                        # Reconectar models
+                        self.proxy_model.setSourceModel(self.table_model)
+                        self.table_view.setModel(self.proxy_model)
+                        
+                    finally:
                         try:
+                            self.proxy_model.blockSignals(False)
                             self.table_view.blockSignals(False)
                         except:
                             pass
-                        self._apply_filters()
+                    
+                    # Restaurar posição do scroll DEPOIS da atualização
+                    self._restore_scroll_position()
         
         except Exception as e:
             self._logger.error(
@@ -499,6 +525,30 @@ class LogcatDialog(QDialog):
         
         dialog.exec_()
     
+    def _save_scroll_position(self):
+        """Salva posição atual do scroll (para preservar durante filtros)."""
+        try:
+            scrollbar = self.table_view.verticalScrollBar()
+            self._saved_scroll_value = scrollbar.value()
+        except Exception as e:
+            self._logger.error(f"Erro ao salvar scroll: {str(e)}")
+            self._saved_scroll_value = None
+    
+    def _restore_scroll_position(self):
+        """Restaura posição anterior do scroll de forma confiável."""
+        try:
+            if hasattr(self, '_saved_scroll_value') and self._saved_scroll_value is not None:
+                scrollbar = self.table_view.verticalScrollBar()
+                saved_val = self._saved_scroll_value  # CRÍTICO: Capturar por valor (não por referência)
+                # Usar QTimer com 50ms para garantir que Qt terminou layout
+                QTimer.singleShot(50, lambda sv=saved_val: scrollbar.setValue(sv))
+        except Exception as e:
+            self._logger.error(f"Erro ao restaurar scroll: {str(e)}")
+    
+    def _do_restore_scroll(self, target_value):
+        """[REMOVIDO] Função consolidada em _restore_scroll_position()"""
+        pass
+    
     def _on_clear_filters(self):
         """Limpa todos os filtros."""
         self.edit_search.setText("")
@@ -509,8 +559,11 @@ class LogcatDialog(QDialog):
         self._apply_filters()
     
     def _apply_filters(self):
-        """Aplica filtros e atualiza tabela, preservando seleção."""
+        """Aplica filtros e atualiza tabela, preservando scroll e seleção."""
         try:
+            # Salvar posição do scroll ANTES de atualizar
+            self._save_scroll_position()
+            
             # Obter texto de busca
             search_text = self.edit_search.text()
             self.filter_engine.set_text_filter(search_text)
@@ -518,26 +571,39 @@ class LogcatDialog(QDialog):
             # Aplicar filtros
             filtered = self.filter_engine.apply(self.all_entries)
             
-            # CRÍTICO: Bloquear signals da table_view durante atualizações para evitar
-            # que QTableView tente acessar índices durante sincronização de modelo
-            self.table_view.blockSignals(True)
+            # SOLUÇÃO PARA SCROLL RESET: Desconectar proxy model antes de atualizar dados
+            # Isso evita que QUALQUER signal Qt cause reset automático
             try:
-                # MÁXIMA PROTEÇÃO: Envolver model update em try/except
+                # Bloquear signals da tabela e proxy
+                self.table_view.blockSignals(True)
+                self.proxy_model.blockSignals(True)
+                
+                # Desconectar models
+                self.table_view.setModel(None)
+                self.proxy_model.setSourceModel(None)
+                
+                # Atualizar dados
                 try:
                     self.table_model.set_entries(filtered)
                 except Exception as model_e:
                     self._logger.critical(
-                        f"CRASH PROTECTED: Erro crítico em set_entries: {str(model_e)}",
+                        f"CRASH PROTECTED: Erro em set_entries: {str(model_e)}",
                         error_type=type(model_e).__name__
                     )
-                    # Tentar recovery: limpar modelo
+                    # Fallback: limpar modelo
                     try:
                         self.table_model.set_entries([])
                     except:
                         pass
                     raise
+                
+                # Reconectar models
+                self.proxy_model.setSourceModel(self.table_model)
+                self.table_view.setModel(self.proxy_model)
+                
             finally:
                 try:
+                    self.proxy_model.blockSignals(False)
                     self.table_view.blockSignals(False)
                 except:
                     pass
@@ -547,6 +613,9 @@ class LogcatDialog(QDialog):
                 self._update_filter_buttons(filtered)
             except Exception as e:
                 self._logger.error(f"Erro ao atualizar filter buttons: {str(e)}")
+            
+            # Restaurar posição do scroll DEPOIS da atualização
+            self._restore_scroll_position()
             
             # Atualizar status
             try:

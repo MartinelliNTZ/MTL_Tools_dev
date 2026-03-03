@@ -6,6 +6,8 @@ import os
 from pathlib import Path
 from datetime import datetime
 import traceback
+
+from ...utils.tool_keys import ToolKey
 from .log_sync import LOG_FILE_LOCK
 
 try:
@@ -51,7 +53,7 @@ class LogUtilsNew:
         cls._write_event(
             level="INFO",
             msg="Log session started",
-            tool="system",
+            tool=ToolKey.SYSTEM,
             class_name="LogUtilsNew",
             code="LOG_START",
             data={}

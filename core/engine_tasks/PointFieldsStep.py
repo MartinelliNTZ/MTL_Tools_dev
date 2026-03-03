@@ -116,36 +116,43 @@ class PointFieldsStep(BaseStep):
         items = list(provider_updates.items())
         total = len(items)
         chunk = 2000
-        for i in range(0, total, chunk):
-            if context.is_cancelled():
+        
+        # Bloquear signals da layer durante atualização em batch para evitar overhead
+        layer.blockSignals(True)
+        try:
+            for i in range(0, total, chunk):
+                if context.is_cancelled():
+                    LogUtils.log(
+                        "PointFieldsStep: cancelado durante aplicação",
+                        level="INFO",
+                        tool=context.get("tool_key"),
+                        class_name=self.__class__.__name__
+                    )
+                    break
+
+                batch_items = dict(items[i:i+chunk])
+                # apply into edit buffer using changeAttributeValue
+                for fid, idx_map in batch_items.items():
+                    for idx, val in idx_map.items():
+                        try:
+                            layer.changeAttributeValue(fid, idx, val)
+                        except Exception as e:
+                            LogUtils.log(
+                                f"PointFieldsStep: falha ao aplicar fid={fid} idx={idx} err={e}",
+                                level="ERROR",
+                                tool=context.get("tool_key"),
+                                class_name=self.__class__.__name__
+                            )
                 LogUtils.log(
-                    "PointFieldsStep: cancelado durante aplicação",
-                    level="INFO",
+                    f"PointFieldsStep: applied edit-buffer batch {i}-{i+len(batch_items)} items={len(batch_items)}",
+                    level="DEBUG",
                     tool=context.get("tool_key"),
                     class_name=self.__class__.__name__
                 )
-                return
-
-            batch_items = dict(items[i:i+chunk])
-            # apply into edit buffer using changeAttributeValue
-            for fid, idx_map in batch_items.items():
-                for idx, val in idx_map.items():
-                    try:
-                        layer.changeAttributeValue(fid, idx, val)
-                    except Exception as e:
-                        LogUtils.log(
-                            f"PointFieldsStep: falha ao aplicar fid={fid} idx={idx} err={e}",
-                            level="ERROR",
-                            tool=context.get("tool_key"),
-                            class_name=self.__class__.__name__
-                        )
-            LogUtils.log(
-                f"PointFieldsStep: applied edit-buffer batch {i}-{i+len(batch_items)} items={len(batch_items)}",
-                level="DEBUG",
-                tool=context.get("tool_key"),
-                class_name=self.__class__.__name__
-            )
-            QApplication.processEvents()
+                QApplication.processEvents()
+        finally:
+            # Sempre desbloquear signals mesmo se houver erro ou cancelamento
+            layer.blockSignals(False)
 
         LogUtils.log(
             f"PointFieldsStep.on_success: aplicação em buffer concluída {len(provider_updates)} features",

@@ -2,7 +2,7 @@
 name=MTL Tools
 qgisMinimumVersion=3.16
 qgisMaximumVersion=3.40
-version=1.5.9
+version=1.5.12
 author=Matheus A.S. Martinelli
 email=martinelli.matheus11@gmail.com
 about=Conjunto de ferramentas avançadas para automação de layouts, substituições em massa e exportações profissionais no QGIS.

@@ -11,6 +11,7 @@ Automatizar a geração de atributos geométricos padrão, eliminando cálculos 
 **Fluxo resumido**
 
 - Entrada: camada vetorial editável (ponto, linha ou polígono via UI).
+- **Validação KML**: Detecta se a camada é arquivo KML (não editável); se verdadeiro, bloqueia execução com mensagem: "Arquivos KML não são editáveis. Converta para GeoPackage (.gpkg) ou Shapefile (.shp)".
 - Validação: `VectorLayerProjection.is_geographic_crs(layer)` detecta CRS geográfico.
 - Resolução de modo: se CRS geográfico + modo Cartesiana solicitado, muda automaticamente para "Ambos" com aviso.
 - Resolução de conflito: verifica nomes de campo existentes via `layer.fields().lookupField()`.
@@ -40,6 +41,7 @@ Automatizar a geração de atributos geométricos padrão, eliminando cálculos 
 
 **Riscos e controles**
 
+- **Arquivo KML**: validação detecta extensão .kml na fonte; bloqueia execução com aviso ao usuário para converter para .gpkg ou .shp (formato editável).
 - Colisão de nomes: confirmação interativa ao usuário (sobrescrever/renomear/cancelar).
 - CRS geográfico + Cartesiana: validação automática com fallback + aviso ao usuário.
 - Altimetria em larga escala: `AltimetriaTask` assíncrona; verificar limite de requisições SRTM para > 5000 feições.

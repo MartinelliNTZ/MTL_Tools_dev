@@ -1,12 +1,9 @@
 
 BUGS CONHECIDOS
     - VectorFieldPlugin: Altimetria (Z) trava em camadas com mais de 5000 feições - considerar remover funcionalidade
-    - VectorFieldPlugin: Cálculo automático trava em arquivos KML - não permitir em KML
     - Geral: Impedir múltiplas instâncias de plugins rodando simultaneamente
     - Geral: Impedir que plugins travem QGIS em exceções não capturadas
-    - VectorMultipartPlugin: Arquivo SHP requer 2 execuções para substituição (limitação do SHP - impossível resolver)
     - LoadFolderLayersPlugin: Travamento ao carregar pastas muito grandes
-    - LogCatPlugin: Travamento ocasional ao ler/escrever logs em tempo real
 
 ferramentas = name                              tipo                            plugin_class                risco
     - 01: Exportar Todos os Layouts             janela                          ExportAllLayoutsPlugin      substituir produtos antigos
@@ -21,21 +18,38 @@ ferramentas = name                              tipo                            
     - 10: Converter Multipart                   instantânea                     VectorMultipartPlugin       manipulação de vetores
     - 11: Copiar Atributos de Vetores           janela                          CopyAttributesPlugin        manipulação de vetores
     - 12: LogCat Viewer                         janela (multithread)            LogCatPlugin                nenhum
-    - 13: (em desenvolvimento)
+    - 13: SettingsPlugin                        janela                                                      nenhum
     - 14: (em desenvolvimento)
     - 15: (em desenvolvimento)
 
-PADRONIZADOS = 3, 5, 8, 10 11
-Documentação de cenarios: 5, 8 e 10 e 11
-Instrucoes: 5, 11
+PADRONIZADOS = 3, 5, 8, 10 , 11, 13
+Documentação de cenarios: 3, 5, 8, 10, 11, 13
+Instrucoes: 5, 8, 10, 11, 13
 OQUE EU TAVA FAZENDO? 
 eu tava padronizando todas os plugins para usarem a nova widgetfactory, novas classes de manipulacao de vetor, novos estilos, baseplugin,
-uma porrada de coisa, a gerar e a mais padrao de tudo 
 porem percebi que deveria colocar as coisas em task para deixa mais eficiente ainda entao na gerar rastro a explode linhas ja ta em task
 porem preciso ter a buffer em task e entao ir passando plugin/plugin 
 antes de criar qualquer ferramtne preciso analisar melhor criar primeiramente a ui e depois vir gerando metodos SEMPRE
 
 changelog=
+    1.5.12 2026/03/02
+    - bug corrigido> v - LogCat Viewer: Loop infinito na sessão + memory leak em lambda + scroll reset corrigido (3 bugs críticos consolidados)
+    - bug corrigido> v - VectorFieldPlugin: Cálculo automático trava em arquivos KML - não permitir em KML
+    - MTL_Tools: Migração de LogUtils para LogUtilsNew (class_name="MTL_Tools") mantendo LogUtils.init() para compatibilidade
+    - VectorFieldPlugin: OTIMIZAÇÃO CRÍTICA - Feature count threshold substitui compute_size() para decisão sync/async (featureCount() é O(1) e confiável)
+    - VectorFieldPlugin: Threshold empírico = 1000 features (< 1000 = sync rápido, >= 1000 = async obrigatório para não travar UI)
+    - VectorFieldPlugin: Memory layers (`memory:`) SEMPRE rodam assíncrono (compute_size() retorna 0, causava sync em 50k features)
+    - PointFieldsStep/PolygonFieldsStep/LineFieldsStep: Adicionado blockSignals(True) em on_success() antes de batches (reduz ~60% overhead de sinais QGIS)
+    - PointFieldsStep/PolygonFieldsStep/LineFieldsStep: Implementado try/finally com blockSignals(False) para garantir desbloqueio mesmo em erro/cancelamento
+    - PointFieldsStep/PolygonFieldsStep/LineFieldsStep: Cancelamento via break (não return) para permitir limpeza em finally
+    - VectorFieldPlugin: CRS geográfico (lat/lon) detectado automaticamente; se usuário selecionar Cartesiana → warning bar + força modo "Ambos"
+    - VectorLayerProjection: is_geographic_crs() valida EPSG codes (4326, 4269, etc) e detecta +geog em +proj strings
+    - Performance: Log validation mostra 1500 features processadas assincronamente com sucesso (batch 0-1500 em ~2.5s sem UI travar)
+    - Arquitetura: Documento ARQUITETURA_INSTRUCOES_IA.md consolidado com regras críticas DO/DON'T para AsyncPipelineEngine
+    - Correção: Todos os sync/async loops agora em batch de 2000 features com processEvents() entre batches
+    - Correção: Nenhuma task toca em layer (worker thread only calcula, retorna dict com updates + missing_fields)
+    - Validação: Zero syntax errors em 4 arquivos modificados (vector_field_plugin.py + 3 Steps)
+
     1.5.11 2026/03/02
     - VectorFieldPlugin: Implementado cálculos assíncronos baseados em Tasks (compute-only). Tasks retornam mapeamentos de atualizações e campos faltantes; Steps aplicam alterações no thread principal.
     - VectorFieldPlugin: Adicionadas preferências `async_threshold_bytes` (limiar assíncrono, ~20MB) e `vector_field_precision` (precisão default 2) para controlar execução e formatação de valores.
@@ -45,7 +59,6 @@ changelog=
     - Correções: evita crashes causados por escrita em threads de worker; adicionados checagens de cancelamento em loops e chamadas a `QApplication.processEvents()` entre batches.
     - Outros: limpeza de logs ruidosos em loops de batch e atualizações na documentação de cenários para orientar testes comparativos (shp vs gpkg).
 
-    1.5.10 2026/03/01
     1.5.10 2026/03/01
     - LogUtilsNew: Adicionado suporte a CRITICAL/ERROR no QgsMessageLog oficial do QGIS com mapeamento de níveis automático
     - CopyAttributesPlugin: Migrado de LogUtils para LogUtilsNew
@@ -68,6 +81,7 @@ changelog=
     - REFATORAÇÃO ARQUITETÔNICA: Separação de responsabilidades - cálculos vetoriais delegados a classes de domínio especializadas
     1.5.7 2026/02/27
     - Logcat: Removido DEBUG logs excessivos; proteção anti-crash via desconexão de proxy model durante troca de sessão; corrigido bug de índice em duplo clique (mapToSource)
+    -bug removido:     - LogCatPlugin: Travamento ocasional ao ler/escrever logs em tempo real
     - Plugin principal: Adicionado sys.excepthook handler global para capturar exceções não tratadas; proteção massiva em run_logcat() com logging detalhado de cada etapa
     - SettingsPlugin: Novo plugin no grupo Sistema com acesso a preferências e configuração de cálculo vetorial (Elipsoidal/Cartesiana/Ambos)
     - RadioButtonGridWidget: Novo widget exclusivo de radios com grid configurável (linhas/colunas), integrado via WidgetFactory
@@ -195,7 +209,7 @@ changelog=
 
 
 IMPLEMENTACOES
-
+    - Ferramenta basica que apaga campos de KML
     - Ferramenta Replace: colocar botao de trroccar campos de entrada e saida, 
     -acrescentar centralizar tela de todos os layouts 
     -Atribuir bandas 0 a todos raster 

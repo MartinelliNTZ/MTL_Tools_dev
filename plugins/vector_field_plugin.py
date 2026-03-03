@@ -51,6 +51,17 @@ class VectorFieldPlugin(BasePluginMTL):
             self.logger.warning("Nenhuma camada vetorial editável disponível")
             return
 
+        # Verificar se a camada é KML (não editável)
+        source = layer.source().lower()
+        if source.endswith('.kml') or '|layername=' in source and source.startswith('file://') and '.kml' in source:
+            self.logger.warning("Camada KML não pode ser editada")
+            QgisMessageUtil.bar_critical(
+                self.iface, 
+                "❌ Arquivos KML não são editáveis.\n\n"
+                "Converta a camada para GeoPackage (.gpkg) ou Shapefile (.shp) antes de usar esta ferramenta."
+            )
+            return
+
         geom_type = layer.geometryType()
         self.logger.debug(f"Camada: {layer.name()}, Geometria: {geom_type}")
 
@@ -78,36 +89,31 @@ class VectorFieldPlugin(BasePluginMTL):
             QgisMessageUtil.bar_critical(self.iface, f"Erro na preparação: {str(e)}")
             return
 
-        # Calcular tamanho e decidir sync vs async
-        size = ProjectUtils.compute_size(layer)
-        threshold = self.settings_preferences.get('async_threshold_bytes', 20 * 1024 * 1024)
+        # Decidir entre sync/async baseado em feature count (mais confiável que tamanho de arquivo)
         precision = int(self.settings_preferences.get('vector_field_precision', 2))
-
-        self.logger.debug(f"Tamanho: {size} bytes, Threshold: {threshold} bytes")
-
-        # regra especial para camadas em memória ou com tamanho não confiável
-        is_memory = layer.source().startswith("memory:")
-        if size <= 0:
-            # compute_size devolveu 0; isso costuma acontecer em vetores
-            # de memória sem fonte explícita. Tratar como memória para evitar
-            # cálculos síncronos enganadores.
-            is_memory = True
-            self.logger.debug("compute_size retornou 0, tratando camada como memória")
-
-        if is_memory:
-            # memory layers can have misleading small size estimates and
-            # synchronous operation would still touch the layer in place which
-            # may not behave as expected. force async for consistency.
-            self.logger.debug("Camada em memória detectada, forçando processamento assíncrono")
+        
+        # Feature count é muito mais confiável que compute_size() para decidir
+        # Threshold: 1000 features = sempre assíncrono (evita UI travada)
+        feature_count = layer.featureCount()
+        threshold_features = 1000
+        
+        self.logger.debug(f"Feature count: {feature_count}, Threshold: {threshold_features} features")
 
         try:
-            if is_memory or size > threshold:
-                self.logger.info("Usando processamento assíncrono")
+            # SEMPRE usar assíncrono para evitar travamento da UI
+            # Feature count > 1000 ou qualquer memória layer = assíncrono obrigatório
+            if feature_count >= threshold_features or layer.source().startswith("memory:"):
+                self.logger.info(f"Usando processamento assíncrono (features={feature_count})")
                 self._start_async_calculation(
                     layer, step_class, field_map, mode_altered, precision
                 )
             else:
-                self.logger.info("Usando processamento síncrono")
+                # Mesmo com < 1000 features, considerar usar async para consistência
+                # Descomentar a linha abaixo para forçar SEMPRE assíncrono
+                # self.logger.info("Forçando processamento assíncrono para consistência")
+                # self._start_async_calculation(layer, step_class, field_map, mode_altered, precision)
+                
+                self.logger.info("Usando processamento síncrono (features={})".format(feature_count))
                 self._execute_sync_calculation(
                     layer, field_map, mode_altered, precision
                 )

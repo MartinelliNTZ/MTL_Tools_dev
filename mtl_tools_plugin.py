@@ -59,7 +59,8 @@ class MTL_Tools:
         self.toolbar = None
         self.actions = []
         self.provider = None
-    TOOL_KEY = ToolKey.MTL_TOOLS_PLUGIN
+        self.logger = None
+        self.TOOL_KEY = ToolKey.SYSTEM
     # =====================================================
     # INICIAR GUI E PROCESSING
     # =====================================================
@@ -72,17 +73,19 @@ class MTL_Tools:
         LogUtilsNew.init(plugin_root)
         # mantém só os últimos 15 logs
         LogCleanupUtils.keep_last_n(plugin_root, keep=15)
-        LogUtils.info("Plugin inicializado", tool=self.TOOL_KEY)
-        LogUtils.info("SYSTEM: Global error handler instalado para capturar crashes", tool="system")
+        # Inicializar logger UMA VEZ como atributo da classe
+        self.logger = LogUtilsNew(tool=self.TOOL_KEY, class_name="MTL_Tools")
+        self.logger.info("Plugin inicializado")
+        self.logger.info("SYSTEM: Global error handler instalado para capturar crashes")
         # -------------------------
         # 1) ATIVAR PROCESSING PROVIDER
         # -------------------------
         try:
             self.provider = MTLProvider()
             QgsApplication.processingRegistry().addProvider(self.provider)
-            LogUtils.info("Processing Provider carregado com sucesso", tool=self.TOOL_KEY)
+            self.logger.info("Processing Provider carregado com sucesso")
         except Exception as e:
-            LogUtils.error(f"Erro ao carregar Processing Provider: {str(e)}", tool=self.TOOL_KEY)
+            self.logger.error(f"Erro ao carregar Processing Provider: {str(e)}")
             QgisMessageUtil.bar_critical(self.iface,f"Erro ao carregar provider. Erro: {e}")
         # -------------------------
         # 2) CRIAR TOOLBAR EXCLUSIVA
@@ -90,9 +93,9 @@ class MTL_Tools:
         try:
             self.toolbar = self.iface.addToolBar("MTL Tools")
             self.toolbar.setObjectName("MTL_Tools_Toolbar")
-            LogUtils.debug("Toolbar MTL Tools criada com sucesso", tool=self.TOOL_KEY)
+            self.logger.debug("Toolbar MTL Tools criada com sucesso")
         except Exception as e:
-            LogUtils.error(f"Erro ao criar toolbar: {str(e)}", tool=self.TOOL_KEY)
+            self.logger.error(f"Erro ao criar toolbar: {str(e)}")
             return
 
         # -------------------------
@@ -104,9 +107,9 @@ class MTL_Tools:
             standard_menu = self.iface.firstRightStandardMenu()
             self.iface.mainWindow().menuBar().insertMenu(standard_menu.menuAction(), self.menu)
             self.menu.clear()
-            LogUtils.debug("Menu MTL Tools criado com sucesso", tool=self.TOOL_KEY)
+            self.logger.debug("Menu MTL Tools criado com sucesso")
         except Exception as e:
-            LogUtils.error(f"Erro ao criar menu principal: {str(e)}", tool=self.TOOL_KEY)
+            self.logger.error(f"Erro ao criar menu principal: {str(e)}")
             return
         
 
@@ -141,9 +144,9 @@ class MTL_Tools:
             self.menu.addMenu(self.raster_menu)
             self.menu.addMenu(self.vectors_menu)
             self.menu.addMenu(self.system_menu)
-            LogUtils.debug("Submenus criados com sucesso", tool=self.TOOL_KEY)
+            self.logger.debug("Submenus criados com sucesso")
         except Exception as e:
-            LogUtils.error(f"Erro ao criar submenus: {str(e)}", tool=self.TOOL_KEY)
+            self.logger.error(f"Erro ao criar submenus: {str(e)}")
             return
 
         # -------------------------
@@ -223,9 +226,9 @@ class MTL_Tools:
             self.action_copy_atributes = QAction(QIcon(copy_atributes_icon), "Copiar Atributos", self.iface.mainWindow())
             self.action_copy_atributes.triggered.connect(self.run_copy_atributes)
             
-            LogUtils.debug("Todas as ações criadas com sucesso", tool=self.TOOL_KEY)
+            self.logger.debug("Todas as ações criadas com sucesso")
         except Exception as e:
-            LogUtils.error(f"Erro ao criar ações: {str(e)}", tool=self.TOOL_KEY)
+            self.logger.error(f"Erro ao criar ações: {str(e)}")
             return
 
         # -------------------------
@@ -255,9 +258,9 @@ class MTL_Tools:
             # Menu principal
             self.menu.addAction(self.action_about_dialog)
             
-            LogUtils.debug("Ações adicionadas aos menus com sucesso", tool=self.TOOL_KEY)
+            self.logger.debug("Ações adicionadas aos menus com sucesso")
         except Exception as e:
-            LogUtils.error(f"Erro ao adicionar ações aos menus: {str(e)}", tool=self.TOOL_KEY)
+            self.logger.error(f"Erro ao adicionar ações aos menus: {str(e)}")
             return
 
         # -------------------------
@@ -322,9 +325,9 @@ class MTL_Tools:
             # ==================================================
 
             self.toolbar.addSeparator()
-            LogUtils.debug("Botões de toolbar criados com sucesso", tool=self.TOOL_KEY)
+            self.logger.debug("Botões de toolbar criados com sucesso")
         except Exception as e:
-            LogUtils.error(f"Erro ao criar botões da toolbar: {str(e)}", tool=self.TOOL_KEY)
+            self.logger.error(f"Erro ao criar botões da toolbar: {str(e)}")
             return
 
         # Salva todas as ações para cleanup
@@ -344,9 +347,9 @@ class MTL_Tools:
                 self.action_multpart,
                 self.action_copy_atributes
             ])
-            LogUtils.info("MTL Tools: GUI inicializada com sucesso", tool=self.TOOL_KEY)
+            self.logger.info("MTL Tools: GUI inicializada com sucesso")
         except Exception as e:
-            LogUtils.error(f"Erro ao salvar ações para cleanup: {str(e)}", tool=self.TOOL_KEY)
+            self.logger.error(f"Erro ao salvar ações para cleanup: {str(e)}")
 
 
     # =====================================================
@@ -357,28 +360,28 @@ class MTL_Tools:
             # Remover provider do Processing
             if self.provider:
                 QgsApplication.processingRegistry().removeProvider(self.provider)
-                LogUtils.info("Processing Provider removido com sucesso", tool=self.TOOL_KEY)
+                self.logger.info("Processing Provider removido com sucesso")
         except Exception as e:
-            LogUtils.error(f"Erro ao remover Processing Provider: {str(e)}", tool=self.TOOL_KEY)
+            self.logger.error(f"Erro ao remover Processing Provider: {str(e)}")
 
         try:
             # Remover ações do menu e toolbar
             for act in self.actions:
                 self.iface.removePluginMenu("MTL Tools", act)
                 self.iface.removeToolBarIcon(act)
-            LogUtils.info("Ações removidas com sucesso", tool=self.TOOL_KEY)
+            self.logger.info("Ações removidas com sucesso")
         except Exception as e:
-            LogUtils.error(f"Erro ao remover ações: {str(e)}", tool=self.TOOL_KEY)
+            self.logger.error(f"Erro ao remover ações: {str(e)}")
 
         try:
             # Remover toolbar
             if self.toolbar:
                 del self.toolbar
-                LogUtils.info("Toolbar removida com sucesso", tool=self.TOOL_KEY)
+                self.logger.info("Toolbar removida com sucesso")
         except Exception as e:
-            LogUtils.error(f"Erro ao remover toolbar: {str(e)}", tool=self.TOOL_KEY)
+            self.logger.error(f"Erro ao remover toolbar: {str(e)}")
         
-        LogUtils.info("Plugin MTL Tools descarregado", tool=self.TOOL_KEY)
+        self.logger.info("Plugin MTL Tools descarregado")
             
             
 #===========================FERRAMENTAS INSTANTANEAS DE SISTEMA===================================================================
@@ -388,11 +391,11 @@ class MTL_Tools:
     def run_restart_qgis(self):
         try:
             from .plugins.restart_qgis import run_restart_qgis
-            LogUtils.info("Iniciando plugin: Restart QGIS", tool=self.TOOL_KEY)
+            self.logger.info("Iniciando plugin: Restart QGIS")
             run_restart_qgis(self.iface)
-            LogUtils.info("Plugin Restart QGIS executado com sucesso", tool=self.TOOL_KEY)
+            self.logger.info("Plugin Restart QGIS executado com sucesso")
         except Exception as e:
-            LogUtils.error(f"Erro ao executar Restart QGIS: {str(e)}", tool=self.TOOL_KEY)
+            self.logger.error(f"Erro ao executar Restart QGIS: {str(e)}")
             QgisMessageUtil.bar_critical(self.iface, f"Erro no plugin Restart QGIS:\n{str(e)}")
 
 #===========================FERRAMENTAS INSTANTANEAS===================================================================
@@ -402,13 +405,13 @@ class MTL_Tools:
     def run_vector_fields(self):
         try:
             from .plugins.vector_field_plugin import VectorFieldPlugin
-            LogUtils.info("Iniciando plugin: Calcular Campos Vetoriais", tool=self.TOOL_KEY)
+            self.logger.info("Iniciando plugin: Calcular Campos Vetoriais")
             # manter referência viva
             self.vector_field_plugin = VectorFieldPlugin(self.iface)
             self.vector_field_plugin.run_vector_field()
-            LogUtils.info("Plugin Calcular Campos Vetoriais executado com sucesso", tool=self.TOOL_KEY)
+            self.logger.info("Plugin Calcular Campos Vetoriais executado com sucesso")
         except Exception as e:
-            LogUtils.error(f"Erro ao executar Calcular Campos Vetoriais: {str(e)}", tool=self.TOOL_KEY)
+            self.logger.error(f"Erro ao executar Calcular Campos Vetoriais: {str(e)}")
             QgisMessageUtil.bar_critical(self.iface, f"Erro no plugin Calcular Campos Vetoriais:\n{str(e)}")
         
     # =====================================================
@@ -417,13 +420,13 @@ class MTL_Tools:
     def run_multpart(self):
         try:
             from .plugins.VectorMultipartPlugin import VectorMultipartPlugin
-            LogUtils.info("Iniciando plugin: Converter para Multipart", tool=self.TOOL_KEY)
+            self.logger.info("Iniciando plugin: Converter para Multipart")
             # manter referência viva
             self.vector_multpart_plugin = VectorMultipartPlugin(self.iface)
             self.vector_multpart_plugin.run_multpart()
-            LogUtils.info("Plugin Converter para Multipart executado com sucesso", tool=self.TOOL_KEY)
+            self.logger.info("Plugin Converter para Multipart executado com sucesso")
         except Exception as e:
-            LogUtils.error(f"Erro ao executar Converter para Multipart: {str(e)}", tool=self.TOOL_KEY)
+            self.logger.error(f"Erro ao executar Converter para Multipart: {str(e)}")
             QgisMessageUtil.bar_critical(self.iface, f"Erro no plugin Converter para Multipart:\n{str(e)}")
  
 #===========================FERRAMENTAS INSTANTANEA COM JANELA DE RESULTADOS=======================================================================
@@ -434,12 +437,12 @@ class MTL_Tools:
     def run_coord_click(self):
         try:
             from .plugins.coord_click_tool import CoordClickTool
-            LogUtils.info("Ativando ferramenta: Capturar Coordenadas", tool=self.TOOL_KEY)
+            self.logger.info("Ativando ferramenta: Capturar Coordenadas")
             self.coord_click_tool = CoordClickTool(self.iface)
             self.iface.mapCanvas().setMapTool(self.coord_click_tool)
-            LogUtils.info("Ferramenta Capturar Coordenadas ativada com sucesso", tool=self.TOOL_KEY)
+            self.logger.info("Ferramenta Capturar Coordenadas ativada com sucesso")
         except Exception as e:
-            LogUtils.error(f"Erro ao ativar Capturar Coordenadas: {str(e)}", tool=self.TOOL_KEY)
+            self.logger.error(f"Erro ao ativar Capturar Coordenadas: {str(e)}")
             QgisMessageUtil.bar_critical(self.iface, f"Erro na ferramenta Capturar Coordenadas:\n{str(e)}")
         
 
@@ -450,12 +453,12 @@ class MTL_Tools:
     def run_export_layouts(self):
         try:
             from .plugins.export_all_layouts import ExportAllLayoutsDialog
-            LogUtils.info("Abrindo diálogo: Exportar todos os Layouts", tool=self.TOOL_KEY)
+            self.logger.info("Abrindo diálogo: Exportar todos os Layouts")
             dlg = ExportAllLayoutsDialog(self.iface)
             dlg.exec()
-            LogUtils.info("Diálogo Exportar Layouts fechado", tool=self.TOOL_KEY)
+            self.logger.info("Diálogo Exportar Layouts fechado")
         except Exception as e:
-            LogUtils.error(f"Erro ao executar Exportar Layouts: {str(e)}", tool=self.TOOL_KEY)
+            self.logger.error(f"Erro ao executar Exportar Layouts: {str(e)}")
             QgisMessageUtil.bar_critical(self.iface, f"Erro no plugin Exportar Layouts:\n{str(e)}")
 
     # =====================================================
@@ -464,11 +467,11 @@ class MTL_Tools:
     def run_gerar_rastro(self):
         try:
             from .plugins.GenerateTrailPlugin import run_gerar_rastro
-            LogUtils.info("Abrindo diálogo: Gerar Rastro Implemento", tool=self.TOOL_KEY)
+            self.logger.info("Abrindo diálogo: Gerar Rastro Implemento")
             self.gerar_rastro_dlg = run_gerar_rastro(self.iface)
-            LogUtils.info("Diálogo Gerar Rastro Implemento aberto com sucesso", tool=self.TOOL_KEY)
+            self.logger.info("Diálogo Gerar Rastro Implemento aberto com sucesso")
         except Exception as e:
-            LogUtils.error(f"Erro ao executar Gerar Rastro Implemento: {str(e)}", tool=self.TOOL_KEY)
+            self.logger.error(f"Erro ao executar Gerar Rastro Implemento: {str(e)}")
             QgisMessageUtil.bar_critical(self.iface, f"Erro no plugin Gerar Rastro Implemento:\n{str(e)}")
     # =====================================================
     # EXECUTAR: Logcat Tool
@@ -479,43 +482,43 @@ class MTL_Tools:
         Qualquer erro será capturado e registrado em arquivo de log.
         """
         try:
-            LogUtils.info("=" * 60, tool="system")
-            LogUtils.info("LOGCAT: Iniciando abertura de diálogo (PROTEGIDO)", tool="system")
+            self.logger.info("=" * 60)
+            self.logger.info("LOGCAT: Iniciando abertura de diálogo (PROTEGIDO)")
             
             # Import isolado
             try:
                 from .plugins.logcat.logcat_plugin import run
-                LogUtils.info("LOGCAT: Módulo logcat_plugin importado", tool="system")
+                self.logger.info("LOGCAT: Módulo logcat_plugin importado")
             except ImportError as import_err:
                 error_msg = f"LOGCAT: Erro ao importar logcat_plugin: {str(import_err)}"
-                LogUtils.critical(error_msg, tool="system")
+                self.logger.critical(error_msg)
                 QgisMessageUtil.bar_critical(self.iface, f"Erro de importação:\n{str(import_err)}")
                 return
             
-            LogUtils.info("Abrindo diálogo: Logcat - Viewer de Logs", tool=self.TOOL_KEY)
+            self.logger.info("Abrindo diálogo: Logcat - Viewer de Logs")
             
             # Execução com proteção adicional
             try:
                 self.logcat_dlg = run(self.iface)
-                LogUtils.info("LOGCAT: Diálogo aberto com sucesso (sem crashes detectados)", tool="system")
-                LogUtils.info("=" * 60, tool="system")
+                self.logger.info("LOGCAT: Diálogo aberto com sucesso (sem crashes detectados)")
+                self.logger.info("=" * 60)
             except Exception as run_error:
                 # Erro na execução do Logcat
                 error_msg = f"LOGCAT: Erro ao executar logcat_plugin.run(): {str(run_error)}"
-                LogUtils.critical(error_msg, tool="system")
+                self.logger.critical(error_msg)
                 error_trace = traceback.format_exc()
-                LogUtils.critical(f"Stack trace:\n{error_trace}", tool="system")
+                self.logger.critical(f"Stack trace:\n{error_trace}")
                 QgisMessageUtil.bar_critical(self.iface, f"Erro ao abrir Logcat:\n{str(run_error)}")
-                LogUtils.info("=" * 60, tool="system")
+                self.logger.info("=" * 60)
                 
         except Exception as outer_error:
             # Erro na própria função run_logcat
             error_msg = f"LOGCAT: Erro CRÍTICO em run_logcat(): {str(outer_error)}"
             try:
-                LogUtils.critical(error_msg, tool="system")
+                self.logger.critical(error_msg)
                 error_trace = traceback.format_exc()
-                LogUtils.critical(f"Stack trace:\n{error_trace}", tool="system")
-                LogUtils.info("=" * 60, tool="system")
+                self.logger.critical(f"Stack trace:\n{error_trace}")
+                self.logger.info("=" * 60)
             except:
                 print(error_msg, file=sys.stderr)
             
@@ -534,11 +537,11 @@ class MTL_Tools:
     def run_drone_coords(self):
         try:
             from .plugins.drone_cordinates import run_drone_cordinates
-            LogUtils.info("Abrindo diálogo: Obter Coordenadas de Drone", tool=self.TOOL_KEY)
+            self.logger.info("Abrindo diálogo: Obter Coordenadas de Drone")
             self.drone_cordinates_dlg = run_drone_cordinates(self.iface)
-            LogUtils.info("Diálogo Obter Coordenadas de Drone aberto com sucesso", tool=self.TOOL_KEY)
+            self.logger.info("Diálogo Obter Coordenadas de Drone aberto com sucesso")
         except Exception as e:
-            LogUtils.error(f"Erro ao executar Obter Coordenadas de Drone: {str(e)}", tool=self.TOOL_KEY)
+            self.logger.error(f"Erro ao executar Obter Coordenadas de Drone: {str(e)}")
             QgisMessageUtil.bar_critical(self.iface, f"Erro no plugin Obter Coordenadas de Drone:\n{str(e)}")
 
 
@@ -552,11 +555,11 @@ class MTL_Tools:
     def run_replace_layouts(self):
         try:
             from .plugins.replace_in_layouts import run_replace_in_layouts
-            LogUtils.info("Abrindo diálogo: Substituir textos nos Layouts", tool=self.TOOL_KEY)
+            self.logger.info("Abrindo diálogo: Substituir textos nos Layouts")
             self.replace_layouts_dlg = run_replace_in_layouts(self.iface)
-            LogUtils.info("Diálogo Substituir Layouts aberto com sucesso", tool=self.TOOL_KEY)
+            self.logger.info("Diálogo Substituir Layouts aberto com sucesso")
         except Exception as e:
-            LogUtils.error(f"Erro ao executar Substituir Layouts: {str(e)}", tool=self.TOOL_KEY)
+            self.logger.error(f"Erro ao executar Substituir Layouts: {str(e)}")
             QgisMessageUtil.bar_critical(self.iface, f"Erro no plugin Substituir Layouts:\n{str(e)}")
 
 
@@ -566,11 +569,11 @@ class MTL_Tools:
     def run_load_folder(self):
         try:
             from .plugins.load_folder_layers import run_load_folder_layers
-            LogUtils.info("Iniciando plugin: Carregar pasta de arquivos", tool=self.TOOL_KEY)
+            self.logger.info("Iniciando plugin: Carregar pasta de arquivos")
             run_load_folder_layers(self.iface)
-            LogUtils.info("Plugin Carregar pasta de arquivos executado com sucesso", tool=self.TOOL_KEY)
+            self.logger.info("Plugin Carregar pasta de arquivos executado com sucesso")
         except Exception as e:
-            LogUtils.error(f"Erro ao executar Carregar pasta de arquivos: {str(e)}", tool=self.TOOL_KEY)
+            self.logger.error(f"Erro ao executar Carregar pasta de arquivos: {str(e)}")
             QgisMessageUtil.bar_critical(self.iface, f"Erro no plugin Carregar pasta:\n{str(e)}")
 
  
@@ -580,11 +583,11 @@ class MTL_Tools:
     def run_about_dialog(self):
         try:
             from .plugins.about_dialog import run_about_dialog
-            LogUtils.info("Abrindo diálogo: Sobre o MTL Tools", tool=self.TOOL_KEY)
+            self.logger.info("Abrindo diálogo: Sobre o MTL Tools")
             run_about_dialog(self.iface)
-            LogUtils.info("Diálogo Sobre MTL Tools fechado", tool=self.TOOL_KEY)
+            self.logger.info("Diálogo Sobre MTL Tools fechado")
         except Exception as e:
-            LogUtils.error(f"Erro ao executar Sobre o MTL Tools: {str(e)}", tool=self.TOOL_KEY)
+            self.logger.error(f"Erro ao executar Sobre o MTL Tools: {str(e)}")
             QgisMessageUtil.bar_critical(self.iface, f"Erro ao abrir Sobre MTL Tools:\n{str(e)}")
         
     # =====================================================
@@ -593,11 +596,11 @@ class MTL_Tools:
     def run_base_tool(self):
         try:
             from .plugins.base_tool import run_base_tool
-            LogUtils.info("Iniciando plugin: Base Tool", tool=self.TOOL_KEY)
+            self.logger.info("Iniciando plugin: Base Tool")
             run_base_tool(self.iface)
-            LogUtils.info("Plugin Base Tool executado com sucesso", tool=self.TOOL_KEY)
+            self.logger.info("Plugin Base Tool executado com sucesso")
         except Exception as e:
-            LogUtils.error(f"Erro ao executar Base Tool: {str(e)}", tool=self.TOOL_KEY)
+            self.logger.error(f"Erro ao executar Base Tool: {str(e)}")
             QgisMessageUtil.bar_critical(self.iface, f"Erro no plugin Base Tool:\n{str(e)}")
         
     # =====================================================
@@ -606,11 +609,11 @@ class MTL_Tools:
     def run_copy_atributes(self):
         try:
             from .plugins.CopyAttributesPlugin import run_copy_attributes
-            LogUtils.info("Abrindo diálogo: Copiar Atributos", tool=self.TOOL_KEY)
+            self.logger.info("Abrindo diálogo: Copiar Atributos")
             self.copy_attributes_dlg = run_copy_attributes(self.iface)
-            LogUtils.info("Diálogo Copiar Atributos aberto com sucesso", tool=self.TOOL_KEY)
+            self.logger.info("Diálogo Copiar Atributos aberto com sucesso")
         except Exception as e:
-            LogUtils.error(f"Erro ao executar Copiar Atributos: {str(e)}", tool=self.TOOL_KEY)
+            self.logger.error(f"Erro ao executar Copiar Atributos: {str(e)}")
             QgisMessageUtil.bar_critical(self.iface, f"Erro no plugin Copiar Atributos:\n{str(e)}")
 
         
@@ -666,9 +669,9 @@ class MTL_Tools:
     def run_settings(self):
         try:
             from .plugins.SettingsPlugin import run_settings
-            LogUtils.info("Abrindo diálogo: Configurações", tool=self.TOOL_KEY)
+            self.logger.info("Abrindo diálogo: Configurações")
             self.settings_dlg = run_settings(self.iface)
-            LogUtils.info("Diálogo de configurações aberto com sucesso", tool=self.TOOL_KEY)
+            self.logger.info("Diálogo de configurações aberto com sucesso")
         except Exception as e:
-            LogUtils.error(f"Erro ao executar Configurações: {str(e)}", tool=self.TOOL_KEY)
+            self.logger.error(f"Erro ao executar Configurações: {str(e)}")
             QgisMessageUtil.bar_critical(self.iface, f"Erro no diálogo de Configurações:\n{str(e)}")

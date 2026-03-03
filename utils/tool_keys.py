@@ -15,6 +15,7 @@ class ToolKey:
     COPY_ATTRIBUTES = "copy_attributes"
     CONVERTER_MULTIPART = "converter_multipart"
     SETTINGS = "settings"
+    SYSTEM = "SYSTEM"  # para logs genéricos do sistema, sem tool específica
     VECTOR_FIELDS = "vector_fields"
 
     # model3 / panel tool
