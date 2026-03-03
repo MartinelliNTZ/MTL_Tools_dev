@@ -45,9 +45,14 @@ class PointFieldsTask(BaseTask):
             class_name=self.__class__.__name__
         )
 
+        # nudge progress bar immediately so pipeline bar moves
+        self.setProgress(1)
+
         updates = {}
+        total = self.layer.featureCount() or 0
         count = 0
         computed = 0
+        last_pct = -1
         const_prec = 8
 
         for feat in self.layer.getFeatures():
@@ -74,6 +79,13 @@ class PointFieldsTask(BaseTask):
                     updates[feat.id()] = vals
                     computed += 1
 
+            # report progress percentage
+            if total > 0:
+                pct = int(count * 100 / total)
+                if pct != last_pct:
+                    self.setProgress(pct)
+                    last_pct = pct
+
             if count % 5000 == 0:
                 LogUtils.log(
                     f"PointFieldsTask: PROGRESS - scanned {count} features, computed {computed}",
@@ -96,5 +108,6 @@ class PointFieldsTask(BaseTask):
                 if fname not in [f.name() for f in self.layer.fields()]
             ]
         }
+        self.setProgress(100)
         return True
 

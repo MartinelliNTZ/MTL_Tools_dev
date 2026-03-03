@@ -44,14 +44,20 @@ class PolygonFieldsTask(BaseTask):
             tool=self.tool_key,
             class_name=self.__class__.__name__
         )
+
+        # nudge progress bar immediately
+        self.setProgress(1)
         
         # New approach: do not modify the layer in the worker thread.
         # Compute a mapping of feature id -> { field_name: value }
         updates = {}
         missing_fields = set()
 
+        total = self.layer.featureCount() or 0
         count = 0
         computed = 0
+        last_pct = -1
+
         for feat in self.layer.getFeatures():
             if self.isCanceled():
                 LogUtils.log(
@@ -86,6 +92,13 @@ class PolygonFieldsTask(BaseTask):
                     updates[feat.id()] = vals
                     computed += 1
 
+            # report progress percentage
+            if total > 0:
+                pct = int(count * 100 / total)
+                if pct != last_pct:
+                    self.setProgress(pct)
+                    last_pct = pct
+
             if count % 5000 == 0:
                 LogUtils.log(
                     f"PolygonFieldsTask: PROGRESS - {count} features scanned, {computed} computed",
@@ -106,5 +119,6 @@ class PolygonFieldsTask(BaseTask):
             "updates": updates,
             "missing_fields": [fname for fname in set(self.field_map.values()) if fname not in [f.name() for f in self.layer.fields()]]
         }
+        self.setProgress(100)
         return True
 

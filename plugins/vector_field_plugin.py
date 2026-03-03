@@ -228,44 +228,54 @@ class VectorFieldPlugin(BasePluginMTL):
         """Executa o cálculo de forma síncrona (bloqueador)."""
         try:
             geom_type = layer.geometryType()
+            self.logger.debug(f"Iniciando cálculo síncrono para geometria tipo {geom_type}")
 
             if geom_type == QgsWkbTypes.PointGeometry:
                 # XY sempre em 8 casas, ignorar preferência
                 const_prec = 8
+                self.logger.debug(f"Criando campos de coordenadas com precisão {const_prec}")
                 VectorLayerAttributes.create_point_coordinate_fields(
                     layer, field_map, precision=const_prec
                 )
+                self.logger.debug("Atualizando coordenadas X/Y")
                 VectorLayerAttributes.update_point_xy_coordinates(
                     layer, field_map, precision=const_prec
                 )
-                msg = "Campos X/Y calculados"
+                msg = "Campos X/Y calculados com sucesso"
 
             elif geom_type == QgsWkbTypes.LineGeometry:
+                self.logger.debug("Criando campos de comprimento")
                 VectorLayerAttributes.create_point_coordinate_fields(layer, field_map, precision=precision)
                 if "Elipsoidal" in field_map:
+                    self.logger.debug("Calculando comprimento elispoidal")
                     VectorLayerMetrics.calculate_line_length(
                         layer, field_map["Elipsoidal"], use_ellipsoidal=True, precision=precision
                     )
                 if "Cartesiana" in field_map:
+                    self.logger.debug("Calculando comprimento cartesiano")
                     VectorLayerMetrics.calculate_line_length(
                         layer, field_map["Cartesiana"], use_ellipsoidal=False, precision=precision
                     )
-                msg = "Comprimento calculado"
+                msg = "Comprimento de linhas calculado com sucesso"
 
             elif geom_type == QgsWkbTypes.PolygonGeometry:
+                self.logger.debug("Criando campos de área")
                 VectorLayerAttributes.create_point_coordinate_fields(layer, field_map, precision=precision)
                 if "Elipsoidal" in field_map:
+                    self.logger.debug("Calculando área elispoidal")
                     VectorLayerMetrics.calculate_polygon_area(
                         layer, field_map["Elipsoidal"], use_ellipsoidal=True, precision=precision
                     )
                 if "Cartesiana" in field_map:
+                    self.logger.debug("Calculando área cartesiana")
                     VectorLayerMetrics.calculate_polygon_area(
                         layer, field_map["Cartesiana"], use_ellipsoidal=False, precision=precision
                     )
-                msg = "Área calculada"
+                msg = "Área de polígonos calculada com sucesso"
 
             if not mode_altered:
                 QgisMessageUtil.bar_success(self.iface, msg)
+                self.logger.info(msg)
             self.logger.info("Cálculo síncrono concluído")
 
         except Exception as e:
@@ -292,9 +302,12 @@ class VectorFieldPlugin(BasePluginMTL):
             context.set("tool_key", self.TOOL_KEY)
             context.set("mode_altered", mode_altered)
 
+            self.logger.info(
+                f"Iniciando pipeline assíncrona: step={step_class.__name__}, "
+                f"layer={layer.name()}, features={layer.featureCount()}"
+            )
             self.logger.debug(
-                f"Contexto preparado: step={step_class.__name__}, "
-                f"field_map={field_map}, precision={precision}"
+                f"Parâmetros: field_map={field_map}, precision={precision}"
             )
 
             # Pipeline com 1 step: calcula campos NO arquivo original
@@ -309,10 +322,11 @@ class VectorFieldPlugin(BasePluginMTL):
             )
 
             engine.start()
-            self.logger.info(f"Pipeline assíncrona iniciada com 1 step")
+            self.logger.info("Pipeline assíncrona iniciada com 1 step")
 
         except Exception as e:
             self.logger.error(f"Erro ao iniciar pipeline: {str(e)}")
+            QgisMessageUtil.bar_critical(self.iface, f"Erro ao iniciar cálculo: {str(e)}")
             raise
 
     def _on_async_finished(self, context):
@@ -322,39 +336,46 @@ class VectorFieldPlugin(BasePluginMTL):
         layer = context.get("layer")
         mode_altered = context.get("mode_altered", False)
         
-        if not mode_altered and layer:
+        if layer:
             geom_type = layer.geometryType()
             if geom_type == QgsWkbTypes.PointGeometry:
-                msg = "Campos X/Y calculados"
+                msg = "Campos X/Y calculados com sucesso"
             elif geom_type == QgsWkbTypes.LineGeometry:
-                msg = "Comprimento calculado"
+                msg = "Comprimento de linhas calculado com sucesso"
             else:
-                msg = "Área calculada"
-            QgisMessageUtil.bar_success(self.iface, msg)
+                msg = "Área de polígonos calculada com sucesso"
+            
+            if not mode_altered:
+                QgisMessageUtil.bar_success(self.iface, msg)
+                self.logger.info(msg)
+        
         # terminar estatísticas
         try:
             self.finish_stats()
-        except Exception:
-            self.logger.debug("Falha ao finalizar estatísticas após cálculo assíncrono")
+            self.logger.debug("Estatísticas finalizadas")
+        except Exception as e:
+            self.logger.debug(f"Falha ao finalizar estatísticas: {e}")
 
     def _on_async_error(self, errors):
         """Callback de erro da pipeline assíncrona."""
         error_msg = "\n".join(str(e) for e in errors) if errors else "Erro desconhecido"
         self.logger.error(f"ERRO na pipeline: {error_msg}")
-        QgisMessageUtil.bar_critical(self.iface, f"Erro: {error_msg}")
+        QgisMessageUtil.bar_critical(self.iface, f"Falha no cálculo:\n{error_msg}")
         try:
             self.finish_stats()
-        except Exception:
-            self.logger.debug("Falha ao finalizar estatísticas após erro")
+            self.logger.debug("Estatísticas finalizadas após erro")
+        except Exception as e:
+            self.logger.debug(f"Falha ao finalizar estatísticas: {e}")
 
     def _on_async_cancelled(self, context):
         """Callback de cancelamento da pipeline assíncrona."""
         self.logger.warning("Pipeline assíncrona CANCELADA pelo usuário")
-        QgisMessageUtil.bar_warning(self.iface, "Operação cancelada!")
+        QgisMessageUtil.bar_warning(self.iface, "Operação cancelada pelo usuário.")
         try:
             self.finish_stats()
-        except Exception:
-            self.logger.debug("Falha ao finalizar estatísticas após cancelamento")
+            self.logger.debug("Estatísticas finalizadas após cancelamento")
+        except Exception as e:
+            self.logger.debug(f"Falha ao finalizar estatísticas: {e}")
 
 
 def run_vector_field(iface):

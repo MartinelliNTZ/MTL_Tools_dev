@@ -194,11 +194,11 @@ class BasePluginMTL(QDialog):
             msg = ""
             if self.preferences["eta"] > 0 and self.preferences["current_size"] > 0 and self.preferences["avg_speed"] > 0 :                
                 msg = (
-                    f"  Velocidade média: {FormatUtils.speed(self.preferences['avg_speed'])} \n"
-                    f"  Tamanho do arquivo: {TAM} \n"
-                    f"  Feições: {feats} \n"
+                   # f"  Velocidade média: {FormatUtils.speed(self.preferences['avg_speed'])} \n"
+                    #f"  Tamanho do arquivo: {TAM} \n"
+                    #f"  Feições: {feats} \n"
                     f"  Hora inicial: {FormatUtils.clock(self.preferences['t0'],)} \n"
-                    f"  Hora final: {FormatUtils.clock(self.preferences.get('eta',0))}\n"
+                    f"  HORA FINAL: {FormatUtils.clock(self.preferences.get('eta',0))}\n"
                 )
 
                 if modal_info == "YES":
