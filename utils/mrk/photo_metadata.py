@@ -4,15 +4,10 @@ import re
 from datetime import datetime
 from PIL import Image, ExifTags
 from PyQt5.QtCore import QVariant
-from ..log_utils import LogUtilsOld
+from ...core.config.LogUtilsNew import LogUtilsNew
 from ..tool_keys import ToolKey
 
-LOG_PATH = r"D:\mtl_photo_metadata_debug.txt"
 TOOL_KEY = ToolKey.DRONE_COORDINATES
-def _dbg(msg):
-    ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    with open(LOG_PATH, "a", encoding="utf-8") as f:
-        f.write(f"[{ts}] {msg}\n")
 
 
 class PhotoMetadata:
@@ -57,17 +52,15 @@ class PhotoMetadata:
 
     @staticmethod
     def enrich(points, base_folder, recursive=True):
-        _dbg("========================================")
-        _dbg("ENRICH START")
-        _dbg(f"BASE_FOLDER = {base_folder}")
-        _dbg(f"RECURSIVE   = {recursive}")
-        _dbg(f"PONTOS      = {len(points)}")
+        logger = LogUtilsNew(tool=TOOL_KEY, class_name="PhotoMetadata")
+        logger.debug(f"ENRICH START | base_folder={base_folder} | recursive={recursive} | points={len(points)}")
 
         # 🔴 INDEXAÇÃO ÚNICA (CRÍTICO)
         photo_index = PhotoMetadata._index_photos(base_folder, recursive)
 
-        _dbg(f"FOTOS INDEXADAS = {len(photo_index)}")
+        logger.debug(f"FOTOS INDEXADAS = {len(photo_index)}")
 
+        missing = 0
         for p in points:
             foto = p.get("foto")
             if foto is None:
@@ -77,13 +70,13 @@ class PhotoMetadata:
             meta = photo_index.get(key)
 
             if not meta:
-                _dbg(f"FOTO {key} NAO ENCONTRADA")
+                missing += 1
+                logger.debug(f"FOTO {key} NAO ENCONTRADA")
                 continue
 
             p.update(meta)
 
-        _dbg("ENRICH END")
-        _dbg("========================================")
+        logger.debug(f"ENRICH END | total={len(points)} | missing={missing} | matched={len(points)-missing}")
         return points
 
     # --------------------------------------------------
@@ -91,6 +84,7 @@ class PhotoMetadata:
     @staticmethod
     def _index_photos(base_folder, recursive):
         index = {}
+        logger = LogUtilsNew(tool=ToolKey.DRONE_COORDINATES, class_name="PhotoMetadata")
 
         walker = os.walk(base_folder) if recursive else [
             (base_folder, [], os.listdir(base_folder))
@@ -102,8 +96,7 @@ class PhotoMetadata:
             for fname in files:
                 if fname.lower().endswith(".jpg") and PhotoMetadata.DJI_RE.search(fname):
                     all_files.append((root, fname))
-        LogUtilsOld.log(ToolKey.DRONE_COORDINATES,
-            f"Indexando fotos: {len(all_files)} arquivos encontrados")
+        logger.info(f"Indexando fotos: {len(all_files)} arquivos encontrados")
         total = len(all_files)
         if total == 0:
             return index
@@ -178,8 +171,7 @@ class PhotoMetadata:
             # LOG A CADA 5%
             percent_done = i / total
             if percent_done >= next_log:
-                LogUtilsOld.log(ToolKey.DRONE_COORDINATES,
-                    f"{int(percent_done*100)}%  {i} arquivos / {total}")
+                logger.info(f"Indexando fotos: {int(percent_done*100)}% ({i}/{total} arquivos)")
                 next_log += 0.05  # próximo 5%
 
         return index

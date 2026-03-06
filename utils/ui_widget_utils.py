@@ -79,10 +79,9 @@ class _LayerComboEventFilter(QObject):
 # ==========================================================
 class OldUiWidgetUtils:
     """
-    Utilitários estáticos para widgets Qt usados em plugins QGIS.
-
-    Esta classe reúne padrões de UI amplamente reutilizáveis,
-    evitando duplicação de código entre ferramentas.
+DECREPATED: Esta classe contém métodos utilitários para criação de widgets UI em plugins QGIS.
+NAO USAR MAIS
+USE WIDGETFACTORY
     """
     @staticmethod
     def create_attribute_selector(
@@ -399,11 +398,13 @@ class OldUiWidgetUtils:
         h_spacing=10,
         v_spacing=5,
         title=None,
-        separator=True
+        separator_top=False,
+        separator_bottom=True,
+        separator=None,
     ):
         """
         Cria um grid de checkboxes com colunas fixas e alinhamento consistente.
-        Opcionalmente exibe um título e um separador visual.
+        Opcionalmente exibe um título e separadores visuais (topo/rodapé).
 
         Returns
         -------
@@ -411,18 +412,22 @@ class OldUiWidgetUtils:
             (main_layout, checkbox_map)
         """
 
+        # compatibilidade: separator (bool) controla topo+rodapé quando fornecido
+        if separator is not None:
+            separator_top = separator
+            separator_bottom = separator
+
         if not names:
             raise ValueError("A lista de nomes de checkbox não pode estar vazia")
 
         main_layout = QVBoxLayout()
-        if separator:          
+        if separator_top:
             main_layout.addWidget(OldUiWidgetUtils.create_separator())
         # 🔹 Título opcional
         if title:
             lbl = QLabel(title)
             lbl.setStyleSheet("font-weight: bold;")
             main_layout.addWidget(lbl)
-
 
         grid = QGridLayout()
         grid.setHorizontalSpacing(h_spacing)
@@ -444,11 +449,9 @@ class OldUiWidgetUtils:
         for col in range(items_per_row):
             grid.setColumnStretch(col, 1)
         main_layout.addLayout(grid)
-        
-        if separator:          
-            main_layout.addWidget(OldUiWidgetUtils.create_separator())
 
-        
+        if separator_bottom:
+            main_layout.addWidget(OldUiWidgetUtils.create_separator())
 
         return main_layout, checkbox_map
     

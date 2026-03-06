@@ -172,6 +172,56 @@ class VectorLayerSource:
         return saved_layer
 
     @staticmethod
+    def save_layer_to_path(
+        layer: QgsVectorLayer,
+        output_path: str,
+        tool_key: str = "untraceable",
+        decision: str = "rename",
+    ) -> Optional[str]:
+        """Salva layer em arquivo e retorna o caminho efetivo salvo."""
+        if not layer or not layer.isValid() or not output_path:
+            return None
+
+        path = output_path
+        if os.path.exists(path) and decision == "rename":
+            path = VectorLayerSource.generate_incremental_path(path)
+
+        saved = VectorLayerSource.save_vector_layer(
+            layer,
+            save_to_folder=True,
+            output_path=path,
+            decision="overwrite",
+            external_tool_key=tool_key,
+        )
+
+        if saved:
+            return path
+        return None
+
+    @staticmethod
+    def save_and_load_layer(
+        layer: QgsVectorLayer,
+        output_path: str,
+        tool_key: str = "untraceable",
+        decision: str = "rename",
+    ) -> Optional[QgsVectorLayer]:
+        """Salva layer e retorna a camada carregada do arquivo salvo."""
+        if not layer or not layer.isValid() or not output_path:
+            return None
+
+        path = output_path
+        if os.path.exists(path) and decision == "rename":
+            path = VectorLayerSource.generate_incremental_path(path)
+
+        return VectorLayerSource.save_vector_layer(
+            layer,
+            save_to_folder=True,
+            output_path=path,
+            decision="overwrite",
+            external_tool_key=tool_key,
+        )
+
+    @staticmethod
     def get_layer_file_size( layer: QgsVectorLayer) -> int:
         """Retorna tamanho em bytes do datasource se for arquivo"""
         try:

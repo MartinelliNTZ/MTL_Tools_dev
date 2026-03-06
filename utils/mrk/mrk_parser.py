@@ -2,12 +2,6 @@
 import os
 import re
 
-from qgis.core import (
-    QgsVectorLayer, QgsFeature, QgsGeometry,
-    QgsPointXY, QgsField, QgsFields
-)
-from PyQt5.QtCore import QVariant
-
 
 class MrkParser:
 
@@ -20,7 +14,23 @@ class MrkParser:
     )
 
     @staticmethod
+    def _extract_file_metadata(file_name: str) -> dict:
+        """Extrai numdovoo e nomedovoo do nome do arquivo MRK."""
+        match = re.search(
+            r"DJI_\d+_(?P<numdovoo>\d+?)_(?P<nomedovoo>[^_]+?)_Timestamp",
+            file_name,
+            re.IGNORECASE,
+        )
+        if not match:
+            return {"numdovoo": None, "nomedovoo": None}
+        return {
+            "numdovoo": match.group("numdovoo"),
+            "nomedovoo": match.group("nomedovoo"),
+        }
+
+    @staticmethod
     def parse_folder(folder, recursive=True, extra_fields=None):
+        """Lê todos os MRKs de uma pasta e retorna lista de pontos."""
         points = []
 
         for root, _, files in os.walk(folder):
@@ -28,14 +38,24 @@ class MrkParser:
                 if not f.lower().endswith(".mrk"):
                     continue
 
-                with open(os.path.join(root, f), "r",
-                          encoding="utf-8", errors="ignore") as fh:
+                # Relativo à pasta base para extrair pastas de nível 1/2
+                rel_dir = os.path.relpath(root, folder)
+                if rel_dir == ".":
+                    rel_dir = ""
+                parts = [p for p in rel_dir.split(os.sep) if p] if rel_dir else []
+                pasta1 = parts[0] if len(parts) > 0 else None
+                pasta2 = parts[1] if len(parts) > 1 else None
+
+                # Extrai metadados do nome do arquivo MRK (numdovoo e nomedovoo)
+                file_meta = MrkParser._extract_file_metadata(f)
+
+                with open(os.path.join(root, f), "r", encoding="utf-8", errors="ignore") as fh:
                     for line in fh:
                         m = MrkParser.LINE_RE.search(line)
                         if not m:
                             continue
+
                         data_mrk = None
-                       
                         # extrai data do nome do MRK: DJI_YYYYMMDDHHMM_...
                         m_date = re.search(r"DJI_(\d{8})", f)
                         if m_date:
@@ -47,9 +67,14 @@ class MrkParser:
                             "lon": float(m.group("lon")),
                             "alt": float(m.group("alt")),
                             "data_name": data_mrk,
-                            "folder": root
+                            "folder": root,
+                            "mrk_file": f,
+                            "mrk_path": os.path.join(root, f),
+                            "numdovoo": file_meta.get("numdovoo"),
+                            "nomedovoo": file_meta.get("nomedovoo"),
+                            "pasta1": pasta1,
+                            "pasta2": pasta2,
                         })
-
 
             if not recursive:
                 break
@@ -58,53 +83,14 @@ class MrkParser:
 
     @staticmethod
     def to_point_layer(points, name="MRK_Pontos", extra_fields=None):
+        """[Deprecated] Cria uma camada de pontos a partir da lista de pontos.
 
-        fields = QgsFields()
-        fields.append(QgsField("foto", QVariant.Int))
-        fields.append(QgsField("alt", QVariant.Double))
-        fields.append(QgsField("data_name", QVariant.String))
+        Use VectorLayerGeometry.create_point_layer_from_dicts() para comportamentos mais flexíveis.
+        """
+        from ..vector.VectorLayerGeometry import VectorLayerGeometry
 
-        if extra_fields:
-            for field_name, qtype in extra_fields.items():
-                fields.append(QgsField(field_name, qtype))
-                
-            
-
-
-
-
-        vl = QgsVectorLayer(
-            "Point?crs=EPSG:4326", name, "memory"
+        return VectorLayerGeometry.create_point_layer_from_dicts(
+            points=points,
+            name=name,
+            extra_fields=extra_fields,
         )
-        vl.dataProvider().addAttributes(fields)
-        vl.updateFields()
-
-
-        vl.startEditing()
-
-        for p in points:
-            f = QgsFeature(vl.fields())
-            f.setGeometry(QgsGeometry.fromPointXY(
-                QgsPointXY(p["lon"], p["lat"])
-            ))
-            attrs = [
-                p.get("foto"),
-                p.get("alt"),
-                p.get("data_name")
-            ]
-
-            if extra_fields:
-                for name in extra_fields.keys():
-                    attrs.append(p.get(name))
-
-                        
-            #attrs.append(p.get("data_name"))
-
-
-            f.setAttributes(attrs)
-            vl.addFeature(f)
-
-        vl.commitChanges()
-        vl.updateExtents()
-        return vl
-

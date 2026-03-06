@@ -15,6 +15,8 @@ from ...resources.styles.Styles import Styles
 from ...resources.widgets.AppBarWidget import AppBarWidget
 from ...resources.widgets.AttributeSelectorWidget import AttributeSelectorWidget
 from ...resources.widgets.RadioButtonGridWidget import RadioButtonGridWidget
+from ...resources.widgets.CollapsibleParametersWidget import CollapsibleParametersWidget
+from ...resources.widgets.PathSelectorWidget import PathSelectorWidget
 
 
 
@@ -24,9 +26,6 @@ class WidgetFactory:
         self.combo = combo
         self.iface = iface
 
-
-class WidgetFactory:
-    
     
     @staticmethod
     def create_attribute_selector(
@@ -136,6 +135,8 @@ class WidgetFactory:
             label_text="QML:"
     ):
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(2)
 
         if separator_top:
             layout.addWidget(WidgetFactory.create_separator())
@@ -181,6 +182,8 @@ class WidgetFactory:
             label_text: str = "Salvar em:",
     ):
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(2)
 
         if separator_top:
             layout.addWidget(WidgetFactory.create_separator())
@@ -218,6 +221,8 @@ class WidgetFactory:
             set_layer(layer)
             """
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(2)
         if separator_top:
             layout.addWidget(WidgetFactory.create_separator())
 
@@ -278,6 +283,8 @@ class WidgetFactory:
         """
 
         layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(4)
         if separator_top:
             layout.addWidget(WidgetFactory.create_separator())
 
@@ -306,24 +313,33 @@ class WidgetFactory:
             h_spacing=10,
             v_spacing=5,
             title=None,
-            separator=True
+            separator_top=False,
+            separator_bottom=True,
+            separator=None,
     ):
-        """
-        Cria um grid de checkboxes com colunas fixas e alinhamento consistente.
-        Opcionalmente exibe um título e um separador visual.
+        """Cria um grid de checkboxes com colunas fixas e alinhamento consistente.
 
-        Returns
-        -------
-        tuple:
-            (main_layout, checkbox_map)
+        Opcionalmente exibe um título e separadores visuais (topo/rodapé).
+
+        Retorna:
+            (layout, checkbox_map)
         """
+
+        # compatibilidade: separator (bool) controla topo+rodapé quando fornecido
+        if separator is not None:
+            separator_top = separator
+            separator_bottom = separator
 
         if not names:
             raise ValueError("A lista de nomes de checkbox não pode estar vazia")
 
         main_layout = QVBoxLayout()
-        if separator:
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(2)
+
+        if separator_top:
             main_layout.addWidget(WidgetFactory.create_separator())
+
         # 🔹 Título opcional
         if title:
             lbl = QLabel(title)
@@ -331,6 +347,7 @@ class WidgetFactory:
             main_layout.addWidget(lbl)
 
         grid = QGridLayout()
+        grid.setContentsMargins(0, 0, 0, 0)
         grid.setHorizontalSpacing(h_spacing)
         grid.setVerticalSpacing(v_spacing)
 
@@ -351,7 +368,7 @@ class WidgetFactory:
             grid.setColumnStretch(col, 1)
         main_layout.addLayout(grid)
 
-        if separator:
+        if separator_bottom:
             main_layout.addWidget(WidgetFactory.create_separator())
 
         return main_layout, checkbox_map
@@ -403,6 +420,8 @@ class WidgetFactory:
             (layout_principal, widget_radios)
         """
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(2)
         
         if separator_top:
             layout.addWidget(WidgetFactory.create_separator())
@@ -431,4 +450,127 @@ class WidgetFactory:
         qframe.setFixedHeight(height)
         qframe.setStyleSheet(Styles.separator())
         return qframe
+
+    @staticmethod
+    def create_collapsible_parameters(
+            *,
+            parent=None,
+            title: str = "Parâmetros Avançados",
+            expanded_by_default: bool = False,
+            separator_top: bool = False,
+            separator_bottom: bool = True,
+    ) -> tuple:
+        """
+        Cria um widget para parâmetros avançados com suporte a expansão/recolhimento.
+        
+        Arquitetura:
+        - Widget genérico e reutilizável (pode ser usado em múltiplos plugins)
+        - Suporta adicionar widgets e layouts dinamicamente
+        - Animação suave na expansão/recolhimento
+        - Ícone dinâmico (→ recolhido | ↓ expandido)
+        
+        Parameters
+        ----------
+        parent : QWidget, optional
+            Widget pai
+        
+        title : str
+            Texto do título exibido no header
+        
+        expanded_by_default : bool
+            Se True, inicia expandido; caso contrário, recolhido
+        
+        separator_top : bool
+            Adicionar separador no topo
+        
+        separator_bottom : bool
+            Adicionar separador no rodapé
+        
+        Returns
+        -------
+        tuple:
+            (layout_principal, widget_collapsible)
+        
+        Exemplo de uso:
+        --------
+        # Criar o widget
+        adv_layout, adv_widget = WidgetFactory.create_collapsible_parameters(
+            parent=self,
+            title="Configurações Avançadas",
+            expanded_by_default=False
+        )
+        
+        # Adicionar conteúdo
+        qml_layout, qml_widget = WidgetFactory.create_qml_selector(parent=self)
+        adv_widget.add_content_layout(qml_layout)
+        
+        # Adicionar ao layout da janela
+        main_layout.addLayout(adv_layout)
+        """
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(2)
+        
+        if separator_top:
+            layout.addWidget(WidgetFactory.create_separator())
+        
+        # Criar widget colapsável
+        widget = CollapsibleParametersWidget(
+            title=title,
+            parent=parent
+        )
+        
+        # Aplicar estilos
+        widget.setStyleSheet(Styles.collapsible_parameters())
+        
+        # Definir estado inicial
+        if expanded_by_default:
+            widget.set_expanded(True)
+        
+        layout.addWidget(widget)
+        
+        if separator_bottom:
+            layout.addWidget(WidgetFactory.create_separator())
+        
+        return layout, widget
+
+    @staticmethod
+    def create_path_selector(
+            *,
+            parent=None,
+            title: str = "Selecionar Caminho",
+            file_filter: str = "Todos (*.*)",
+            mode: str = "radio",
+            separator_top: bool = False,
+            separator_bottom: bool = True,
+    ) -> tuple:
+        """Cria um widget de seleção de caminho.
+
+        O widget pode operar nos seguintes modos:
+        - "radio" (padrão): exibe rádios Pasta / Arquivos
+        - "folder": somente pasta (sem rádios)
+        - "files": somente arquivos (sem rádios)
+        """
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(2)
+
+        if separator_top:
+            layout.addWidget(WidgetFactory.create_separator())
+
+        widget = PathSelectorWidget(
+            title=title,
+            file_filter=file_filter,
+            mode=mode,
+            parent=parent,
+        )
+
+        widget.setStyleSheet(Styles.file_selector())
+
+        layout.addWidget(widget)
+
+        if separator_bottom:
+            layout.addWidget(WidgetFactory.create_separator())
+
+        return layout, widget
 

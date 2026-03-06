@@ -1,5 +1,9 @@
 
 BUGS CONHECIDOS
+    - DroneCordinatesPlugin: MrkParser.parse_folder() não processa TODOS os MRKs da pasta - apenas 1 arquivo [1.6.2 TODO]
+      - Encontra 98 MRKs mas retorna apenas 16160 pontos (1 arquivo) em vez de múltiplos de 16160
+      - Afeta: seleção de pasta completa com múltiplos .mrk
+      - Workaround: selecionar múltiplos arquivos manualmente via browse (contorna o problema)
     - VectorFieldPlugin: Altimetria (Z) trava em camadas com mais de 5000 feições - considerar remover funcionalidade
     - Geral: Impedir múltiplas instâncias de plugins rodando simultaneamente
     - Geral: Impedir que plugins travem QGIS em exceções não capturadas
@@ -32,6 +36,50 @@ porem preciso ter a buffer em task e entao ir passando plugin/plugin
 antes de criar qualquer ferramtne preciso analisar melhor criar primeiramente a ui e depois vir gerando metodos SEMPRE
 
 changelog=
+    1.6.2 aq
+    - Refatorado: VectorLayerGeometry agora contém helpers de criação de layer (pontos + trilha) usados pelo DroneCordinates.
+    - Refatorado: VectorLayerSource agora expõe save_layer_to_path() e save_and_load_layer() para salvar camadas em disco com comportamento "rename/overwrite" consistente.
+    - Melhorado logging de PhotoMetadata: migrado para LogUtilsNew e adicionado log de quantas fotos foram indexadas / não encontradas (ajuda a diagnosticar por que só algumas imagens aparecem).
+
+    1.6.1 2026/03/05-06
+    - REFATORAÇÃO COMPLETA: PathSelectorWidget agora é "caixa preta" auto-contida
+      - Widget contém 2 radios internos: 📁 Pasta | 📄 Arquivos (não expostos ao plugin)
+      - Validação automática: user cola path → widget detecta tipo (pasta/arquivo/múltiplos) → atualiza radio interno
+      - `get_paths()` SEMPRE retorna lista: [] | ["pasta"] | ["arquivo"] | ["a", "b", "c"]
+      - Plugin recebe apenas lista, NUNCA toca em internals do widget (encapsulação total)
+    - WidgetFactory.create_path_selector() corrigido
+      - Removido parâmetro `mode=` (incompatível com novo design)
+      - Factory agora cria PathSelectorWidget sem passar modos externos
+      - Documentação atualizada com exemplos de uso
+    - DroneCordinatesPlugin simplificado drasticamente
+      - Removidas: _on_radio_folder_toggled(), _on_radio_files_toggled(), _change_widget_mode() (40+ linhas)
+      - Radio handlers agora INTERNOS ao widget (PathSelectorWidget._on_radio_*_changed)
+      - _load_prefs() reduzido: 35 linhas → 15 linhas (apenas set_path + checkboxes)
+      - _save_prefs() reduzido: 24 linhas → 16 linhas (apenas paths[0])
+      - _run() completamente reescrito para iterar sobre lista de paths (60 linhas, clara intenção)
+    - Logging aprimorado em _run()
+      - Adicionado glob.glob() para debug: mostra quantos .mrk foram encontrados em cada pasta
+      - Code="MRK_FILES_FOUND" com base, mrk_count, recursive, primeiros 5 arquivos
+      - Code="PATH_PROCESSING" com is_dir/is_file validation
+      - Facilita identificação de bugs em MrkParser.parse_folder()
+    - Suporte a múltiplos MRKs
+      - User pode selecionar 1 pasta, múltiplos arquivos, ou 1 arquivo
+      - Widget valida automático: pasta → radio=FOLDER | arquivo → radio=FILE | múltiplos → radio=FILES
+      - _run() processa cada path individualmente: pasta (recursivo ou não) + múltiplos arquivos juntos
+      - Cada path gera sua lista de pontos, tudo agregado em all_points[]
+    - Syntax validated: 0 errors em PathSelectorWidget.py, drone_cordinates.py, WidgetFactory.py
+
+    1.6.0 2026/03/03
+    - bug corrigido: ExplodeHugeLayerTask crash "QgsVectorLayer(): argument 1 has unexpected type 'QgsVectorLayer'" - ExplodeStep agora força disk export e passa file path string
+    - bug corrigido: GPKG "UNIQUE constraint failed: exploded.fid" erro 400+ vezes - explode_lines_to_path_safe() agora deleta stale output file, resets feature ID (setId(-1)), nulls 'fid' attribute herdado
+    - VectorFieldPlugin: REFATORAÇÃO COMPLETA de progress reporting - PointFieldsTask/LineFieldsTask/PolygonFieldsTask agora calculam progresso (1-100%) baseado em feature count total
+    - TaskFeedback: Adicionados helper methods setProgress(), pushInfo(), pushWarning(), pushCritical() para safe progress forwarding com try/except
+    - VectorFieldPlugin: Melhorado logging em _execute_sync_calculation() com step-by-step detalhes
+    - VectorFieldPlugin: Melhorado logging em _start_async_calculation() com contexto (layer name, feature count)
+    - VectorFieldPlugin: _on_async_finished() com mensagens geometry-type-specific, _on_async_error() com detailed error feedback, _on_async_cancelled() com UX melhorada
+    - Documentação: Criado VECTORFIELD_PLUGIN_INSTRUCTIONS.txt com referência completa de VectorField refactoring
+    - Validação: Todas as mudanças isoladas em VectorField (GenerateTrail deixado intocado por revert)
+    - Performance: Progress bar atualizado periodicamente durante field calculations, não mais UI travada
     1.5.12 2026/03/02
     - bug corrigido> v - LogCat Viewer: Loop infinito na sessão + memory leak em lambda + scroll reset corrigido (3 bugs críticos consolidados)
     - bug corrigido> v - VectorFieldPlugin: Cálculo automático trava em arquivos KML - não permitir em KML

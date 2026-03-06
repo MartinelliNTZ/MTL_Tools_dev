@@ -1,28 +1,26 @@
 from pathlib import Path
-from qgis.core import (
-            QgsVectorFileWriter,
-            QgsProject,
-            QgsVectorLayer,
-            QgsCoordinateReferenceSystem,
-            QgsCoordinateTransform,
-            QgsFeature,
-            QgsGeometry, 
-            QgsPointXY,  
-            QgsWkbTypes,
-            QgsFeatureRequest,
-            QgsField
-        )
-from qgis.core import (
-    QgsVectorLayer,
-    QgsVectorFileWriter,
-    QgsProject,
-    QgsCoordinateTransformContext
-)
-from pathlib import Path
-from ...utils.string_utils import StringUtils
-from ...core.config.LogUtilsNew import LogUtilsNew
 import os
 from typing import Optional
+
+from qgis.core import (
+    QgsVectorFileWriter,
+    QgsProject,
+    QgsVectorLayer,
+    QgsCoordinateReferenceSystem,
+    QgsCoordinateTransform,
+    QgsFeature,
+    QgsGeometry,
+    QgsPointXY,
+    QgsWkbTypes,
+    QgsFeatureRequest,
+    QgsField,
+    QgsFields,
+    QgsCoordinateTransformContext,
+)
+from qgis.PyQt.QtCore import QVariant
+
+from ...utils.string_utils import StringUtils
+from ...core.config.LogUtilsNew import LogUtilsNew
 import processing
 class VectorLayerGeometry:
     """
@@ -68,6 +66,75 @@ class VectorLayerGeometry:
             Instância de logger configurada para a classe
         """
         return LogUtilsNew(tool=tool_key, class_name="VectorLayerGeometry")
+
+    @staticmethod
+    def create_point_layer_from_dicts(
+        points: list,
+        name: str = "MRK_Pontos",
+        extra_fields: Optional[dict] = None,
+    ) -> Optional[QgsVectorLayer]:
+        """Cria uma camada de pontos em memória a partir de uma lista de dicionários."""
+        if not points:
+            return None
+
+        fields = QgsFields()
+        fields.append(QgsField("foto", QVariant.Int))
+        fields.append(QgsField("alt", QVariant.Double))
+        fields.append(QgsField("data_name", QVariant.String))
+        fields.append(QgsField("numdovoo", QVariant.String))
+        fields.append(QgsField("nomedovoo", QVariant.String))
+        fields.append(QgsField("pasta1", QVariant.String))
+        fields.append(QgsField("pasta2", QVariant.String))
+
+        if extra_fields:
+            for field_name, qtype in extra_fields.items():
+                fields.append(QgsField(field_name, qtype))
+
+        vl = QgsVectorLayer("Point?crs=EPSG:4326", name, "memory")
+        vl.dataProvider().addAttributes(fields)
+        vl.updateFields()
+
+        vl.startEditing()
+        for p in points:
+            f = QgsFeature(vl.fields())
+            f.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(p.get("lon"), p.get("lat"))))
+            attrs = [
+                p.get("foto"),
+                p.get("alt"),
+                p.get("data_name"),
+                p.get("numdovoo"),
+                p.get("nomedovoo"),
+                p.get("pasta1"),
+                p.get("pasta2"),
+            ]
+            if extra_fields:
+                for field_name in extra_fields.keys():
+                    attrs.append(p.get(field_name))
+            f.setAttributes(attrs)
+            vl.addFeature(f)
+
+        vl.commitChanges()
+        vl.updateExtents()
+        return vl
+
+    @staticmethod
+    def create_line_layer_from_points(
+        points: list,
+        name: str = "Trilha",
+    ) -> Optional[QgsVectorLayer]:
+        """Cria uma camada de linha em memória a partir de uma lista de pontos."""
+        if not points or len(points) < 2:
+            return None
+
+        line = QgsVectorLayer("LineString?crs=EPSG:4326", name, "memory")
+        geom = QgsGeometry.fromPolylineXY([
+            QgsPointXY(p.get("lon"), p.get("lat")) for p in points
+        ])
+        f = QgsFeature()
+        f.setGeometry(geom)
+        line.dataProvider().addFeature(f)
+        line.updateExtents()
+        return line
 
     def create_buffer_geometry(        
              *,

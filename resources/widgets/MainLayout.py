@@ -49,7 +49,7 @@ class MainLayout(QVBoxLayout):
         # layout interno real
         self._inner_layout = QVBoxLayout(self._frame)
         self._inner_layout.setContentsMargins(5, 5, 5, 5)
-        self._inner_layout.setSpacing(8)
+        self._inner_layout.setSpacing(2)  # Reduzido de 8 para eliminar lacunas
 
         # adiciona o frame ao layout principal
         super().addWidget(self._frame)

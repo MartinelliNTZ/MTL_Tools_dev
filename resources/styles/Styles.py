@@ -482,3 +482,68 @@ class Styles:
             border: 1px solid {Styles.COLOR_BORDER};
         }}
         """
+    # ==========================================================
+    # COLLAPSIBLE PARAMETERS WIDGET
+    # ==========================================================
+
+    @staticmethod
+    def collapsible_parameters():
+        """
+        Estilo para CollapsibleParametersWidget (parâmetros avançados expansíveis).
+        
+        Componentes:
+        - Header: background degradado, borda inferior
+        - Ícone: seta direcionável (→ ↓)
+        - Título: bold, texto primário
+        - Conteúdo: fundo ligeiramente mais claro
+        """
+        return f"""
+        /* ================== HEADER (SEMPRE VISÍVEL) ================== */
+        #collapsible_header {{
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                stop:0 rgba(106, 74, 47, 100),
+                stop:1 rgba(166, 120, 79, 100));
+            border-bottom: 1px solid {Styles.COLOR_BORDER};
+            border-radius: 6px 6px 0px 0px;
+        }}
+
+        #collapsible_header:hover {{
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                stop:0 rgba(106, 74, 47, 140),
+                stop:1 rgba(166, 120, 79, 140));
+        }}
+
+        /* ================== ÍCONE DE EXPANSÃO ================== */
+        #collapsible_icon {{
+            color: {Styles.COLOR_TEXT_PRIMARY};
+            font-weight: bold;
+            font-size: 12pt;
+            qproperty-alignment: AlignCenter;
+        }}
+
+        /* ================== TÍTULO ================== */
+        #collapsible_title {{
+            color: {Styles.COLOR_TEXT_PRIMARY};
+            font-weight: bold;
+            font-size: {Styles.FONT_SIZE_NORMAL};
+            font-family: {Styles.FONT_FAMILY_DEFAULT};
+            background: transparent;
+        }}
+
+        /* ================== BOTÃO HEADER (INVISÍVEL) ================== */
+        #collapsible_header_btn {{
+            background: transparent;
+            border: none;
+            padding: 0px;
+            margin: 0px;
+        }}
+
+        /* ================== CONTEÚDO (ANIMADO) ================== */
+        #collapsible_content {{
+            background: {Styles.COLOR_BACKGROUND_SOFT};
+            border-bottom: 1px solid {Styles.COLOR_BORDER};
+            border-left: 1px solid {Styles.COLOR_BORDER};
+            border-right: 1px solid {Styles.COLOR_BORDER};
+            border-radius: 0px 0px 6px 6px;
+        }}
+        """

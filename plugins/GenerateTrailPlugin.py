@@ -39,7 +39,11 @@ class GenerateTrailPlugin(BasePluginMTL):
 
     def _build_ui(self, **kwargs):
         self.logger.debug("Inicializando PLUGIN Gerar Rastro Implemento")
-        super()._build_ui(title = "Gerar Rastro de Máquinas",icon_path="gerar_rastro.ico",instructions_file="generate_trail_help.md")  
+        super()._build_ui(title = "Gerar Rastro de Máquinas",
+                          icon_path="gerar_rastro.ico",
+                          instructions_file="generate_trail_help.md",
+                            min_width = 250,
+                            min_height = 450,)  
         self.logger.info("Construindo interface da ferramenta")
 
 
@@ -54,7 +58,7 @@ class GenerateTrailPlugin(BasePluginMTL):
 
         # implement_lenght
         tam_layout, self.spin_tam = WidgetFactory.create_double_spin_input(
-            "Tamanho implemento: (sempre em metros)",separator_bottom=False,
+            "Tamanho implemento: (sempre em metros)",separator_bottom=True,
         )
         self.logger.debug("Componente de tamanho de implemento adicionado")
 
@@ -63,14 +67,28 @@ class GenerateTrailPlugin(BasePluginMTL):
 
         # salvar em arquivo ou temporário (campo único: arquivo completo)
         save_layout, self.save_selector = WidgetFactory.create_save_file_selector(
-            parent=self,            file_filter=StringUtils.FILTER_VECTOR,            separator_top=True
+            parent=self,            file_filter=StringUtils.FILTER_VECTOR,            separator_top=False
         )
         self.logger.debug("Componente de salvamento de arquivo adicionado")
 
+        # ======= WIDGET COLAPSÁVEL PARA PARÂMETROS AVANÇADOS =======
+        adv_layout, self.adv_params = WidgetFactory.create_collapsible_parameters(
+            parent=self,
+            title="Parâmetros Avançados",
+            expanded_by_default=False,
+            separator_top=False,
+            separator_bottom=True
+        )
+        self.logger.debug("Widget de parâmetros avançados criado")
 
-        # aplicar estilo QML
-        qml_layout, self.qml_selector = WidgetFactory.create_qml_selector(            parent=self        )       
-        self.logger.debug("Componente de estilo QML adicionado")
+        # Adicionar QML selector dentro do widget colapsável
+        qml_layout, self.qml_selector = WidgetFactory.create_qml_selector(
+            parent=self,
+            separator_top=False,
+            separator_bottom=False
+        )
+        self.adv_params.add_content_layout(qml_layout)
+        self.logger.debug("Componente de estilo QML adicionado dentro de parâmetros avançados")
 
         # buttons
         buttons_layout, self.action_buttons = WidgetFactory.create_bottom_action_buttons(
@@ -78,7 +96,7 @@ class GenerateTrailPlugin(BasePluginMTL):
             info_callback=self.show_info_dialog,            tool_key=self.TOOL_KEY,        ) 
         
         #-----------------------------------------------------------------------       
-        self.layout.add_items([layer_layout,tam_layout, save_layout, qml_layout,  buttons_layout])
+        self.layout.add_items([layer_layout, tam_layout, save_layout, adv_layout, buttons_layout])
         self.setLayout(self.layout)
         self.logger.info("Interface da ferramenta construída com sucesso")
 
