@@ -85,11 +85,13 @@ class PathSelectorWidget(QWidget):
         """Constrói UI completa (radio ou modo fixo, dependendo da configuração)."""
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
-        main_layout.setSpacing(4)
+        main_layout.setSpacing(2)
 
         # ========== RADIOS (OPCIONAL) ==========
         if self._mode_config == self.MODE_RADIO:
             radio_layout = QHBoxLayout()
+            radio_layout.setContentsMargins(0, 0, 0, 0)
+            radio_layout.setSpacing(6)
             radio_layout.addWidget(QLabel("Selecionar:"))
 
             self._radio_folder = QRadioButton("📁 Pasta")
@@ -111,16 +113,20 @@ class PathSelectorWidget(QWidget):
 
         # ========== INPUT + BOTÃO ==========
         input_layout = QHBoxLayout()
+        input_layout.setContentsMargins(0, 0, 0, 0)
+        input_layout.setSpacing(4)
         input_layout.addWidget(QLabel(self._title))
 
         self._input = QLineEdit()
         self._input.setPlaceholderText("Nenhum caminho selecionado")
+        self._input.setMaximumHeight(24)
         # Validar quando user digita/cola
         self._input.textChanged.connect(self._on_input_changed)
         input_layout.addWidget(self._input)
 
         btn = QPushButton("...")
-        btn.setFixedWidth(40)
+        btn.setFixedWidth(36)
+        btn.setFixedHeight(24)
         btn.clicked.connect(self._browse)
         input_layout.addWidget(btn)
         main_layout.addLayout(input_layout)

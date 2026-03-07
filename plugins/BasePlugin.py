@@ -80,6 +80,7 @@ class BasePluginMTL(QDialog):
             self._build_ui(min_width=min_width, min_height=min_height)
             self.logger.debug("Carregando preferências do usuário. xxd")
             self._load_prefs()
+            self._load_window_geometry()
             self.logger.info("Diálogo Gerar Rastro Implemento inicializado com sucesso. xxd")
         else:
             self.logger.debug("Construção de UI desabilitada")
@@ -166,6 +167,12 @@ class BasePluginMTL(QDialog):
             if self.layout.handle_mouse_release(event):
                 return
         super().mouseReleaseEvent(event)
+    
+    def closeEvent(self, event):
+        """Salva preferências e geometria antes de fechar."""
+        self._save_window_geometry()
+        self._save_prefs()
+        super().closeEvent(event)
 
     def start_stats(self, input_obj=None,modal_info = "YES"):
         try:
@@ -247,14 +254,35 @@ class BasePluginMTL(QDialog):
             self.logger.error(f"Erro: {e} Preferences: {self.preferences}")
 
 
-    #@abstractmethod
-    def execute_tool(self):
-        """
-        Método principal a ser implementado por cada plugin específico.
-        Ele é chamado quando o usuário aciona a funcionalidade do plugin (ex: clica em um botão).
-        Deve conter a lógica de execução do plugin.
-        """
+    def _load_prefs(self):
+        """Carrega preferências da ferramenta (a ser implementado por subclasses)."""
         pass
+
+    def _save_prefs(self):
+        """Salva preferências da ferramenta (a ser implementado por subclasses)."""
+        pass
+
+    def _load_window_geometry(self):
+        """Carrega tamanho e posição da janela salva nas preferências."""
+        prefs = load_tool_prefs(self.TOOL_KEY)
+        
+        # Restaurar tamanho
+        width = prefs.get("window_width")
+        height = prefs.get("window_height")
+        if width and height:
+            self.resize(width, height)
+            self.logger.debug(f"Geometria restaurada: {width}x{height}", code="GEOM_RESTORED")
+    
+    def _save_window_geometry(self):
+        """Salva tamanho e posição da janela nas preferências."""
+        prefs = load_tool_prefs(self.TOOL_KEY)
+        
+        # Salvar tamanho
+        prefs["window_width"] = self.width()
+        prefs["window_height"] = self.height()
+        
+        save_tool_prefs(self.TOOL_KEY, prefs)
+        self.logger.debug(f"Geometria salva: {self.width()}x{self.height()}", code="GEOM_SAVED")
 
     def _on_pipeline_finished(self, context):    
         """Callback para quando a pipeline é finalizada com sucesso."""

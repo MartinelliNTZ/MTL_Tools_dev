@@ -48,7 +48,7 @@ class DroneCordinates(BasePluginMTL):
             load_settings_prefs=False,
             build_ui=True,
             min_width=250,
-            min_height=450,
+            min_height=250,
         )
 
     def _build_ui(self, **kwargs):
@@ -57,7 +57,7 @@ class DroneCordinates(BasePluginMTL):
             icon_path="coord.ico",
             instructions_file="drone_coordinates_help.md",
             min_width=250   ,
-            min_height=450,
+            min_height=250,
         )
 
         # ====== PASTA MRK ======
@@ -67,8 +67,15 @@ class DroneCordinates(BasePluginMTL):
             mode="folder",
         )
 
-        # ====== OPÇÕES ======
-        opts_layout, self.checkbox_map = WidgetFactory.create_checkbox_grid(
+        # ====== OPÇÕES (CollapsibleParametersWidget) ======
+        opts_layout, self.opts_collapsible = WidgetFactory.create_collapsible_parameters(
+            parent=self,
+            title="Opções",
+            expanded_by_default=True,
+        )
+        
+        # Criar checkboxes
+        opts_checkbox_layout, self.checkbox_map = WidgetFactory.create_checkbox_grid(
             names=[
                 self.LABEL_RECURSIVE,
                 self.LABEL_MERGE,
@@ -76,16 +83,24 @@ class DroneCordinates(BasePluginMTL):
             ],
             items_per_row=1,
             checked_by_default=False,
-            title="Opções",
         )
+        self.opts_collapsible.add_content_layout(opts_checkbox_layout)
+        self.opts_collapsible.refresh()
 
-        # ====== SALVAMENTO ======
+        # ====== SALVAMENTO (CollapsibleParametersWidget) ======
+        save_layout, self.save_collapsible = WidgetFactory.create_collapsible_parameters(
+            parent=self,
+            title="Salvamento",
+            expanded_by_default=False,
+        )
+        
         save_points_layout, self.save_points_selector = WidgetFactory.create_save_file_selector(
             parent=self,
             file_filter=StringUtils.FILTER_VECTOR,
             checkbox_text="Salvar pontos MRK em arquivo? (caso não marcado: camada temporária)",
             label_text="Salvar em:",
-
+            separator_top=False,
+            separator_bottom=False,
         )
 
         save_track_layout, self.save_track_selector = WidgetFactory.create_save_file_selector(
@@ -93,28 +108,40 @@ class DroneCordinates(BasePluginMTL):
             file_filter=StringUtils.FILTER_VECTOR,
             checkbox_text="Salvar rastro em arquivo? (caso não marcado: camada temporária)",
             label_text="Salvar em:",
+            separator_top=False,
+            separator_bottom=False,
         )
+        
+        self.save_collapsible.add_content_layout(save_points_layout)
+        self.save_collapsible.add_content_layout(save_track_layout)
+        self.save_collapsible.refresh()
 
-        # ====== ESTILO (QML) - Parâmetros Avançados ======
+        # ====== ESTILOS (QML) - CollapsibleParametersWidget ======
+        styles_layout, self.styles_collapsible = WidgetFactory.create_collapsible_parameters(
+            parent=self,
+            title="Estilos",
+            expanded_by_default=False,
+        )
+        
         qml_points_layout, self.qml_points_selector = WidgetFactory.create_qml_selector(
             parent=self,
             checkbox_text="Aplicar estilo (QML) nos pontos?",
             label_text="QML pontos:",
+            separator_top=False,
+            separator_bottom=False,
         )
 
         qml_track_layout, self.qml_track_selector = WidgetFactory.create_qml_selector(
             parent=self,
             checkbox_text="Aplicar estilo (QML) no rastro?",
             label_text="QML:",
+            separator_top=False,
+            separator_bottom=False,
         )
-
-        adv_layout, self.adv_params = WidgetFactory.create_collapsible_parameters(
-            parent=self,
-            title="Parâmetros Avançados",
-            expanded_by_default=False,
-        )
-        self.adv_params.add_content_layout(qml_points_layout)
-        self.adv_params.add_content_layout(qml_track_layout)
+        
+        self.styles_collapsible.add_content_layout(qml_points_layout)
+        self.styles_collapsible.add_content_layout(qml_track_layout)
+        self.styles_collapsible.refresh()
 
         # ====== BOTOES ======
         buttons_layout, self.action_buttons = WidgetFactory.create_bottom_action_buttons(
@@ -129,9 +156,8 @@ class DroneCordinates(BasePluginMTL):
             [
                 folder_layout,
                 opts_layout,
-                save_points_layout,
-                save_track_layout,
-                adv_layout,
+                save_layout,
+                styles_layout,
                 buttons_layout,
             ]
         )
@@ -164,6 +190,11 @@ class DroneCordinates(BasePluginMTL):
         self.qml_track_selector.set_enabled(prefs.get("apply_style_track", False))
         self.qml_track_selector.set_file_path(prefs.get("qml_path_track", ""))
 
+        # Estados dos CollapsibleParametersWidget
+        self.opts_collapsible.set_expanded(prefs.get("opts_expanded", True))
+        self.save_collapsible.set_expanded(prefs.get("save_expanded", False))
+        self.styles_collapsible.set_expanded(prefs.get("styles_expanded", False))
+
         self.logger.debug("Preferências carregadas", code="PREFS_LOAD_COMPLETE")
 
     def _save_prefs(self):
@@ -187,6 +218,10 @@ class DroneCordinates(BasePluginMTL):
                 "qml_path_track": self.qml_track_selector.get_file_path(),
                 "apply_style_points": self.qml_points_selector.is_enabled(),
                 "qml_path_points": self.qml_points_selector.get_file_path(),
+                # Estados dos CollapsibleParametersWidget
+                "opts_expanded": self.opts_collapsible.is_expanded(),
+                "save_expanded": self.save_collapsible.is_expanded(),
+                "styles_expanded": self.styles_collapsible.is_expanded(),
             },
         )
 

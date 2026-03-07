@@ -36,6 +36,55 @@ porem preciso ter a buffer em task e entao ir passando plugin/plugin
 antes de criar qualquer ferramtne preciso analisar melhor criar primeiramente a ui e depois vir gerando metodos SEMPRE
 
 changelog=
+  1.6.5 2026/03/06 - BUG FIX
+    - [TODO] CollapsibleParametersWidget: sizeHint() não recalcula ao expandir (fix QTimer.singleShot ou refresh pattern)
+    - [TODO] BasePlugin.closeEvent(): verificar se está sendo chamado quando janela é fechada
+    - [TODO] Preferências: validar se window_width/window_height salvam corretamente em load_tool_prefs/save_tool_prefs
+
+  1.6.4 2026/03/06
+    - LIMPEZA DE SISTEMA: Substituição completa de LogUtilsOld → LogUtilsNew em todos arquivos funcionais
+      - Migração: project_utils.py, layouts_utils.py, base_tool.py, todos os Step/Task files
+      - Padrão unificado: logger = LogUtilsNew(tool=tool_key, class_name=ClassName) → logger.info/debug/error/exception()
+      - Validação: zero referências a LogUtilsOld em código funcional (preservado utils/log_utils.py como referência)
+    - REMOÇÃO de base_tool do menu principal
+      - Removido: action_base_tool, run_base_tool() method de mtl_tools_plugin.py
+      - Removido: BASE_TOOL constant de tool_keys.py e mapeamentos de cores em tool_key_color_provider.py
+      - Preservado: BaseTool class em plugins/base_tool.py (TOOL_KEY = "base_tool" string literal)
+      - Validação: grep confirma zero referências funcionais, apenas definição de classe
+    - CONSOLIDAÇÃO DE PROJEÇÃO E CRS
+      - Removidas classes OLD: OLD_crs_utils.py, OLD_projection_helper.py
+      - Métodos consolidados em VectorLayerProjection:
+        ✓ reproject_features(features, source_crs, target_crs, context) - reprojeção de features entre CRS
+        ✓ get_coordinate_info(point, canvas_crs) - informações de coordenada em múltiplos formatos (lat, lon, dms, utm, zona, hemisferio, epsg)
+        ✓ Helpers: _decimal_to_dms(), _utm_zone_from_lon(), _utm_letter_from_lat()
+      - Arquivos atualizados:
+        ✓ coord_click_tool.py - usa VectorLayerProjection.get_coordinate_info()
+        ✓ raster_mass_sampler.py - usa VectorLayerProjection.reproject_features()
+        ✓ elevation_analisys.py - usa VectorLayerProjection.reproject_features()
+      - Imports consolidados: todas as operações de CRS/Projeção agora em um único lugar
+    - REFATORAÇÃO DroneCoordinates UI
+      - PathSelectorWidget: altura reduzida 24px, margins 0,0,0,0, spacing 2
+      - 3 CollapsibleParametersWidget groups com estado persistido:
+        ✓ "Opções" (expandido por padrão): 3 checkboxes (recursive, merge, photos)
+        ✓ "Salvamento" (colapsado): 2 path selectors (save_points, save_track)
+        ✓ "Estilos" (colapsado): 2 QML selectors (style_track, apply_style)
+      - Preferências: opts_expanded, save_expanded, styles_expanded persistidas em load_tool_prefs/save_tool_prefs
+    - CORREÇÃO CollapsibleParametersWidget refresh() bug
+      - Problema: sizeHint() calculado antes de layout eventos finalizarem → conteúdo invisível ao expandir de prefs
+      - Solução: QTimer.singleShot(0, _do_refresh) adia cálculo para próximo ciclo de eventos
+      - Implementação: refresh() chamado após adicionar conteúdo em cada collapsible
+      - Resultado: collapsibles expandem com conteúdo visível (sem glitch)
+    - PERSISTÊNCIA DE GEOMETRIA DA JANELA
+      - BasePlugin._load_window_geometry(): restora width/height de preferências via self.resize()
+      - BasePlugin._save_window_geometry(): persiste width/height em preferências via save_tool_prefs()
+      - BasePlugin.closeEvent(): override salva geometria + prefs automaticamente ao fechar
+      - Integração init(): _load_prefs() → _load_window_geometry() → showEvent()
+      - Padrão: Todos plugins que herdam BasePluginMTL ganham persistência automática
+      - Keys: window_width, window_height salvos em load_tool_prefs(TOOL_KEY)
+    - REFATORAÇÃO DE CLASSES para CamelCase
+      - Classes renomeadas seguindo padrão Python: nomes descritivos em PascalCase
+      - Movimentação de classes para melhor organização arquitetônica
+      - Preservada retrocompatibilidade em imports críticos
   1.6.3 2026/03/06
     - LIMPEZA DE SISTEMA: Substituição completa de LogUtilsOld → LogUtilsNew em todos os arquivos funcionais
       - Migração: project_utils.py, layouts_utils.py, base_tool.py, todos os Step/Task files
@@ -46,21 +95,6 @@ changelog=
       - Removido: BASE_TOOL constant de tool_keys.py e mapeamentos de cores
       - Preservado: BaseTool class em plugins/base_tool.py para uso futuro
       - Classe agora usa TOOL_KEY = "base_tool" (string literal)
-    - CONSOLIDAÇÃO DE PROJEÇÃO E CRS
-      - Removidas classes OLD: OLD_crs_utils.py, OLD_projection_helper.py
-      - Métodos consolidados em VectorLayerProjection:
-        ✓ reproject_features() - reprojeção de features entre CRS (movido de ProjectionHelper)
-        ✓ get_coordinate_info() - informações de coordenada em múltiplos formatos (movido de crs_utils)
-        ✓ Helpers: _decimal_to_dms(), _utm_zone_from_lon(), _utm_letter_from_lat()
-      - Arquivos atualizados:
-        ✓ coord_click_tool.py - usa VectorLayerProjection.get_coordinate_info()
-        ✓ raster_mass_sampler.py - usa VectorLayerProjection.reproject_features()
-        ✓ elevation_analisys.py - usa VectorLayerProjection.reproject_features()
-      - Imports consolidados: todas as operações de CRS/Projeção agora em um único lugar
-    - REFATORAÇÃO DE CLASSES para CamelCase
-      - Classes renomeadas seguindo padrão Python: nomes descritivos em PascalCase
-      - Movimentação de classes para melhor organização arquitetônica
-      - Preservada retrocompatibilidade em imports críticos
     - REORGANIZAÇÃO DE ARQUIVOS
       - Algumas classes movidas entre módulos para melhor encapsulação
       - Estrutura de diretórios mantida, apenas refatoração interna de dependências
