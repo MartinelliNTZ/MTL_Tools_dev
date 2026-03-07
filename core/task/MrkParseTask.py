@@ -46,7 +46,12 @@ class MrkParseTask(BaseTask):
                 extra_fields=self.extra_fields,
             )
 
+            # 🔴 CRÍTICO: Rastrear pasta específica de cada ponto
+            # MrkParser.parse_folder() já retorna p['folder'] (pasta específica onde MRK foi encontrado)
+            # Usamos p['folder'] como mrk_folder para evitar conflito de numeração em múltiplos voos
             if points:
+                for p in points:
+                    p['mrk_folder'] = p.get('folder', base)  # Usa pasta específica (já vem do MrkParser)
                 all_points.extend(points)
 
         self.result = {

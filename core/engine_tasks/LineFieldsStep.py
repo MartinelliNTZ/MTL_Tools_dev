@@ -2,7 +2,7 @@
 from .BaseStep import BaseStep
 from .ExecutionContext import ExecutionContext
 from ..task.LineFieldsTask import LineFieldsTask
-from ..config.LogUtils import LogUtils
+from ..config.LogUtilsNew import LogUtilsNew
 from qgis.core import QgsField
 from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtWidgets import QApplication
@@ -38,29 +38,19 @@ class LineFieldsStep(BaseStep):
         Apply attribute mappings computed by the task on the MAIN THREAD.
         Result expected shape: { 'updates': {fid: {field_name: value}}, 'missing_fields': [field_name,...] }
         """
-        LogUtils.log(
-            f"LineFieldsStep.on_success: applying results",
-            level="INFO",
-            tool=context.get("tool_key"),
-            class_name=self.__class__.__name__
-        )
+        logger = LogUtilsNew(tool=context.get("tool_key"), class_name=self.__class__.__name__)
+        logger.info("LineFieldsStep.on_success: applying results")
 
         if not result or not isinstance(result, dict):
-            LogUtils.log(
-                f"LineFieldsStep.on_success: resultado inválido: {result}",
-                level="ERROR",
-                tool=context.get("tool_key"),
-                class_name=self.__class__.__name__
+            logger.error(
+                f"LineFieldsStep.on_success: resultado inválido: {result}"
             )
             return
 
         layer = context.get("layer")
         if layer is None:
-            LogUtils.log(
-                "LineFieldsStep.on_success: layer ausente no contexto",
-                level="ERROR",
-                tool=context.get("tool_key"),
-                class_name=self.__class__.__name__
+            logger.error(
+                "LineFieldsStep.on_success: layer ausente no contexto"
             )
             return
 
@@ -72,11 +62,8 @@ class LineFieldsStep(BaseStep):
                 layer.startEditing()
                 started_editing = True
             for fname in missing:
-                LogUtils.log(
-                    f"LineFieldsStep: adicionando campo (edição) {fname}",
-                    level="DEBUG",
-                    tool=context.get("tool_key"),
-                    class_name=self.__class__.__name__
+                logger.debug(
+                    f"LineFieldsStep: adicionando campo (edição) {fname}"
                 )
                 layer.addAttribute(QgsField(fname, QVariant.Double, len=20, prec=context.get("precision", 4)))
             layer.updateFields()
@@ -89,22 +76,16 @@ class LineFieldsStep(BaseStep):
             for fname, val in vals.items():
                 idx = name_to_idx.get(fname)
                 if idx is None:
-                    LogUtils.log(
-                        f"LineFieldsStep: campo não encontrado {fname}, pulando",
-                        level="WARNING",
-                        tool=context.get("tool_key"),
-                        class_name=self.__class__.__name__
+                    logger.warning(
+                        f"LineFieldsStep: campo não encontrado {fname}, pulando"
                     )
                     continue
                 provider_updates.setdefault(fid, {})[idx] = val
 
         # 3) Apply in batches on main thread
         if not provider_updates:
-            LogUtils.log(
-                "LineFieldsStep: nada a aplicar",
-                level="INFO",
-                tool=context.get("tool_key"),
-                class_name=self.__class__.__name__
+            logger.info(
+                "LineFieldsStep: nada a aplicar"
             )
             return
 
@@ -117,11 +98,8 @@ class LineFieldsStep(BaseStep):
         try:
             for i in range(0, total, chunk):
                 if context.is_cancelled():
-                    LogUtils.log(
-                        "LineFieldsStep: cancelado durante aplicação",
-                        level="INFO",
-                        tool=context.get("tool_key"),
-                        class_name=self.__class__.__name__
+                    logger.info(
+                        "LineFieldsStep: cancelado durante aplicação"
                     )
                     break
 
@@ -131,26 +109,17 @@ class LineFieldsStep(BaseStep):
                         try:
                             layer.changeAttributeValue(fid, idx, val)
                         except Exception as e:
-                            LogUtils.log(
-                                f"LineFieldsStep: falha ao aplicar fid={fid} idx={idx} err={e}",
-                                level="ERROR",
-                                tool=context.get("tool_key"),
-                                class_name=self.__class__.__name__
+                            logger.error(
+                                f"LineFieldsStep: falha ao aplicar fid={fid} idx={idx} err={e}"
                             )
-                LogUtils.log(
-                    f"LineFieldsStep: applied edit-buffer batch {i}-{i+len(batch_items)} items={len(batch_items)}",
-                    level="DEBUG",
-                    tool=context.get("tool_key"),
-                    class_name=self.__class__.__name__
+                logger.debug(
+                    f"LineFieldsStep: applied edit-buffer batch {i}-{i+len(batch_items)} items={len(batch_items)}"
                 )
                 QApplication.processEvents()
         finally:
             # Sempre desbloquear signals mesmo se houver erro ou cancelamento
             layer.blockSignals(False)
 
-        LogUtils.log(
-            f"LineFieldsStep.on_success: aplicação concluída {len(provider_updates)} features",
-            level="INFO",
-            tool=context.get("tool_key"),
-            class_name=self.__class__.__name__
+        logger.info(
+            f"LineFieldsStep.on_success: aplicação concluída {len(provider_updates)} features"
         )

@@ -9,6 +9,8 @@ import math
 # Letras UTM (C–X, sem I e O)
 UTM_LETTERS = "CDEFGHJKLMNPQRSTUVWX"
 
+"DEPRECATED USE VECTORLAYERPROJECTION"
+
 
 def decimal_to_dms(value):
     sign = "-" if value < 0 else ""

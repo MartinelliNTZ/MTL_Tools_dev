@@ -20,7 +20,7 @@ from ..core.config.LogUtilsNew import LogUtilsNew
 from ..utils.string_utils import StringUtils
 
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
-from ..utils.tool_keys import ToolKey
+from ..utils.ToolKeys import ToolKey
 from ..core.ui.WidgetFactory import WidgetFactory
 from pathlib import Path
 
@@ -235,7 +235,7 @@ class DroneCordinates(BasePluginMTL):
     def _on_pipeline_finished(self, context):
         layer = context.get("layer")
         if not layer or not layer.isValid():
-            from ..utils.qgis_messagem_util import QgisMessageUtil
+            from ..utils.QgisMessageUtil import QgisMessageUtil
 
             QgisMessageUtil.modal_error(
                 self.iface,
@@ -301,7 +301,7 @@ class DroneCordinates(BasePluginMTL):
                     if ok:
                         out_layer.triggerRepaint()
 
-        from ..utils.qgis_messagem_util import QgisMessageUtil
+        from ..utils.QgisMessageUtil import QgisMessageUtil
         QgisMessageUtil.bar_success(self.iface, "Processamento executado com sucesso.")
 
         # Persistir preferências

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 
-from ..core.config.LogUtils import LogUtils
 from qgis.core import QgsProject
 from qgis.PyQt.QtWidgets import (
     QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
@@ -12,12 +11,12 @@ from qgis.PyQt.QtCore import Qt, QUrl
 from qgis.PyQt.QtGui import QDesktopServices
 
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
-from ..utils.info_dialog import InfoDialog
-from ..utils.qgis_messagem_util import QgisMessageUtil
-from ..utils.ui_widget_utils import OldUiWidgetUtils
+
+from ..utils.QgisMessageUtil import QgisMessageUtil
+
 from ..utils.layouts_utils import LayoutsUtils
 from ..utils.project_utils import ProjectUtils
-from ..utils.tool_keys import ToolKey
+from ..utils.ToolKeys import ToolKey
 from .BasePlugin import BasePluginMTL
 
 
@@ -50,9 +49,7 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
     # -------------------------------------------------
     def _build_ui(self):
         super()._build_ui(title = "Gerar Rastro de Máquinas",icon_path="gerar_rastro.ico",instructions_file="generate_trail_help.md")  
-        LogUtils.log("Construindo interface da ferramenta", level="INFO", tool=self.TOOL_KEY, class_name="GenerateTrailPlugin")
-    
-    
+
     def _build_ui2(self):
         main = QVBoxLayout()
 

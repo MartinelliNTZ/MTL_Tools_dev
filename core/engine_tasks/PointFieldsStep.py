@@ -2,7 +2,7 @@
 from .BaseStep import BaseStep
 from .ExecutionContext import ExecutionContext
 from ..task.PointFieldsTask import PointFieldsTask
-from ..config.LogUtils import LogUtils
+from ..config.LogUtilsNew import LogUtilsNew
 from qgis.core import QgsField
 from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtWidgets import QApplication
@@ -41,29 +41,19 @@ class PointFieldsStep(BaseStep):
         Apply attribute mappings computed by the task on the MAIN THREAD.
         Result expected shape: { 'updates': {fid: {field_name: value}}, 'missing_fields': [field_name,...] }
         """
-        LogUtils.log(
-            f"PointFieldsStep.on_success: applying results",
-            level="INFO",
-            tool=context.get("tool_key"),
-            class_name=self.__class__.__name__
-        )
+        logger = LogUtilsNew(tool=context.get("tool_key"), class_name=self.__class__.__name__)
+        logger.info("PointFieldsStep.on_success: applying results")
 
         if not result or not isinstance(result, dict):
-            LogUtils.log(
-                f"PointFieldsStep.on_success: resultado inválido: {result}",
-                level="ERROR",
-                tool=context.get("tool_key"),
-                class_name=self.__class__.__name__
+            logger.error(
+                f"PointFieldsStep.on_success: resultado inválido: {result}"
             )
             return
 
         layer = context.get("layer")
         if layer is None:
-            LogUtils.log(
-                "PointFieldsStep.on_success: layer ausente no contexto",
-                level="ERROR",
-                tool=context.get("tool_key"),
-                class_name=self.__class__.__name__
+            logger.error(
+                "PointFieldsStep.on_success: layer ausente no contexto"
             )
             return
 
@@ -77,11 +67,8 @@ class PointFieldsStep(BaseStep):
                 layer.startEditing()
                 started_editing = True
             for fname in missing:
-                LogUtils.log(
-                    f"PointFieldsStep: adicionando campo (edição) {fname}",
-                    level="DEBUG",
-                    tool=context.get("tool_key"),
-                    class_name=self.__class__.__name__
+                logger.debug(
+                    f"PointFieldsStep: adicionando campo (edição) {fname}"
                 )
                 layer.addAttribute(QgsField(fname, QVariant.Double, len=20, prec=const_prec))
             layer.updateFields()
@@ -94,22 +81,16 @@ class PointFieldsStep(BaseStep):
             for fname, val in vals.items():
                 idx = name_to_idx.get(fname)
                 if idx is None:
-                    LogUtils.log(
-                        f"PointFieldsStep: campo não encontrado {fname}, pulando",
-                        level="WARNING",
-                        tool=context.get("tool_key"),
-                        class_name=self.__class__.__name__
+                    logger.warning(
+                        f"PointFieldsStep: campo não encontrado {fname}, pulando"
                     )
                     continue
                 provider_updates.setdefault(fid, {})[idx] = val
 
         # 3) Apply in batches on main thread
         if not provider_updates:
-            LogUtils.log(
-                "PointFieldsStep: nada a aplicar",
-                level="INFO",
-                tool=context.get("tool_key"),
-                class_name=self.__class__.__name__
+            logger.info(
+                "PointFieldsStep: nada a aplicar"
             )
             return
 
@@ -122,11 +103,8 @@ class PointFieldsStep(BaseStep):
         try:
             for i in range(0, total, chunk):
                 if context.is_cancelled():
-                    LogUtils.log(
-                        "PointFieldsStep: cancelado durante aplicação",
-                        level="INFO",
-                        tool=context.get("tool_key"),
-                        class_name=self.__class__.__name__
+                    logger.info(
+                        "PointFieldsStep: cancelado durante aplicação"
                     )
                     break
 
@@ -137,26 +115,17 @@ class PointFieldsStep(BaseStep):
                         try:
                             layer.changeAttributeValue(fid, idx, val)
                         except Exception as e:
-                            LogUtils.log(
-                                f"PointFieldsStep: falha ao aplicar fid={fid} idx={idx} err={e}",
-                                level="ERROR",
-                                tool=context.get("tool_key"),
-                                class_name=self.__class__.__name__
+                            logger.error(
+                                f"PointFieldsStep: falha ao aplicar fid={fid} idx={idx} err={e}"
                             )
-                LogUtils.log(
-                    f"PointFieldsStep: applied edit-buffer batch {i}-{i+len(batch_items)} items={len(batch_items)}",
-                    level="DEBUG",
-                    tool=context.get("tool_key"),
-                    class_name=self.__class__.__name__
+                logger.debug(
+                    f"PointFieldsStep: applied edit-buffer batch {i}-{i+len(batch_items)} items={len(batch_items)}"
                 )
                 QApplication.processEvents()
         finally:
             # Sempre desbloquear signals mesmo se houver erro ou cancelamento
             layer.blockSignals(False)
 
-        LogUtils.log(
-            f"PointFieldsStep.on_success: aplicação em buffer concluída {len(provider_updates)} features",
-            level="INFO",
-            tool=context.get("tool_key"),
-            class_name=self.__class__.__name__
+        logger.info(
+            f"PointFieldsStep.on_success: aplicação em buffer concluída {len(provider_updates)} features"
         )

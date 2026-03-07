@@ -1,5 +1,5 @@
-# 📘 Coordenadas de Drone (MRK) – Manual de Utilização  
-Ferramenta do pacote **MTL Tools** para geração de **pontos e trajetos de voo de drone** a partir de arquivos **MRK**.
+# 📘 Obter Coordenadas de Drone (MRK) – Manual de Utilização  
+Ferramenta do pacote **MTL Tools** para geração de **pontos e trajetos de voo de drone** a partir de arquivos **MRK** (DJI).
 
 ---
 
@@ -27,29 +27,38 @@ Define a pasta onde estão os arquivos `.mrk`.
 ---
 
 ### ✔ Vasculhar subpastas
-Quando marcado, a ferramenta procura arquivos MRK em todas as subpastas da pasta selecionada.
+Quando marcado, a ferramenta procura arquivos `.mrk` em **todas as subpastas recursivamente** da pasta selecionada.
+
+⚠ **Atenção:**  
+- Se desmarcado, apenas MRKs na **pasta raiz** serão processados
+- Esta opção é ignorada se arquivos individuais forem selecionados diretamente
 
 ---
 
 ### ✔ Unir todos os MRK
-Quando ativado, todos os arquivos MRK encontrados são tratados como **um único voo**, gerando:
+Quando ativado, todos os arquivos MRK encontrados são **agregados em um único voo**, gerando:
 
-- Um único conjunto de pontos
-- Um único trajeto
+- **Um único conjunto de pontos** (com todos os waypoints combinados)
+- **Um único trajeto** (com a rota completa do voo unificada)
+
+Se desmarcado, cada MRK é processado **independentemente**, criando múltiplas camadas de pontos e trajetos.
 
 ---
 
 ### ✔ Cruzar com metadados das fotos
-Permite enriquecer os pontos MRK com informações extraídas das fotos JPG, como:
+Permite enriquecer os pontos MRK com informações extraídas das **fotos JPG** do voo, como:
 
-- Nome do arquivo
-- Tamanho
-- Datas
-- Dimensões da imagem
-- ISO, abertura, distância focal, etc.
+- **Nome do arquivo** da foto
+- **Tamanho** do arquivo (bytes)
+- **Data de modificação** do arquivo
+- **Dimensões** da imagem (largura × altura)
+- **Metadados EXIF**: ISO, abertura (f-stop), distância focal, marca da câmera, etc.
+
+Requer que as fotos estejam disponíveis **na mesma pasta** do MRK ou em subpastas.
 
 ⚠ **Atenção:**  
-Não recomendado para **grandes volumes de fotos**, pois o processamento é mais pesado.
+- Não recomendado para **grandes volumes de fotos** (>5000 imagens), pois o processamento é assíncrono e pode levar minutos
+- Se a foto não for encontrada, o ponto MRK será criado **sem os metadados de foto** (processamento continua)
 
 ---
 
@@ -139,18 +148,25 @@ O progresso e mensagens são registrados automaticamente.
 
 ---
 
-## 🔄 Salvamento de preferências
+## 🔄 Persistência de Configurações
 
-Todas as opções escolhidas são salvas automaticamente.  
-Na próxima abertura da ferramenta, os campos serão preenchidos com as últimas configurações usadas.
+Todas as opções escolhidas são salvas automaticamente nas **preferências do QGIS** para a próxima abertura:
+- Última pasta/arquivos selecionados
+- Estado dos checkboxes (vasculhar subpastas, unir MRKs, etc.)
+- Caminhos de saída e estilos QML
+
+⚠ **Nota:**  
+Apenas o **primeiro caminho** (pasta ou arquivo) é lembrado. Se múltiplos arquivos foram selecionados, apenas o primeiro será restaurado.
 
 ---
 
-## ℹ️ Observações importantes
+## ℹ️ Observações Importantes
 
-- Para arquivos **KML**, a reprojeção para **EPSG:4326** é feita automaticamente
-- Camadas temporárias não são salvas no disco
-- Grandes volumes de fotos podem levar mais tempo para processar
+- **Processamento assíncrono:** Especialmente quando cruzando com metadados de fotos, a ferramenta executa em **background thread** para não travar o QGIS
+- **Reprojeção automática:** Arquivos KML são automaticamente reprojetados para **EPSG:4326** (WGS84)
+- **Camadas temporárias:** Se nenhum caminho de saída for fornecido, pontos e trajetos são criados como **camadas de memória** (temporárias)
+- **MRK não encontrados:** Se a pasta contém " .mrk arquivos inválidos ou corrompidos, a ferramenta reportará warnings mas continuará processando os válidos
+- **Fotos não encontradas:** Se ativar "Cruzar com fotos" mas alguma JPG estiver faltando, a ferramenta criará o ponto MRK sem metadados de foto (não falha)
 
 ---
 

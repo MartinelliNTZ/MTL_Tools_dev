@@ -36,10 +36,29 @@ porem preciso ter a buffer em task e entao ir passando plugin/plugin
 antes de criar qualquer ferramtne preciso analisar melhor criar primeiramente a ui e depois vir gerando metodos SEMPRE
 
 changelog=
-    1.6.2 aq
+  1.6.3 2026/03/06
+    - LIMPEZA DE SISTEMA: Substituição completa de LogUtilsOld → LogUtilsNew em todos os arquivos funcionais
+      - Migração: project_utils.py, layouts_utils.py, base_tool.py, todos os Step/Task files
+      - Referências restantes apenas em utils/log_utils.py (classe original) e docs/ANOTACOES.txt (documentação)
+      - Padrão unificado: logger = LogUtilsNew(tool=tool_key, class_name=ClassName) → logger.info/debug/error/exception()
+    - REMOÇÃO de base_tool do menu principal
+      - Removido: action_base_tool, run_base_tool() method de mtl_tools_plugin.py
+      - Removido: BASE_TOOL constant de tool_keys.py e mapeamentos de cores
+      - Preservado: BaseTool class em plugins/base_tool.py para uso futuro
+      - Classe agora usa TOOL_KEY = "base_tool" (string literal)
+    - REFATORAÇÃO DE CLASSES para CamelCase
+      - Classes renomeadas seguindo padrão Python: nomes descritivos em PascalCase
+      - Movimentação de classes para melhor organização arquitetônica
+      - Preservada retrocompatibilidade em imports críticos
+    - REORGANIZAÇÃO DE ARQUIVOS
+      - Algumas classes movidas entre módulos para melhor encapsulação
+      - Estrutura de diretórios mantida, apenas refatoração interna de dependências
+    
+    1.6.2 2026/03/06
     - Refatorado: VectorLayerGeometry agora contém helpers de criação de layer (pontos + trilha) usados pelo DroneCordinates.
     - Refatorado: VectorLayerSource agora expõe save_layer_to_path() e save_and_load_layer() para salvar camadas em disco com comportamento "rename/overwrite" consistente.
     - Melhorado logging de PhotoMetadata: migrado para LogUtilsNew e adicionado log de quantas fotos foram indexadas / não encontradas (ajuda a diagnosticar por que só algumas imagens aparecem).
+    - DronePhotosTask: Migrado de LogUtilsOld para LogUtilsNew - substituído LogUtilsOld.log() por instância self._logger com métodos info()/warning()/exception() semanticamente corretos.
 
     1.6.1 2026/03/05-06
     - REFATORAÇÃO COMPLETA: PathSelectorWidget agora é "caixa preta" auto-contida

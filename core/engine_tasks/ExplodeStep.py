@@ -5,6 +5,7 @@ import tempfile
 from .BaseStep import BaseStep
 from .ExecutionContext import ExecutionContext
 from ..task.ExplodeHugeLayerTask import ExplodeHugeLayerTask
+from ..config.LogUtilsNew import LogUtilsNew
 from ...utils.vector.VectorLayerSource import VectorLayerSource
 
 
@@ -19,6 +20,7 @@ class ExplodeStep(BaseStep):
 
         layer = context.get("layer")
         tool_key = context.get("tool_key")
+        logger = LogUtilsNew(tool=tool_key, class_name=self.__class__.__name__)
 
         tmp_dir = context.get("tmp_dir")
         if not tmp_dir:
@@ -36,12 +38,18 @@ class ExplodeStep(BaseStep):
         )
 
         if not input_path:
+            logger.error(
+                f"Falha ao exportar camada para explode. "
+                f"Layer valid: {layer.isValid()}, "
+                f"Provider: {layer.providerType()}"
+            )
             raise RuntimeError(
                 f"Falha ao exportar camada para explode.\n"
                 f"Layer valid: {layer.isValid()}\n"
                 f"Provider: {layer.providerType()}\n"
                 f"Path: {input_path}"
             )
+        logger.debug(f"ExplodeStep: criando task para {input_path}")
         return ExplodeHugeLayerTask(
             input_path=input_path,
             output_path=exploded_path,
@@ -49,4 +57,6 @@ class ExplodeStep(BaseStep):
         )
 
     def on_success(self, context: ExecutionContext, result):
+        logger = LogUtilsNew(tool=context.get("tool_key"), class_name=self.__class__.__name__)
+        logger.info(f"ExplodeStep.on_success: camada explodida salva em {result}")
         context.set("current_path", result)

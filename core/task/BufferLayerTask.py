@@ -1,6 +1,6 @@
 from .BaseTask import BaseTask
 from .TaskFeedback import TaskFeedback
-from ..config.LogUtils import LogUtils
+from ..config.LogUtilsNew import LogUtilsNew
 from ...utils.vector.VectorLayerGeometry import VectorLayerGeometry
 import time
 
@@ -36,29 +36,20 @@ class BufferLayerTask(BaseTask):
         self.miter_limit = miter_limit
         self.dissolve = dissolve
 
-        LogUtils.log(
-            f"BufferLayerTask initialized: {self.input_path} -> {self.output_path}, distance={self.distance}",
-            level="DEBUG",
-            tool=self.tool_key,
-            class_name=self.__class__.__name__
+        self.logger.debug(
+            f"BufferLayerTask initialized: {self.input_path} -> {self.output_path}, distance={self.distance}"
         )
 
     def _run(self) -> bool:
 
         if self.isCanceled():
-            LogUtils.log(
-                "BufferLayerTask canceled before start",
-                level="INFO",
-                tool=self.tool_key,
-                class_name=self.__class__.__name__
+            self.logger.info(
+                "BufferLayerTask canceled before start"
             )
             return False
 
-        LogUtils.log(
-            f"Starting buffer task: {self.input_path} -> {self.output_path}",
-            level="INFO",
-            tool=self.tool_key,
-            class_name=self.__class__.__name__
+        self.logger.info(
+            f"Starting buffer task: {self.input_path} -> {self.output_path}"
         )
         feedback = TaskFeedback(self)
 
@@ -78,30 +69,21 @@ class BufferLayerTask(BaseTask):
             #            time.sleep(10)
 
         except Exception as e:
-            LogUtils.log(
-                f"Erro no buffer: {str(e)}",
-                level="CRITICAL",
-                tool=self.tool_key,
-                class_name=self.__class__.__name__
+            self.logger.critical(
+                f"Erro no buffer: {str(e)}"
             )
             raise
 
         if self.isCanceled():
-            LogUtils.log(
-                "BufferLayerTask canceled after execution",
-                level="INFO",
-                tool=self.tool_key,
-                class_name=self.__class__.__name__
+            self.logger.info(
+                "BufferLayerTask canceled after execution"
             )
             return False
 
         self.result = self.output_path
 
-        LogUtils.log(
-            "BufferLayerTask completed successfully",
-            level="INFO",
-            tool=self.tool_key,
-            class_name=self.__class__.__name__
+        self.logger.info(
+            "BufferLayerTask completed successfully"
         )
 
         return True

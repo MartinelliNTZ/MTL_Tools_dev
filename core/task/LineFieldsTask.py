@@ -4,7 +4,7 @@ import tempfile
 from qgis.core import QgsVectorLayer, QgsDistanceArea, QgsProject
 from qgis.PyQt.QtCore import QVariant
 from .BaseTask import BaseTask
-from ..config.LogUtils import LogUtils
+from ..config.LogUtilsNew import LogUtilsNew
 
 
 class LineFieldsTask(BaseTask):
@@ -23,22 +23,16 @@ class LineFieldsTask(BaseTask):
         self.field_map = field_map
         self.precision = precision
 
-        LogUtils.log(
-            f"LineFieldsTask.__init__: layer={layer.name()}, modes={list(field_map.keys())}",
-            level="DEBUG",
-            tool=self.tool_key,
-            class_name=self.__class__.__name__
+        self.logger.debug(
+            f"LineFieldsTask.__init__: layer={layer.name()}, modes={list(field_map.keys())}"
         )
 
     def _run(self) -> bool:
         if self.isCanceled():
             return False
 
-        LogUtils.log(
-            f"LineFieldsTask._run: START - computing line lengths (worker)",
-            level="INFO",
-            tool=self.tool_key,
-            class_name=self.__class__.__name__
+        self.logger.info(
+            f"LineFieldsTask._run: START - computing line lengths (worker)"
         )
 
         # nudge progress bar immediately
@@ -57,11 +51,8 @@ class LineFieldsTask(BaseTask):
 
         for feat in self.layer.getFeatures():
             if self.isCanceled():
-                LogUtils.log(
-                    "LineFieldsTask: cancelado durante cálculo",
-                    level="INFO",
-                    tool=self.tool_key,
-                    class_name=self.__class__.__name__
+                self.logger.info(
+                    "LineFieldsTask: cancelado durante cálculo"
                 )
                 return False
 
@@ -87,18 +78,12 @@ class LineFieldsTask(BaseTask):
                     last_pct = pct
 
             if count % 5000 == 0:
-                LogUtils.log(
-                    f"LineFieldsTask: PROGRESS - scanned {count} features, computed {computed}",
-                    level="DEBUG",
-                    tool=self.tool_key,
-                    class_name=self.__class__.__name__
+                self.logger.debug(
+                    f"LineFieldsTask: PROGRESS - scanned {count} features, computed {computed}"
                 )
 
-        LogUtils.log(
-            f"LineFieldsTask._run: FINISHED - computed={computed} / scanned={count}",
-            level="INFO",
-            tool=self.tool_key,
-            class_name=self.__class__.__name__
+        self.logger.info(
+            f"LineFieldsTask._run: FINISHED - computed={computed} / scanned={count}"
         )
 
         self.result = {

@@ -1,6 +1,7 @@
 # core/engine_tasks/SaveVectorStep.py
 
 from .BaseStep import BaseStep
+from ..config.LogUtilsNew import LogUtilsNew
 from ..task.SaveVectorLayerTask import SaveVectorLayerTask
 from qgis.core import QgsVectorLayer
 
@@ -19,11 +20,18 @@ class SaveVectorStep(BaseStep):
         output_path = context.get("output_path")
         output_name = context.get("output_name")
         tool_key = context.get("tool_key")
+        logger = LogUtilsNew(tool=tool_key, class_name=self.__class__.__name__)
 
         layer = QgsVectorLayer(current_path, output_name, "ogr")
 
         if not layer.isValid():
+            logger.error(
+                f"SaveVectorStep: falha ao carregar camada de {current_path}. "
+                f"Provider: {layer.providerType()}"
+            )
             raise RuntimeError("SaveVectorStep: falha ao carregar camada do current_path.")
+
+        logger.debug(f"SaveVectorStep: salvando {output_name} para {output_path}")
 
         return SaveVectorLayerTask(
             layer=layer,
@@ -35,8 +43,11 @@ class SaveVectorStep(BaseStep):
         )
 
     def on_success(self, context, result):
+        logger = LogUtilsNew(tool=context.get("tool_key"), class_name=self.__class__.__name__)
 
         if not result:
+            logger.error("SaveVectorStep: falha ao salvar camada")
             raise RuntimeError("SaveVectorStep: falha ao salvar camada.")
 
+        logger.info(f"SaveVectorStep.on_success: camada salva com sucesso")
         context.set("layer", result)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from qgis.PyQt.QtWidgets import QWidget, QHBoxLayout, QPushButton
-from ...core.config.LogUtils import LogUtils
+
 
 
 class BottomActionButtonsWidget(QWidget):
@@ -27,12 +27,6 @@ class BottomActionButtonsWidget(QWidget):
         self._tool_key = tool_key
         self._info_callback = info_callback
 
-        LogUtils.log(
-            "Inicializando BottomActionButtonsWidget",
-            level="DEBUG",
-            tool=self._tool_key,
-            class_name=self.__class__.__name__,
-        )
 
         self._btn_run = QPushButton(run_text)
         self._btn_close = QPushButton(close_text)
@@ -77,19 +71,9 @@ class BottomActionButtonsWidget(QWidget):
     # API pública
     # --------------------------------------------------
     def set_run_enabled(self, enabled: bool):
-        LogUtils.log(
-            f"set_run_enabled({enabled})",
-            level="DEBUG",
-            tool=self._tool_key,
-            class_name=self.__class__.__name__,
-        )
+
         self._btn_run.setEnabled(enabled)
 
     def set_info_visible(self, visible: bool):
-        LogUtils.log(
-            f"set_info_visible({visible})",
-            level="DEBUG",
-            tool=self._tool_key,
-            class_name=self.__class__.__name__,
-        )
+
         self._btn_info.setVisible(visible)

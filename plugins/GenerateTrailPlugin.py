@@ -4,13 +4,13 @@ from typing import Optional, Tuple
 
 from ..utils.project_utils import ProjectUtils
 from ..plugins.BasePlugin import BasePluginMTL
-from ..utils.qgis_messagem_util import QgisMessageUtil
+from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.string_utils import StringUtils
 from ..utils.vector.VectorLayerGeometry import VectorLayerGeometry
 from ..utils.vector.VectorLayerProjection import VectorLayerProjection
 from ..utils.vector.VectorLayerSource import VectorLayerSource
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
-from ..utils.tool_keys import ToolKey
+from ..utils.ToolKeys import ToolKey
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..core.engine_tasks.AsyncPipelineEngine import AsyncPipelineEngine
 from ..core.engine_tasks.BufferStep import BufferStep

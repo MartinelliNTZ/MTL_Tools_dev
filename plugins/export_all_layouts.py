@@ -14,8 +14,8 @@ from qgis.PyQt.QtGui import QIcon
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
 from ..utils.info_dialog import InfoDialog
 from ..utils import pdf_png_merge_utils as merge_utils
-from ..utils.qgis_messagem_util import QgisMessageUtil
-from ..utils.tool_keys import ToolKey
+from ..utils.QgisMessageUtil import QgisMessageUtil
+from ..utils.ToolKeys import ToolKey
 
 
 

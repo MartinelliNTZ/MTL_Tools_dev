@@ -85,6 +85,9 @@ class VectorLayerGeometry:
         fields.append(QgsField("nomedovoo", QVariant.String))
         fields.append(QgsField("pasta1", QVariant.String))
         fields.append(QgsField("pasta2", QVariant.String))
+        # 🔴 NOVO: Campo para rastrear qual pasta (voo) cada ponto veio
+        # Isso permite PhotoMetadata distinguir fotos de múltiplos voos com mesma numeração
+        fields.append(QgsField("mrk_folder", QVariant.String))
 
         if extra_fields:
             for field_name, qtype in extra_fields.items():
@@ -106,6 +109,7 @@ class VectorLayerGeometry:
                 p.get("nomedovoo"),
                 p.get("pasta1"),
                 p.get("pasta2"),
+                p.get("mrk_folder"),  # 🔴 NOVO: pasta de origem do ponto
             ]
             if extra_fields:
                 for field_name in extra_fields.keys():

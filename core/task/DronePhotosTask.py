@@ -1,10 +1,10 @@
-# drone_task.py
+# DronePhotosTask.py
 # -*- coding: utf-8 -*-
 import os
 from qgis.core import QgsTask
-from ..mrk.photo_metadata import PhotoMetadata
-from ...core.config.LogUtilsNew import LogUtilsNew
-from ..tool_keys import ToolKey
+from utils.mrk.photo_metadata import PhotoMetadata
+from core.config.LogUtilsNew import LogUtilsNew
+from utils.ToolKeys import ToolKey
 
 class DronePhotosTask(QgsTask):
     TOOL_KEY = ToolKey.DRONE_COORDINATES

@@ -4,7 +4,7 @@ from datetime import datetime
 
 from qgis.core import QgsLayoutItemLabel, QgsProject
 
-from .log_utils import LogUtilsOld
+from ..core.config.LogUtilsNew import LogUtilsNew
 
 
 class LayoutsUtils:
@@ -72,12 +72,13 @@ class LayoutsUtils:
         layouts = project.layoutManager().layouts()
         total_layouts = len(layouts)
         total_changes = 0
+        logger = LogUtilsNew(tool=tool_key, class_name="LayoutsUtils")
 
-        LogUtilsOld.log(tool_key, "Iniciando replace em layouts")
-        LogUtilsOld.log(tool_key, f"Layouts encontrados: {total_layouts}")
-        LogUtilsOld.log(tool_key, f"Old text: '{old_text}' | New text: '{new_text}'")
-        LogUtilsOld.log(tool_key, f"Case sensitive: {case_sensitive}")
-        LogUtilsOld.log(tool_key, f"Full replace: {full_replace}")
+        logger.info("Iniciando replace em layouts")
+        logger.info(f"Layouts encontrados: {total_layouts}")
+        logger.info(f"Old text: '{old_text}' | New text: '{new_text}'")
+        logger.info(f"Case sensitive: {case_sensitive}")
+        logger.info(f"Full replace: {full_replace}")
 
         for layout in layouts:
             layout_name = layout.name()
@@ -95,19 +96,17 @@ class LayoutsUtils:
                     total_changes += 1
                     layout_changes += 1
 
-                    LogUtilsOld.log(
-                        tool_key,
+                    logger.debug(
                         f"[{layout_name}] '{original}' -> '{replaced}'"
                     )
 
             if layout_changes:
-                LogUtilsOld.log(
-                    tool_key,
+                logger.debug(
                     f"[{layout_name}] alterações: {layout_changes}"
                 )
 
-        LogUtilsOld.log(tool_key, f"Total de substituições: {total_changes}")
-        LogUtilsOld.log(tool_key, f"Finalizado em {datetime.now().isoformat()}")
+        logger.info(f"Total de substituições: {total_changes}")
+        logger.info(f"Finalizado em {datetime.now().isoformat()}")
 
         return {
             "total_layouts": total_layouts,

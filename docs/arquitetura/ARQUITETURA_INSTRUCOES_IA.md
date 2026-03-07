@@ -301,7 +301,7 @@ MyStep.py (core/engine_tasks/)
 
 ## 📚 REFERÊNCIAS DE CÓDIGO
 
-**Problema Original**: [ANALISE_THREAD_SAFETY.md](ANALISE_THREAD_SAFETY.md)
+**Problema Original**: [ANALISE_THREAD_SAFETY.md](../ANALISE_THREAD_SAFETY.md)
 
 **Implementação Real**:
 - [vector_field_plugin.py](plugins/vector_field_plugin.py) - linhas 82-115 (decisão sync/async)

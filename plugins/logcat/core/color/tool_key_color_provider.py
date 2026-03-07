@@ -26,7 +26,6 @@ class ToolKeyColorProvider:
         "restart_qgis": "#FF6B6B",
         "gerar_rastro_implemento": "#82E0AA",
         "coord_click_tool": "#85C1E9",
-        "base_tool": "#AED6F1",
         "copy_attributes": "#DDA0DD",
         
         # === Processing / análises ===
@@ -68,7 +67,7 @@ class ToolKeyColorProvider:
             Dict com cores ou None se falhar
         """
         try:
-            from .....utils.tool_keys import ToolKey
+            from .....utils.ToolKeys import ToolKey
             return ToolKey.TOOL_KEY_COLORS.copy()
         except Exception:
             return None

@@ -16,8 +16,8 @@ from ..core.config.LogUtilsNew import LogUtilsNew
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..utils.info_dialog import InfoDialog
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
-from ..utils.tool_keys import ToolKey
-from ..utils.qgis_messagem_util import QgisMessageUtil
+from ..utils.ToolKeys import ToolKey
+from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.project_utils import  ProjectUtils
 from ..utils.string_utils import StringUtils
 
@@ -29,7 +29,7 @@ from ..utils.string_utils import StringUtils
 # -------------------------------------------------------------
 class BasePluginMTL(QDialog):
     APP_NAME = StringUtils.APP_NAME
-    TOOL_KEY = ToolKey.BASE_TOOL
+    TOOL_KEY = "base_plugin"  # Identificador padrão
     PLUGIN_NAME = ""
     layout = None
     prefs = None
@@ -42,13 +42,13 @@ class BasePluginMTL(QDialog):
 
 
 
-    def init(self, tool_key="ToolKey.BASE_TOOL", class_name="BasePluginMTL", min_width=460, min_height=320, load_settings_prefs=False, build_ui=True):
+    def init(self, tool_key="base_plugin", class_name="BasePluginMTL", min_width=460, min_height=320, load_settings_prefs=False, build_ui=True):
         """Inicializa o plugin base.
         
         Parameters
         ----------
         tool_key : str
-            Identificador único da ferramenta (padrão: ToolKey.BASE_TOOL)
+            Identificador único da ferramenta (padrão: base_plugin)
         class_name : str
             Nome da classe para logging (padrão: BasePluginMTL)
         min_width : int

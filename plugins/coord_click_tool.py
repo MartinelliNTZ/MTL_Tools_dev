@@ -4,7 +4,7 @@ import sip
 
 from ..utils.reverse_geocoding_task import ReverseGeocodeTask
 from ..utils.altimetry_task import AltimetriaTask
-from ..utils.crs_utils import get_coord_info
+from ..utils.OLD_crs_utils import get_coord_info
 from ..gui.dialogs.coord_result_dialog import CoordResultDialog
 
 

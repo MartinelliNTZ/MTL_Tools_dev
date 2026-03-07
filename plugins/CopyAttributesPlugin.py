@@ -5,9 +5,9 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import QgsVectorLayer, QgsWkbTypes, QgsMapLayerProxyModel
 
-from ..utils.tool_keys import ToolKey
+from ..utils.ToolKeys import ToolKey
 from ..core.config.LogUtilsNew import LogUtilsNew
-from ..utils.qgis_messagem_util import QgisMessageUtil
+from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
 from ..utils.vector.VectorLayerAttributes import VectorLayerAttributes

@@ -8,12 +8,11 @@ from qgis.core import QgsApplication
 from qgis.PyQt.QtWidgets import QAction, QMenu, QToolButton, QWidgetAction
 from pathlib import Path
 
-from .utils.tool_keys import ToolKey
+from .utils.ToolKeys import ToolKey
 
-from .utils.qgis_messagem_util import QgisMessageUtil
+from .utils.QgisMessageUtil import QgisMessageUtil
 from .processing.provider import MTLProvider
 from .core.config.LogCleanupUtils import LogCleanupUtils
-from .core.config.LogUtils import LogUtils
 from .core.config.LogUtilsNew import LogUtilsNew
 
 
@@ -69,7 +68,6 @@ class MTL_Tools:
         _install_global_error_handler()
         
         plugin_root = Path(__file__).resolve().parent
-        LogUtils.init(plugin_root)
         LogUtilsNew.init(plugin_root)
         # mantém só os últimos 15 logs
         LogCleanupUtils.keep_last_n(plugin_root, keep=15)
@@ -193,12 +191,6 @@ class MTL_Tools:
             self.action_settings = QAction(QIcon(settings_icon), "Configurações", self.iface.mainWindow())
             self.action_settings.triggered.connect(self.run_settings)
             
-            # null-base tool
-            base_tool_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "mtl_agro.ico")
-            self.action_base_tool = QAction(QIcon(base_tool_icon), "Base Tool", self.iface.mainWindow())
-            self.action_base_tool.triggered.connect(self.run_base_tool)
-
-
             # 7-Capturar Coordenadas
             coord_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "coord.ico")
             self.action_coord_click = QAction(QIcon(coord_icon), "Capturar Coordenadas", self.iface.mainWindow())
@@ -390,7 +382,7 @@ class MTL_Tools:
     # =====================================================
     def run_restart_qgis(self):
         try:
-            from .plugins.restart_qgis import run_restart_qgis
+            from .plugins.RestartQgis import run_restart_qgis
             self.logger.info("Iniciando plugin: Restart QGIS")
             run_restart_qgis(self.iface)
             self.logger.info("Plugin Restart QGIS executado com sucesso")
@@ -404,10 +396,10 @@ class MTL_Tools:
     # =====================================================
     def run_vector_fields(self):
         try:
-            from .plugins.vector_field_plugin import VectorFieldPlugin
+            from .plugins.VectorFieldsCalculationPlugin import VectorFieldsCalculationPlugin
             self.logger.info("Iniciando plugin: Calcular Campos Vetoriais")
             # manter referência viva
-            self.vector_field_plugin = VectorFieldPlugin(self.iface)
+            self.vector_field_plugin = VectorFieldsCalculationPlugin(self.iface)
             self.vector_field_plugin.run_vector_field()
             self.logger.info("Plugin Calcular Campos Vetoriais executado com sucesso")
         except Exception as e:
@@ -536,7 +528,7 @@ class MTL_Tools:
     # =====================================================
     def run_drone_coords(self):
         try:
-            from .plugins.drone_cordinates import run_drone_cordinates
+            from .plugins.DroneCoordinates import run_drone_cordinates
             self.logger.info("Abrindo diálogo: Obter Coordenadas de Drone")
             self.drone_cordinates_dlg = run_drone_cordinates(self.iface)
             self.logger.info("Diálogo Obter Coordenadas de Drone aberto com sucesso")
@@ -589,19 +581,6 @@ class MTL_Tools:
         except Exception as e:
             self.logger.error(f"Erro ao executar Sobre o MTL Tools: {str(e)}")
             QgisMessageUtil.bar_critical(self.iface, f"Erro ao abrir Sobre MTL Tools:\n{str(e)}")
-        
-    # =====================================================
-    # EXECUTAR: Base Tool
-    # =====================================================
-    def run_base_tool(self):
-        try:
-            from .plugins.base_tool import run_base_tool
-            self.logger.info("Iniciando plugin: Base Tool")
-            run_base_tool(self.iface)
-            self.logger.info("Plugin Base Tool executado com sucesso")
-        except Exception as e:
-            self.logger.error(f"Erro ao executar Base Tool: {str(e)}")
-            QgisMessageUtil.bar_critical(self.iface, f"Erro no plugin Base Tool:\n{str(e)}")
         
     # =====================================================
     # EXECUTAR: Copiar Atributos entre Camadas

@@ -6,8 +6,8 @@ import os
 from ..utils.vector.VectorLayerAttributes import VectorLayerAttributes
 from ..utils.vector.VectorLayerMetrics import VectorLayerMetrics
 from ..utils.vector.VectorLayerProjection import VectorLayerProjection
-from ..utils.qgis_messagem_util import QgisMessageUtil
-from ..utils.tool_keys import ToolKey
+from ..utils.QgisMessageUtil import QgisMessageUtil
+from ..utils.ToolKeys import ToolKey
 from ..utils.project_utils import ProjectUtils
 from ..core.engine_tasks.AsyncPipelineEngine import AsyncPipelineEngine
 from ..core.engine_tasks.ExecutionContext import ExecutionContext
@@ -17,14 +17,14 @@ from ..core.engine_tasks.PolygonFieldsStep import PolygonFieldsStep
 from .BasePlugin import BasePluginMTL
 
 
-class VectorFieldPlugin(BasePluginMTL):
+class VectorFieldsCalculationPlugin(BasePluginMTL):
     
     def __init__(self, iface):
         self.iface = iface
         self.actions = []
         self.init(
             tool_key=ToolKey.VECTOR_FIELDS,
-            class_name="VectorFieldPlugin",
+            class_name="VectorFieldsCalculationPlugin",
             build_ui=False,
             load_settings_prefs=True
         )
@@ -380,6 +380,6 @@ class VectorFieldPlugin(BasePluginMTL):
 
 def run_vector_field(iface):
     """Função de entrada do plugin."""
-    plugin = VectorFieldPlugin(iface)
+    plugin = VectorFieldsCalculationPlugin(iface)
     plugin.initGui()
     return plugin

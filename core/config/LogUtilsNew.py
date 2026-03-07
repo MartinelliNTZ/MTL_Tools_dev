@@ -7,7 +7,7 @@ from pathlib import Path
 from datetime import datetime
 import traceback
 
-from ...utils.tool_keys import ToolKey
+from ...utils.ToolKeys import ToolKey
 from .log_sync import LOG_FILE_LOCK
 
 try:
@@ -23,7 +23,14 @@ class LogUtilsNew:
     WARNING = "WARNING"
     ERROR = "ERROR"
     CRITICAL = "CRITICAL"
-
+    # Cores para níveis de log
+    LEVEL_COLORS = {
+        'DEBUG': '#9CA3AF',      # Cinza (suave)
+        'INFO': '#10B981',       # Verde (informação)
+        'WARNING': '#F59E0B',    # Âmbar (atenção)
+        'ERROR': '#DC2626',      # Vermelho forte (erro)
+        'CRITICAL': '#991B1B'    # Vermelho escuro muito forte (crítico)
+    }
     LEVEL_ORDER = [DEBUG, INFO, WARNING, ERROR, CRITICAL]
 
     _session_id = None

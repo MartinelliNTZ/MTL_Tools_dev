@@ -11,7 +11,7 @@ from qgis.PyQt.QtCore import QUrl, Qt
 
 from ..plugins.BasePlugin import BasePluginMTL
 from ..utils.preferences import load_tool_prefs, save_tool_prefs
-from ..utils.tool_keys import ToolKey
+from ..utils.ToolKeys import ToolKey
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..core.config.LogUtilsNew import LogUtilsNew
 from ..utils.string_utils import StringUtils

@@ -5,7 +5,7 @@ from qgis.core import QgsVectorLayer, QgsField, QgsDistanceArea, QgsProject
 from qgis.PyQt.QtCore import QVariant
 from .BaseTask import BaseTask
 from ...utils.vector.VectorLayerSource import VectorLayerSource
-from ..config.LogUtils import LogUtils
+from ..config.LogUtilsNew import LogUtilsNew
 
 
 class PolygonFieldsTask(BaseTask):
@@ -27,22 +27,16 @@ class PolygonFieldsTask(BaseTask):
         self.field_map = field_map
         self.precision = precision
         
-        LogUtils.log(
-            f"PolygonFieldsTask.__init__: layer={layer.name()}, modes={list(field_map.keys())}",
-            level="DEBUG",
-            tool=self.tool_key,
-            class_name=self.__class__.__name__
+        self.logger.debug(
+            f"PolygonFieldsTask.__init__: layer={layer.name()}, modes={list(field_map.keys())}"
         )
 
     def _run(self) -> bool:
         if self.isCanceled():
             return False
 
-        LogUtils.log(
-            f"PolygonFieldsTask._run: START - calculando áreas no arquivo original",
-            level="INFO",
-            tool=self.tool_key,
-            class_name=self.__class__.__name__
+        self.logger.info(
+            f"PolygonFieldsTask._run: START - calculando áreas no arquivo original"
         )
 
         # nudge progress bar immediately
@@ -60,11 +54,8 @@ class PolygonFieldsTask(BaseTask):
 
         for feat in self.layer.getFeatures():
             if self.isCanceled():
-                LogUtils.log(
-                    "PolygonFieldsTask: cancelado durante cálculo",
-                    level="INFO",
-                    tool=self.tool_key,
-                    class_name=self.__class__.__name__
+                self.logger.info(
+                    "PolygonFieldsTask: cancelado durante cálculo"
                 )
                 return False
 
@@ -100,18 +91,12 @@ class PolygonFieldsTask(BaseTask):
                     last_pct = pct
 
             if count % 5000 == 0:
-                LogUtils.log(
-                    f"PolygonFieldsTask: PROGRESS - {count} features scanned, {computed} computed",
-                    level="DEBUG",
-                    tool=self.tool_key,
-                    class_name=self.__class__.__name__
+                self.logger.debug(
+                    f"PolygonFieldsTask: PROGRESS - {count} features scanned, {computed} computed"
                 )
 
-        LogUtils.log(
-            f"PolygonFieldsTask._run: CONCLUÍDO - computed={computed} / scanned={count}",
-            level="INFO",
-            tool=self.tool_key,
-            class_name=self.__class__.__name__
+        self.logger.info(
+            f"PolygonFieldsTask._run: CONCLUÍDO - computed={computed} / scanned={count}"
         )
 
         # Return structured result for on_success to apply on main thread

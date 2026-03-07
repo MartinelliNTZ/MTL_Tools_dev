@@ -6,8 +6,8 @@ from qgis.PyQt.QtWidgets import QAction
 from qgis.core import QgsVectorLayer, QgsWkbTypes, QgsFeedback
 
 from ..utils.vector.VectorLayerGeometry import VectorLayerGeometry
-from ..utils.qgis_messagem_util import QgisMessageUtil
-from ..utils.tool_keys import ToolKey
+from ..utils.QgisMessageUtil import QgisMessageUtil
+from ..utils.ToolKeys import ToolKey
 from .BasePlugin import BasePluginMTL
 
 class VectorMultipartPlugin(BasePluginMTL):

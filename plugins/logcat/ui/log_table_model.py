@@ -269,8 +269,8 @@ class LogTableModel(QAbstractTableModel):
         Retorna cor para nível de log.
         Importa cores de LogUtils.
         """
-        from ....core.config.LogUtils import LogUtils
-        return LogUtils.LEVEL_COLORS.get(level, "#FFFFFF")
+        from ....core.config.LogUtilsNew import LogUtilsNew
+        return LogUtilsNew.LEVEL_COLORS.get(level, "#FFFFFF")
     
     def get_entry(self, index: QModelIndex) -> Optional[LogEntry]:
         """Retorna a entrada em um índice (para detalhe)."""

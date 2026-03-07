@@ -20,7 +20,7 @@ from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QCoreApplication
 
 from ..core.config.LogUtilsNew import LogUtilsNew
-from ..utils.qgis_messagem_util import QgisMessageUtil
+from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.project_utils import ProjectUtils
 
 logger = LogUtilsNew(tool="restart_qgis", class_name="RestartQGIS")

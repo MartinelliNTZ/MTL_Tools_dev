@@ -2,7 +2,7 @@
 from .BaseStep import BaseStep
 from .ExecutionContext import ExecutionContext
 from ..task.PolygonFieldsTask import PolygonFieldsTask
-from ..config.LogUtils import LogUtils
+from ..config.LogUtilsNew import LogUtilsNew
 from qgis.core import QgsField
 from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtWidgets import QApplication
@@ -40,29 +40,19 @@ class PolygonFieldsStep(BaseStep):
         Apply attribute mappings computed by the task on the MAIN THREAD.
         Result expected shape: { 'updates': {fid: {field_name: value}}, 'missing_fields': [field_name,...] }
         """
-        LogUtils.log(
-            f"PolygonFieldsStep.on_success: applying results",
-            level="INFO",
-            tool=context.get("tool_key"),
-            class_name=self.__class__.__name__
-        )
+        logger = LogUtilsNew(tool=context.get("tool_key"), class_name=self.__class__.__name__)
+        logger.info("PolygonFieldsStep.on_success: applying results")
 
         if not result or not isinstance(result, dict):
-            LogUtils.log(
-                f"PolygonFieldsStep.on_success: resultado inválido: {result}",
-                level="ERROR",
-                tool=context.get("tool_key"),
-                class_name=self.__class__.__name__
+            logger.error(
+                f"PolygonFieldsStep.on_success: resultado inválido: {result}"
             )
             return
 
         layer = context.get("layer")
         if layer is None:
-            LogUtils.log(
-                "PolygonFieldsStep.on_success: layer ausente no contexto",
-                level="ERROR",
-                tool=context.get("tool_key"),
-                class_name=self.__class__.__name__
+            logger.error(
+                "PolygonFieldsStep.on_success: layer ausente no contexto"
             )
             return
 
@@ -76,11 +66,8 @@ class PolygonFieldsStep(BaseStep):
                 layer.startEditing()
                 started_editing = True
             for fname in missing:
-                LogUtils.log(
-                    f"PolygonFieldsStep: adicionando campo (edição) {fname}",
-                    level="DEBUG",
-                    tool=context.get("tool_key"),
-                    class_name=self.__class__.__name__
+                logger.debug(
+                    f"PolygonFieldsStep: adicionando campo (edição) {fname}"
                 )
                 layer.addAttribute(QgsField(fname, QVariant.Double, len=20, prec=precision))
             layer.updateFields()
@@ -93,22 +80,16 @@ class PolygonFieldsStep(BaseStep):
             for fname, val in vals.items():
                 idx = name_to_idx.get(fname)
                 if idx is None:
-                    LogUtils.log(
-                        f"PolygonFieldsStep: campo não encontrado {fname}, pulando",
-                        level="WARNING",
-                        tool=context.get("tool_key"),
-                        class_name=self.__class__.__name__
+                    logger.warning(
+                        f"PolygonFieldsStep: campo não encontrado {fname}, pulando"
                     )
                     continue
                 provider_updates.setdefault(fid, {})[idx] = val
 
         # 3) Apply in batches on main thread
         if not provider_updates:
-            LogUtils.log(
-                "PolygonFieldsStep: nada a aplicar",
-                level="INFO",
-                tool=context.get("tool_key"),
-                class_name=self.__class__.__name__
+            logger.info(
+                "PolygonFieldsStep: nada a aplicar"
             )
             return
 
@@ -121,11 +102,8 @@ class PolygonFieldsStep(BaseStep):
         try:
             for i in range(0, total, chunk):
                 if context.is_cancelled():
-                    LogUtils.log(
-                        "PolygonFieldsStep: cancelado durante aplicação",
-                        level="INFO",
-                        tool=context.get("tool_key"),
-                        class_name=self.__class__.__name__
+                    logger.info(
+                        "PolygonFieldsStep: cancelado durante aplicação"
                     )
                     break
 
@@ -135,26 +113,17 @@ class PolygonFieldsStep(BaseStep):
                         try:
                             layer.changeAttributeValue(fid, idx, val)
                         except Exception as e:
-                            LogUtils.log(
-                                f"PolygonFieldsStep: falha ao aplicar fid={fid} idx={idx} err={e}",
-                                level="ERROR",
-                                tool=context.get("tool_key"),
-                                class_name=self.__class__.__name__
+                            logger.error(
+                                f"PolygonFieldsStep: falha ao aplicar fid={fid} idx={idx} err={e}"
                             )
-                LogUtils.log(
-                    f"PolygonFieldsStep: applied edit-buffer batch {i}-{i+len(batch_items)} items={len(batch_items)}",
-                    level="DEBUG",
-                    tool=context.get("tool_key"),
-                    class_name=self.__class__.__name__
+                logger.debug(
+                    f"PolygonFieldsStep: applied edit-buffer batch {i}-{i+len(batch_items)} items={len(batch_items)}"
                 )
                 QApplication.processEvents()
         finally:
             # Sempre desbloquear signals mesmo se houver erro ou cancelamento
             layer.blockSignals(False)
 
-        LogUtils.log(
-            f"PolygonFieldsStep.on_success: aplicação concluída {len(provider_updates)} features",
-            level="INFO",
-            tool=context.get("tool_key"),
-            class_name=self.__class__.__name__
+        logger.info(
+            f"PolygonFieldsStep.on_success: aplicação concluída {len(provider_updates)} features"
         )
