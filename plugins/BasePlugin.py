@@ -15,7 +15,7 @@ from ..utils.vector.VectorLayerSource import VectorLayerSource
 from ..core.config.LogUtilsNew import LogUtilsNew
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..utils.info_dialog import InfoDialog
-from ..utils.preferences import load_tool_prefs, save_tool_prefs
+from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.ToolKeys import ToolKey
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.project_utils import  ProjectUtils

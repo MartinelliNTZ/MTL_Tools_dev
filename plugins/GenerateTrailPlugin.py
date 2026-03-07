@@ -9,7 +9,7 @@ from ..utils.string_utils import StringUtils
 from ..utils.vector.VectorLayerGeometry import VectorLayerGeometry
 from ..utils.vector.VectorLayerProjection import VectorLayerProjection
 from ..utils.vector.VectorLayerSource import VectorLayerSource
-from ..utils.preferences import load_tool_prefs, save_tool_prefs
+from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.ToolKeys import ToolKey
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..core.engine_tasks.AsyncPipelineEngine import AsyncPipelineEngine

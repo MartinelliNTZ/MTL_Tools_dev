@@ -17,7 +17,7 @@ from qgis.core import (
     QgsRasterLayer,
 )
 
-from ..utils.preferences import (
+from ..utils.Preferences import (
     load_tool_prefs,
     save_tool_prefs,
 )

@@ -10,7 +10,7 @@ from qgis.PyQt.QtGui import QDesktopServices
 from qgis.PyQt.QtCore import QUrl, Qt
 
 from ..plugins.BasePlugin import BasePluginMTL
-from ..utils.preferences import load_tool_prefs, save_tool_prefs
+from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.ToolKeys import ToolKey
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..core.config.LogUtilsNew import LogUtilsNew
@@ -198,7 +198,7 @@ class SettingsPlugin(BasePluginMTL):
         """Abre a pasta de preferências do MTL Tools."""
         self.logger.debug("Abrindo pasta de preferências")
         
-        from ..utils.preferences import PREF_FOLDER
+        from ..utils.Preferences import PREF_FOLDER
         import os
         
         if os.path.exists(PREF_FOLDER):

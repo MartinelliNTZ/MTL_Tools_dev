@@ -10,7 +10,7 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtCore import Qt, QUrl
 from qgis.PyQt.QtGui import QDesktopServices
 
-from ..utils.preferences import load_tool_prefs, save_tool_prefs
+from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 
 from ..utils.QgisMessageUtil import QgisMessageUtil
 

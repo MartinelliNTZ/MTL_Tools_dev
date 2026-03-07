@@ -9,7 +9,7 @@ from ..utils.ToolKeys import ToolKey
 from ..core.config.LogUtilsNew import LogUtilsNew
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..core.ui.WidgetFactory import WidgetFactory
-from ..utils.preferences import load_tool_prefs, save_tool_prefs
+from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.vector.VectorLayerAttributes import VectorLayerAttributes
 from .BasePlugin import BasePluginMTL
 

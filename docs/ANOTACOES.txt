@@ -46,6 +46,17 @@ changelog=
       - Removido: BASE_TOOL constant de tool_keys.py e mapeamentos de cores
       - Preservado: BaseTool class em plugins/base_tool.py para uso futuro
       - Classe agora usa TOOL_KEY = "base_tool" (string literal)
+    - CONSOLIDAÇÃO DE PROJEÇÃO E CRS
+      - Removidas classes OLD: OLD_crs_utils.py, OLD_projection_helper.py
+      - Métodos consolidados em VectorLayerProjection:
+        ✓ reproject_features() - reprojeção de features entre CRS (movido de ProjectionHelper)
+        ✓ get_coordinate_info() - informações de coordenada em múltiplos formatos (movido de crs_utils)
+        ✓ Helpers: _decimal_to_dms(), _utm_zone_from_lon(), _utm_letter_from_lat()
+      - Arquivos atualizados:
+        ✓ coord_click_tool.py - usa VectorLayerProjection.get_coordinate_info()
+        ✓ raster_mass_sampler.py - usa VectorLayerProjection.reproject_features()
+        ✓ elevation_analisys.py - usa VectorLayerProjection.reproject_features()
+      - Imports consolidados: todas as operações de CRS/Projeção agora em um único lugar
     - REFATORAÇÃO DE CLASSES para CamelCase
       - Classes renomeadas seguindo padrão Python: nomes descritivos em PascalCase
       - Movimentação de classes para melhor organização arquitetônica

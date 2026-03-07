@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from typing import Optional
+from typing import Optional, List, Dict
+import math
 
 from qgis.core import (
     QgsVectorLayer,
@@ -9,7 +10,8 @@ from qgis.core import (
     QgsProject,
     QgsUnitTypes,
     QgsFeature,
-    QgsGeometry
+    QgsGeometry,
+    QgsPoint
 )
 
 
@@ -204,3 +206,154 @@ class VectorLayerProjection:
     def list_common_crs_for_region(self, region_code, external_tool_key="untraceable"):
         """Lista os CRS mais comuns e apropriados para uma região geográfica."""
         pass
+
+    # ---------------------------------------------------------
+    # REPROJEÇÃO DE FEATURES (movido de ProjectionHelper)
+    # ---------------------------------------------------------
+    @staticmethod
+    def reproject_features(
+        features: List[QgsFeature],
+        source_crs: QgsCoordinateReferenceSystem,
+        target_crs: QgsCoordinateReferenceSystem,
+        context
+    ) -> List[QgsFeature]:
+        """
+        Reprojeta uma lista de features entre CRS diferentes.
+        
+        Movido de ProjectionHelper para consolidar lógica de projeção.
+        
+        Parameters
+        ----------
+        features : List[QgsFeature]
+            Lista de QgsFeature a reprojetar
+        source_crs : QgsCoordinateReferenceSystem
+            CRS de origem
+        target_crs : QgsCoordinateReferenceSystem
+            CRS de destino
+        context : QgsProcessingContext
+            Contexto de processamento com transformContext()
+            
+        Returns
+        -------
+        List[QgsFeature]
+            Nova lista de features reprojetadas
+        """
+        if not target_crs.isValid():
+            return features
+
+        transform = QgsCoordinateTransform(
+            source_crs,
+            target_crs,
+            context.transformContext()
+        )
+        reproj = []
+
+        for feat in features:
+            new_feat = QgsFeature(feat)
+            geom = feat.geometry()
+
+            if geom is not None:
+                new_geom = QgsGeometry(geom)
+                new_geom.transform(transform)
+                new_feat.setGeometry(new_geom)
+
+            reproj.append(new_feat)
+
+        return reproj
+
+    # ---------------------------------------------------------
+    # INFORMAÇÕES DE COORDENADAS (movido de crs_utils)
+    # ---------------------------------------------------------
+    @staticmethod
+    def _decimal_to_dms(value: float) -> str:
+        """Converte coordenada decimal para DMS (graus, minutos, segundos)."""
+        sign = "-" if value < 0 else ""
+        value = abs(value)
+        deg = int(value)
+        minutes_full = (value - deg) * 60
+        minutes = int(minutes_full)
+        seconds = (minutes_full - minutes) * 60
+        return f"{sign}{deg}°{minutes}'{seconds:.3f}\""
+
+    @staticmethod
+    def _utm_zone_from_lon(lon: float) -> int:
+        """Calcula zona UTM a partir da longitude."""
+        return int((lon + 180) / 6) + 1
+
+    @staticmethod
+    def _utm_letter_from_lat(lat: float) -> str:
+        """Calcula letra UTM a partir da latitude."""
+        # Letras UTM (C–X, sem I e O)
+        UTM_LETTERS = "CDEFGHJKLMNPQRSTUVWX"
+        if lat < -80 or lat > 84:
+            return ""
+        index = int((lat + 80) / 8)
+        return UTM_LETTERS[index]
+
+    @staticmethod
+    def get_coordinate_info(
+        point: QgsPoint,
+        canvas_crs: QgsCoordinateReferenceSystem
+    ) -> Dict:
+        """
+        Obtém informações de coordenada em múltiplos formatos.
+        
+        Movido de crs_utils.get_coord_info() para consolidar lógica de projeção.
+        
+        Parameters
+        ----------
+        point : QgsPoint
+            Ponto em coordenadas do canvas
+        canvas_crs : QgsCoordinateReferenceSystem
+            CRS do canvas
+            
+        Returns
+        -------
+        Dict
+            Dicionário com informações:
+            - lat, lon: coordenadas WGS84
+            - lat_dms, lon_dms: formato DMS
+            - utm_x, utm_y: coordenadas UTM SIRGAS 2000
+            - zona_num, zona_letra: zona UTM
+            - hemisferio: "Norte" ou "Sul"
+            - epsg: código EPSG da zona UTM
+        """
+        # Transformar para WGS84
+        crs_wgs = QgsCoordinateReferenceSystem("EPSG:4326")
+        transform = QgsCoordinateTransform(
+            canvas_crs,
+            crs_wgs,
+            QgsProject.instance().transformContext()
+        )
+        p_wgs = transform.transform(point)
+
+        lon = p_wgs.x()
+        lat = p_wgs.y()
+
+        zona = VectorLayerProjection._utm_zone_from_lon(lon)
+        letra = VectorLayerProjection._utm_letter_from_lat(lat)
+
+        # SIRGAS 2000 UTM
+        epsg_utm_sirgas = 31960 + zona
+        crs_utm_sirgas = QgsCoordinateReferenceSystem(f"EPSG:{epsg_utm_sirgas}")
+        transform_utm = QgsCoordinateTransform(
+            canvas_crs,
+            crs_utm_sirgas,
+            QgsProject.instance().transformContext()
+        )
+        p_utm_sirgas = transform_utm.transform(point)
+
+        hemisferio = "Sul" if lat < 0 else "Norte"
+
+        return {
+            "lat": lat,
+            "lon": lon,
+            "lat_dms": VectorLayerProjection._decimal_to_dms(lat),
+            "lon_dms": VectorLayerProjection._decimal_to_dms(lon),
+            "utm_x": p_utm_sirgas.x(),
+            "utm_y": p_utm_sirgas.y(),
+            "zona_num": zona,
+            "zona_letra": letra,
+            "hemisferio": hemisferio,
+            "epsg": epsg_utm_sirgas
+        }

@@ -4,7 +4,7 @@ import sip
 
 from ..utils.reverse_geocoding_task import ReverseGeocodeTask
 from ..utils.altimetry_task import AltimetriaTask
-from ..utils.OLD_crs_utils import get_coord_info
+from ..utils.vector.VectorLayerProjection import VectorLayerProjection
 from ..gui.dialogs.coord_result_dialog import CoordResultDialog
 
 
@@ -23,7 +23,7 @@ class CoordClickTool(QgsMapTool):
         snap = self.canvas.snappingUtils().snapToMap(event.pos())
         point = snap.point() if snap.isValid() else self.toMapCoordinates(event.pos())
 
-        info = get_coord_info(
+        info = VectorLayerProjection.get_coordinate_info(
             point,
             self.canvas.mapSettings().destinationCrs()
         )

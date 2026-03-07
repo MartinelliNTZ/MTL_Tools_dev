@@ -13,11 +13,11 @@ from qgis.core import (
 )
 
 # Preferências
-from ..utils.preferences import load_tool_prefs, save_tool_prefs
+from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 
 # Lógicas externas
 from .model.raster_mass_sampler_model import RasterMassSamplerModel
-from ..utils.OLD_projection_helper import ProjectionHelper
+from ..utils.vector.VectorLayerProjection import VectorLayerProjection
 from ..utils.ToolKeys import ToolKey
 #from ..qgis_model.implement_trail.py import ....
 
@@ -109,10 +109,9 @@ class ElevationAnalisys(QgsProcessingAlgorithm):
 
         # ----------------- REPROJEÇÃO SE NECESSÁRIO -----------------
         if output_crs:
-            proj = ProjectionHelper()
             source_crs = pts.sourceCrs()
 
-            features = proj.reproject_features(
+            features = VectorLayerProjection.reproject_features(
                 features,
                 source_crs,
                 output_crs,
