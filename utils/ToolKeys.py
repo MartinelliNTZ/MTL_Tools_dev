@@ -11,7 +11,6 @@ class ToolKey:
     RESTART_QGIS = "restart_qgis"
     GERAR_RASTRO_IMPLEMENTO = "gerar_rastro_implemento"
     COORD_CLICK_TOOL = "coord_click_tool"    
-    BASE_TOOL = "base_tool"
     COPY_ATTRIBUTES = "copy_attributes"
     CONVERTER_MULTIPART = "converter_multipart"
     SETTINGS = "settings"
@@ -38,7 +37,6 @@ class ToolKey:
         RESTART_QGIS: "#FF6B6B",  # vermelho → ação crítica
         GERAR_RASTRO_IMPLEMENTO: "#82E0AA",  # verde limão → geração geométrica
         COORD_CLICK_TOOL: "#85C1E9",  # azul céu → map tool
-        BASE_TOOL: "#AED6F1",  # azul gelo → base / neutro
         COPY_ATTRIBUTES: "#DDA0DD",  # plum → dados / atributos
         CONVERTER_MULTIPART: "#F5A962",  # laranja-pêssego → conversão geométrica
         SETTINGS: "#95A5A6",  # cinza → configurações / sistema
