@@ -695,4 +695,45 @@ class WidgetFactory:
         
         return layout, widget
 
+    @staticmethod
+    def create_label(
+        *,
+        text: str = "",
+        bold: bool = False,
+        word_wrap: bool = False,
+        parent=None
+    ) -> QLabel:
+        """
+        Cria um QLabel configurado e estilizado.
+        
+        Parameters
+        ----------
+        text : str
+            Texto do label
+        
+        bold : bool
+            Se True, aplica negrito
+        
+        word_wrap : bool
+            Se True, ativa quebra de linha
+        
+        parent : QWidget
+            Widget pai
+        
+        Returns
+        -------
+        QLabel
+            Label configurado e estilizado
+        """
+        label = QLabel(text, parent)
+        label.setStyleSheet(Styles.label())
+        label.setWordWrap(word_wrap)
+        
+        if bold:
+            font = label.font()
+            font.setBold(True)
+            label.setFont(font)
+        
+        return label
+
 

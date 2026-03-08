@@ -1135,6 +1135,45 @@ class Styles:
 
     @staticmethod
     def simple_button_widget():
+        """Estilo para SimpleButtonWidget (botão que ocupa espaço)."""
+        return f"""
+        QPushButton {{
+            background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                stop:0 {Styles.COLOR_PRIMARY_LIGHT},
+                stop:1 {Styles.COLOR_PRIMARY_DARK});
+            color: {Styles.COLOR_TEXT_PRIMARY};
+            font-family: {Styles.FONT_FAMILY_DEFAULT};
+            font-size: {Styles.FONT_SIZE_NORMAL};
+            border: 1px solid {Styles.COLOR_BORDER};
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-weight: bold;
+        }}
+        
+        QPushButton:hover {{
+            background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                stop:0 {Styles.COLOR_PRIMARY},
+                stop:1 {Styles.COLOR_PRIMARY_LIGHT});
+        }}
+        
+        QPushButton:pressed {{
+            background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                stop:0 {Styles.COLOR_PRIMARY_DARK},
+                stop:1 {Styles.COLOR_PRIMARY});
+        }}
+        """
+
+    @staticmethod
+    def label():
+        """Estilo para QLabel."""
+        return f"""
+        QLabel {{
+            color: {Styles.COLOR_TEXT_PRIMARY};
+            font-family: {Styles.FONT_FAMILY_DEFAULT};
+            font-size: {Styles.FONT_SIZE_NORMAL};
+            background: transparent;
+        }}
+        """
         """
         Estilo para SimpleButtonWidget (botão simples que ocupa a tela).
         Padrão: mesmo estilo dos botões de ação (Run, Close, etc).

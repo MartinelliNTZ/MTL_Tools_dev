@@ -51,7 +51,7 @@ class MainLayout(QVBoxLayout):
         # layout interno real (sempre criado, com ou sem scroll)
         self._inner_layout = QVBoxLayout(self._frame)
         self._inner_layout.setContentsMargins(5, 5, 5, 5)
-        self._inner_layout.setSpacing(Styles.LAYOUT_V_SPACING)
+        # Espaçamento será definido dinamicamente baseado no scroll
 
         # scroll widget (criado apenas se enable_scroll=True)
         self._scroll = None

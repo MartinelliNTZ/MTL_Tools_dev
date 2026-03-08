@@ -3,21 +3,19 @@ import os
 
 from qgis.core import QgsProject
 from qgis.PyQt.QtWidgets import (
-    QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
-    QLineEdit, QMessageBox, QCheckBox
+    QHBoxLayout, QPushButton, QLineEdit, QMessageBox
 )
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtCore import Qt, QUrl
 from qgis.PyQt.QtGui import QDesktopServices
 
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
-
 from ..utils.QgisMessageUtil import QgisMessageUtil
-
 from ..utils.layouts_utils import LayoutsUtils
 from ..utils.project_utils import ProjectUtils
 from ..utils.ToolKeys import ToolKey
 from .BasePlugin import BasePluginMTL
+from ..core.ui.WidgetFactory import WidgetFactory
 
 
 class ReplaceInLayoutsDialog(BasePluginMTL):
@@ -27,131 +25,110 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
     def __init__(self, iface):
         super().__init__(iface.mainWindow())
         self.iface = iface
-
-       # self.setWindowTitle("MTL Tools — Replace Text in Layouts")
-       # self.setMinimumWidth(520)
-
-        icon_path = os.path.join(
-            os.path.dirname(__file__), "..", "resources","icons", "mtl_tools_icon.png"
-        )
-        if os.path.exists(icon_path):
-            self.setWindowIcon(QIcon(icon_path))
-
-        self.instructions_file = os.path.join(
-            os.path.dirname(__file__),
-            "..","resources", "instructions",
-            "replace_in_layouts_help.md"
+        
+        self.init(
+            self.TOOL_KEY,
+            "ReplaceInLayoutsDialog",
+            load_settings_prefs=False,
+            build_ui=True,
         )
 
-        self._build_ui2()
-       # self._load_saved_preferences()
-
-    # -------------------------------------------------
-    def _build_ui(self):
-        super()._build_ui(title = "Gerar Rastro de Máquinas",icon_path="gerar_rastro.ico",instructions_file="generate_trail_help.md")  
-
-    def _build_ui2(self):
-        main = QVBoxLayout()
-
-        # INFO
-        info_layout = QHBoxLayout()
-        info_layout.addStretch()
-        btn_info = QPushButton("ℹ️")
-        btn_info.setFixedWidth(30)
-        btn_info.clicked.connect(
-            lambda: self.show_info_dialog(
-                "📘 Instruções – Replace Text in Layouts"
-            )
+    def _build_ui(self, **kwargs):
+        super()._build_ui(
+            title="Substituir Texto em Layouts",
+            icon_path="mtl_tools_icon.png",
+            instructions_file="replace_in_layouts_help.md",
+            enable_scroll=False,
         )
 
-        info_layout.addWidget(btn_info)
-        main.addLayout(info_layout)
-
-        # CAMPOS
-        h1 = QHBoxLayout()
-        h1.addWidget(QLabel("Texto a buscar:"))
-        self.txt_old = QLineEdit()
-        h1.addWidget(self.txt_old)
-        main.addLayout(h1)
-
-        h2 = QHBoxLayout()
-        h2.addWidget(QLabel("Texto a substituir (novo):"))
-        self.txt_new = QLineEdit()
-        h2.addWidget(self.txt_new)
-        main.addLayout(h2)
-
-        self.chk_case_sensitive = QCheckBox(
-            "Diferenciar maiúsculas/minúsculas (case sensitive)"
+        # ====== BUSCAR E SUBSTITUIR ======
+        input_layout, self.input_fields_widget = WidgetFactory.create_input_fields_widget(
+            fields_dict={
+                'old_text': {
+                    'title': 'Texto a buscar:',
+                    'type': 'text',
+                    'default': ''
+                },
+                'new_text': {
+                    'title': 'Texto a substituir (novo):',
+                    'type': 'text',
+                    'default': ''
+                }
+            },
+            separator_bottom=True
         )
-        main.addWidget(self.chk_case_sensitive)
 
-        self.chk_full_replace = QCheckBox(
-            "Substituir o label inteiro quando encontrar o texto (modo chave)"
+        # ====== OPÇÕES ======
+        opts_layout, self.checkbox_map = WidgetFactory.create_checkbox_grid(
+            names=[
+                "Diferenciar maiúsculas/minúsculas (case sensitive)",
+                "Substituir o label inteiro quando encontrar o texto (modo chave)"
+            ],
+            items_per_row=1,
+            checked_by_default=False,
+            separator_bottom=True
         )
-        main.addWidget(self.chk_full_replace)
 
-        lbl_backup = QLabel(
-            "<b>Backup:</b> será criada uma cópia do projeto (.qgz) "
-            "na pasta <i>backup</i> ao lado do arquivo do projeto."
+        # ====== INFO ======
+        info_label = WidgetFactory.create_label(
+            text="Backup: será criada uma cópia do projeto (.qgz) na pasta backup ao lado do arquivo do projeto.",
+            word_wrap=True,
+            bold=False
         )
-        lbl_backup.setWordWrap(True)
-        main.addWidget(lbl_backup)
 
-        # BOTÕES
-        h_buttons = QHBoxLayout()
+        # ====== BOTÕES ======
+        buttons_layout, self.action_buttons = WidgetFactory.create_bottom_action_buttons(
+            parent=self,
+            run_callback=self.execute_tool,
+            close_callback=self.close,
+            info_callback=self.show_info_dialog,
+            tool_key=self.TOOL_KEY,
+            run_text="Executar substituição",
+            close_text="Fechar"
+        )
 
-        btn_show_proj = QPushButton("Mostrar arquivo do projeto")
-        btn_show_proj.clicked.connect(self.show_project_file)
-        h_buttons.addWidget(btn_show_proj)
-
-        btn_run = QPushButton("Executar substituição")
-        btn_run.clicked.connect(self.execute_tool)
-        h_buttons.addWidget(btn_run)
-
-        main.addLayout(h_buttons)
-
-        h_close = QHBoxLayout()
-        h_close.addStretch()
-        btn_close = QPushButton("Fechar")
-        btn_close.clicked.connect(self.close)
-        h_close.addWidget(btn_close)
-        main.addLayout(h_close)
-
-        self.setLayout(main)
+        # ====== ADICIONAR AO LAYOUT ======
+        self.layout.add_items([
+            input_layout,
+            opts_layout,
+            info_label,
+            buttons_layout
+        ])
 
 
-    # -------------------------------------------------
-    def _load_saved_preferences(self):
+
+    def _load_prefs(self):
         prefs = load_tool_prefs(self.TOOL_KEY)
 
-        self.txt_old.setText(prefs.get("old_text", ""))
-        self.txt_new.setText(prefs.get("new_text", ""))
-        self.chk_case_sensitive.setChecked(
+        self.input_fields_widget.set_values({
+            'old_text': prefs.get("old_text", ""),
+            'new_text': prefs.get("new_text", "")
+        })
+        self.checkbox_map["Diferenciar maiúsculas/minúsculas (case sensitive)"].setChecked(
             prefs.get("case_sensitive", True)
         )
-        self.chk_full_replace.setChecked(
+        self.checkbox_map["Substituir o label inteiro quando encontrar o texto (modo chave)"].setChecked(
             prefs.get("full_replace", False)
         )
 
-    def _save_preferences(self):
+    def _save_prefs(self):
+        values = self.input_fields_widget.get_values()
         save_tool_prefs(
             self.TOOL_KEY,
             {
-                "old_text": self.txt_old.text(),
-                "new_text": self.txt_new.text(),
-                "case_sensitive": self.chk_case_sensitive.isChecked(),
-                "full_replace": self.chk_full_replace.isChecked()
+                "old_text": values.get('old_text', ''),
+                "new_text": values.get('new_text', ''),
+                "case_sensitive": self.checkbox_map["Diferenciar maiúsculas/minúsculas (case sensitive)"].isChecked(),
+                "full_replace": self.checkbox_map["Substituir o label inteiro quando encontrar o texto (modo chave)"].isChecked()
             }
         )
 
-
-
-    # -------------------------------------------------
     def execute_tool(self):
-        old_text = self.txt_old.text().strip()
-        new_text = self.txt_new.text()
-        case_sensitive = self.chk_case_sensitive.isChecked()
-        full_replace = self.chk_full_replace.isChecked()
+        values = self.input_fields_widget.get_values()
+        old_text = values.get('old_text', '').strip()
+        new_text = values.get('new_text', '')
+        case_sensitive = self.checkbox_map["Diferenciar maiúsculas/minúsculas (case sensitive)"].isChecked()
+        full_replace = self.checkbox_map["Substituir o label inteiro quando encontrar o texto (modo chave)"].isChecked()
 
         if not old_text:
             QgisMessageUtil.bar_warning(
@@ -160,7 +137,7 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
             )
             return
 
-        self._save_preferences()
+        self._save_prefs()
 
         if not QgisMessageUtil.confirm_destructive(
             self,
@@ -172,7 +149,6 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
             red_text="Atenção — operação destrutiva"
         ):
             return
-
 
         project = QgsProject.instance()
 
@@ -192,7 +168,7 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
             )
             total = result.get("total_changes", 0)
             layouts = result.get("total_layouts", 0)
-            message =f"<b>Layouts analisados:</b> {layouts}<br>" f"<b>Substituições aplicadas:</b> {total}"
+            message = f"<b>Layouts analisados:</b> {layouts}<br>" f"<b>Substituições aplicadas:</b> {total}"
             QgisMessageUtil.modal_success(
                 self.iface,
                 message,
@@ -206,8 +182,6 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
             )
 
 
-
-# -------------------------------------------------
 def run_replace_in_layouts(iface):
     dlg = ReplaceInLayoutsDialog(iface)
     dlg.setModal(False)
