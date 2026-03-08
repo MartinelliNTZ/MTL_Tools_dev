@@ -22,6 +22,7 @@ from qgis.PyQt.QtWidgets import (
 )
 from qgis.PyQt.QtCore import Qt, QPropertyAnimation, QEasingCurve, pyqtSignal
 from qgis.PyQt.QtGui import QIcon
+from ..styles.Styles import Styles
 
 
 class CollapsibleParametersWidget(QWidget):
@@ -75,13 +76,13 @@ class CollapsibleParametersWidget(QWidget):
         header = QFrame()
         header.setObjectName("collapsible_header")
         header_layout = QHBoxLayout(header)
-        header_layout.setContentsMargins(8, 3, 8, 3)  # Reduzido top/bottom de 6 para 3
-        header_layout.setSpacing(6)  # Reduzido de 8 para 6
+        header_layout.setContentsMargins(8, Styles.CONTENT_PADDING, 8, Styles.CONTENT_PADDING)
+        header_layout.setSpacing(Styles.LAYOUT_H_SPACING)
         
         # Ícone expansível (→ ou ↓)
         self._icon_label = QLabel("→")
         self._icon_label.setObjectName("collapsible_icon")
-        self._icon_label.setFixedWidth(14)  # Reduzido de 16 para 14
+        self._icon_label.setFixedWidth(14)
         header_layout.addWidget(self._icon_label)
         
         # Título
@@ -108,8 +109,13 @@ class CollapsibleParametersWidget(QWidget):
         self._content_container.setObjectName("collapsible_content")
         
         self._content_layout = QVBoxLayout(self._content_container)
-        self._content_layout.setContentsMargins(12, 6, 12, 6)  # Reduzido de 16,8,16,8 para 12,6,12,6
-        self._content_layout.setSpacing(6)  # Reduzido de 8 para 6
+        self._content_layout.setContentsMargins(
+            Styles.CONTENT_PADDING, 
+            Styles.CONTENT_PADDING, 
+            Styles.CONTENT_PADDING, 
+            Styles.CONTENT_PADDING
+        )
+        self._content_layout.setSpacing(Styles.LAYOUT_V_SPACING)
         
         # Inicialmente recolhido (altura = 0)
         self._content_container.setMaximumHeight(0)

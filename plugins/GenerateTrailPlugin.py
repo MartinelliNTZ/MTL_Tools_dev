@@ -39,15 +39,15 @@ class GenerateTrailPlugin(BasePluginMTL):
 
     def _build_ui(self, **kwargs):
         self.logger.debug("Inicializando PLUGIN Gerar Rastro Implemento")
-        super()._build_ui(title = "Gerar Rastro de Máquinas",
-                          icon_path="gerar_rastro.ico",
-                          instructions_file="generate_trail_help.md",
-                            min_width = 250,
-                            min_height = 450,)  
+        super()._build_ui(
+            title="Gerar Rastro de Máquinas",
+            icon_path="gerar_rastro.ico",
+            instructions_file="generate_trail_help.md",
+            enable_scroll=True
+        )
         self.logger.info("Construindo interface da ferramenta")
 
-
-        #novo
+        # novo
         layer_layout, self.layer_input = WidgetFactory.create_layer_input(
             label_text="Camada de Linhas (INPUT):",
             filters=[QgsMapLayerProxyModel.LineLayer],
@@ -62,12 +62,11 @@ class GenerateTrailPlugin(BasePluginMTL):
         )
         self.logger.debug("Componente de tamanho de implemento adicionado")
 
-
-        #---------------------------------------
-
         # salvar em arquivo ou temporário (campo único: arquivo completo)
         save_layout, self.save_selector = WidgetFactory.create_save_file_selector(
-            parent=self,            file_filter=StringUtils.FILTER_VECTOR,            separator_top=False
+            parent=self,
+            file_filter=StringUtils.FILTER_VECTOR,
+            separator_top=False
         )
         self.logger.debug("Componente de salvamento de arquivo adicionado")
 
@@ -92,12 +91,23 @@ class GenerateTrailPlugin(BasePluginMTL):
 
         # buttons
         buttons_layout, self.action_buttons = WidgetFactory.create_bottom_action_buttons(
-            parent=self,            run_callback=self.execute_tool,            close_callback=self.close, 
-            info_callback=self.show_info_dialog,            tool_key=self.TOOL_KEY,        ) 
-        
-        #-----------------------------------------------------------------------       
-        self.layout.add_items([layer_layout, tam_layout, save_layout, adv_layout, buttons_layout])
-        self.setLayout(self.layout)
+            parent=self,
+            run_callback=self.execute_tool,
+            close_callback=self.close,
+            info_callback=self.show_info_dialog,
+            tool_key=self.TOOL_KEY,
+        )
+
+        # ====== CONTEÚDO AO LAYOUT ======
+        # MainLayout encapsula o scroll internamente
+        # add_items() roteia automaticamente para scroll ou inner_layout
+        self.layout.add_items([
+            layer_layout,
+            tam_layout,
+            save_layout,
+            adv_layout,
+            buttons_layout
+        ])
         self.logger.info("Interface da ferramenta construída com sucesso")
 
     def _load_prefs(self):
@@ -132,6 +142,9 @@ class GenerateTrailPlugin(BasePluginMTL):
         self.preferences['last_output_file'] = self.save_selector.get_file_path()
         self.preferences['apply_style'] = bool(self.qml_selector.is_enabled())
         self.preferences['last_qml_path'] = self.qml_selector.get_file_path()
+        # Tamanho da janela (persistido automaticamente por BasePlugin.closeEvent)
+        self.preferences['window_width'] = self.width()
+        self.preferences['window_height'] = self.height()
         
         save_tool_prefs(self.TOOL_KEY, self.preferences)
         self.logger.debug(f"Preferências salvas: tamanho={self.preferences['last_implement_length']}m, salvar_arquivo={self.preferences['save_to_folder']}")
@@ -396,7 +409,6 @@ class GenerateTrailPlugin(BasePluginMTL):
         QgisMessageUtil.bar_success(  self.iface,     "Processamento executado com sucesso."        )
 
         self.finish_stats()
-        self._save_prefs()
 
 def run_gerar_rastro(iface):
     dlg = GenerateTrailPlugin(iface)

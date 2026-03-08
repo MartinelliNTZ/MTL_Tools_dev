@@ -8,7 +8,6 @@ from qgis.PyQt.QtWidgets import QLayout, QWidget
 from qgis.gui import QgsMapLayerComboBox
 from ...utils.string_utils import StringUtils
 from ...resources.widgets.LayerInputWidget import LayerInputWidget
-from ...resources.widgets.FileSelectorWidget import FileSelectorWidget
 from ...resources.widgets.BottomActionButtonsWidget import BottomActionButtonsWidget
 from ...resources.widgets.MainLayout import MainLayout
 from ...resources.styles.Styles import Styles
@@ -16,7 +15,9 @@ from ...resources.widgets.AppBarWidget import AppBarWidget
 from ...resources.widgets.AttributeSelectorWidget import AttributeSelectorWidget
 from ...resources.widgets.RadioButtonGridWidget import RadioButtonGridWidget
 from ...resources.widgets.CollapsibleParametersWidget import CollapsibleParametersWidget
-from ...resources.widgets.PathSelectorWidget import PathSelectorWidget
+from ...resources.widgets.SelectorWidget import SelectorWidget
+from ...resources.widgets.InputFieldsWidget import InputFieldsWidget
+from ...resources.widgets.SimpleButtonWidget import SimpleButtonWidget
 
 
 
@@ -112,7 +113,7 @@ class WidgetFactory:
             close_callback=close_callback,
             info_callback=info_callback,
             tool_key=tool_key,
-            style = Styles.buttons(),
+            style=Styles.bottom_action_buttons_widget(),
             run_text=run_text,
             close_text=close_text,
         )
@@ -134,22 +135,24 @@ class WidgetFactory:
             checkbox_text="Aplicar estilo QML",
             label_text="QML:"
     ):
+        """Criar seletor de arquivo QML com checkbox."""
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(2)
+        layout.setSpacing(Styles.LAYOUT_V_SPACING)
 
         if separator_top:
             layout.addWidget(WidgetFactory.create_separator())
 
-        widget = FileSelectorWidget(
+        widget = SelectorWidget(
             parent=parent,
             file_filter=file_filter,
             checkbox_text=checkbox_text,
-            label_text=label_text,
-            mode=FileSelectorWidget.MODE_OPEN
+            title=label_text,
+            mode=SelectorWidget.MODE_FILE,
+            checkbox=True
         )
 
-        widget.setStyleSheet(Styles.file_selector())
+        widget.setStyleSheet(Styles.path_selector_widget())
 
         layout.addWidget(widget)
 
@@ -158,17 +161,31 @@ class WidgetFactory:
 
         return layout, widget
     
-    def create_main_layout(self, title: str="Title"):
-        #ha implementar
-        layout = MainLayout(self)      
+    def create_main_layout(self, title: str="Title", enable_scroll: bool=False):
+        """
+        Criar layout principal com AppBar.
+        
+        O MainLayout agora encapsula o scroll internamente.
+        
+        Args:
+            title: Texto do AppBar
+            enable_scroll: Se True, MainLayout cria ScrollWidget internamente
+        
+        Returns:
+            MainLayout (que gerencia scroll automaticamente)
+        """
+        layout = MainLayout(self, enable_scroll=enable_scroll)      
 
         app_bar = WidgetFactory.create_app_bar(
             parent=self,
             title=title,
         )
-        layout.addWidget(app_bar)
+        
+        # Adicionar app_bar ao INÍCIO do _inner_layout (fora do scroll)
+        layout._inner_layout.insertWidget(0, app_bar)
 
         self.setStyleSheet(Styles.main_application())
+        
         return layout
 
     @staticmethod
@@ -183,20 +200,21 @@ class WidgetFactory:
     ):
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(2)
+        layout.setSpacing(Styles.LAYOUT_V_SPACING)
 
         if separator_top:
             layout.addWidget(WidgetFactory.create_separator())
 
-        widget = FileSelectorWidget(
+        widget = SelectorWidget(
             parent=parent,
             file_filter=file_filter,
             checkbox_text=checkbox_text,
-            label_text=label_text,
-            mode=FileSelectorWidget.MODE_SAVE
+            title=label_text,
+            mode=SelectorWidget.MODE_SAVE,
+            checkbox=True
         )
 
-        widget.setStyleSheet(Styles.file_selector())
+        widget.setStyleSheet(Styles.path_selector_widget())
 
         layout.addWidget(widget)
 
@@ -233,12 +251,12 @@ class WidgetFactory:
             enable_selected_checkbox=enable_selected_checkbox,
             parent=parent
         )
+
+        widget.setStyleSheet(Styles.layer_input_widget())
+
         layout.addWidget(widget)
         if separator_bottom:
             layout.addWidget(WidgetFactory.create_separator())
-
-        # estilo centralizado (opcional)
-        # LayerInputStyles.apply(widgets)
 
         return layout, widget
 
@@ -310,8 +328,8 @@ class WidgetFactory:
             *,
             items_per_row=3,
             checked_by_default=False,
-            h_spacing=10,
-            v_spacing=5,
+            h_spacing=None,
+            v_spacing=None,
             title=None,
             separator_top=False,
             separator_bottom=True,
@@ -320,10 +338,16 @@ class WidgetFactory:
         """Cria um grid de checkboxes com colunas fixas e alinhamento consistente.
 
         Opcionalmente exibe um título e separadores visuais (topo/rodapé).
+        
+        Usa altura padrão de 12px por item (Styles.ITEM_HEIGHT).
 
         Retorna:
             (layout, checkbox_map)
         """
+        if h_spacing is None:
+            h_spacing = Styles.LAYOUT_H_SPACING
+        if v_spacing is None:
+            v_spacing = Styles.LAYOUT_V_SPACING
 
         # compatibilidade: separator (bool) controla topo+rodapé quando fornecido
         if separator is not None:
@@ -335,7 +359,7 @@ class WidgetFactory:
 
         main_layout = QVBoxLayout()
         main_layout.setContentsMargins(0, 0, 0, 0)
-        main_layout.setSpacing(2)
+        main_layout.setSpacing(0)
 
         if separator_top:
             main_layout.addWidget(WidgetFactory.create_separator())
@@ -359,6 +383,7 @@ class WidgetFactory:
 
             chk = QCheckBox(name)
             chk.setChecked(checked_by_default)
+            chk.setFixedHeight(Styles.ITEM_HEIGHT)
 
             grid.addWidget(chk, row, col)
             checkbox_map[name] = chk
@@ -434,6 +459,8 @@ class WidgetFactory:
             tool_key=tool_key,
             parent=parent
         )
+
+        widget.setStyleSheet(Styles.radio_button_grid_widget())
         
         layout.addWidget(widget)
         
@@ -558,14 +585,14 @@ class WidgetFactory:
         if separator_top:
             layout.addWidget(WidgetFactory.create_separator())
 
-        widget = PathSelectorWidget(
+        widget = SelectorWidget(
             title=title,
             file_filter=file_filter,
             mode=mode,
             parent=parent,
         )
 
-        widget.setStyleSheet(Styles.file_selector())
+        widget.setStyleSheet(Styles.path_selector_widget())
 
         layout.addWidget(widget)
 
@@ -573,4 +600,99 @@ class WidgetFactory:
             layout.addWidget(WidgetFactory.create_separator())
 
         return layout, widget
+
+    @staticmethod
+    def create_input_fields_widget(
+        *,
+        fields_dict: dict,
+        parent=None,
+        separator_top=False,
+        separator_bottom=True,
+    ):
+        """
+        Cria widget com múltiplos campos de input baseados em dicionário.
+        
+        Parameters
+        ----------
+        fields_dict : dict
+            Dicionário com configuração dos campos
+            {
+                'chave': {
+                    'title': 'Rótulo',
+                    'type': 'text' | 'int' | 'float',
+                    'default': valor_padrão
+                },
+                ...
+            }
+        
+        separator_top : bool
+            Adicionar separador no topo
+        
+        separator_bottom : bool
+            Adicionar separador no rodapé
+        
+        Returns
+        -------
+        tuple:
+            (layout_principal, widget_input_fields)
+        """
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(Styles.LAYOUT_V_SPACING)
+        
+        if separator_top:
+            layout.addWidget(WidgetFactory.create_separator())
+        
+        widget = InputFieldsWidget(fields_dict, parent=parent)
+        widget.setStyleSheet(Styles.input_fields_widget())
+        layout.addWidget(widget)
+        
+        if separator_bottom:
+            layout.addWidget(WidgetFactory.create_separator())
+        
+        return layout, widget
+
+    @staticmethod
+    def create_simple_button(
+        *,
+        text: str = "Botão",
+        parent=None,
+        separator_top=False,
+        separator_bottom=True,
+    ):
+        """
+        Cria botão simples que ocupa espaço disponível.
+        
+        Parameters
+        ----------
+        text : str
+            Texto exibido no botão
+        
+        separator_top : bool
+            Adicionar separador no topo
+        
+        separator_bottom : bool
+            Adicionar separador no rodapé
+        
+        Returns
+        -------
+        tuple:
+            (layout_principal, botao)
+        """
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(Styles.LAYOUT_V_SPACING)
+        
+        if separator_top:
+            layout.addWidget(WidgetFactory.create_separator())
+        
+        widget = SimpleButtonWidget(text, parent=parent)
+        widget.setStyleSheet(Styles.simple_button_widget())
+        layout.addWidget(widget)
+        
+        if separator_bottom:
+            layout.addWidget(WidgetFactory.create_separator())
+        
+        return layout, widget
+
 

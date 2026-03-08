@@ -7,33 +7,35 @@ from qgis.PyQt.QtCore import Qt, QPoint
 from qgis.PyQt.QtGui import QCursor
 from typing import Optional
 from ..styles.Styles import Styles
+from .ScrollWidget import ScrollWidget
 
 class MainLayout(QVBoxLayout):
     """Container layout customizado para plugins MTL Tools com suporte a resize.
     
-    ARQUITETURA DE RESIZE (Separação de Responsabilidades):
-    ========================================================
+    ARQUITETURA:
+    ============
+    1. RESIZE (Separação de Responsabilidades):
+       - BasePlugin recebe eventos de mouse do Qt
+       - MainLayout executa lógica de resize (_get_resize_edge, _update_cursor)
+       - Limpo e reutilizável em qualquer plugin
     
-    Recepção de Eventos:
-    - BasePlugin (QDialog) recebe eventos de mouse do Qt
-    - Layouts NÃO recebem eventos - apenas widgets
-    - Por isso os métodos mousePressEvent() etc ficam em BasePlugin
-    
-    Delegação de Lógica:
-    - BasePlugin delega para MainLayout.handle_mouse_press/move/release()
-    - MainLayout executa toda a lógica de resize:
-      * Detecta qual borda foi apontada (_get_resize_edge)
-      * Atualiza cursor dinamicamente (_update_cursor)
-      * Calcula novo tamanho com respeito ao mínimo
-      * Aplica geometria ao dialog parent
+    2. SCROLL (Encapsulamento Automático):
+       - MainLayout cria ScrollWidget INTERNAMENTE se enable_scroll=True
+       - Plugin NÃO importa ScrollWidget (encapsulado)
+       - Plugin NÃO toca em self.scroll_container (não existe)
+       - add_items() decide automaticamente para onde vai cada item:
+         * Se scroll habilitado: encaminha para scroll
+         * Se scroll desabilitado: encaminha para inner_layout
+       - Responsabilidade única: MainLayout gerencia scroll, plugin só adiciona itens
     
     Benefícios:
     - Separação de responsabilidades: BasePlugin recebe, MainLayout executa
-    - Reutilizável: MainLayout pode ser usado em qualquer plugin
-    - Testável: Lógica concentrada em uma classe
-    - Limpo: BasePlugin tem apenas 3 métodos de delegação simples
+    - Encapsulamento: scroll é detalhe interno
+    - Reutilizável: MainLayout funciona com ou sem scroll
+    - Testável: lógica concentrada em uma classe
+    - Simples: BasePlugin tem apenas 3 métodos de delegação
     """
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, enable_scroll=False):
         super().__init__(parent)
 
         # margens externas do dialog (recorte do radius)
@@ -46,10 +48,16 @@ class MainLayout(QVBoxLayout):
         self._frame.setStyleSheet(Styles.main_application())
         self._frame.setMouseTracking(True)  # Ativa rastreamento no frame
 
-        # layout interno real
+        # layout interno real (sempre criado, com ou sem scroll)
         self._inner_layout = QVBoxLayout(self._frame)
         self._inner_layout.setContentsMargins(5, 5, 5, 5)
-        self._inner_layout.setSpacing(2)  # Reduzido de 8 para eliminar lacunas
+        self._inner_layout.setSpacing(Styles.LAYOUT_V_SPACING)
+
+        # scroll widget (criado apenas se enable_scroll=True)
+        self._scroll = None
+        if enable_scroll:
+            self._scroll = ScrollWidget(parent)
+            self._inner_layout.addWidget(self._scroll)
 
         # adiciona o frame ao layout principal
         super().addWidget(self._frame)
@@ -65,12 +73,34 @@ class MainLayout(QVBoxLayout):
         if parent:
             parent.setMouseTracking(True)
 
-    # -------- proxy methods --------
     def addWidget(self, widget, *args, **kwargs):
-        self._inner_layout.addWidget(widget, *args, **kwargs)
+        """
+        Adiciona widget ao layout.
+        
+        Se scroll está habilitado, adiciona ao scroll.
+        Caso contrário, adiciona ao inner_layout.
+        """
+        if self._scroll is not None:
+            # Cria container para o widget se necessário
+            container = QWidget()
+            layout = QVBoxLayout(container)
+            layout.setContentsMargins(0, 0, 0, 0)
+            layout.addWidget(widget)
+            self._scroll.add_layout_as_content(layout)
+        else:
+            self._inner_layout.addWidget(widget, *args, **kwargs)
 
     def addLayout(self, layout, *args, **kwargs):
-        self._inner_layout.addLayout(layout, *args, **kwargs)
+        """
+        Adiciona layout ao layout.
+        
+        Se scroll está habilitado, adiciona ao scroll.
+        Caso contrário, adiciona ao inner_layout.
+        """
+        if self._scroll is not None:
+            self._scroll.add_layout_as_content(layout)
+        else:
+            self._inner_layout.addLayout(layout, *args, **kwargs)
 
     def addStretch(self, *args, **kwargs):
         self._inner_layout.addStretch(*args, **kwargs)
@@ -80,8 +110,12 @@ class MainLayout(QVBoxLayout):
         
     def add_items(self, items):
         """
-        Adiciona widgets e/ou layouts ao layout interno,
-        respeitando a ordem da lista.
+        Adiciona widgets e/ou layouts ao layout.
+
+        Se scroll está habilitado, coleta todos os itens e os adiciona
+        ao scroll como um único layout.
+        
+        Se scroll está desabilitado, adiciona ao inner_layout diretamente.
 
         Parameters
         ----------
@@ -91,15 +125,63 @@ class MainLayout(QVBoxLayout):
         if not items:
             return
 
-        for item in items:
-            if isinstance(item, QLayout):
-                self._inner_layout.addLayout(item)
-            elif isinstance(item, QWidget):
-                self._inner_layout.addWidget(item)
-            else:
-                raise TypeError(
-                    f"Tipo inválido em MainLayout.add_items: {type(item)}"
-                )
+        if self._scroll is not None:
+            # Scroll habilitado: coleta itens em um layout e adiciona ao scroll
+            container_layout = QVBoxLayout()
+            container_layout.setContentsMargins(0, 0, 0, 0)
+            container_layout.setSpacing(Styles.LAYOUT_V_SPACING)
+            
+            for item in items:
+                if isinstance(item, QLayout):
+                    container_layout.addLayout(item)
+                elif isinstance(item, QWidget):
+                    container_layout.addWidget(item)
+                else:
+                    raise TypeError(
+                        f"Tipo inválido em MainLayout.add_items: {type(item)}"
+                    )
+            
+            # Adiciona ao scroll
+            self._scroll.add_layout_as_content(container_layout)
+        else:
+            # Scroll desabilitado: adiciona diretamente ao inner_layout
+            for item in items:
+                if isinstance(item, QLayout):
+                    self._inner_layout.addLayout(item)
+                elif isinstance(item, QWidget):
+                    self._inner_layout.addWidget(item)
+                else:
+                    raise TypeError(
+                        f"Tipo inválido em MainLayout.add_items: {type(item)}"
+                    )
+
+    def get_size(self) -> tuple:
+        """
+        Retorna a dimensão atual do layout container (width, height).
+        
+        Returns
+        -------
+        tuple
+            (width, height) em pixels
+        """
+        if self._frame:
+            return (self._frame.width(), self._frame.height())
+        return (0, 0)
+
+    def set_size(self, width: int, height: int):
+        """
+        Define a dimensão do layout container.
+        
+        Parameters
+        ----------
+        width : int
+            Largura em pixels
+        height : int
+            Altura em pixels
+        """
+        if self._frame:
+            self._frame.setMinimumSize(width, height)
+            self._frame.resize(width, height)
     
     def _get_resize_edge(self, pos: QPoint) -> Optional[str]:
         """Detecta qual borda está sendo apontada."""
@@ -155,6 +237,9 @@ class MainLayout(QVBoxLayout):
     def handle_mouse_move(self, event):
         """Redimensiona a janela ao arrastar."""
         edge = self._get_resize_edge(event.pos())
+        
+        # SEMPRE atualiza o cursor baseado na posição atual
+        # Mesmo quando não está em resize, isso garante que o cursor resete corretamente
         self._update_cursor(edge)
         
         if self._resize_active and self._resize_edge and self._last_pos and self._parent_dialog:

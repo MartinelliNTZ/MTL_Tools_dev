@@ -20,16 +20,19 @@ class CopyAttributes(BasePluginMTL):
     def __init__(self, iface):
         super().__init__(iface.mainWindow())
         self.iface = iface
-        self.init(ToolKey.COPY_ATTRIBUTES, "CopyAttributes", min_width=320, min_height=450)
+        self.init(ToolKey.COPY_ATTRIBUTES, "CopyAttributes")
 
     # =========================
     # UI
     # =========================
     def _build_ui(self, **kwargs):
-        super()._build_ui("Copiar Atributos de Vetor","copy_attributes.ico","copy_attributes_help.md", **kwargs)       
-              
+        super()._build_ui(
+            title="Copiar Atributos de Vetor",
+            icon_path="copy_attributes.ico",
+            instructions_file="copy_attributes_help.md",
+            enable_scroll=True
+        )
         self.logger.info("Construindo interface da ferramenta")
-
 
         # CAMADA DESTINO
         tgt_layout, self.target_layer_input = WidgetFactory.create_layer_input(
@@ -38,6 +41,7 @@ class CopyAttributes(BasePluginMTL):
             parent=self
         )
         self.logger.debug("Componente de camada de target adicionado")        
+        
         # CAMADA ORIGEM
         src_layout, self.source_layer_input = WidgetFactory.create_layer_input(
             label_text="Camada de Origem:",
@@ -45,29 +49,33 @@ class CopyAttributes(BasePluginMTL):
             parent=self
         )        
         self.source_layer_input.layerChanged.connect(self._populate_fields)
-
         self.logger.debug("Componente de camada de origem adicionado")    
-
-
 
         # ATRIBUTOS
         attr_layout, self.attr_widget = WidgetFactory.create_attribute_selector(
             parent=self,
-            title="Atributos da camada origem"       )
-
+            title="Atributos da camada origem"
+        )
 
         # BOTÕES
         buttons_layout, self.action_buttons = WidgetFactory.create_bottom_action_buttons(
-            parent=self,            run_callback=self.execute_tool,
-            close_callback=self.close, 
-            info_callback=self.show_info_dialog,            tool_key=self.TOOL_KEY,        ) 
+            parent=self,
+            run_callback=self.execute_tool,
+            close_callback=self.close,
+            info_callback=self.show_info_dialog,
+            tool_key=self.TOOL_KEY,
+        )
+
+        # ====== CONTEÚDO AO LAYOUT ======
+        # MainLayout encapsula o scroll internamente
+        # add_items() roteia automaticamente para scroll ou inner_layout
+        self.layout.add_items([
+            tgt_layout,
+            src_layout,
+            attr_layout,
+            buttons_layout
+        ])
         
-
-        # SIGNALS
-        #self.cmb_source.layerChanged.connect(self._populate_fields)
-
-        # AUTO SETUP
-        self.layout.add_items([tgt_layout,src_layout,attr_layout, buttons_layout])        
         self._populate_fields()
 
 
@@ -90,12 +98,14 @@ class CopyAttributes(BasePluginMTL):
     def _save_prefs(self):       
         data = {}
         data['chk_all'] = bool(self.attr_widget.use_all_fields())
+        # Tamanho da janela (persistido automaticamente por BasePlugin.closeEvent)
+        data['window_width'] = self.width()
+        data['window_height'] = self.height()
         save_tool_prefs(self.TOOL_KEY, data)
     # =========================
     # CONTROLLER
     # =========================
     def execute_tool(self):
-        self._save_prefs()
         self.logger.info("Execução iniciada")
 
         source = self.source_layer_input.current_layer()

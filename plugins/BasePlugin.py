@@ -42,8 +42,8 @@ class BasePluginMTL(QDialog):
 
 
 
-    def init(self, tool_key="base_plugin", class_name="BasePluginMTL", min_width=460, min_height=320, load_settings_prefs=False, build_ui=True):
-        """Inicializa o plugin base.
+    def init(self, tool_key="base_plugin", class_name="BasePluginMTL", load_settings_prefs=False, build_ui=True):
+        """Inicializa o plugin base.    
         
         Parameters
         ----------
@@ -51,10 +51,6 @@ class BasePluginMTL(QDialog):
             Identificador único da ferramenta (padrão: base_plugin)
         class_name : str
             Nome da classe para logging (padrão: BasePluginMTL)
-        min_width : int
-            Largura mínima da janela em pixels (padrão: 460)
-        min_height : int
-            Altura mínima da janela em pixels (padrão: 320)
         load_settings_prefs : bool
             Se True, carrega preferências globais do MTL Tools Settings (padrão: False)
         build_ui : bool
@@ -77,10 +73,9 @@ class BasePluginMTL(QDialog):
         # Construir UI apenas se solicitado
         if build_ui:
             self.logger.debug("Construindo interface de usuário")
-            self._build_ui(min_width=min_width, min_height=min_height)
+            self._build_ui()
             self.logger.debug("Carregando preferências do usuário. xxd")
             self._load_prefs()
-            self._load_window_geometry()
             self.logger.info("Diálogo Gerar Rastro Implemento inicializado com sucesso. xxd")
         else:
             self.logger.debug("Construção de UI desabilitada")
@@ -102,25 +97,31 @@ class BasePluginMTL(QDialog):
         title: Optional[str] = None,
         icon_path: Optional[str] = "mtl_agro.ico",
         instructions_file: Optional[str] = "standard.md",
-        min_width: int = 460,
-        min_height: int = 320,
+        enable_scroll: bool = True,
         **kwargs
     ):
         """Constrói a interface do plugin.
 
-        Recebe: title (str|None), icon_path (str), instructions_file (str), min_width (int), min_height (int).
+        Recebe: title (str|None), icon_path (str), instructions_file (str), enable_scroll (bool).
         Retorna: None.
-        Faz: configura layout, ícone, tamanho da janela e caminho de instruções.
+        Faz: configura layout, ícone, tamanho da janela (padrão 300x300, persistido em prefs), 
+             caminho de instruções e scroll opcional.
+        
+        ARQUITETURA (MainLayout encapsula scroll):
+        - MainLayout cria ScrollWidget internamente se enable_scroll=True
+        - Plugin apenas atribui self.layout = WidgetFactory.create_main_layout()
+        - Responsabilidade única: MainLayout gerencia scroll, plugin usa add_items()
         """
         if title is not None:
             self.PLUGIN_NAME = title
-            self.layout = WidgetFactory.create_main_layout(self, title=title)
+            self.layout = WidgetFactory.create_main_layout(self, title=title, enable_scroll=enable_scroll)
 
         self.logger.debug(f"Construindo UI para plugin: {self.PLUGIN_NAME}")
 
         self.setWindowFlags(Qt.Dialog | Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground, True)
-        self.setMinimumSize(min_width, min_height)
+        # Tamanho mínimo padrão: 300x300 (persistido em preferências)
+        self.setMinimumSize(300, 300)
         self.setWindowTitle(f"MTL Tools — {self.PLUGIN_NAME}")
 
         # Size grip (resize visual indicator)
@@ -148,6 +149,49 @@ class BasePluginMTL(QDialog):
             instructions_file
         )
 
+        # Restaurar tamanho da janela se foi persistido
+        self._restore_window_size()
+
+    def _restore_window_size(self):
+        """
+        Restaura o tamanho da janela a partir das preferências.
+        
+        Se não houver tamanho persistido, usa 300x300 como padrão.
+        """
+        saved_width = self.preferences.get("window_width", 300)
+        saved_height = self.preferences.get("window_height", 300)
+        
+        try:
+            self.resize(int(saved_width), int(saved_height))
+            self.logger.debug(f"Tamanho da janela restaurado: {saved_width}x{saved_height}")
+        except Exception as e:
+            self.logger.warning(f"Erro ao restaurar tamanho da janela: {e}, usando padrão")
+            self.resize(300 , 300)
+
+    def _persist_window_size(self):
+        """
+        Persiste o tamanho atual da janela nas preferências.
+        
+        Deve ser chamado em closeEvent() ou ao finalizar a execução.
+        """
+        width = self.width()
+        height = self.height()
+        
+        self.preferences["window_width"] = width
+        self.preferences["window_height"] = height
+        
+        self.logger.debug(f"Tamanho da janela persistido: {width}x{height}")
+
+    def closeEvent(self, event):
+        """
+        Override do evento de fechamento para persistir preferências.
+        
+        Salva tamanho da janela e demais preferências antes de fechar.
+        """
+        self._persist_window_size()
+        self._save_prefs()
+        super().closeEvent(event)
+
     def mousePressEvent(self, event):
         """Delega evento de mouse para detecção de bordas e início de resize do MainLayout."""
         if self.layout and hasattr(self.layout, 'handle_mouse_press'):
@@ -167,12 +211,6 @@ class BasePluginMTL(QDialog):
             if self.layout.handle_mouse_release(event):
                 return
         super().mouseReleaseEvent(event)
-    
-    def closeEvent(self, event):
-        """Salva preferências e geometria antes de fechar."""
-        self._save_window_geometry()
-        self._save_prefs()
-        super().closeEvent(event)
 
     def start_stats(self, input_obj=None,modal_info = "YES"):
         try:
@@ -254,35 +292,14 @@ class BasePluginMTL(QDialog):
             self.logger.error(f"Erro: {e} Preferences: {self.preferences}")
 
 
-    def _load_prefs(self):
-        """Carrega preferências da ferramenta (a ser implementado por subclasses)."""
+    #@abstractmethod
+    def execute_tool(self):
+        """
+        Método principal a ser implementado por cada plugin específico.
+        Ele é chamado quando o usuário aciona a funcionalidade do plugin (ex: clica em um botão).
+        Deve conter a lógica de execução do plugin.
+        """
         pass
-
-    def _save_prefs(self):
-        """Salva preferências da ferramenta (a ser implementado por subclasses)."""
-        pass
-
-    def _load_window_geometry(self):
-        """Carrega tamanho e posição da janela salva nas preferências."""
-        prefs = load_tool_prefs(self.TOOL_KEY)
-        
-        # Restaurar tamanho
-        width = prefs.get("window_width")
-        height = prefs.get("window_height")
-        if width and height:
-            self.resize(width, height)
-            self.logger.debug(f"Geometria restaurada: {width}x{height}", code="GEOM_RESTORED")
-    
-    def _save_window_geometry(self):
-        """Salva tamanho e posição da janela nas preferências."""
-        prefs = load_tool_prefs(self.TOOL_KEY)
-        
-        # Salvar tamanho
-        prefs["window_width"] = self.width()
-        prefs["window_height"] = self.height()
-        
-        save_tool_prefs(self.TOOL_KEY, prefs)
-        self.logger.debug(f"Geometria salva: {self.width()}x{self.height()}", code="GEOM_SAVED")
 
     def _on_pipeline_finished(self, context):    
         """Callback para quando a pipeline é finalizada com sucesso."""

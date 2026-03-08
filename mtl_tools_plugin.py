@@ -65,6 +65,7 @@ class MTL_Tools:
     # =====================================================
     def initGui(self):
         # Instalar proteção global contra crashes
+        #QgisMessageUtil.bar_info(self.iface, "Iniciando MTL Tools...")
         _install_global_error_handler()
         
         plugin_root = Path(__file__).resolve().parent

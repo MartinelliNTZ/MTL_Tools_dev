@@ -38,7 +38,7 @@ class BottomActionButtonsWidget(QWidget):
     # --------------------------------------------------
     # UI
     # --------------------------------------------------
-    def _build_ui(self, height: int,style=None):
+    def _build_ui(self, height: int, style=None):
         layout = QHBoxLayout(self)
         layout.addStretch()
 
@@ -47,9 +47,7 @@ class BottomActionButtonsWidget(QWidget):
         self._btn_info.setFixedWidth(height)
         self._btn_info.setFixedHeight(height)
         if style:
-            self._btn_run.setStyleSheet(style)
-            self._btn_close.setStyleSheet(style)
-            self._btn_info.setStyleSheet(style)
+            self.setStyleSheet(style)
 
         layout.addWidget(self._btn_run)
         layout.addWidget(self._btn_close)
