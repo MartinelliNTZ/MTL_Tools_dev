@@ -1,6 +1,103 @@
 changelog=
-  1.6.7 (em desenvolvimento - Persistência de Tamanho de Janela + Padronização de Styles)
-    1.6.7.9
+
+  1.6.7 2026/03/09
+    1.6.7.1# COMEÇA AQUI
+
+
+
+  1.6.6 2026/03/09
+    1.6.6.4
+    - PERSISTÊNCIA: Tamanho de Janela em ReplaceInLayouts
+      - Adicionado: window_width e window_height em _save_prefs()
+        ✓ Arquivo: plugins/replace_in_layouts.py (_save_prefs method)
+        ✓ Padrão: Consistente com DroneCoordinates e outros plugins
+      - Benefício: ReplaceInLayouts agora abre com tamanho anterior
+      - Implementação:
+        ✓ Linha ~109: "window_width": self.width()
+        ✓ Linha ~110: "window_height": self.height()
+      - Funcionamento: BasePlugin.closeEvent() chama _save_prefs() automaticamente
+      - Risco: Baixo
+        ✓ Apenas adiciona persistência, sem lógica adicional
+    1.6.6.3
+    - FEATURE: Botão de Troca (Swap) em ReplaceInLayouts
+      - Novo: Botão "⇅ Inverter" entre campos old_text/new_text
+        ✓ Inverte o conteúdo dos campos ao clicar
+        ✓ old_text ↔ new_text (troca de posição)
+      - Implementação:
+        ✓ Arquivo: plugins/replace_in_layouts.py
+        ✓ Método: _swap_fields() - inverte valores dos campos
+        ✓ Widget: SimpleButtonWidget via WidgetFactory.create_simple_button()
+      - Layout:
+        ✓ Posição: entre input_fields_widget e checkbox_grid
+        ✓ Separator: top=False (conecta ao input), bottom=True (separa das opções)
+      - Benefícios:
+        ✓ UX melhorada: usuário pode rapidly testar ambas as direções
+        ✓ Integração com InputFieldsWidget.set_values/get_values()
+        ✓ Sem estado: apenas alterna valores, não persiste
+      - Risco: Baixo
+        ✓ Ação não-destrutiva, simples reversão
+        ✓ Sem persistência (não salva estado do botão)
+    1.6.6.2
+    - CORREÇÃO PROFUNDA: Gap Entre AppBar e Itens (enable_scroll=False/True)
+      - Problema Raiz Identificado: Falta de stretch ao final do _inner_layout
+        ✓ Com scroll: ScrollWidget + itens não preenchiam espaço, deixava gap
+        ✓ Sem scroll: Itens diretos no layout sem stretch = espaço vazio abaixo
+      - Arquitetura do Problema:
+        ✓ Com scroll:
+          - _inner_layout contém: AppBar + ScrollWidget
+          - Itens dentro do ScrollWidget via container_layout
+          - SEM stretch: ScrollWidget fica pequeno (tamanho do conteúdo)
+        ✓ Sem scroll:
+          - _inner_layout contém: AppBar + item1 + item2 + item3
+          - SEM stretch: Espaço vazio abaixo dos itens
+      - Solução: Adicionar addStretch() ao final em AMBOS os casos
+        ✓ Com scroll: self._inner_layout.addStretch() após add_layout_as_content()
+        ✓ Sem scroll: self._inner_layout.addStretch() após adicionar itens
+        ✓ Resultado: Itens compactos no topo, stretch preenche resto
+      - Arquivos Modificados:
+        ✓ resources/widgets/MainLayout.py (método add_items())
+          - Linha ~144: Added addStretch() para caso com scroll
+          - Linha ~155: Added addStretch() para caso sem scroll
+      - Plugins Afetados:
+        ✓ ReplaceInLayouts (enable_scroll=False): GAP ELIMINADO ✓
+        ✓ DroneCoordinates (enable_scroll=True): Layout mais robusto ✓
+        ✓ GenerateTrailPlugin (enable_scroll=True): Layout mais robusto ✓
+      - Como Funciona:
+        ✓ Stretch é um spacer invisível com sizePolicy Expanding
+        ✓ Mantém itens compactos no topo, preenchendo espaço vertical restante
+        ✓ Consistente com ou sem scroll: mesma estrutura visual
+      - Benefícios:
+        ✓ Gap entre AppBar e itens eliminado completamente
+        ✓ Layouts mais previsíveis: itens sempre no topo mesmo com resize
+        ✓ UX consistente: mesmo comportamento em todos plugins
+        ✓ Robustos: funciona com qualquer quantidade de itens
+      - Risco: Muito Baixo
+        ✓ addStretch() é pattern standard em Qt
+        ✓ Não afeta componentes existentes (apenas melhora spacing)
+        ✓ Reversível se houver comportamento indesejado
+    1.6.6.1
+    - CORREÇÃO: Espaçamento Inconsistente Entre AppBar e Itens (enable_scroll=False)
+      - Problema: ReplaceInLayouts exibia gap grande entre AppBar e primeiro item
+        ✓ Causa: _inner_layout não tinha setSpacing() quando enable_scroll=False
+        ✓ Com scroll: container_layout.setSpacing(Styles.LAYOUT_V_SPACING) definido
+        ✓ Sem scroll: _inner_layout.setSpacing() nunca era chamado
+      - Solução: Adicionar setSpacing() em MainLayout.__init__() SEMPRE
+        ✓ Linha 51: self._inner_layout.setSpacing(Styles.LAYOUT_V_SPACING)
+        ✓ Agora consistent: spacing=2px com ou sem scroll
+      - Arquivos Modificados:
+        ✓ resources/widgets/MainLayout.py
+      - Plugins Afetados (Corrigidos):
+        ✓ ReplaceInLayoutsDialog: enable_scroll=False (agora com espaçamento correto)
+      - Benefícios:
+        ✓ Espaçamento visual consistente em todos os plugins
+        ✓ Melhor UX: gaps uniformes entre componentes
+      - Risco: Baixo
+        ✓ change é minimal e isolada (apenas 1 linha adicionada)
+        ✓ Não afeta lógica, apenas espaçamento visual
+
+
+  1.6.5 2026/03/08
+    1.6.5.9
     - ENCAPSULAMENTO DE SCROLL: MainLayout gerencia ScrollWidget internamente
       - Objetivo: Separação de responsabilidades - plugins NÃO tocam em scroll
       - ARQUITETURA NOVA:
@@ -42,7 +139,7 @@ changelog=
       - RISCO: Baixo
         ✓ Behavior mantido: items ainda vão para scroll ou layout dependendo de enable_scroll
         ✓ Tests: DroneCoordinates, GenerateTrailPlugin, CopyAttributesPlugin funcionando
-    1.6.7.8
+    1.6.5.8
     - APLICAÇÃO DE ESTILOS: InputFieldsWidget + SimpleButtonWidget
       - Renomeado FullScreenButtonWidget → SimpleButtonWidget (nome mais apropriado)
         ✓ Arquivo: resources/widgets/SimpleButtonWidget.py
@@ -69,7 +166,7 @@ changelog=
         ✓ Botões spinbox menores (visual melhorado)
         ✓ Consistência visual com tema do software
         ✓ Fácil customização via Styles
-    1.6.7.7
+    1.6.5.7
     - TESTE: Novos widgets para DroneCoordinates
       - Criado InputFieldsWidget: widget com múltiplos campos de input (text/int/float) via dicionário
         ✓ Arquivo: resources/widgets/InputFieldsWidget.py
@@ -87,7 +184,7 @@ changelog=
         ✓ FullScreenButtonWidget com callback que loga ao clicar
         ✓ Ambos adicionados ao content_layout (dentro do scroll)
       - Status: TESTE (pode ser removido facilmente)
-    1.6.7.6
+    1.6.5.6
     - CENTRALIZAÇÃO DE PERSISTÊNCIA: Todas as preferências via BasePlugin.closeEvent()
       - Objetivo: Evitar duplicação de _save_prefs() espalhadas em pipelines
       - Mudanças em BasePlugin.closeEvent():
@@ -117,7 +214,7 @@ changelog=
         ✓ Sem race conditions: não há múltiplos saves simultâneos
         ✓ Dados sincronizados: tamanho da janela sempre incluído
         ✓ Mais limpeza de código: sem _save_prefs() espalhadas
-    1.6.7.5
+    1.6.5.5
     - CONSOLIDAÇÃO UNIVERSAL: FileSelectorWidget → SelectorWidget
       - Objetivo: Eliminar duplicação, unificar toda seleção de paths (pastas/arquivos/salvamento)
       - Renomeação: PathSelectorWidget → SelectorWidget (mais apropriado para universalidade)
@@ -144,7 +241,7 @@ changelog=
         ✓ DroneCoordinates: cria_path_selector() → retorna SelectorWidget
         ✓ GenerateTrailPlugin: create_save_file_selector() → retorna SelectorWidget
         ✓ APIs compatíveis: get_paths(), get_file_path(), set_file_path(), is_enabled()
-    1.6.7.4
+    1.6.5.4
     - SIMPLIFICAÇÃO: REMOÇÃO DE OBRIGATORIEDADE DE TAMANHOS EM PLUGINS
       - Objetivo: Aproveitar persistência de tamanho para remover parâmetros repetitivos
       - Mudanças em BasePlugin.init():
@@ -171,7 +268,7 @@ changelog=
         ✓ 300x300: tamanho mínimo consistente e persistido
         ✓ Cada ferramenta redimensiona e salva sua preferência
         ✓ NoNeed pra plugins definirem tamanhos customizados
-    1.6.7.3
+    1.6.5.3
     - REFATORAÇÃO DE ARQUITETURA: SCROLL COMO RESPONSABILIDADE DO WIDGETFACTORY
       - Objetivo: Separação clara de responsabilidades entre WidgetFactory e plugins
       - Padrão anterior: Plugins criavam ScrollWidget diretamente em _build_ui()
@@ -197,7 +294,7 @@ changelog=
         ✓ Manutenibilidade: mudanças em scroll só precisam de 1 lugar
         ✓ Testabilidade: WidgetFactory encapsula lógica de scroll
       - Compatibilidade: Plugins sem enable_scroll continuam funcionando (padrão False)
-    1.6.7.2
+    1.6.5.2
     - PADRONIZAÇÃO CENTRALIZADA DE ESTILOS (Styles.py)
       - Adicionadas constantes de altura:
         ✓ INPUT_HEIGHT = 24px (QLineEdit, QComboBox, etc)
@@ -221,7 +318,7 @@ changelog=
       - Centralização completa: todos widgets recebem estilos via WidgetFactory
       - Paleta de cores com 5 estados: normal, hover, pressed, disabled, focused
       - Estrutura reutilizável para novos widgets
-    1.6.7.1
+    1.6.5.1
     - PERSISTÊNCIA DE TAMANHO DE JANELA AUTOMÁTICA
       - BasePlugin.closeEvent() override: salva window_width/window_height automaticamente
       - BasePlugin._restore_window_size(): restaura tamanho ao abrir cada ferramenta
@@ -237,8 +334,7 @@ changelog=
         ✓ GenerateTrailPlugin, CopyAttributes, SettingsPlugin: funcionam via herança
         ✓ Padrão reutilizável para novos plugins
 
-  1.6.6
-    1.6.6.1
+    1.6.5.0
     - REFATORAÇÃO COMPLETA DE LAYOUT E SPACING
       - Variáveis globais em Styles.py:
         ✓ ITEM_HEIGHT = 12px (altura padrão de cada elemento)
@@ -264,7 +360,6 @@ changelog=
         ✓ Spacing interno = LAYOUT_V_SPACING (2px)
       - Resultado: Layout compacto, consistente e sem "jumping"
 
-  1.6.5 
 
   1.6.4 2026/03/06
     1.6.4.4

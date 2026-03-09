@@ -55,14 +55,23 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
                     'default': ''
                 }
             },
+            separator_bottom=False
+        )
+
+        # ====== BOTÃO DE TROCA ======
+        swap_layout, self.swap_button = WidgetFactory.create_simple_button(
+            text="⇅ Inverter",
+            parent=self,
+            separator_top=False,
             separator_bottom=True
         )
+        self.swap_button.clicked.connect(self._swap_fields)
 
         # ====== OPÇÕES ======
         opts_layout, self.checkbox_map = WidgetFactory.create_checkbox_grid(
             names=[
-                "Diferenciar maiúsculas/minúsculas (case sensitive)",
-                "Substituir o label inteiro quando encontrar o texto (modo chave)"
+                "Diferenciar maiúsculas/minúsculas",
+                "Substituir o label inteiro quando encontrar o texto"
             ],
             items_per_row=1,
             checked_by_default=False,
@@ -90,6 +99,7 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
         # ====== ADICIONAR AO LAYOUT ======
         self.layout.add_items([
             input_layout,
+            swap_layout,
             opts_layout,
             info_label,
             buttons_layout
@@ -104,10 +114,10 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
             'old_text': prefs.get("old_text", ""),
             'new_text': prefs.get("new_text", "")
         })
-        self.checkbox_map["Diferenciar maiúsculas/minúsculas (case sensitive)"].setChecked(
+        self.checkbox_map["Diferenciar maiúsculas/minúsculas"].setChecked(
             prefs.get("case_sensitive", True)
         )
-        self.checkbox_map["Substituir o label inteiro quando encontrar o texto (modo chave)"].setChecked(
+        self.checkbox_map["Substituir o label inteiro quando encontrar o texto"].setChecked(
             prefs.get("full_replace", False)
         )
 
@@ -118,17 +128,32 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
             {
                 "old_text": values.get('old_text', ''),
                 "new_text": values.get('new_text', ''),
-                "case_sensitive": self.checkbox_map["Diferenciar maiúsculas/minúsculas (case sensitive)"].isChecked(),
-                "full_replace": self.checkbox_map["Substituir o label inteiro quando encontrar o texto (modo chave)"].isChecked()
+                "case_sensitive": self.checkbox_map["Diferenciar maiúsculas/minúsculas"].isChecked(),
+                "full_replace": self.checkbox_map["Substituir o label inteiro quando encontrar o texto"].isChecked(),
+                # Tamanho da janela (persistido automaticamente por BasePlugin.closeEvent)
+                "window_width": self.width(),
+                "window_height": self.height(),
             }
         )
+
+    def _swap_fields(self):
+        """Inverte o conteúdo dos campos old_text e new_text."""
+        values = self.input_fields_widget.get_values()
+        old = values.get('old_text', '')
+        new = values.get('new_text', '')
+        
+        # Troca os valores
+        self.input_fields_widget.set_values({
+            'old_text': new,
+            'new_text': old
+        })
 
     def execute_tool(self):
         values = self.input_fields_widget.get_values()
         old_text = values.get('old_text', '').strip()
         new_text = values.get('new_text', '')
-        case_sensitive = self.checkbox_map["Diferenciar maiúsculas/minúsculas (case sensitive)"].isChecked()
-        full_replace = self.checkbox_map["Substituir o label inteiro quando encontrar o texto (modo chave)"].isChecked()
+        case_sensitive = self.checkbox_map["Diferenciar maiúsculas/minúsculas"].isChecked()
+        full_replace = self.checkbox_map["Substituir o label inteiro quando encontrar o texto"].isChecked()
 
         if not old_text:
             QgisMessageUtil.bar_warning(

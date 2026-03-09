@@ -36,11 +36,17 @@ porem preciso ter a buffer em task e entao ir passando plugin/plugin
 antes de criar qualquer ferramtne preciso analisar melhor criar primeiramente a ui e depois vir gerando metodos SEMPRE
 
 changelog=
-1.6.6
-dar esse propt ai tava replace in layouts
-analise basepluigin drone cordinates e generatrial e tenten entender pq em replace inlayouts tem um espaço grande entre a appbar e o primeiro item isso ocorre quando o senable_scroll=False, tente entender pq e corrija esse problema
-  1.6.5 2026/03/06 - BUG FIX
-      tem que resumir e botaaqui 
+  1.6.6 2026/03/06
+    - REFATORAÇÃO COMPLETA DE LAYOUT E SPACING
+      - Variáveis de espaçamento centralizadas em Styles.py: ITEM_HEIGHT, LAYOUT_V_SPACING, LAYOUT_H_SPACING, etc
+      - ScrollWidget customizada criada com QScrollArea + estilo integrado ao tema
+      - DroneCoordinates refatorada: scroll integrado, botões de ação fixos na base
+      - MainLayout melhorado com métodos get_size() / set_size() para gerenciar dimensões
+      - Resultado: Layout compacto, consistente e sem "jumping" entre componentes
+  1.6.5 2026/03/06 - Versão de Estabilização
+    - Consolidação de refatorações anteriores (1.6.4)
+    - Bug fixes diversos e ajustes de compatibilidade
+    - Preparação para release 1.6.6
   1.6.4 2026/03/06
     - LIMPEZA DE SISTEMA: Substituição completa de LogUtilsOld → LogUtilsNew em todos arquivos funcionais
       - Migração: project_utils.py, layouts_utils.py, base_tool.py, todos os Step/Task files

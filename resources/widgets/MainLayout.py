@@ -51,7 +51,7 @@ class MainLayout(QVBoxLayout):
         # layout interno real (sempre criado, com ou sem scroll)
         self._inner_layout = QVBoxLayout(self._frame)
         self._inner_layout.setContentsMargins(5, 5, 5, 5)
-        # Espaçamento será definido dinamicamente baseado no scroll
+        self._inner_layout.setSpacing(Styles.LAYOUT_V_SPACING)  # Consistente com ou sem scroll
 
         # scroll widget (criado apenas se enable_scroll=True)
         self._scroll = None
@@ -143,6 +143,9 @@ class MainLayout(QVBoxLayout):
             
             # Adiciona ao scroll
             self._scroll.add_layout_as_content(container_layout)
+            
+            # Adiciona stretch ao final para preenchimento consistente
+            #self._inner_layout.addStretch()
         else:
             # Scroll desabilitado: adiciona diretamente ao inner_layout
             for item in items:
@@ -154,6 +157,10 @@ class MainLayout(QVBoxLayout):
                     raise TypeError(
                         f"Tipo inválido em MainLayout.add_items: {type(item)}"
                     )
+            
+            # Adiciona stretch ao final para evitar gaps quando sem scroll
+            # Isso mantém itens compactos no topo, preenchendo espaço restante com stretch
+            self._inner_layout.addStretch()
 
     def get_size(self) -> tuple:
         """

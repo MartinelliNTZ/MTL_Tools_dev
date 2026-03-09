@@ -358,7 +358,7 @@ class WidgetFactory:
             raise ValueError("A lista de nomes de checkbox não pode estar vazia")
 
         main_layout = QVBoxLayout()
-        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setContentsMargins(2, 2, 2, 2)
         main_layout.setSpacing(0)
 
         if separator_top:
