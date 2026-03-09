@@ -74,9 +74,9 @@ class BasePluginMTL(QDialog):
         if build_ui:
             self.logger.debug("Construindo interface de usuário")
             self._build_ui()
-            self.logger.debug("Carregando preferências do usuário. xxd")
+            self.logger.debug("Carregando preferências do usuário")
             self._load_prefs()
-            self.logger.info("Diálogo Gerar Rastro Implemento inicializado com sucesso. xxd")
+            self.logger.info("Plugin inicializado com sucesso")
         else:
             self.logger.debug("Construção de UI desabilitada")
 

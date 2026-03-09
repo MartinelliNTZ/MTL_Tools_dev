@@ -49,7 +49,6 @@ class SettingsPlugin(BasePluginMTL):
         # ========== SEÇÃO 1: Preferências do App ==========
         prefs_label = QLabel("📋 Preferências do Aplicativo")
         prefs_label.setStyleSheet("font-weight: bold; font-size: 11pt;")
-        self.layout.add_items([prefs_label])
 
         # Link clicável para preferências
         pref_link = QLabel(
@@ -59,7 +58,6 @@ class SettingsPlugin(BasePluginMTL):
         pref_link.setCursor(Qt.PointingHandCursor)
         pref_link.linkActivated.connect(self._on_open_preferences)
 
-        self.layout.add_items([pref_link])
         self.logger.debug("Link de preferências adicionado")
 
         # ========== SEÇÃO 2: Método de Cálculo Vetorial ==========
@@ -73,9 +71,9 @@ class SettingsPlugin(BasePluginMTL):
             separator_bottom=True,
             parent=self
         )
-        self.layout.add_items([calc_layout])
         self.logger.debug("Widget de cálculo vetorial adicionado")
-                # ========== SEÇÃO 4: Precisão para campos vetoriais ==========
+        
+        # ========== SEÇÃO 3: Precisão para campos vetoriais ==========
         prec_layout, self.spin_precision = WidgetFactory.create_double_spin_input(
             "🎯 Precisão de campos vetoriais (casas decimais):",
             decimals=0,
@@ -86,10 +84,9 @@ class SettingsPlugin(BasePluginMTL):
             separator_top=True,
             separator_bottom=False,
         )
-        self.layout.add_items([prec_layout])
         self.logger.debug("Widget de precisão de campos vetoriais adicionado")
 
-        # ========== SEÇÃO 3: Limiar de processamento assíncrono ==========
+        # ========== SEÇÃO 4: Limiar de processamento assíncrono ==========
         # Agora o valor é o número máximo de feições que podem ser processadas
         # de forma síncrona; tudo acima irá disparar execução em segundo plano.
         thresh_layout, self.spin_threshold = WidgetFactory.create_double_spin_input(
@@ -102,10 +99,7 @@ class SettingsPlugin(BasePluginMTL):
             separator_top=False,
             separator_bottom=True,
         )
-        self.layout.add_items([thresh_layout])
         self.logger.debug("Widget de limiar assíncrono por feições adicionado")
-
-
 
         # ========== BOTÕES DE AÇÃO ==========
         buttons_layout, self.action_buttons = WidgetFactory.create_bottom_action_buttons(
@@ -116,7 +110,18 @@ class SettingsPlugin(BasePluginMTL):
             tool_key=ToolKey.SETTINGS,
             run_text = "Salvar"
         )
-        self.layout.add_items([buttons_layout])
+        
+        # ========== ADICIONAR TODOS OS ITEMS DE UMA VEZ ==========
+        # Importante: adicionar items em uma ÚNICA chamada a add_items()
+        # para evitar reparentings repetidos que destroem widgets internos
+        self.layout.add_items([
+            prefs_label,
+            pref_link,
+            calc_layout,
+            prec_layout,
+            thresh_layout,
+            buttons_layout
+        ])
         self.logger.info("Interface de configurações construída com sucesso")
 
     def _load_prefs(self):

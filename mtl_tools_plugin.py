@@ -277,9 +277,11 @@ class MTL_Tools:
             # ==================================================
             self._add_toolbar_dropdown(
                 title="Layouts",
-                main_action=self.action_replace_layouts,
-               # main_action=self.action_export_all,
-                secondary_actions=[self.action_replace_layouts, self.action_export_all]
+                #main_action=self.action_replace_layouts,
+                main_action=self.action_export_all,
+                secondary_actions=[ self.action_export_all,
+                                    self.action_replace_layouts,
+                                    ]
             )
 
             # ==================================================
@@ -445,10 +447,9 @@ class MTL_Tools:
     # =====================================================
     def run_export_layouts(self):
         try:
-            from .plugins.export_all_layouts import ExportAllLayoutsDialog
+            from .plugins.export_all_layouts import run_export_all_layouts
             self.logger.info("Abrindo diálogo: Exportar todos os Layouts")
-            dlg = ExportAllLayoutsDialog(self.iface)
-            dlg.exec()
+            self.export_dlg = run_export_all_layouts(self.iface)
             self.logger.info("Diálogo Exportar Layouts fechado")
         except Exception as e:
             self.logger.error(f"Erro ao executar Exportar Layouts: {str(e)}")

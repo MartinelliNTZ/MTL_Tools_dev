@@ -507,7 +507,7 @@ class Styles:
             border: 1px solid {Styles.COLOR_PRIMARY_DARK};
             border-radius: 6px;
             padding: 4px 10px;
-            min-height: 26px;
+            min-height: 12px;
         }}
 
         QPushButton:hover {{
@@ -1146,6 +1146,7 @@ class Styles:
             font-size: {Styles.FONT_SIZE_NORMAL};
             border: 1px solid {Styles.COLOR_BORDER};
             border-radius: 6px;
+            min-height: {Styles.BUTTON_HEIGHT}px;
             padding: 6px 12px;
             font-weight: bold;
         }}

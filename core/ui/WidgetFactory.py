@@ -195,7 +195,7 @@ class WidgetFactory:
             separator_top=False,
             separator_bottom=True,
             file_filter=StringUtils.FILTER_VECTOR,
-            checkbox_text: str = "Salvar em arquivo (caso não marcado: camada temporária)",
+            checkbox_text: str = "Salvar em arquivo: ",
             label_text: str = "Salvar em:",
     ):
         layout = QVBoxLayout()
@@ -300,14 +300,21 @@ class WidgetFactory:
             Atualiza valor enquanto digita
         """
 
-        layout = QHBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(4)
+        # Layout externo (vertical) para separadores em linhas diferentes
+        main_layout = QVBoxLayout()
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(2)
+
         if separator_top:
-            layout.addWidget(WidgetFactory.create_separator())
+            main_layout.addWidget(WidgetFactory.create_separator())
+
+        # Layout interno (horizontal) para label + spin na mesma linha
+        h_layout = QHBoxLayout()
+        h_layout.setContentsMargins(0, 0, 0, 0)
+        h_layout.setSpacing(4)
 
         lbl = QLabel(label_text)
-        layout.addWidget(lbl)
+        h_layout.addWidget(lbl)
 
         spin = QDoubleSpinBox()
         spin.setKeyboardTracking(keyboard_tracking)
@@ -316,11 +323,15 @@ class WidgetFactory:
         spin.setRange(minimum, maximum)
         spin.setValue(value)
 
-        layout.addWidget(spin)
+        h_layout.addWidget(spin)
+        
+        # Adicionar h_layout ao main_layout
+        main_layout.addLayout(h_layout)
+        
         if separator_bottom:
-            layout.addWidget(WidgetFactory.create_separator())
+            main_layout.addWidget(WidgetFactory.create_separator())
 
-        return layout, spin
+        return main_layout, spin
 
     @staticmethod
     def create_checkbox_grid(
@@ -369,11 +380,13 @@ class WidgetFactory:
             lbl = QLabel(title)
             lbl.setStyleSheet("font-weight: bold;")
             main_layout.addWidget(lbl)
+            # Espaço entre título e checkboxes
+            main_layout.addSpacing(6)
 
         grid = QGridLayout()
         grid.setContentsMargins(0, 0, 0, 0)
         grid.setHorizontalSpacing(h_spacing)
-        grid.setVerticalSpacing(v_spacing)
+        grid.setVerticalSpacing(v_spacing)  # Espaço entre items: 2px
 
         checkbox_map = {}
 
@@ -383,7 +396,7 @@ class WidgetFactory:
 
             chk = QCheckBox(name)
             chk.setChecked(checked_by_default)
-            chk.setFixedHeight(Styles.ITEM_HEIGHT)
+            chk.setFixedHeight(14)  # Aumentado de 12px para 14px (checkbox 12px + padding superior/inferior)
 
             grid.addWidget(chk, row, col)
             checkbox_map[name] = chk
@@ -392,8 +405,10 @@ class WidgetFactory:
         for col in range(items_per_row):
             grid.setColumnStretch(col, 1)
         main_layout.addLayout(grid)
-
+        
+        # Espaço antes do separador
         if separator_bottom:
+            main_layout.addSpacing(6)
             main_layout.addWidget(WidgetFactory.create_separator())
 
         return main_layout, checkbox_map
@@ -658,7 +673,7 @@ class WidgetFactory:
         text: str = "Botão",
         parent=None,
         separator_top=False,
-        separator_bottom=True,
+        separator_bottom=False,
     ):
         """
         Cria botão simples que ocupa espaço disponível.

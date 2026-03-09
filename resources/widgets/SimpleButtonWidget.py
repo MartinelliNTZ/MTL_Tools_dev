@@ -18,10 +18,11 @@ from qgis.PyQt.QtWidgets import QPushButton, QSizePolicy
 
 class SimpleButtonWidget(QPushButton):
     """
-    Botão simples que ocupa espaço disponível.
+    Botão simples que ocupa a largura disponível com altura fixa.
     
     Características:
-    - Expande para preencher espaço horizontal e vertical
+    - Expande para preencher espaço horizontal (largura)
+    - Altura fixa em 12px (padrão Styles.BUTTON_HEIGHT)
     - Simplificado e reutilizável
     - Aplicar estilo via: widget.setStyleSheet(Styles.simple_button_widget())
     """
@@ -36,5 +37,7 @@ class SimpleButtonWidget(QPushButton):
         """
         super().__init__(text, parent)
         
-        # Configurar política de tamanho para expandir
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        # Configurar política de tamanho: largura expande, altura fixa
+        from ...resources.styles.Styles import Styles
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.setFixedHeight(Styles.BUTTON_HEIGHT)

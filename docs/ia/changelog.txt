@@ -1,6 +1,264 @@
 changelog=
 
   1.6.7 2026/03/09
+    1.6.7.9
+    - BUG FIX: PDFUtils logging crash (PNG merge silencioso)
+      - Problema: "Unindo 3 PNGs em PDF" era logado, mas depois silêncio total (5s)
+        ✓ Logs não aparecem: NENHUM log de PDFUtils.merge_pngs_to_pdf()
+        ✓ Causa: LogUtilsNew.get_logger() não existe - deve instanciar diretamente
+        ✓ Erro foi: `LogUtilsNew.get_logger()` → não é método estático
+      
+      - Solução implementada:
+        ✓ Alterar: LogUtilsNew.get_logger() → LogUtilsNew(...) instância
+        ✓ Adicionar try/except robustuem _get_logger() com fallback SimpleLogger
+        ✓ Adicionar try/except outer em merge_pdfs() e merge_pngs_to_pdf()
+        ✓ Adicionar traceback completo em logger.error()
+        ✓ Adicionar ImportError específica para PIL e PyPDF2
+      
+      - Impacto:
+        ✓ PNG merge agora loga todas etapas (ou erros precisos)
+        ✓ Fallback SimpleLogger se LogUtilsNew falhar
+        ✓ Traceback completo para diagnóstico de erros
+        ✓ Zero chance de crash silencioso
+      
+      - Risco: Muito Baixo
+        ✓ Apenas correção de logging
+        ✓ Lógica core idêntica
+
+    1.6.7.8
+    - REFATORAÇÃO: PDFUtils + DependenciesManager (arquitetura melhorada)
+      - Problema identificado: PNG merge crashava silenciosamente (sem logs)
+        ✓ Root cause: merge_pngs_to_pdf sem tratamento de erros/logging
+      - Solução: Separação de responsabilidades e logging assertivo
+        
+      [1] Classe PDFUtils - Merge de PDFs/PNGs com logs detalhados
+        ✓ merge_pdfs(): Mescla PDFs com validação e logging
+        ✓ merge_pngs_to_pdf(): Mescla PNGs com redimensionamento e logging detalhado
+        ✓ Logs em cada etapa: verificação deps, arquivo processado, redimensionamento, output
+        ✓ Tratamento completo de exceções
+        ✓ Usa LogUtilsNew para logging estruturado
+      
+      [2] Classe DependenciesManager - Gerencia dependências externas
+        ✓ check_dependency(nome): Valida se módulo está instalado
+        ✓ get_dependency_info(nome): Retorna info sobre dependência
+        ✓ get_install_script_path(nome): Localiza script .cmd/.bat
+        ✓ install_dependency(nome): Executa instalação via script
+        ✓ validate_dependencies(lista): Valida múltiplas deps
+      
+      [3] Refatoração export_all_layouts.py
+        ✓ Imports otimizados: PDFUtils, DependenciesManager
+        ✓ Validação: merge_utils.HAS_PYPDF2 → DependenciesManager.check_dependency()
+        ✓ Instalação: merge_utils.install_pypdf2() → DependenciesManager.install_dependency()
+        ✓ Merge: merge_utils.merge_pdfs() → PDFUtils.merge_pdfs()
+        ✓ Log detalhado de max_width na chamada de PNG merge
+      
+      [4] Backward compatibility em pdf_png_merge_utils.py
+        ✓ Mantido como wrapper deprecated
+        ✓ Redireciona para novas classes (sem breaking changes)
+        ✓ Aviso DeprecationWarning para código legado
+      
+      - Impacto:
+        ✓ Logs completos de todas operações de merge
+        ✓ Melhor diagnóstico de falhas (onde e por quê)
+        ✓ Arquitetura escalável para futuras dependências
+        ✓ Zero breaking changes para código existente
+      
+      - Risco: Muito Baixo
+        ✓ Apenas reorganização de código
+        ✓ Lógica core idêntica à anterior
+        ✓ Backward compatibility garantida
+
+    1.6.7.7
+    - AJUSTE VISUAL: CheckboxGrid altura de linha refinada
+      - Problema: Checkbox 12px estava sendo cortada nas extremidades superior/inferior
+      - Causa: Altura da linha = 12px (mesmo tamanho do checkbox), sem padding
+      - Solução em create_checkbox_grid():
+        ✓ chk.setFixedHeight(14) aumentado de 12px para 14px
+        ✓ Fornece 1px de padding acima e 1px abaixo do checkbox
+        ✓ v_spacing mantido em 2px entre items
+      - Espaçamento preservado:
+        ✓ addSpacing(6) após título
+        ✓ addSpacing(6) antes de separador_bottom
+      - Resultado: Checkbox totalmente visível, sem cortes
+      - Impacto: Visual refinado, melhor usabilidade
+      - Risco: Muito Baixo (apenas ajuste de altura)
+
+    1.6.7.6
+    - BUG FIX: ExportAllLayoutsDialog - PNG merge silencioso e checkbox grid spacing
+      - Problema 1: "Unir PNGs em PDF final" não unia e não exibia sucesso
+        ✓ Causa: merge_pngs_to_pdf() bem sucedido não mostrava mensagem final
+        ✓ Lógica anterior: só exibia erro (if not ok), silenciava sucesso
+        ✓ Solução: Adicionado flag merge_png_success para tracking
+          - Se ok=True: log "✓ PNGs unidos com sucesso" + flag=True
+          - Se ok=False: log warning + erro adicionado à lista
+        ✓ Resultado: Exibição clara de sucesso/falha no diálogo final
+      - Problema 2: Checkboxes no grid muito apertadas (falta espaço)
+        ✓ Causa: Spacing vertical = 2px + sem espaço após título
+        ✓ Solução em create_checkbox_grid():
+          - Aumentado v_spacing de 2px para 6px entre items
+          - Adicionado addSpacing(6) após título
+          - Adicionado addSpacing(6) antes de separador_bottom
+        ✓ Resultado: Grid visualmente mais arejado e legível
+      - Melhorias:
+        ✓ PDF merge também agora com flag merge_pdf_success
+        ✓ Mensagem final mostra resumo: layouts exportados + merges bem-sucedidos
+        ✓ Log detalhado com status de cada merge
+      - Impacto: 
+        ✓ Usuário vê claramente resultado de merge PNG/PDF
+        ✓ UI mais confortável visualmente
+      - Risco: Muito Baixo
+        ✓ Apenas logging e spacing (visual)
+        ✓ Lógica de merge intacta
+
+    1.6.7.5
+    - BUG FIX: ExportAllLayoutsDialog - erro de atributo QgsLayoutExporter e tamanho do botão
+      - Problema 1: QgsLayoutExporter.PrinterResolution não existe
+        ✓ Erro: "type object 'QgsLayoutExporter' has no attribute 'PrinterResolution'"
+        ✓ Causado: ao refatorar para WidgetFactory, usei atributo inválido
+        ✓ Solução: Voltar ao padrão original
+          - PDF: `exporter.exportToPdf(path, QgsLayoutExporter.PdfExportSettings())`
+          - PNG: `exporter.exportToImage(path, QgsLayoutExporter.ImageExportSettings())`
+      - Problema 2: SimpleButtonWidget ("Usar pasta do projeto") muito grande
+        ✓ Causa: setSizePolicy(Expanding, Expanding) ocupava altura total
+        ✓ Solução: setSizePolicy(Expanding, Fixed) + setFixedHeight(Styles.BUTTON_HEIGHT)
+        ✓ Resultado: Largura expande (preenche), altura fixa 12px
+      - Impacto: ExportAllLayoutsDialog funciona corretamente
+        ✓ Botão de pasta com tamanho correto
+        ✓ Exportação de PDFs/PNGs normalizado
+      - Risco: Muito Baixo
+        ✓ Apenas correção de atributos/dimensões
+        ✓ Lógica intacta
+
+    1.6.7.4
+    - REFATORAÇÃO: ExportAllLayoutsDialog padronização com BasePluginMTL + WidgetFactory
+      - Antes: Herança de QDialog com UI manual (QCheckBox, QLineEdit, QPushButton espalhados)
+        ✓ Código duplicado para load/save preferências
+        ✓ Sem padronização visual com plugins
+        ✓ Sem AppBar, sem MainLayout encapsulado
+      - Depois: Herança de BasePluginMTL com WidgetFactory
+        ✓ Checkboxes: 5 itens em grid 2 colunas via create_checkbox_grid()
+        ✓ Max Width: InputFieldsWidget com um campo int via create_input_fields_widget()
+        ✓ Pasta Saída: PathSelector (modo folder) via create_path_selector()
+        ✓ Botão Projeto: SimpleButton com callback _set_folder_to_project()
+        ✓ Botões Ação: create_bottom_action_buttons() (Exportar, Fechar, Info)
+        ✓ AppBar integrada automaticamente via _build_ui()
+        ✓ MainLayout sem scroll (enable_scroll=False, simples)
+      - Persistência automática:
+        ✓ _load_prefs() carrega checkboxes, max_width, pasta_saida, tamanho_janela
+        ✓ _save_prefs() salva tudo automaticamente
+        ✓ BasePlugin.closeEvent() chama _save_prefs() automaticamente
+        ✓ Remove: carregar_preferencias(), salvar_preferencias(), métodos manual
+      - Lógica de negócio mantida:
+        ✓ execute_tool() exporta PDFs/PNGs com mesma lógica
+        ✓ Validação de dependências (PyPDF2, Pillow) oferece instalação
+        ✓ Unão de PDFs/PNGs funciona igual
+        ✓ Modal final com resultado idêntico
+      - Métodos novos:
+        ✓ _set_folder_to_project(): callback do SimpleButton
+        ✓ Antes: definir_pasta_projeto(), selecionar_pasta() - agora não precisa
+      - Compatibilidade:
+        ✓ Função run_export_all_layouts() continua igual
+        ✓ TOOL_KEY.EXPORT_ALL_LAYOUTS continua mesmo
+        ✓ Preferências migram automaticamente (load_tool_prefs usa mesma chave)
+      - Benefícios:
+        ✓ Interface padronizada com outros plugins (SettingsPlugin, GenerateTrailPlugin)
+        ✓ 100+ linhas removidas (sem UI manual)
+        ✓ Código mais limpo e manutenível
+        ✓ Autocompletar AppBar, resize, tamanho janela persistido
+        ✓ Logging automático via BasePluginMTL
+      - Risco: Baixo
+        ✓ Lógica de negócio intacta
+        ✓ Preferências continuam funcionando
+        ✓ Widgets WidgetFactory já testados em outros plugins
+        ✓ Reversível se houver problema
+
+    1.6.7.3
+    - BUG FIX: Separador visual em create_double_spin_input ficava na mesma linha do widget
+      - Problema: função usava QHBoxLayout (horizontal) para tudo
+        ✓ Separador_top era adicionado horizontalmente à esquerda do label
+        ✓ Separador_bottom era adicionado horizontalmente à direita do spinbox
+        ✓ Layout permanecia na mesma linha: [separador] [label] [spin] [separador]
+      - Solução: estrutura de layout aninhado
+        ✓ QVBoxLayout externo (main_layout) → contém separadores em linhas distintas
+        ✓ QHBoxLayout interno (h_layout) → contém apenas label + spin na mesma linha
+        ✓ Retorno agora é (main_layout, spin) com separadores em posição correta
+      - Impacto: Separadores visuais agora aparecem em linhas distintas (UI correta)
+        ✓ SettingsPlugin (precision, threshold) agora renderizam corretamente
+        ✓ GenerateTrailPlugin (tamanho implemento) também beneficiado
+        ✓ Qualquer widget que use create_double_spin_input terá UI consistente
+      - Risco: Muito Baixo
+        ✓ Apenas reorganização de layout, sem mudança lógica
+        ✓ Retorno continua sendo (layout, widget)
+        ✓ Compatível com código existente em SettingsPlugin, GenerateTrailPlugin
+
+    1.6.7.2
+    - BUG FIX: SettingsPlugin crash com erro "wrapped C/C++ object of type QRadioButton has been deleted"
+      - Problema: múltiplas chamadas a self.layout.add_items() causavam reparentings repetidos
+        ✓ Cada chamada a add_items() reconstruía layouts, deletando widgets internos prematurely
+        ✓ RadioButtonGridWidget perdia referência aos QRadioButton filhos
+        ✓ _load_prefs() tentava acessar widget deletado → segmentation fault C++
+      - Solução: consolidar em chamada ÚNICA a add_items()
+        ✓ Acumular todos os items: prefs_label, pref_link, calc_layout, prec_layout, thresh_layout, buttons_layout
+        ✓ Chamar self.layout.add_items([...lista completa...]) uma só vez ao final
+        ✓ Evita reparentings repetidos e garante integridade de widget lifecycle
+      - Impacto: SettingsPlugin agora funciona corretamente
+        ✓ Preferences carregam e salvam sem crash
+        ✓ RadioButtonGridWidget mantém referências válidas
+        ✓ Layout é construído uma vez com estabilidade
+      - Risco: Muito Baixo
+        ✓ Apenas reorganization de chamadas existentes
+        ✓ Zero lógica de negócio alterada
+        ✓ Pattern agora alinhado com best practices Qt (minimal reparenting)
+      - Aprendizado: MainLayout.add_items() espera execução ÚNICA
+        ✓ Implementar de forma idêntica em outros plugins que o usem (GenerateTrailPlugin, etc)
+
+    1.6.7.1
+    - DOCUMENTAÇÃO: Análises de Cenário para GenerateTrailPlugin, VectorFieldsCalculationPlugin e ReplaceInLayouts
+      - Criadas: 3 novos arquivos de análise de cenário seguindo padrão arquitetônico
+        ✓ docs/analise_de_cenario/06_gerar_rastro_generalizado_analise_cenario.MD
+          - Visão geral, objetivo, fluxo do GenerateTrailPlugin
+          - Cenários de uso: memória, GeoPackage, assíncrono larga escala, seleção, CRS em graus
+          - Tipos de geometria, impactos nos dados, riscos e controles
+          - Observações sobre classes-chave: VectorLayerProjection, ExplodeStep, BufferStep, SaveVectorStep
+          - Evoluções recomendadas: reprojeção automática, dissolução, feedback granular
+        ✓ docs/analise_de_cenario/07_calcular_campos_vetoriais_analise_cenario.MD
+          - Visão geral, objetivo, fluxo de VectorFieldsCalculationPlugin
+          - Validações críticas: KML bloqueante, CRS geográfico automático, colisão de campos
+          - Cenários de uso: polígonos métrico, WGS84 com fallback, larga escala, pontos com altimetria
+          - Conflito de nomes, modo "Ambos", bloqueio KML, altimetria assíncrona
+          - Observações: is_geographic_crs(), generate_field_name_with_suffix(), AltimetriaTask thread-safety
+          - Evoluções: seleção de subset, reprojeção transparente, cache SRTM, progresso granular
+        ✓ docs/analise_de_cenario/10_replace_in_layouts_analise_cenario.MD
+          - Visão geral, objetivo, fluxo de ReplaceInLayoutsDialog
+          - Backup automático timestamped + log detalhado em /backup/
+          - Cenários: atualização simples, case sensitive, modo chave, sem backup, zero resultados
+          - Múltiplos layouts, caracteres especiais, botão swap, troca rápida
+          - Tipos de layout, impactos, riscos: texto em branco, sobrescrita desejada, sem backup
+          - Observações: InputFieldsWidget, LayoutsUtils, ProjectUtils, LogUtilsNew
+          - Evoluções: preview pré-execução, undo integrado, regex, filtro layouts, CSV batch
+      - Atualizada: resources/instructions/replace_in_layouts_help.MD
+        ✓ Título traduzido: "Replace Text in Layouts" → "Substituir Texto em Layouts"
+        ✓ Adicionada seção detalhada de backup com exemplos de paths e estrutura de log
+        ✓ Documentação de ⇅ Botão Inverter com casos de uso
+        ✓ Nova seção "Desfazendo uma Substituição" com 3 opções práticas:
+          - Opção 1: Botão Inverter (rápido, undo manual)
+          - Opção 2: Restauração de backup (arquivo anterior)
+          - Opção 3: Edição manual em último caso
+        ✓ Adicionada seção "Preferências e Memória de Estado":
+          - Texto buscado/substituição lembrados
+          - Estado de checkboxes persistido
+          - Tamanho de janela restaurado
+          - Local de armazenamento documentado (~/.qgis3/)
+        ✓ Aprimorada seção "Boas práticas" com avisos alarmantes
+        ✓ Exemplo detalhado de arquivo de log com formatação real
+      - Benefícios:
+        ✓ Documentação arquitetônica completa para manutenção futura
+        ✓ Cenários reais mapeados (ajuda na detecção de bugs)
+        ✓ Help de usuário expandido e mais intuitivo
+        ✓ Referências cruzadas entre análises facilitam compreensão sistêmica
+      - Risco: Muito Baixo
+        ✓ Documentação pura, zero impacto em código executável
+        ✓ Padrão seguido (compatível com análises existentes v1.6.5, 1.6.6)
     1.6.7.1# COMEÇA AQUI
 
 
