@@ -36,6 +36,8 @@ porem preciso ter a buffer em task e entao ir passando plugin/plugin
 antes de criar qualquer ferramtne preciso analisar melhor criar primeiramente a ui e depois vir gerando metodos SEMPRE
 
 changelog=
+  1.6.8 bug em replace in layouts
+ 1.6.7 TEM QUE BOTAR AQUI
   1.6.6 2026/03/06
     - REFATORAÇÃO COMPLETA DE LAYOUT E SPACING
       - Variáveis de espaçamento centralizadas em Styles.py: ITEM_HEIGHT, LAYOUT_V_SPACING, LAYOUT_H_SPACING, etc

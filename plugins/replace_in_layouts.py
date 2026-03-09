@@ -19,6 +19,10 @@ from ..core.ui.WidgetFactory import WidgetFactory
 
 
 class ReplaceInLayoutsDialog(BasePluginMTL):
+    CHECKBOX_OPTIONS = {
+        "case_sensitive": "Diferenciar maiúsculas/minúsculas",
+        "full_replace": "Substituir o label inteiro quando encontrar o texto"
+    }
 
     TOOL_KEY = ToolKey.REPLACE_IN_LAYOUTS
 
@@ -69,10 +73,7 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
 
         # ====== OPÇÕES ======
         opts_layout, self.checkbox_map = WidgetFactory.create_checkbox_grid(
-            names=[
-                "Diferenciar maiúsculas/minúsculas",
-                "Substituir o label inteiro quando encontrar o texto"
-            ],
+            options_dict=self.CHECKBOX_OPTIONS,
             items_per_row=1,
             checked_by_default=False,
             separator_bottom=True
@@ -114,10 +115,10 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
             'old_text': prefs.get("old_text", ""),
             'new_text': prefs.get("new_text", "")
         })
-        self.checkbox_map["Diferenciar maiúsculas/minúsculas"].setChecked(
+        self.checkbox_map["case_sensitive"].setChecked(
             prefs.get("case_sensitive", True)
         )
-        self.checkbox_map["Substituir o label inteiro quando encontrar o texto"].setChecked(
+        self.checkbox_map["full_replace"].setChecked(
             prefs.get("full_replace", False)
         )
 
@@ -128,8 +129,8 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
             {
                 "old_text": values.get('old_text', ''),
                 "new_text": values.get('new_text', ''),
-                "case_sensitive": self.checkbox_map["Diferenciar maiúsculas/minúsculas"].isChecked(),
-                "full_replace": self.checkbox_map["Substituir o label inteiro quando encontrar o texto"].isChecked(),
+                "case_sensitive": self.checkbox_map["case_sensitive"].isChecked(),
+                "full_replace": self.checkbox_map["full_replace"].isChecked(),
                 # Tamanho da janela (persistido automaticamente por BasePlugin.closeEvent)
                 "window_width": self.width(),
                 "window_height": self.height(),
@@ -152,8 +153,8 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
         values = self.input_fields_widget.get_values()
         old_text = values.get('old_text', '').strip()
         new_text = values.get('new_text', '')
-        case_sensitive = self.checkbox_map["Diferenciar maiúsculas/minúsculas"].isChecked()
-        full_replace = self.checkbox_map["Substituir o label inteiro quando encontrar o texto"].isChecked()
+        case_sensitive = self.checkbox_map["case_sensitive"].isChecked()
+        full_replace = self.checkbox_map["full_replace"].isChecked()
 
         if not old_text:
             QgisMessageUtil.bar_warning(

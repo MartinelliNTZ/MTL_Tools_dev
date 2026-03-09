@@ -33,14 +33,14 @@ class ExportAllLayoutsDialog(BasePluginMTL):
 
     TOOL_KEY = ToolKey.EXPORT_ALL_LAYOUTS
     
-    # Mapeamento de opções para checkboxes
-    CHECKBOX_OPTIONS = [
-        "Exportar PDF",
-        "Exportar PNG",
-        "Unir PDFs em PDF final",
-        "Unir PNGs em PDF final",
-        "Substituir arquivos existentes"
-    ]
+    # Mapeamento de opções para checkboxes (chave: label)
+    CHECKBOX_OPTIONS = {
+        "export_pdf": "Exportar PDF",
+        "export_png": "Exportar PNG",
+        "merge_pdf": "Unir PDFs em PDF final",
+        "merge_png": "Unir PNGs em PDF final",
+        "replace_existing": "Substituir arquivos existentes"
+    }
 
     def __init__(self, iface):
         super().__init__(iface.mainWindow())
@@ -69,7 +69,7 @@ class ExportAllLayoutsDialog(BasePluginMTL):
 
         # ========== SEÇÃO 1: Opções de Exportação (Grid Checkboxes - 2 colunas) ==========
         checkboxes_layout, self.checkbox_map = WidgetFactory.create_checkbox_grid(
-            names=self.CHECKBOX_OPTIONS,
+            options_dict=self.CHECKBOX_OPTIONS,
             items_per_row=2,
             checked_by_default=False,
             title="Opções de Exportação",
@@ -139,19 +139,19 @@ class ExportAllLayoutsDialog(BasePluginMTL):
         self.preferences = load_tool_prefs(self.TOOL_KEY)
 
         # Checkboxes (padrões true para PDF e PNG)
-        self.checkbox_map[self.CHECKBOX_OPTIONS[0]].setChecked(
+        self.checkbox_map["export_pdf"].setChecked(
             self.preferences.get("export_pdf", True)
         )
-        self.checkbox_map[self.CHECKBOX_OPTIONS[1]].setChecked(
+        self.checkbox_map["export_png"].setChecked(
             self.preferences.get("export_png", True)
         )
-        self.checkbox_map[self.CHECKBOX_OPTIONS[2]].setChecked(
+        self.checkbox_map["merge_pdf"].setChecked(
             self.preferences.get("merge_pdf", False)
         )
-        self.checkbox_map[self.CHECKBOX_OPTIONS[3]].setChecked(
+        self.checkbox_map["merge_png"].setChecked(
             self.preferences.get("merge_png", False)
         )
-        self.checkbox_map[self.CHECKBOX_OPTIONS[4]].setChecked(
+        self.checkbox_map["replace_existing"].setChecked(
             self.preferences.get("replace_existing", False)
         )
 
@@ -171,11 +171,11 @@ class ExportAllLayoutsDialog(BasePluginMTL):
         self.logger.debug("Salvando preferências de exportação")
 
         # Checkboxes
-        self.preferences['export_pdf'] = self.checkbox_map[self.CHECKBOX_OPTIONS[0]].isChecked()
-        self.preferences['export_png'] = self.checkbox_map[self.CHECKBOX_OPTIONS[1]].isChecked()
-        self.preferences['merge_pdf'] = self.checkbox_map[self.CHECKBOX_OPTIONS[2]].isChecked()
-        self.preferences['merge_png'] = self.checkbox_map[self.CHECKBOX_OPTIONS[3]].isChecked()
-        self.preferences['replace_existing'] = self.checkbox_map[self.CHECKBOX_OPTIONS[4]].isChecked()
+        self.preferences['export_pdf'] = self.checkbox_map["export_pdf"].isChecked()
+        self.preferences['export_png'] = self.checkbox_map["export_png"].isChecked()
+        self.preferences['merge_pdf'] = self.checkbox_map["merge_pdf"].isChecked()
+        self.preferences['merge_png'] = self.checkbox_map["merge_png"].isChecked()
+        self.preferences['replace_existing'] = self.checkbox_map["replace_existing"].isChecked()
 
         # Max Width
         max_width_values = self.max_width_input.get_values()
@@ -210,11 +210,11 @@ class ExportAllLayoutsDialog(BasePluginMTL):
         self.logger.info("Iniciando exportação de layouts")
 
         # ========== LEITURA DE VALORES ==========
-        export_pdf = self.checkbox_map[self.CHECKBOX_OPTIONS[0]].isChecked()
-        export_png = self.checkbox_map[self.CHECKBOX_OPTIONS[1]].isChecked()
-        merge_pdf = self.checkbox_map[self.CHECKBOX_OPTIONS[2]].isChecked()
-        merge_png = self.checkbox_map[self.CHECKBOX_OPTIONS[3]].isChecked()
-        replace_existing = self.checkbox_map[self.CHECKBOX_OPTIONS[4]].isChecked()
+        export_pdf = self.checkbox_map["export_pdf"].isChecked()
+        export_png = self.checkbox_map["export_png"].isChecked()
+        merge_pdf = self.checkbox_map["merge_pdf"].isChecked()
+        merge_png = self.checkbox_map["merge_png"].isChecked()
+        replace_existing = self.checkbox_map["replace_existing"].isChecked()
 
         max_width_values = self.max_width_input.get_values()
         max_width = int(max_width_values.get('max_width', 3500))

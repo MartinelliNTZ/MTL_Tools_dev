@@ -1,3 +1,11 @@
+    1.6.7.10
+    - REFATORAÇÃO: CheckboxGridWidget e uso de dicionário chave→label
+      - WidgetFactory.create_checkbox_grid agora utiliza widget exclusivo CheckboxGridWidget
+      - Interface alterada: recebe dicionário {chave: label} ao invés de lista
+      - Plugins atualizados: export_all_layouts.py, DroneCoordinates.py, replace_in_layouts.py
+      - Preferências e acessos agora usam as chaves, evitando bugs de duplicidade de label
+      - Compatibilidade e integração mantidas
+      - Risco: Baixíssimo (interface padronizada, plugins migrados)
 changelog=
 
   1.6.7 2026/03/09

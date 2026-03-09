@@ -29,9 +29,11 @@ class DroneCordinates(BasePluginMTL):
 
     TOOL_KEY = ToolKey.DRONE_COORDINATES
 
-    LABEL_RECURSIVE = "Vasculhar subpastas"
-    LABEL_MERGE = "Unir todos os MRKs"
-    LABEL_PHOTOS = "Cruzar com metadados das fotos"
+    CHECKBOX_OPTIONS = {
+        "recursive": "Vasculhar subpastas",
+        "merge": "Unir todos os MRKs",
+        "photos": "Cruzar com metadados das fotos"
+    }
 
     def __init__(self, iface):
         super().__init__(iface.mainWindow())
@@ -74,11 +76,7 @@ class DroneCordinates(BasePluginMTL):
         
         # Criar checkboxes
         opts_checkbox_layout, self.checkbox_map = WidgetFactory.create_checkbox_grid(
-            names=[
-                self.LABEL_RECURSIVE,
-                self.LABEL_MERGE,
-                self.LABEL_PHOTOS,
-            ],
+            options_dict=self.CHECKBOX_OPTIONS,
             items_per_row=1,
             checked_by_default=False,
             separator_bottom=False
@@ -173,9 +171,9 @@ class DroneCordinates(BasePluginMTL):
             )
 
         # Checkboxes
-        self.checkbox_map[self.LABEL_RECURSIVE].setChecked(prefs.get("recursive", True))
-        self.checkbox_map[self.LABEL_MERGE].setChecked(prefs.get("merge", True))
-        self.checkbox_map[self.LABEL_PHOTOS].setChecked(prefs.get("photos", True))
+        self.checkbox_map["recursive"].setChecked(prefs.get("recursive", True))
+        self.checkbox_map["merge"].setChecked(prefs.get("merge", True))
+        self.checkbox_map["photos"].setChecked(prefs.get("photos", True))
 
         # Salvamento
         self.save_points_selector.set_enabled(prefs.get("save_file_pts", False))
@@ -204,9 +202,9 @@ class DroneCordinates(BasePluginMTL):
 
         prefs_data = {
             "folder": folder_path,
-            "recursive": self.checkbox_map[self.LABEL_RECURSIVE].isChecked(),
-            "merge": self.checkbox_map[self.LABEL_MERGE].isChecked(),
-            "photos": self.checkbox_map[self.LABEL_PHOTOS].isChecked(),
+            "recursive": self.checkbox_map["recursive"].isChecked(),
+            "merge": self.checkbox_map["merge"].isChecked(),
+            "photos": self.checkbox_map["photos"].isChecked(),
             "save_file": self.save_track_selector.is_enabled(),
             "save_file_pts": self.save_points_selector.is_enabled(),
             "output_path": self.save_track_selector.get_file_path(),
@@ -223,7 +221,6 @@ class DroneCordinates(BasePluginMTL):
             "window_width": self.width(),
             "window_height": self.height(),
         }
-        
         save_tool_prefs(self.TOOL_KEY, prefs_data)
 
         self.logger.debug("Preferências salvas", code="PREFS_SAVE_COMPLETE")
@@ -236,9 +233,9 @@ class DroneCordinates(BasePluginMTL):
             self.logger.error("Nenhum diretório selecionado", code="NO_SELECTION")
             return
 
-        recursive = self.checkbox_map[self.LABEL_RECURSIVE].isChecked()
-        merge = self.checkbox_map[self.LABEL_MERGE].isChecked()
-        apply_photos = self.checkbox_map[self.LABEL_PHOTOS].isChecked()
+        recursive = self.checkbox_map["recursive"].isChecked()
+        merge = self.checkbox_map["merge"].isChecked()
+        apply_photos = self.checkbox_map["photos"].isChecked()
 
         extra_fields = PhotoMetadata.FIELDS_PHOTO if apply_photos else None
 
