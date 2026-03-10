@@ -2,8 +2,8 @@ import os
 from pathlib import Path
 from typing import List, Dict
 
-from ..core.config.LogUtilsNew import LogUtilsNew
-from .project_utils import ProjectUtils
+from ..core.config.LogUtils import LogUtils
+from .ProjectUtils import ProjectUtils
 from .vector.VectorLayerSource import VectorLayerSource
 from .raster.RasterLayerSource import RasterLayerSource
 
@@ -20,7 +20,7 @@ class ExplorerUtils:
 
     @staticmethod
     def _get_logger(tool_key: str):
-        return LogUtilsNew(tool=tool_key, class_name="ExplorerUtils")
+        return LogUtils(tool=tool_key, class_name="ExplorerUtils")
 
     @staticmethod
     def scan_folder(folder: str, extensions: List[str], tool_key: str) -> List[Dict]:

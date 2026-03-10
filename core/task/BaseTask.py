@@ -1,5 +1,5 @@
 from qgis.core import QgsTask, QgsMessageLog, Qgis
-from ..config.LogUtilsNew import LogUtilsNew
+from ..config.LogUtils import LogUtils
 
 class BaseTask(QgsTask):
     """
@@ -17,7 +17,7 @@ class BaseTask(QgsTask):
         self.tool_key = tool_key
         self.exception = None
         self.result = None
-        self.logger = LogUtilsNew(tool=self.tool_key, class_name=self.__class__.__name__)
+        self.logger = LogUtils(tool=self.tool_key, class_name=self.__class__.__name__)
 
         self.logger.debug("Task initialized")
 

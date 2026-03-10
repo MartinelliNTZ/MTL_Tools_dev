@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 from qgis.core import QgsProject, QgsMapLayer, QgsVectorLayer
 from qgis.PyQt.QtWidgets import QApplication
-from ..core.config.LogUtilsNew import LogUtilsNew
+from ..core.config.LogUtils import LogUtils
 from pathlib import Path
 import gc
 from pathlib import Path
@@ -125,7 +125,7 @@ class ProjectUtils:
             return layer.id() in project.mapLayers()
 
         except Exception as e:
-            logger = LogUtilsNew(tool="project_utils", class_name="ProjectUtils")
+            logger = LogUtils(tool="project_utils", class_name="ProjectUtils")
             logger.error(f"Erro ao verificar camada no projeto: {e}")
             return False
 
@@ -151,7 +151,7 @@ class ProjectUtils:
             return True
 
         except Exception as e:
-            logger = LogUtilsNew(tool="project_utils", class_name="ProjectUtils")
+            logger = LogUtils(tool="project_utils", class_name="ProjectUtils")
             logger.error(f"Erro ao remover camada do projeto: {e}")
             return False
         
@@ -190,7 +190,7 @@ class ProjectUtils:
             return False
 
         except Exception as e:
-            logger = LogUtilsNew(tool="project_utils", class_name="ProjectUtils")
+            logger = LogUtils(tool="project_utils", class_name="ProjectUtils")
             logger.error(f"Erro ao verificar arquivo no projeto: {e}")
             return False
     @staticmethod
@@ -219,7 +219,7 @@ class ProjectUtils:
             return False
 
         except Exception as e:
-            logger = LogUtilsNew(tool="project_utils", class_name="ProjectUtils")
+            logger = LogUtils(tool="project_utils", class_name="ProjectUtils")
             logger.error(f"Erro ao remover arquivo do projeto: {e}")
             return False
 
@@ -337,7 +337,7 @@ class ProjectUtils:
             return True
 
         except Exception as e:
-            logger = LogUtilsNew(tool="project_utils", class_name="ProjectUtils")
+            logger = LogUtils(tool="project_utils", class_name="ProjectUtils")
             logger.error(
                 f"Erro ao remover camada e liberar datasource: {e}"
             )

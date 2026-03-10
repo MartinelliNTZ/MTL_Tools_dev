@@ -5,7 +5,7 @@ from qgis.core import QgsApplication
 
 from .ExecutionContext import ExecutionContext
 from .BaseStep import BaseStep
-from ..config.LogUtilsNew import LogUtilsNew
+from ..config.LogUtils import LogUtils
 from ..task.BaseTask import BaseTask
 from qgis.core import QgsTask
 
@@ -14,7 +14,7 @@ class AsyncPipelineEngine:
     """
     Orquestrador genérico de Steps e QgsTasks.
     """
-    logger = LogUtilsNew(tool="AsyncPipelineEngine", class_name="AsyncPipelineEngine", level=LogUtilsNew.DEBUG)
+    logger = LogUtils(tool="AsyncPipelineEngine", class_name="AsyncPipelineEngine", level=LogUtils.DEBUG)
 
     def __init__(
         self,

@@ -3,8 +3,8 @@ from typing import Optional, Dict, Any
 from qgis.core import QgsProject
 
 from .BaseTask import BaseTask
-from ..config.LogUtilsNew import LogUtilsNew
-from ...utils.mrk.photo_metadata import PhotoMetadata
+from ..config.LogUtils import LogUtils
+from ...utils.mrk.PhotoMetadata import PhotoMetadata
 
 
 class PhotoMetadataTask(BaseTask):
@@ -30,7 +30,7 @@ class PhotoMetadataTask(BaseTask):
         if not layer or not layer.isValid():
             raise RuntimeError("Camada não encontrada para cruzamento de metadados")
 
-        logger = LogUtilsNew(tool=self.tool_key, class_name=self.__class__.__name__)
+        logger = LogUtils(tool=self.tool_key, class_name=self.__class__.__name__)
         
         # Extrair lista de fotos a serem cruzadas (campo 'foto')
         # 🔴 IMPORTANTE: Também extrair 'mrk_folder' se disponível (para múltiplos voos)

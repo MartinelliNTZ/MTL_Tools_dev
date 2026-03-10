@@ -49,8 +49,8 @@ class LogTableModel(QAbstractTableModel):
     def _get_logger():
         """Obtém logger para este módulo."""
         try:
-            from ....core.config.LogUtilsNew import LogUtilsNew
-            return LogUtilsNew(tool="logcat", class_name="LogTableModel")
+            from ....core.config.LogUtils import LogUtils
+            return LogUtils(tool="logcat", class_name="LogTableModel")
         except:
             # Fallback - logger fake
             class FakeLogger:
@@ -269,8 +269,8 @@ class LogTableModel(QAbstractTableModel):
         Retorna cor para nível de log.
         Importa cores de LogUtils.
         """
-        from ....core.config.LogUtilsNew import LogUtilsNew
-        return LogUtilsNew.LEVEL_COLORS.get(level, "#FFFFFF")
+        from ....core.config.LogUtils import LogUtils
+        return LogUtils.LEVEL_COLORS.get(level, "#FFFFFF")
     
     def get_entry(self, index: QModelIndex) -> Optional[LogEntry]:
         """Retorna a entrada em um índice (para detalhe)."""

@@ -1,5 +1,5 @@
-from ...core.config.LogUtilsNew import LogUtilsNew
-from ..project_utils import ProjectUtils
+from ...core.config.LogUtils import LogUtils
+from ..ProjectUtils import ProjectUtils
 from qgis.core import QgsRasterLayer
 from pathlib import Path
 import os
@@ -30,7 +30,7 @@ class RasterLayerSource:
                               external_tool_key="untraceable"):
         """Carrega um raster de um arquivo GeoTIFF, IMG, ou outro formato suportado."""
         
-        logger = LogUtilsNew(tool=external_tool_key, class_name="RasterLayerSource")
+        logger = LogUtils(tool=external_tool_key, class_name="RasterLayerSource")
         try:
             if not file_path or not os.path.exists(file_path):
                 logger.error(f"Raster não encontrado: {file_path}")

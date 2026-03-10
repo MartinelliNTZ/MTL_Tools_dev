@@ -6,7 +6,7 @@ from qgis.PyQt.QtWidgets import (
 from qgis.PyQt.QtCore import QObject, QEvent, Qt
 from qgis.PyQt.QtWidgets import QLayout, QWidget
 from qgis.gui import QgsMapLayerComboBox
-from ...utils.string_utils import StringUtils
+from ...utils.StringUtils import StringUtils
 from ...resources.widgets.LayerInputWidget import LayerInputWidget
 from ...resources.widgets.BottomActionButtonsWidget import BottomActionButtonsWidget
 from ...resources.widgets.MainLayout import MainLayout

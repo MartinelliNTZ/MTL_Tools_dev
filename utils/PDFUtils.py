@@ -9,7 +9,7 @@ Responsável por:
 """
 
 import os
-from ..core.config.LogUtilsNew import LogUtilsNew
+from ..core.config.LogUtils import LogUtils
 from .DependenciesManager import DependenciesManager
 
 
@@ -24,7 +24,7 @@ class PDFUtils:
         """Retorna instância do logger."""
         if cls._logger is None:
             try:
-                cls._logger = LogUtilsNew(tool="pdf_utils", class_name="PDFUtils", level=LogUtilsNew.DEBUG)
+                cls._logger = LogUtils(tool="pdf_utils", class_name="PDFUtils", level=LogUtils.DEBUG)
             except Exception as e:
                 # Fallback: criar logger simples se falhar
                 import sys

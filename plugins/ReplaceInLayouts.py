@@ -11,8 +11,8 @@ from qgis.PyQt.QtGui import QDesktopServices
 
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.QgisMessageUtil import QgisMessageUtil
-from ..utils.layouts_utils import LayoutsUtils
-from ..utils.project_utils import ProjectUtils
+from ..utils.LayoutsUtils import LayoutsUtils
+from ..utils.ProjectUtils import ProjectUtils
 from ..utils.ToolKeys import ToolKey
 from .BasePlugin import BasePluginMTL
 from ..core.ui.WidgetFactory import WidgetFactory

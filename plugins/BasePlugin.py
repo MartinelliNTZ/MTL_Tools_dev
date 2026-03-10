@@ -9,17 +9,16 @@ import os
 from pathlib import Path
 from typing import Optional
 import time
-from ..utils.project_utils import ProjectUtils
 from ..utils.FormatUtils import FormatUtils
 from ..utils.vector.VectorLayerSource import VectorLayerSource
-from ..core.config.LogUtilsNew import LogUtilsNew
+from ..core.config.LogUtils import LogUtils
 from ..core.ui.WidgetFactory import WidgetFactory
-from ..utils.info_dialog import InfoDialog
+from ..core.ui.info_dialog import InfoDialog
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.ToolKeys import ToolKey
 from ..utils.QgisMessageUtil import QgisMessageUtil
-from ..utils.project_utils import  ProjectUtils
-from ..utils.string_utils import StringUtils
+from ..utils.ProjectUtils import  ProjectUtils
+from ..utils.StringUtils import StringUtils
 
 
 
@@ -57,7 +56,7 @@ class BasePluginMTL(QDialog):
             Se True, constrói a interface de usuário (padrão: True)
         """
         self.TOOL_KEY = tool_key
-        self.logger = LogUtilsNew(tool=self.TOOL_KEY, class_name=class_name, level=LogUtilsNew.DEBUG)
+        self.logger = LogUtils(tool=self.TOOL_KEY, class_name=class_name, level=LogUtils.DEBUG)
         self.preferences = {}
         self.preferences.clear()
         self.preferences = load_tool_prefs(self.TOOL_KEY)

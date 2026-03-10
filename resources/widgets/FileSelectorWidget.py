@@ -4,7 +4,7 @@ from qgis.PyQt.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QCheckBox, QLineEdit, QPushButton
 )
-from ...utils.string_utils import StringUtils
+from ...utils.StringUtils import StringUtils
 from qgis.PyQt.QtWidgets import QFileDialog
 
 

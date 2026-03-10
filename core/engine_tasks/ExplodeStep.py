@@ -5,7 +5,7 @@ import tempfile
 from .BaseStep import BaseStep
 from .ExecutionContext import ExecutionContext
 from ..task.ExplodeHugeLayerTask import ExplodeHugeLayerTask
-from ..config.LogUtilsNew import LogUtilsNew
+from ..config.LogUtils import LogUtils
 from ...utils.vector.VectorLayerSource import VectorLayerSource
 
 
@@ -20,7 +20,7 @@ class ExplodeStep(BaseStep):
 
         layer = context.get("layer")
         tool_key = context.get("tool_key")
-        logger = LogUtilsNew(tool=tool_key, class_name=self.__class__.__name__)
+        logger = LogUtils(tool=tool_key, class_name=self.__class__.__name__)
 
         tmp_dir = context.get("tmp_dir")
         if not tmp_dir:
@@ -57,6 +57,6 @@ class ExplodeStep(BaseStep):
         )
 
     def on_success(self, context: ExecutionContext, result):
-        logger = LogUtilsNew(tool=context.get("tool_key"), class_name=self.__class__.__name__)
+        logger = LogUtils(tool=context.get("tool_key"), class_name=self.__class__.__name__)
         logger.info(f"ExplodeStep.on_success: camada explodida salva em {result}")
         context.set("current_path", result)

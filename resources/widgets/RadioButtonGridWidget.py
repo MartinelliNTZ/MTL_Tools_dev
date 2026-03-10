@@ -6,7 +6,7 @@ Permite selecionar apenas uma opção por vez.
 
 from qgis.PyQt.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QRadioButton, QLabel, QButtonGroup
 from qgis.PyQt.QtCore import Qt
-from ...core.config.LogUtilsNew import LogUtilsNew
+from ...core.config.LogUtils import LogUtils
 
 
 class RadioButtonGridWidget(QWidget):
@@ -50,7 +50,7 @@ class RadioButtonGridWidget(QWidget):
         self.columns = max(1, columns)
         self.title = title
         self.tool_key = tool_key
-        self.logger = LogUtilsNew(tool=self.tool_key or "system", class_name="RadioButtonGridWidget")
+        self.logger = LogUtils(tool=self.tool_key or "system", class_name="RadioButtonGridWidget")
         
         self.logger.info(f"Criando RadioButtonGridWidget com {len(self.items)} items, {self.columns} colunas")
         

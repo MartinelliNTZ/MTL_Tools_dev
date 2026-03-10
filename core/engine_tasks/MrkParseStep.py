@@ -2,7 +2,7 @@
 from .BaseStep import BaseStep
 from .ExecutionContext import ExecutionContext
 from ..task.MrkParseTask import MrkParseTask
-from ..config.LogUtilsNew import LogUtilsNew
+from ..config.LogUtils import LogUtils
 from ...utils.vector.VectorLayerGeometry import VectorLayerGeometry
 from qgis.core import QgsProject
 
@@ -27,7 +27,7 @@ class MrkParseStep(BaseStep):
     def on_success(self, context: ExecutionContext, result):
         points = result.get("points", []) if isinstance(result, dict) else []
         if not points:
-            LogUtilsNew(
+            LogUtils(
                 tool=context.get("tool_key"),
                 class_name=self.__class__.__name__,
             ).warning("Nenhum ponto encontrado após leitura de MRKs")
@@ -46,7 +46,7 @@ class MrkParseStep(BaseStep):
             context.set("points", points)
             context.set("base_folder", result.get("base_folder"))
         else:
-            LogUtilsNew(
+            LogUtils(
                 tool=context.get("tool_key"),
                 class_name=self.__class__.__name__,
             ).error("Falha ao criar camada de pontos a partir dos MRKs")

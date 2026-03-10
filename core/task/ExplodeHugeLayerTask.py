@@ -1,7 +1,7 @@
 import processing
 from qgis.core import QgsVectorLayer
 from .BaseTask import BaseTask
-from ..config.LogUtilsNew import LogUtilsNew
+from ..config.LogUtils import LogUtils
 from ...utils.vector.VectorLayerGeometry import VectorLayerGeometry
 import time
 

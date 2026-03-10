@@ -4,7 +4,7 @@ import re
 from datetime import datetime
 from PIL import Image, ExifTags
 from PyQt5.QtCore import QVariant
-from ...core.config.LogUtilsNew import LogUtilsNew
+from ...core.config.LogUtils import LogUtils
 from ..ToolKeys import ToolKey
 
 TOOL_KEY = ToolKey.DRONE_COORDINATES
@@ -52,7 +52,7 @@ class PhotoMetadata:
 
     @staticmethod
     def enrich(points, base_folder, recursive=True, mrk_folder=None):
-        logger = LogUtilsNew(tool=TOOL_KEY, class_name="PhotoMetadata")
+        logger = LogUtils(tool=TOOL_KEY, class_name="PhotoMetadata")
         logger.info("Iniciando enriquecimento de metadados de fotos", code="PHOTO_ENRICH_START", data={
             "base_folder": base_folder,
             "recursive": recursive,
@@ -166,7 +166,7 @@ class PhotoMetadata:
     @staticmethod
     def _index_photos(base_folder, recursive):
         index = {}
-        logger = LogUtilsNew(tool=ToolKey.DRONE_COORDINATES, class_name="PhotoMetadata")
+        logger = LogUtils(tool=ToolKey.DRONE_COORDINATES, class_name="PhotoMetadata")
 
         logger.info("Iniciando indexação de fotos", code="PHOTO_INDEXING_START", data={
             "base_folder": base_folder,

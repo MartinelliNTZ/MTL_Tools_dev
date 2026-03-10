@@ -6,7 +6,7 @@ from qgis.PyQt.QtCore import QVariant
 from .BaseTask import BaseTask
 from ...utils.vector.VectorLayerAttributes import VectorLayerAttributes
 from ...utils.vector.VectorLayerSource import VectorLayerSource
-from ..config.LogUtilsNew import LogUtilsNew
+from ..config.LogUtils import LogUtils
 
 
 class PointFieldsTask(BaseTask):

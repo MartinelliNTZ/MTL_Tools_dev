@@ -13,9 +13,9 @@ from typing import Optional, Tuple
 import os
 import tempfile 
 import time
-from ...utils.string_utils import StringUtils
-from ...utils.project_utils import ProjectUtils
-from ...core.config.LogUtilsNew import LogUtilsNew
+from ...utils.StringUtils import StringUtils
+from ...utils.ProjectUtils import ProjectUtils
+from ...core.config.LogUtils import LogUtils
 class VectorLayerSource:
     """
     Responsável pela entrada, saída e origem de camadas vetoriais.
@@ -38,7 +38,7 @@ class VectorLayerSource:
     """
 
     @staticmethod
-    def _get_logger(tool_key: str = "untraceable") -> LogUtilsNew:
+    def _get_logger(tool_key: str = "untraceable") -> LogUtils:
         """Helper para obter logger com tool_key específico.
         
         Parameters
@@ -48,10 +48,10 @@ class VectorLayerSource:
             
         Returns
         -------
-        LogUtilsNew
+        LogUtils
             Instância de logger configurada para a classe
         """
-        return LogUtilsNew(tool=tool_key, class_name="VectorLayerSource")
+        return LogUtils(tool=tool_key, class_name="VectorLayerSource")
 
 
     # ------------------------------------------------------------------

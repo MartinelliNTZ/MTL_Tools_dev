@@ -4,7 +4,7 @@ import tempfile
 from qgis.core import QgsVectorLayer, QgsDistanceArea, QgsProject
 from qgis.PyQt.QtCore import QVariant
 from .BaseTask import BaseTask
-from ..config.LogUtilsNew import LogUtilsNew
+from ..config.LogUtils import LogUtils
 
 
 class LineFieldsTask(BaseTask):

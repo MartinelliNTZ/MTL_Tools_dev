@@ -4,7 +4,7 @@ from datetime import datetime
 
 from qgis.core import QgsLayoutItemLabel, QgsProject
 
-from ..core.config.LogUtilsNew import LogUtilsNew
+from ..core.config.LogUtils import LogUtils
 
 
 class LayoutsUtils:
@@ -72,7 +72,7 @@ class LayoutsUtils:
         layouts = project.layoutManager().layouts()
         total_layouts = len(layouts)
         total_changes = 0
-        logger = LogUtilsNew(tool=tool_key, class_name="LayoutsUtils")
+        logger = LogUtils(tool=tool_key, class_name="LayoutsUtils")
 
         logger.info("Iniciando replace em layouts")
         logger.info(f"Layouts encontrados: {total_layouts}")

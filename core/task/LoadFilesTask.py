@@ -3,7 +3,7 @@ import os
 from typing import List, Dict, Optional
 
 from .BaseTask import BaseTask
-from ..config.LogUtilsNew import LogUtilsNew
+from ..config.LogUtils import LogUtils
 
 
 class LoadFilesTask(BaseTask):
@@ -16,7 +16,7 @@ class LoadFilesTask(BaseTask):
     def __init__(self, *, records: List[Dict], tool_key: str = "untraceable"):
         super().__init__("Load files task", tool_key)
         self.records = records or []
-        self.logger = LogUtilsNew(tool=self.tool_key, class_name=self.__class__.__name__)
+        self.logger = LogUtils(tool=self.tool_key, class_name=self.__class__.__name__)
 
     def _run(self) -> bool:
         if self.isCanceled():

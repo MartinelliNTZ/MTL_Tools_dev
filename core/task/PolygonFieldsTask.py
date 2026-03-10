@@ -5,7 +5,7 @@ from qgis.core import QgsVectorLayer, QgsField, QgsDistanceArea, QgsProject
 from qgis.PyQt.QtCore import QVariant
 from .BaseTask import BaseTask
 from ...utils.vector.VectorLayerSource import VectorLayerSource
-from ..config.LogUtilsNew import LogUtilsNew
+from ..config.LogUtils import LogUtils
 
 
 class PolygonFieldsTask(BaseTask):

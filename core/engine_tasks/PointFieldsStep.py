@@ -2,7 +2,7 @@
 from .BaseStep import BaseStep
 from .ExecutionContext import ExecutionContext
 from ..task.PointFieldsTask import PointFieldsTask
-from ..config.LogUtilsNew import LogUtilsNew
+from ..config.LogUtils import LogUtils
 from qgis.core import QgsField
 from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtWidgets import QApplication
@@ -41,7 +41,7 @@ class PointFieldsStep(BaseStep):
         Apply attribute mappings computed by the task on the MAIN THREAD.
         Result expected shape: { 'updates': {fid: {field_name: value}}, 'missing_fields': [field_name,...] }
         """
-        logger = LogUtilsNew(tool=context.get("tool_key"), class_name=self.__class__.__name__)
+        logger = LogUtils(tool=context.get("tool_key"), class_name=self.__class__.__name__)
         logger.info("PointFieldsStep.on_success: applying results")
 
         if not result or not isinstance(result, dict):

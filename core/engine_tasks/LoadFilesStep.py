@@ -4,14 +4,14 @@ import time
 
 from .BaseStep import BaseStep
 from ..task.LoadFilesTask import LoadFilesTask
-from ..config.LogUtilsNew import LogUtilsNew
+from ..config.LogUtils import LogUtils
 from .ExecutionContext import ExecutionContext
 import os
 from qgis.core import QgsProject
 from qgis.PyQt.QtWidgets import QApplication
 
 from ...utils.ExplorerUtils import ExplorerUtils
-from ...utils.project_utils import ProjectUtils
+from ...utils.ProjectUtils import ProjectUtils
 from ...utils.QgisMessageUtil import QgisMessageUtil
 import threading
 from ..ui.ProgressDialog import ProgressDialog
@@ -28,7 +28,7 @@ class LoadFilesStep(BaseStep):
         return LoadFilesTask(records=records, tool_key=tool_key)
 
     def on_success(self, context: ExecutionContext, result: Any) -> None:
-        logger = LogUtilsNew(tool=context.get("tool_key"), class_name=self.__class__.__name__)
+        logger = LogUtils(tool=context.get("tool_key"), class_name=self.__class__.__name__)
 
         valid = []
         if isinstance(result, dict):

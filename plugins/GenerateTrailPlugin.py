@@ -2,10 +2,10 @@
 from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes, QgsMapLayerProxyModel, QgsApplication
 from typing import Optional, Tuple
 
-from ..utils.project_utils import ProjectUtils
+from ..utils.ProjectUtils import ProjectUtils
 from ..plugins.BasePlugin import BasePluginMTL
 from ..utils.QgisMessageUtil import QgisMessageUtil
-from ..utils.string_utils import StringUtils
+from ..utils.StringUtils import StringUtils
 from ..utils.vector.VectorLayerGeometry import VectorLayerGeometry
 from ..utils.vector.VectorLayerProjection import VectorLayerProjection
 from ..utils.vector.VectorLayerSource import VectorLayerSource

@@ -13,7 +13,7 @@ from .utils.ToolKeys import ToolKey
 from .utils.QgisMessageUtil import QgisMessageUtil
 from .processing.provider import MTLProvider
 from .core.config.LogCleanupUtils import LogCleanupUtils
-from .core.config.LogUtilsNew import LogUtilsNew
+from .core.config.LogUtils import LogUtils
 
 
 # ========================================================================
@@ -31,8 +31,8 @@ def _install_global_error_handler():
         # Log em arquivo de sistema se possível
         try:
             if _logger_global is None:
-                from .core.config.LogUtilsNew import LogUtilsNew
-                _logger_global = LogUtilsNew(tool="system", class_name="GlobalErrorHandler")
+                from .core.config.LogUtils import LogUtils
+                _logger_global = LogUtils(tool="system", class_name="GlobalErrorHandler")
             
             error_msg = "".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
             _logger_global.critical(
@@ -69,11 +69,11 @@ class MTL_Tools:
         _install_global_error_handler()
         
         plugin_root = Path(__file__).resolve().parent
-        LogUtilsNew.init(plugin_root)
+        LogUtils.init(plugin_root)
         # mantém só os últimos 15 logs
         LogCleanupUtils.keep_last_n(plugin_root, keep=15)
         # Inicializar logger UMA VEZ como atributo da classe
-        self.logger = LogUtilsNew(tool=self.TOOL_KEY, class_name="MTL_Tools")
+        self.logger = LogUtils(tool=self.TOOL_KEY, class_name="MTL_Tools")
         self.logger.info("Plugin inicializado")
         self.logger.info("SYSTEM: Global error handler instalado para capturar crashes")
         # -------------------------
@@ -447,7 +447,7 @@ class MTL_Tools:
     # =====================================================
     def run_export_layouts(self):
         try:
-            from .plugins.export_all_layouts import run_export_all_layouts
+            from .plugins.ExportAllLayouts import run_export_all_layouts
             self.logger.info("Abrindo diálogo: Exportar todos os Layouts")
             self.export_dlg = run_export_all_layouts(self.iface)
             self.logger.info("Diálogo Exportar Layouts fechado")
@@ -548,7 +548,7 @@ class MTL_Tools:
     # =====================================================
     def run_replace_layouts(self):
         try:
-            from .plugins.replace_in_layouts import run_replace_in_layouts
+            from .plugins.ReplaceInLayouts import run_replace_in_layouts
             self.logger.info("Abrindo diálogo: Substituir textos nos Layouts")
             self.replace_layouts_dlg = run_replace_in_layouts(self.iface)
             self.logger.info("Diálogo Substituir Layouts aberto com sucesso")
@@ -562,7 +562,7 @@ class MTL_Tools:
     # =====================================================
     def run_load_folder(self):
         try:
-            from .plugins.load_folder_layers import run_load_folder_layers
+            from .plugins.LoadFolderLayers import run_load_folder_layers
             self.logger.info("Iniciando plugin: Carregar pasta de arquivos")
             self.load_folder_dlg = run_load_folder_layers(self.iface)
             self.logger.info("Plugin Carregar pasta de arquivos executado com sucesso")

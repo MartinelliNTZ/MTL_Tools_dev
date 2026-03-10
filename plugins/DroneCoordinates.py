@@ -12,11 +12,11 @@ from ..core.engine_tasks.AsyncPipelineEngine import AsyncPipelineEngine
 from ..core.engine_tasks.ExecutionContext import ExecutionContext
 from ..core.engine_tasks.MrkParseStep import MrkParseStep
 from ..core.engine_tasks.PhotoMetadataStep import PhotoMetadataStep
-from ..utils.mrk.photo_metadata import PhotoMetadata
+from ..utils.mrk.PhotoMetadata import PhotoMetadata
 from ..utils.vector.VectorLayerGeometry import VectorLayerGeometry
 from ..utils.vector.VectorLayerSource import VectorLayerSource
-from ..core.config.LogUtilsNew import LogUtilsNew
-from ..utils.string_utils import StringUtils
+from ..core.config.LogUtils import LogUtils
+from ..utils.StringUtils import StringUtils
 
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..resources.styles.Styles import Styles
@@ -41,7 +41,7 @@ class DroneCordinates(BasePluginMTL):
 
         # Inicializar logger de sessão (arquivo JSON)
         plugin_root = Path(__file__).parent.parent
-        LogUtilsNew.init(plugin_root)
+        LogUtils.init(plugin_root)
 
         # Inicializa a UI e preferências via BasePluginMTL
         self.init(

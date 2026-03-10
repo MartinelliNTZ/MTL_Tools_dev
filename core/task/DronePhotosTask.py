@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 import os
 from qgis.core import QgsTask
-from utils.mrk.photo_metadata import PhotoMetadata
-from core.config.LogUtilsNew import LogUtilsNew
+from utils.mrk.PhotoMetadata import PhotoMetadata
+from core.config.LogUtils import LogUtils
 from utils.ToolKeys import ToolKey
 
 class DronePhotosTask(QgsTask):
@@ -11,7 +11,7 @@ class DronePhotosTask(QgsTask):
 
     def __init__(self, description, points, base_folder, recursive=True, callback=None):
         super().__init__(description, QgsTask.CanCancel)
-        self._logger = LogUtilsNew(tool=self.TOOL_KEY, class_name=self.__class__.__name__)
+        self._logger = LogUtils(tool=self.TOOL_KEY, class_name=self.__class__.__name__)
         self._logger.info(f"Inicializando task: {description}")
         self.points = points
         self.base_folder = base_folder

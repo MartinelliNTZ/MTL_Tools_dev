@@ -3,8 +3,8 @@ from typing import List, Optional, Dict, Any
 import os
 
 from .BaseTask import BaseTask
-from ..config.LogUtilsNew import LogUtilsNew
-from ...utils.mrk.mrk_parser import MrkParser
+from ..config.LogUtils import LogUtils
+from ...utils.mrk.MrkParser import MrkParser
 
 
 class MrkParseTask(BaseTask):
@@ -28,7 +28,7 @@ class MrkParseTask(BaseTask):
         if self.isCanceled():
             return False
 
-        LogUtilsNew(tool=self.tool_key, class_name=self.__class__.__name__).info(
+        LogUtils(tool=self.tool_key, class_name=self.__class__.__name__).info(
             f"Iniciando leitura de MRKs (paths={self.paths}, recursive={self.recursive})"
         )
 

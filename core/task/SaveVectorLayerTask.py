@@ -2,7 +2,7 @@
 
 from .BaseTask import BaseTask
 from ...utils.vector.VectorLayerSource import VectorLayerSource
-from ...core.config.LogUtilsNew import LogUtilsNew
+from ...core.config.LogUtils import LogUtils
 from typing import Any, Dict, List, Optional
 
 
@@ -51,7 +51,7 @@ class SaveVectorLayerTask(BaseTask):
             self.result = result_layer
 
         except Exception as e:
-            logger = LogUtilsNew(tool=self.tool_key, class_name=self.__class__.__name__)
+            logger = LogUtils(tool=self.tool_key, class_name=self.__class__.__name__)
             logger.critical(f"Erro no SaveLayerTask: {str(e)}")
             raise
 

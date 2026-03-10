@@ -17,10 +17,9 @@ from ..utils.Preferences import (
     load_tool_prefs,
     save_tool_prefs,
 )
-from ..utils.info_dialog import InfoDialog
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.ExplorerUtils import ExplorerUtils
-from ..utils.project_utils import ProjectUtils
+from ..utils.ProjectUtils import ProjectUtils
 from ..core.engine_tasks.AsyncPipelineEngine import AsyncPipelineEngine
 from ..core.engine_tasks.LoadFilesStep import LoadFilesStep
 from ..core.engine_tasks.ExecutionContext import ExecutionContext

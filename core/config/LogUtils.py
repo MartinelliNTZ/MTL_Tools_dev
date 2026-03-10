@@ -16,7 +16,7 @@ try:
 except ImportError:
     QGIS_AVAILABLE = False
 
-class LogUtilsNew:
+class LogUtils:
     #C:\Users\<usuario>\AppData\Roaming\QGIS\QGIS3\MTLTools
     DEBUG = "DEBUG"
     INFO = "INFO"

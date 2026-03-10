@@ -8,7 +8,7 @@ from ..utils.vector.VectorLayerMetrics import VectorLayerMetrics
 from ..utils.vector.VectorLayerProjection import VectorLayerProjection
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.ToolKeys import ToolKey
-from ..utils.project_utils import ProjectUtils
+from ..utils.ProjectUtils import ProjectUtils
 from ..core.engine_tasks.AsyncPipelineEngine import AsyncPipelineEngine
 from ..core.engine_tasks.ExecutionContext import ExecutionContext
 from ..core.engine_tasks.PointFieldsStep import PointFieldsStep

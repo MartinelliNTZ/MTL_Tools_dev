@@ -111,8 +111,8 @@ class LogcatDialog(QDialog):
     def _get_logger():
         """Obtém logger para este módulo."""
         try:
-            from ....core.config.LogUtilsNew import LogUtilsNew
-            return LogUtilsNew(tool="logcat", class_name="LogcatDialog")
+            from ....core.config.LogUtils import LogUtils
+            return LogUtils(tool="logcat", class_name="LogcatDialog")
         except:
             # Fallback - logger fake
             class FakeLogger:

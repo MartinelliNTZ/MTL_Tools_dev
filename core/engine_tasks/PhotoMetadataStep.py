@@ -2,7 +2,7 @@
 from .BaseStep import BaseStep
 from .ExecutionContext import ExecutionContext
 from ..task.PhotoMetadataTask import PhotoMetadataTask
-from ..config.LogUtilsNew import LogUtilsNew
+from ..config.LogUtils import LogUtils
 from qgis.core import QgsField
 from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtWidgets import QApplication
@@ -31,7 +31,7 @@ class PhotoMetadataStep(BaseStep):
 
         layer = context.get("layer")
         if layer is None:
-            LogUtilsNew(
+            LogUtils(
                 tool=context.get("tool_key"),
                 class_name=self.__class__.__name__,
             ).error("Camada ausente no contexto durante aplicação de metadados")
@@ -41,13 +41,13 @@ class PhotoMetadataStep(BaseStep):
         field_names = result.get("field_names", []) or []
 
         if not updates:
-            LogUtilsNew(
+            LogUtils(
                 tool=context.get("tool_key"),
                 class_name=self.__class__.__name__,
             ).info("Nenhuma atualização de metadados de fotos para aplicar")
             return
 
-        LogUtilsNew(
+        LogUtils(
             tool=context.get("tool_key"),
             class_name=self.__class__.__name__,
         ).debug(f"Aplicando metadados em {len(updates)} itens. Campos esperados: {field_names}")
@@ -56,7 +56,7 @@ class PhotoMetadataStep(BaseStep):
         missing_fields = [f for f in field_names if layer.fields().indexOf(f) == -1]
         started_editing = False
         if missing_fields:
-            LogUtilsNew(
+            LogUtils(
                 tool=context.get("tool_key"),
                 class_name=self.__class__.__name__,
             ).debug(f"Adicionando campos faltantes: {missing_fields}")
@@ -114,7 +114,7 @@ class PhotoMetadataStep(BaseStep):
         except Exception:
             pass
 
-        LogUtilsNew(
+        LogUtils(
             tool=context.get("tool_key"),
             class_name=self.__class__.__name__,
         ).info(f"Metadados de fotos aplicados em {len(updates)} feições")

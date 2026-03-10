@@ -19,8 +19,8 @@ from qgis.core import (
 )
 from qgis.PyQt.QtCore import QVariant
 
-from ...utils.string_utils import StringUtils
-from ...core.config.LogUtilsNew import LogUtilsNew
+from ...utils.StringUtils import StringUtils
+from ...core.config.LogUtils import LogUtils
 import processing
 class VectorLayerGeometry:
     """
@@ -52,7 +52,7 @@ class VectorLayerGeometry:
     """
     
     @staticmethod
-    def _get_logger(tool_key: str = "untraceable") -> LogUtilsNew:
+    def _get_logger(tool_key: str = "untraceable") -> LogUtils:
         """Helper para obter logger com tool_key específico.
         
         Parameters
@@ -62,10 +62,10 @@ class VectorLayerGeometry:
             
         Returns
         -------
-        LogUtilsNew
+        LogUtils
             Instância de logger configurada para a classe
         """
-        return LogUtilsNew(tool=tool_key, class_name="VectorLayerGeometry")
+        return LogUtils(tool=tool_key, class_name="VectorLayerGeometry")
 
     @staticmethod
     def create_point_layer_from_dicts(

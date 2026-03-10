@@ -7,7 +7,7 @@ Fornece uma classe simples e direta para barra de progresso modal com logging.
 
 from qgis.PyQt.QtWidgets import QProgressDialog
 from qgis.PyQt.QtCore import Qt, QCoreApplication
-from ..config.LogUtilsNew import LogUtilsNew
+from ..config.LogUtils import LogUtils
 
 
 class ProgressDialog:
@@ -45,7 +45,7 @@ class ProgressDialog:
         # Instanciar LogUtilsNew como logger (sem ToolKey, usar nome genérico)
         
             
-        self.logger = LogUtilsNew(tool="ui_progress", class_name="ProgressDialog", level=LogUtilsNew.DEBUG)
+        self.logger = LogUtils(tool="ui_progress", class_name="ProgressDialog", level=LogUtils.DEBUG)
  
         # Criar QProgressDialog
         self.dialog = QProgressDialog(title, cancel_button_text, minimum, maximum, parent)

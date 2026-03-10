@@ -19,11 +19,11 @@ from typing import Optional
 from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QCoreApplication
 
-from ..core.config.LogUtilsNew import LogUtilsNew
+from ..core.config.LogUtils import LogUtils
 from ..utils.QgisMessageUtil import QgisMessageUtil
-from ..utils.project_utils import ProjectUtils
+from ..utils.ProjectUtils import ProjectUtils
 
-logger = LogUtilsNew(tool="restart_qgis", class_name="RestartQGIS")
+logger = LogUtils(tool="restart_qgis", class_name="RestartQGIS")
 
 
 

@@ -1,6 +1,6 @@
 from .BaseTask import BaseTask
 from .TaskFeedback import TaskFeedback
-from ..config.LogUtilsNew import LogUtilsNew
+from ..config.LogUtils import LogUtils
 from ...utils.vector.VectorLayerGeometry import VectorLayerGeometry
 import time
 
