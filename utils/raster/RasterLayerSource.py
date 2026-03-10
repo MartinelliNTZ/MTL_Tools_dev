@@ -1,3 +1,8 @@
+from ...core.config.LogUtilsNew import LogUtilsNew
+from ..project_utils import ProjectUtils
+from qgis.core import QgsRasterLayer
+from pathlib import Path
+import os
 class RasterLayerSource:
     """
     Responsável pelo carregamento, salvamento e criação de camadas raster.
@@ -21,9 +26,26 @@ class RasterLayerSource:
     - Alterar visualização (use RasterLayerRendering)
     """
 
-    def load_raster_from_file(self, file_path, external_tool_key="untraceable"):
+    def load_raster_from_file(self, file_path, 
+                              external_tool_key="untraceable"):
         """Carrega um raster de um arquivo GeoTIFF, IMG, ou outro formato suportado."""
-        pass
+        
+        logger = LogUtilsNew(tool=external_tool_key, class_name="RasterLayerSource")
+        try:
+            if not file_path or not os.path.exists(file_path):
+                logger.error(f"Raster não encontrado: {file_path}")
+                return None
+
+            name = Path(file_path).stem
+            layer = QgsRasterLayer(file_path, name)
+            if not layer or not layer.isValid():
+                logger.error(f"Falha ao carregar raster: {file_path}")
+                return None
+            logger.info(f"Raster carregado: {file_path}")
+            return layer
+        except Exception as e:
+            logger.error(f"Erro carregando raster {file_path}: {e}")
+            return None
 
     def load_raster_from_url(self, url, cache_directory, external_tool_key="untraceable"):
         """Carrega um raster de uma URL remota com opção de cache local."""

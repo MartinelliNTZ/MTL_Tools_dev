@@ -142,7 +142,7 @@ class DroneCordinates(BasePluginMTL):
         # ====== BOTOES ======
         buttons_layout, self.action_buttons = WidgetFactory.create_bottom_action_buttons(
             parent=self,
-            run_callback=self._run,
+            run_callback=self.execute_tool,
             close_callback=self.close,
             info_callback=self.show_info_dialog,
             tool_key=self.TOOL_KEY,
@@ -225,7 +225,7 @@ class DroneCordinates(BasePluginMTL):
 
         self.logger.debug("Preferências salvas", code="PREFS_SAVE_COMPLETE")
 
-    def _run(self):
+    def execute_tool(self):
         self.logger.info("Iniciando processamento de coordenadas de drone", code="EXEC_START")
 
         paths = self.folder_selector.get_paths()

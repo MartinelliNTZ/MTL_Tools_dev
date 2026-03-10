@@ -564,7 +564,7 @@ class MTL_Tools:
         try:
             from .plugins.load_folder_layers import run_load_folder_layers
             self.logger.info("Iniciando plugin: Carregar pasta de arquivos")
-            run_load_folder_layers(self.iface)
+            self.load_folder_dlg = run_load_folder_layers(self.iface)
             self.logger.info("Plugin Carregar pasta de arquivos executado com sucesso")
         except Exception as e:
             self.logger.error(f"Erro ao executar Carregar pasta de arquivos: {str(e)}")

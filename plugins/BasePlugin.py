@@ -212,77 +212,124 @@ class BasePluginMTL(QDialog):
                 return
         super().mouseReleaseEvent(event)
 
-    def start_stats(self, input_obj=None,modal_info = "YES"):
+    def start_stats(self, input_obj=None,modal_info = "YES",total_files=None):
         try:
             self.preferences["t0"] = time.time()
-            # compute both size and feature count when possible
-            self.preferences["current_size"] = ProjectUtils.compute_size(input_obj) if input_obj else 0
-            if hasattr(input_obj, "featureCount"):
-                try:
-                    self.preferences["current_features"] = input_obj.featureCount()
-                except Exception:
-                    self.preferences["current_features"] = 0
-            else:
-                self.preferences["current_features"] = 0
 
-            self.preferences["eta"] = 0
-            self.preferences["avg_speed"] = self.preferences.get("avg_speed", 0)
+            # Reset transient counters
+            self.preferences.pop("current_size", None)
+            self.preferences.pop("current_features", None)
+            self.preferences.pop("current_files", None)
+            self.preferences.pop("eta", None)
+            self.preferences.pop("eta_files", None)
+
+            # Aggregates (ensure exist)
             self.preferences["total_bytes"] = self.preferences.get("total_bytes", 0)
             self.preferences["total_time"] = self.preferences.get("total_time", 0)
+            self.preferences["total_features"] = self.preferences.get("total_features", 0)
+            self.preferences["total_files"] = self.preferences.get("total_files", 0)
+            self.preferences["total_time_features"] = self.preferences.get("total_time_features", 0)
+            self.preferences["total_time_files"] = self.preferences.get("total_time_files", 0)
 
-            if self.preferences["total_time"] > 0:
-                self.preferences["avg_speed"] = self.preferences["total_bytes"] / self.preferences["total_time"]
-            if self.preferences["avg_speed"] > 0 and self.preferences["current_size"] > 0:
-                self.preferences["eta"] = (self.preferences["current_size"] / self.preferences["avg_speed"])+time.time()
-            TAM = FormatUtils.bytes(self.preferences["current_size"])
-            feats = self.preferences.get("current_features", 0)
-            msg = ""
-            if self.preferences["eta"] > 0 and self.preferences["current_size"] > 0 and self.preferences["avg_speed"] > 0 :                
-                msg = (
-                   # f"  Velocidade média: {FormatUtils.speed(self.preferences['avg_speed'])} \n"
-                    #f"  Tamanho do arquivo: {TAM} \n"
-                    #f"  Feições: {feats} \n"
-                    f"  Hora inicial: {FormatUtils.clock(self.preferences['t0'],)} \n"
-                    f"  HORA FINAL: {FormatUtils.clock(self.preferences.get('eta',0))}\n"
-                )
-
+            # Metrics: files-based, features-based, or bytes-based
+            if total_files is not None:
+                # files metric
+                self.preferences["current_files"] = int(total_files)
+                avg_files = self.preferences.get("avg_speed_files", 0)
+                if avg_files > 0:
+                    self.preferences["eta_files"] = time.time() + (self.preferences["current_files"] / avg_files)
+                else:
+                    self.preferences["eta_files"] = 0
+                TAM = f"{self.preferences['current_files']} files"
+                msg = f"Iniciando: total files={self.preferences['current_files']}"
                 if modal_info == "YES":
-                    QgisMessageUtil.bar_info(self.iface, msg, "Estatisticas",duration=10)
+                    QgisMessageUtil.bar_info(self.iface, msg, "Estatisticas", duration=5)
                 self.logger.info(msg)
+
+            else:
+                # fallback: if vector-like, use features; else use size(bytes)
+                if input_obj is not None and hasattr(input_obj, "featureCount"):
+                    try:
+                        self.preferences["current_features"] = input_obj.featureCount()
+                    except Exception:
+                        self.preferences["current_features"] = 0
+                    avg_feat = self.preferences.get("avg_speed_features", 0)
+                    if avg_feat > 0 and self.preferences["current_features"] > 0:
+                        self.preferences["eta"] = time.time() + (self.preferences["current_features"] / avg_feat)
+                    TAM = f"{self.preferences.get('current_features',0)} feats"
+                    msg = f"Iniciando: features={self.preferences.get('current_features',0)}"
+                    if modal_info == "YES":
+                        QgisMessageUtil.bar_info(self.iface, msg, "Estatisticas", duration=5)
+                    self.logger.info(msg)
+                else:
+                    # treat as raster/file
+                    self.preferences["current_size"] = ProjectUtils.compute_size(input_obj) if input_obj else 0
+                    avg_bytes = self.preferences.get("avg_speed", 0)
+                    if avg_bytes > 0 and self.preferences["current_size"] > 0:
+                        self.preferences["eta"] = time.time() + (self.preferences["current_size"] / avg_bytes)
+                    TAM = FormatUtils.bytes(self.preferences.get("current_size", 0))
+                    msg = f"Iniciando: size={TAM}"
+                    if modal_info == "YES":
+                        QgisMessageUtil.bar_info(self.iface, msg, "Estatisticas", duration=5)
+                    self.logger.info(msg)
         except Exception as e:
             self.logger.error(e)
 
-    def finish_stats(self,modal_info = "YES"):
+    def finish_stats(self, modal_info = "YES", input_obj=None, start_time=None, total_files=None):
         self.logger.debug("finish_stats")
         try:
-            dt = time.time() - self.preferences["t0"]
-            size = self.preferences["current_size"]
-            feats = self.preferences.get("current_features", 0)
-            self.logger.info("")
-            self.preferences["total_bytes"] = self.preferences.get("total_bytes", 0) + size
-            self.preferences["total_time"] = self.preferences.get("total_time", 0) + dt
-            self.preferences["runs"] = self.preferences.get("runs", 0) + 1
+            if start_time is None:
+                start_time = self.preferences.get("t0", time.time())
+            end_time = time.time()
+            total_time = end_time - start_time
 
+            # files-based completion
+            if total_files is not None:
+                self.preferences["total_files"] = self.preferences.get("total_files", 0) + int(total_files)
+                self.preferences["total_time_files"] = self.preferences.get("total_time_files", 0) + total_time
+                if self.preferences["total_time_files"] > 0:
+                    self.preferences["avg_speed_files"] = self.preferences.get("total_files", 0) / self.preferences.get("total_time_files", 1)
+
+            # features-based completion (if input supports it)
+            current_features = 0
+            if input_obj is not None and hasattr(input_obj, "featureCount"):
+                try:
+                    current_features = input_obj.featureCount()
+                except Exception:
+                    current_features = self.preferences.get("current_features", 0)
+            self.preferences["total_features"] = self.preferences.get("total_features", 0) + current_features
+            self.preferences["total_time_features"] = self.preferences.get("total_time_features", 0) + total_time
+            if self.preferences["total_time_features"] > 0:
+                self.preferences["avg_speed_features"] = self.preferences.get("total_features", 0) / self.preferences.get("total_time_features", 1)
+
+            # bytes/size-based completion
+            current_size = ProjectUtils.compute_size(input_obj) if input_obj else self.preferences.get("current_size", 0)
+            self.preferences["total_time"] = self.preferences.get("total_time", 0) + total_time
+            self.preferences["total_bytes"] = self.preferences.get("total_bytes", 0) + current_size
             if self.preferences["total_time"] > 0:
-                self.preferences["avg_speed"] = (
-                        self.preferences["total_bytes"] / self.preferences["total_time"]
+                self.preferences["avg_speed"] = self.preferences.get("total_bytes", 0) / self.preferences.get("total_time", 1)
+
+            # Log summary
+            try:
+                msg = (
+                    f"Tempo total: {FormatUtils.time_interval(total_time)}\n"
+                    f"Tamanho: {FormatUtils.bytes(current_size)}\n"
+                    f"Feições: {current_features}\n"
+                    f"Velocidade média(bytes/s): {FormatUtils.speed(self.preferences.get('avg_speed',0))}\n"
+                    f"Velocidade média(feats/s): {FormatUtils.pretty(self.preferences.get('avg_speed_features',0))}\n"
+                    f"Velocidade média(files/s): {FormatUtils.pretty(self.preferences.get('avg_speed_files',0))}\n"
                 )
+                self.logger.info(msg)
+                if modal_info == "YES":
+                    QgisMessageUtil.bar_success(self.iface, f"Estatistivas: {msg} ")
+            except Exception:
+                pass
 
-            msg = (
-                f"+{FormatUtils.bytes(size)} "
-                f"{dt:.1f}s "
-                f"feats={feats} "
-                f"avg={FormatUtils.speed(self.preferences['avg_speed'])}"
-            )
-
-            if modal_info == "YES":
-                QgisMessageUtil.bar_success(self.iface,f"Estatistivas: {msg} ")
-            self.logger.info(msg)
             # atualizar agregados de features e limpar dados transitórios antes de persistir
-            feats = self.preferences.get("current_features", 0)
-            self.preferences["total_features"] = self.preferences.get("total_features", 0) + feats
+            self.preferences["total_features"] = self.preferences.get("total_features", 0)
+
             # campos que não devem ser salvos entre execuções
-            for key in ("t0", "current_size", "current_features", "eta", "avg_speed"):
+            for key in ("t0", "current_size", "current_features", "eta", "avg_speed", "current_files", "eta_files"):
                 self.preferences.pop(key, None)
             try:
                 save_tool_prefs(self.TOOL_KEY, self.preferences)

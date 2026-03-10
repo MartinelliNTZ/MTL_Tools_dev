@@ -232,6 +232,66 @@ class ProjectUtils:
         if not file_path:
             return False
 
+    # ------------------------------------------------------------------
+    # Helpers adicionais para LoadFolderLayers refactor
+    # ------------------------------------------------------------------
+    @staticmethod
+    def normalize_layer_source(src: str) -> str:
+        """Normaliza a source de uma layer (remove parâmetros e resolve path)."""
+        if not src:
+            return ""
+        if "|" in src:
+            src = src.split("|", 1)[0]
+        try:
+            return str(Path(src).resolve())
+        except Exception:
+            return os.path.normpath(src)
+
+    @staticmethod
+    def ensure_group(rel_path: str):
+        """Garante a existência de um grupo aninhado a partir de um caminho relativo.
+
+        Retorna o QgsLayerTreeGroup criado/encontrado.
+        """
+        project = QgsProject.instance()
+        root = project.layerTreeRoot()
+
+        parts = rel_path.split(os.sep)
+        current = root
+
+        for part in parts:
+            found = current.findGroup(part)
+            if not found:
+                found = current.addGroup(part)
+            current = found
+
+        return current
+
+    @staticmethod
+    def add_layer(layer, add_to_root: bool = True):
+        """Adiciona uma layer ao projeto; retorna a layer adicionada ou None."""
+        try:
+            project = QgsProject.instance()
+            if add_to_root:
+                project.addMapLayer(layer, True)
+            else:
+                project.addMapLayer(layer, False)
+            return layer
+        except Exception:
+            return None
+
+    @staticmethod
+    def add_layer_to_group(layer, group):
+        """Adiciona uma camada já registrada no projeto dentro de um grupo (QgsLayerTreeGroup)."""
+        try:
+            project = QgsProject.instance()
+            # garante que layer está no projeto sem inserir na root
+            project.addMapLayer(layer, False)
+            group.insertLayer(0, layer)
+            return layer
+        except Exception:
+            return None
+
         target = Path(file_path).resolve()
         project = QgsProject.instance()
 

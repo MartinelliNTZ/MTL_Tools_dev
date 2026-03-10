@@ -344,7 +344,22 @@ class VectorLayerSource:
 
     def load_vector_layer_from_file(self, file_path, external_tool_key="untraceable"):
         """Carrega uma camada vetorial de um arquivo no disco."""
-        pass
+        logger = VectorLayerSource._get_logger(external_tool_key)
+        try:
+            if not file_path or not os.path.exists(file_path):
+                logger.error(f"Arquivo não encontrado: {file_path}")
+                return None
+
+            name = Path(file_path).stem
+            layer = QgsVectorLayer(file_path, name, "ogr")
+            if not layer or not layer.isValid():
+                logger.error(f"Falha ao carregar camada: {file_path}")
+                return None
+            logger.info(f"Camada vetorial carregada: {file_path}")
+            return layer
+        except Exception as e:
+            logger.error(f"Erro carregando layer {file_path}: {e}")
+            return None
 
     def load_vector_layer_from_database(self, connection_string, layer_name, external_tool_key="untraceable"):
         """Carrega uma camada vetorial de um banco de dados."""

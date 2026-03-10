@@ -1,4 +1,40 @@
-    1.6.7.10
+
+changelog=
+1.6.8 2026/03/09
+      1.6.8.01
+      - PADRONIZAÇÃO: `load_folder_layers` UI com BasePluginMTL + WidgetFactory
+        - Substituída UI manual por `_build_ui()` padronizada usando:
+          - `WidgetFactory.create_path_selector` para seleção de pasta (modo folder)
+          - `WidgetFactory.create_collapsible_parameters` + `WidgetFactory.create_checkbox_grid` (2 colunas) para tipos de arquivo
+          - `WidgetFactory.create_checkbox_grid` (1 coluna) para opções: carregar apenas não carregados, preservar estrutura, criar backup
+          - `WidgetFactory.create_bottom_action_buttons` para botões padrão (Carregar / Fechar / Info)
+        - Preferências (`_load_prefs` / `_save_prefs`) adaptadas para usar API dos widgets
+        - Lógica de execução (`run_tool`) preservada; comportamento inalterado
+        - Risco: Baixíssimo (apenas padronização da camada UI)
+        ✓ Apenas adiciona persistência, sem lógica adicional
+
+      1.6.8.02
+      - LOG / PREFS / GPKG / EXPLORER
+        - Adicionado: logging em `plugins/load_folder_layers.py` usando `self.logger` (BasePluginMTL)
+        - Persistência: estado do painel "Tipos de Arquivo" (`types_expanded`) salvo/carregado nas preferências
+        - Suporte: GeoPackage (`.gpkg`) adicionado ao `FILE_TYPES` e ao `ExplorerUtils.VECTOR_EXTS`
+        - ExplorerUtils: `load_raster_from_file()` implementado como método estático wrapper (parâmetro nomeado `external_tool_key="untraceable"`)
+        - ProjectUtils: `ensure_group()` usa `s = rel_path.split(os.sep)` para clareza ao criar grupos aninhados
+        - Clean-up: remoção do override `show_info()` em `load_folder_layers` (usa `show_info_dialog()` da classe-base)
+        - Risco: Baixo (muda apenas logging, prefs e delega carregamento de rasters para wrapper estático)
+
+      1.6.8.03
+      - ESTATÍSTICAS: métricas por arquivos/feições/tamanho
+        - `start_stats()` agora aceita `total_files` e escolhe automaticamente entre métricas por arquivos, por feições ou por bytes
+        - `finish_stats()` grava agregados e calcula `avg_speed_files`, `avg_speed_features` e `avg_speed` (bytes/s)
+        - Mensagens resumidas exibidas via `QgisMessageUtil`; preferências atualizadas e salvas
+        - Risco: Baixo (compatível com chaves de prefs anteriores)
+
+
+
+
+  1.6.7 2026/03/09
+      1.6.7.10
     - REFATORAÇÃO: CheckboxGridWidget e uso de dicionário chave→label
       - WidgetFactory.create_checkbox_grid agora utiliza widget exclusivo CheckboxGridWidget
       - Interface alterada: recebe dicionário {chave: label} ao invés de lista
@@ -6,9 +42,6 @@
       - Preferências e acessos agora usam as chaves, evitando bugs de duplicidade de label
       - Compatibilidade e integração mantidas
       - Risco: Baixíssimo (interface padronizada, plugins migrados)
-changelog=
-
-  1.6.7 2026/03/09
     1.6.7.9
     - BUG FIX: PDFUtils logging crash (PNG merge silencioso)
       - Problema: "Unindo 3 PNGs em PDF" era logado, mas depois silêncio total (5s)
@@ -283,7 +316,6 @@ changelog=
         ✓ Linha ~110: "window_height": self.height()
       - Funcionamento: BasePlugin.closeEvent() chama _save_prefs() automaticamente
       - Risco: Baixo
-        ✓ Apenas adiciona persistência, sem lógica adicional
     1.6.6.3
     - FEATURE: Botão de Troca (Swap) em ReplaceInLayouts
       - Novo: Botão "⇅ Inverter" entre campos old_text/new_text

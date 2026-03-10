@@ -1,4 +1,4 @@
-
+mtlagriculturaetecnologia@gmail.com - 07/04/2026
 BUGS CONHECIDOS
     - DroneCordinatesPlugin: MrkParser.parse_folder() não processa TODOS os MRKs da pasta - apenas 1 arquivo [1.6.2 TODO]
       - Encontra 98 MRKs mas retorna apenas 16160 pontos (1 arquivo) em vez de múltiplos de 16160
@@ -23,8 +23,9 @@ ferramentas = name                              tipo                            
     - 11: Copiar Atributos de Vetores           janela                          CopyAttributesPlugin        manipulação de vetores
     - 12: LogCat Viewer                         janela (multithread)            LogCatPlugin                nenhum
     - 13: SettingsPlugin                        janela                                                      nenhum
-    - 14: (em desenvolvimento)
-    - 15: (em desenvolvimento)
+    - 14: AmostradorMassivo de Raster           Processing
+    - 15: Gerador de diferença entre campos     Processing
+    - 16: Estatisticas de atributos             Processing
 
 PADRONIZADOS = 2, 3, 5, 8, 9, 10 , 11, 13
 Documentação de cenarios: 2, 3, 5, 8, 9, 10, 11, 13
@@ -36,8 +37,11 @@ porem preciso ter a buffer em task e entao ir passando plugin/plugin
 antes de criar qualquer ferramtne preciso analisar melhor criar primeiramente a ui e depois vir gerando metodos SEMPRE
 
 changelog=
-  1.6.8 bug em replace in layouts
- 1.6.7 TEM QUE BOTAR AQUI
+  1.6.9 2026/03/09
+  -TODO: a progrees dialog ficou top e resolveu porem as camada continuam invisiveis ate adicionar um grupo ou adcionar uma camda manualmente no qgs
+  -TODO: bug em replace in layouts
+  1.6.8 TEM QUE BOTAR RESUMO AQUI 
+  1.6.7 TEM QUE BOTAR AQUI
   1.6.6 2026/03/06
     - REFATORAÇÃO COMPLETA DE LAYOUT E SPACING
       - Variáveis de espaçamento centralizadas em Styles.py: ITEM_HEIGHT, LAYOUT_V_SPACING, LAYOUT_H_SPACING, etc
@@ -329,6 +333,9 @@ changelog=
 
 
 IMPLEMENTACOES
+  - projeto padrao (defini uma pasta em, configuracoes cria projeto la 
+    ja carrega algumas camdas e web services pergunta nome se nao cria 
+      nome padrrao)
     - Ferramenta basica que apaga campos de KML
     - Ferramenta Replace: colocar botao de trroccar campos de entrada e saida, 
     -acrescentar centralizar tela de todos os layouts 
