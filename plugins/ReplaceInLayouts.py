@@ -67,7 +67,8 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
             text="⇅ Inverter",
             parent=self,
             separator_top=False,
-            separator_bottom=True
+            separator_bottom=True,
+            spacing=12
         )
         self.swap_button.clicked.connect(self._swap_fields)
 

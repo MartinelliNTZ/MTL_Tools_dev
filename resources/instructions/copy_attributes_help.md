@@ -1,55 +1,73 @@
-# 📘 Copiar Atributos — Guia Rápido e Intuitivo
+# 📘 Copiar Atributos — Guia de Uso
 
-Breve: copia campos (atributos) de uma camada origem para uma camada destino com escolha de campos e controle de conflitos. 🧾
-
----
-
-## ▶ Passo a passo (rápido) ✅
-
-1. Abra: Menu → **MTL Tools** → **Copiar Atributos**
-2. Selecione a **camada destino** (onde os campos serão inseridos). 🎯
-3. Selecione a **camada origem** (de onde os campos serão copiados). 🗂️
-4. Escolha os campos:
-   - Marque **Usar todos os atributos** para copiar tudo, ou
-   - Selecione manualmente os campos desejados da lista. ✅
-5. Clique em **Executar** ▶️. Em caso de conflito, confirme a ação quando solicitado.
+Ferramenta para copiar campos (atributos) de uma camada origem para uma camada destino, com seleção de campos e resolução interativa de conflitos.
 
 ---
 
-## ℹ️ O que acontece por trás (resumido)
+## 🎯 Objetivo
 
-- Os campos escolhidos são copiados para a camada destino; os valores são mapeados por feição.
-- A operação age diretamente na camada destino (alterações ficam abertas para salvar/descartar). 🔁
-- A ferramenta não cria camadas temporárias por padrão; preserve um backup se necessário. 💾
+Permitir transferir atributos entre camadas vetoriais de forma controlada, preservando tipos de dados e oferecendo opções para tratar conflitos de nomes/colunas.
 
 ---
 
-## 💡 Dicas rápidas
+## 🛠️ Como usar
 
-- Verifique compatibilidade de tipos entre campos (ex.: número → número, texto → texto). 🔍
-- Selecione apenas os campos necessários para evitar sobrecarga da camada destino. ✂️
-- Faça backup da camada destino antes de operações em massa, especialmente em ambientes de produção. 🧰
+### 1️⃣ Abrir a ferramenta
+Menu → MTL Tools → Copiar Atributos
 
----
+### 2️⃣ Selecionar camadas
+- `Camada destino`: a camada que receberá os campos
+- `Camada origem`: a camada que fornece os campos
 
-## ⚠️ Problemas comuns e solução
+### 3️⃣ Escolher atributos
+- Marque `Usar todos os atributos` para copiar todos os campos
+- Ou selecione manualmente os campos desejados na lista
 
-- Conflito de nomes: ferramenta pedirá confirmação; escolha sobrescrever, renomear ou pular. ⚠️
-- Tipos incompatíveis: valores podem ficar vazios ou truncados — prefira campos compatíveis. 🔄
-- Não é possível editar a camada destino: verifique se a camada está desbloqueada e se você tem permissão de escrita. 🔐
-
----
-
-## ✅ Checklist rápido pós-execução
-
-- Campos esperados presentes na `camada destino`? ✔️
-- Valores copiados corretamente (ex.: amostra visual)? ✔️
-- Salvou as alterações (se desejado)? ✔️
+### 4️⃣ Executar
+Clique em `Executar`. Se houver conflito de nomes, a ferramenta solicitará ação: sobrescrever, renomear ou pular o campo conflitante.
 
 ---
 
-## 🔧 Preferências e suporte
+## ℹ️ O que acontece por trás
 
-- A ferramenta usa a chave interna `copy_attributes` para logs e rastreamento.
-- Em caso de erro, verifique o painel de logs do plugin e reporte com: tipo da camada, número de feições e campos selecionados. 🐞
+- Os campos selecionados são adicionados à `camada destino` com mapeamento por feição.
+- A operação modifica a camada destino em memória (alterações ficam pendentes para salvar ou descartar).
+- Conflitos de nomes são tratados via diálogo interativo (`QgisMessageUtil.ask_field_conflict`).
+
+---
+
+## ⚠️ Problemas comuns e soluções
+
+- Conflito de nomes: responda ao diálogo para sobrescrever, renomear ou pular.
+- Tipos incompatíveis: alguns valores podem ficar vazios ou truncados — prefira campos com tipos compatíveis.
+- Camada destino não editável: verifique permissões e se a camada está desbloqueada.
+
+---
+
+## ✅ Checklist pós-execução
+
+- Campos esperados presentes na camada destino
+- Valores amostrados visualmente corretos
+- Salvou as alterações se necessário
+
+---
+
+## 🔧 Preferências e logs
+
+- Chave de preferências/logs: `copy_attributes`
+- Em caso de erro, veja o log do plugin e reporte: tipo de camada, número de feições, campos selecionados
+
+---
+
+## 💡 Boas práticas
+
+- Faça backup da camada destino antes de operações em massa
+- Prefira copiar apenas os campos necessários para evitar inflar o esquema
+- Teste em um subconjunto de feições quando possível
+
+---
+
+## ❤️ Criado por
+
+Matheus A.S. Martinelli
 

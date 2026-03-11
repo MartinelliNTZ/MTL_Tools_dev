@@ -28,9 +28,9 @@ ferramentas = name                              tipo                            
     - 15: Gerador de diferença entre campos     Processing
     - 16: Estatisticas de atributos             Processing
 
-PADRONIZADOS = 2, 3, 5, 8, 9, 10 , 11, 13
-Documentação de cenarios: 2, 3, 5, 8, 9, 10, 11, 13
-Instrucoes: 2, 3, 5, 8, 9, 10, 11, 13
+PADRONIZADOS = 1, 2, 3, 4, 5, 8, 9, 10 , 11, 13
+Documentação de cenarios: 1, 2, 3, 4, 5, 8, 9, 10, 11, 13
+Instrucoes: 1, 2, 3, 4,  5, 8, 9, 10, 11, 13
 OQUE EU TAVA FAZENDO? 
 eu tava padronizando todas os plugins para usarem a nova widgetfactory, novas classes de manipulacao de vetor, novos estilos, baseplugin,
 porem percebi que deveria colocar as coisas em task para deixa mais eficiente ainda entao na gerar rastro a explode linhas ja ta em task

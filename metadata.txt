@@ -1,7 +1,7 @@
 [general]
 name=MTL Tools
 qgisMinimumVersion=3.16
-qgisMaximumVersion=3.40
+qgisMaximumVersion=4.00
 version=1.5.12
 author=Matheus A.S. Martinelli
 email=martinelli.matheus11@gmail.com

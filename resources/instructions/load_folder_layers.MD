@@ -1,84 +1,67 @@
-# 📘 Ferramenta: Carregar Pasta de Arquivos
-Bem-vindo(a)! Esta ferramenta foi criada para agilizar o processo de carregar grandes volumes de arquivos no QGIS, mantendo organização, evitando duplicações e permitindo automações úteis no dia a dia.  
+# 🗂️ Load Folder Layers — Guia de Uso
+
+Ferramenta para carregar em lote arquivos vetoriais e raster de uma pasta, preservando opcionalmente a estrutura de diretórios como grupos no projeto QGIS.
 
 ---
 
 ## 🎯 Objetivo
-Permitir que você selecione uma pasta raiz e carregue automaticamente **todos os layers encontrados dentro dela**, incluindo subpastas, respeitando filtros, estrutura e evitando arquivos já carregados no projeto.
+
+Automatizar o carregamento de grandes volumes de arquivos geoespaciais, evitando duplicação, mantendo organização por grupos e fornecendo feedback contínuo ao usuário.
 
 ---
 
-## 🚀 Como usar
+## 🛠️ Como usar
 
-### 1️⃣ Selecione a Pasta Raiz
-Clique no botão `...` ao lado do campo de pasta e escolha onde estão seus arquivos.
+### 1️⃣ Selecione a pasta raiz
+Clique no botão `...` ao lado do campo e selecione a pasta que contém os arquivos.
 
-A ferramenta pesquisa recursivamente dentro de **todas as subpastas**.
+### 2️⃣ Escolha os tipos de arquivo
+Marque os tipos desejados (Shapefile, GeoJSON, GeoPackage, TIFF, etc.).
 
----
+### 3️⃣ Ajuste opções
+- `Carregar apenas arquivos ainda NÃO carregados`: evita duplicações
+- `Preservar estrutura de pastas`: cria grupos aninhados conforme diretório
+- `Não agrupar a última pasta`: útil em conjunto com `Preservar estrutura`
+- `Criar backup`: gera backup do projeto (apenas se projeto salvo)
 
-## 📂 Tipos de arquivos suportados
-Você pode marcar os tipos que deseja incluir:
-
-- Shapefile (`.shp`)
-- GeoJSON / JSON
-- KML e KMZ
-- TIFF / GeoTIFF
-- ECW
-- JPEG2000 (`.jp2`)
-- ASCII Grid (`.asc`)
-- GPX
-- CSV
-- TAB (MapInfo)
-- LAS / LAZ
-- e outros formatos vetoriais compatíveis com o QGIS
+### 4️⃣ Execute
+Clique em `Carregar Arquivos`. A operação pode rodar de forma assíncrona se muitos arquivos forem detectados; o progresso será exibido.
 
 ---
 
-## 🧠 Opções Inteligentes
+## 🔎 Detalhes e comportamento
 
-### ✔ **Carregar apenas arquivos ainda NÃO carregados**
-Evita duplicações automaticamente.  
-Se um arquivo já está no projeto → ele será ignorado.
-
-### ⚠️ Precaução de desempenho
-Para evitar travamentos e garantir que o painel de camadas atualize corretamente, a ferramenta adiciona as camadas em pequenos lotes e mantém a interface responsiva durante o processo. Evite interromper o carregamento com cliques excessivos ou ações na árvore de camadas até a conclusão.
-
-### ✔ **Preservar estrutura de pastas**
-Cria no QGIS a mesma organização da sua pasta, com grupos e subgrupos.
-
-### ✔ **Não agrupar a última pasta**
-Quando ativado junto com **Preservar estrutura**, o plugin **não cria o grupo referente à última pasta que contém o arquivo**.
-Exemplo: `F:\TTG\FEV_2026\FAZ_UNIAO\OLD\file.shp` → grupos `TTG / FEV_2026 / FAZ_UNIAO` (o `OLD` não vira grupo).
-
-### ✔ **Criar backup do projeto**
-Antes de carregar, o plugin cria um backup automático na pasta `backup/`  
-(ativo apenas se o projeto já estiver salvo).
+- Busca recursiva por arquivos nas subpastas
+- `missing_only` filtra antes de adicionar ao projeto para evitar recarregar camadas já presentes
+- Ao preservar estrutura, `ensure_group()` cria grupos aninhados usando `os.sep` para split
+- Para grandes volumes, o pipeline assincrono (`AsyncPipelineEngine`) é utilizado para manter a UI responsiva
 
 ---
 
-## 📊 Resultado
-Ao finalizar, o QGIS mostrará:
+## 🧾 Resultado
 
-- Quantos arquivos foram carregados
-- Caminho do backup (se ativado)
-
----
-
-## ❤️ Dicas de Uso
-
-- Ideal para quem recebe *pastas enormes de shapefiles* e precisa carregar tudo organizado.
-- Perfeito para cargas iniciais de projetos SIG corporativos.
-- Ótimo para comparar pastas ou atualizar lotes de arquivos sem duplicar facilmente.
+- Resumo com contagem de arquivos processados
+- Caminho do backup criado (se aplicável)
+- Logs detalhados para itens com erro
 
 ---
 
-## 🔧 Observação técnica
-A ferramenta usa normalização completa de paths e leitura absoluta dos arquivos, garantindo que:
-- caminhos relativos não causem duplicação,
-- formatos compactados (KMZ, JP2 etc.) sejam tratados corretamente,
-- raster e vetores tenham suas origens identificadas sem ambiguidades.
+## ✅ Boas práticas
+
+- Teste com uma subpasta pequena antes de rodar o processamento completo
+- Verifique permissões de leitura na pasta e espaço em disco
+- Ative `Criar backup` quando estiver trabalhando em projetos críticos
 
 ---
 
-Se desejar expandir a ferramenta com filtros avançados, carregamento assíncrono ou integração com banco de dados PostGIS, entre em contato! 😄
+## 🧩 Observações técnicas
+
+- `FILE_TYPES` deve estar sincronizado com utilitários do `ExplorerUtils`
+- `missing_only` precisa filtrar registros antes da adição ao projeto (performance)
+- Use threshold razoável para mudar entre modo síncrono/assíncrono
+
+---
+
+## ❤️ Criado por
+
+Matheus A.S. Martinelli

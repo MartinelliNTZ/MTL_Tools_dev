@@ -80,6 +80,14 @@ changelog=
         ✓ Causa: LogUtilsNew.get_logger() não existe - deve instanciar diretamente
         ✓ Erro foi: `LogUtilsNew.get_logger()` → não é método estático
       
+      1.6.8.10
+      - FIX: restaurado padrão `(layout, widget)` em `create_simple_button`
+        - Revertida mudança que retornava `QWidget` container para preservar
+          a API consistente da `WidgetFactory` (sempre retorna container+widget)
+        - Adicionado `layout.addSpacing(6)` antes do separador quando
+          `separator_bottom=True` para evitar que o botão "encave" visualmente
+          com itens abaixo (corrige perda parcial de altura observada)
+        - Risco: Baixíssimo (ajuste de espaçamento; compatibilidade preservada)
       - Solução implementada:
         ✓ Alterar: LogUtilsNew.get_logger() → LogUtilsNew(...) instância
         ✓ Adicionar try/except robustuem _get_logger() com fallback SimpleLogger

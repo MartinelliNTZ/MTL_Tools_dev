@@ -633,6 +633,7 @@ class WidgetFactory:
         parent=None,
         separator_top=False,
         separator_bottom=False,
+        spacing: int = Styles.LAYOUT_V_SPACING
     ):
         """
         Cria botão simples que ocupa espaço disponível.
@@ -663,9 +664,10 @@ class WidgetFactory:
         widget = SimpleButtonWidget(text, parent=parent)
         widget.setStyleSheet(Styles.simple_button_widget())
         layout.addWidget(widget)
-        
+        layout.addSpacing(spacing)
         if separator_bottom:
-            layout.addWidget(WidgetFactory.create_separator())
+                
+                layout.addWidget(WidgetFactory.create_separator())
         
         return layout, widget
 
