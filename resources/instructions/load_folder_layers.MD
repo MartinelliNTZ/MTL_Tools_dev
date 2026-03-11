@@ -41,8 +41,15 @@ Você pode marcar os tipos que deseja incluir:
 Evita duplicações automaticamente.  
 Se um arquivo já está no projeto → ele será ignorado.
 
+### ⚠️ Precaução de desempenho
+Para evitar travamentos e garantir que o painel de camadas atualize corretamente, a ferramenta adiciona as camadas em pequenos lotes e mantém a interface responsiva durante o processo. Evite interromper o carregamento com cliques excessivos ou ações na árvore de camadas até a conclusão.
+
 ### ✔ **Preservar estrutura de pastas**
 Cria no QGIS a mesma organização da sua pasta, com grupos e subgrupos.
+
+### ✔ **Não agrupar a última pasta**
+Quando ativado junto com **Preservar estrutura**, o plugin **não cria o grupo referente à última pasta que contém o arquivo**.
+Exemplo: `F:\TTG\FEV_2026\FAZ_UNIAO\OLD\file.shp` → grupos `TTG / FEV_2026 / FAZ_UNIAO` (o `OLD` não vira grupo).
 
 ### ✔ **Criar backup do projeto**
 Antes de carregar, o plugin cria um backup automático na pasta `backup/`  

@@ -12,7 +12,6 @@ from qgis.PyQt.QtWidgets import QApplication
 
 from ...utils.ExplorerUtils import ExplorerUtils
 from ...utils.ProjectUtils import ProjectUtils
-from ...utils.QgisMessageUtil import QgisMessageUtil
 import threading
 from ..ui.ProgressDialog import ProgressDialog
 
@@ -40,13 +39,12 @@ class LoadFilesStep(BaseStep):
 
         # Agora, no thread principal, instanciar camadas e adicioná-las ao projeto
         project = QgsProject.instance()
-        root = project.layerTreeRoot()
 
-        # Evitar refresh pesado bloqueando signals do layer tree
-        try:
-            root.blockSignals(True)
-        except Exception:
-            pass
+        # Se o usuário marcou "missing_only", evita carregar arquivos já presentes no projeto
+        already_loaded = set()
+        if context.get("missing_only", False):
+            for layer in project.mapLayers().values():
+                already_loaded.add(ProjectUtils.normalize_layer_source(layer.source()))
 
         loaded = 0
         total = len(valid)
@@ -68,14 +66,16 @@ class LoadFilesStep(BaseStep):
 
                 batch = valid[i:i+chunk]
 
-                # bloquear signals apenas durante adição do lote
-                try:
-                    root.blockSignals(True)
-                except Exception:
-                    pass
 
                 for rec in batch:
                     try:
+                        # Se solicitado, não carregue arquivos que já estão no projeto
+                        if context.get("missing_only", False):
+                            rec_src = ProjectUtils.normalize_layer_source(rec.get("path"))
+                            if rec_src in already_loaded:
+                                logger.debug(f"LoadFilesStep: arquivo já carregado, pulando: {rec_src}")
+                                continue
+
                         layer = ExplorerUtils.create_layer(rec, context.get("tool_key"))
                         if not layer or not layer.isValid():
                             logger.warning(f"LoadFilesStep: camada inválida para {rec.get('path')}")
@@ -84,6 +84,15 @@ class LoadFilesStep(BaseStep):
                         folder = context.get("folder", "")
                         if context.get("preserve", False):
                             rel = os.path.relpath(os.path.dirname(rec.get("path")), folder)
+
+                            # Se last_folder estiver ativo, descarta o último segmento
+                            if context.get("last_folder", False) and rel not in (".", ""):
+                                parts = rel.split(os.sep)
+                                if len(parts) > 1:
+                                    rel = os.path.join(*parts[:-1])
+                                else:
+                                    rel = "."
+
                             if rel == ".":
                                 ProjectUtils.add_layer(layer, add_to_root=True)
                             else:
@@ -111,12 +120,6 @@ class LoadFilesStep(BaseStep):
                         logger.error(f"LoadFilesStep: erro ao criar/adicionar camada {rec.get('path')}: {e}")
                         continue
 
-                # desbloquear signals para permitir atualização da árvore e UI
-                try:
-                    root.blockSignals(False)
-                except Exception:
-                    pass
-
                 # permitir UI responder entre lotes
                 try:
                     QApplication.processEvents()
@@ -124,12 +127,7 @@ class LoadFilesStep(BaseStep):
                     pass
 
                 logger.info(f"LoadFilesStep: batch {i}-{i+len(batch)-1} adicionadas; progresso {loaded}/{total}")
-                # reloop - signals serão bloqueados novamente no próximo lote
         finally:
-            try:
-                root.blockSignals(False)
-            except Exception:
-                pass
             try:
                 if progress:
                     progress.close()

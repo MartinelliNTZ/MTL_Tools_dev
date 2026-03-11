@@ -154,6 +154,7 @@ class WidgetFactory:
             title=title
         )
         layout.addWidget(widget)
+        widget.setStyleSheet(Styles.grid_checkboxes())
 
         if separator_bottom:
             layout.addWidget(WidgetFactory.create_separator())
@@ -358,6 +359,7 @@ class WidgetFactory:
         spin.setSingleStep(step)
         spin.setRange(minimum, maximum)
         spin.setValue(value)
+        spin.setStyleSheet(Styles.input_fields_widget())
 
         h_layout.addWidget(spin)
         

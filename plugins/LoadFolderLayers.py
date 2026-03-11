@@ -7,8 +7,6 @@ import shutil
 
 from qgis.core import (
     QgsProject,
-    QgsVectorLayer,
-    QgsRasterLayer,
 )
 
 from ..plugins.BasePlugin import BasePluginMTL
@@ -106,8 +104,16 @@ class LoadFolderLayersDialog(BasePluginMTL):
         opts = {
             "missing_only": "Carregar apenas arquivos ainda NÃO carregados no projeto",
             "preserve": "Criar grupos conforme estrutura de pastas/subpastas",
-            "backup": "Criar backup do projeto antes de carregar (somente se salvo)",
+            "lastfolder": "Não agrupar a última pasta",
+            "backup": "Criar backup do projeto antes de carregar (somente se salvo)",            
         }
+        #cmo funciona F:\TTG\FEV_2026\FAZ_UNIAO\OLD\file.shp)
+        #crie os grupo TTG  - FEV_2026 - FAZ_UNIAO - MAS NAO CARREGUE O OLD, POIS É A ULTIMA PASTA
+        # MODO PRESERVE COM LASTFOLDER DESABILITADO: F:\TTG\FEV_2026\FAZ_UNIAO\OLD\file.shp -> GRUPOS: TTG  - FEV_2026 - FAZ_UNIAO - OLD
+        #VEJA QUE O MODO LASTFOLDER SO FAZ SENTIDO SE O MODO PRESERVE ESTIVER HABILITADO. SE O MODO PRESERVE ESTIVER DESABILITADO, 
+        # O LASTFOLDER NAO TEM EFEITO, POIS NAO SERA CRIADA NENHUMA ESTRUTURA DE GRUPOS, INDEPENDENTE DO VALOR DE LASTFOLDER
+        # POR ISSO ANALISE O GRID DE CHECKBOX E TENTE IMPLEMENTAR UM SISTEMA ONDE DETERMINADO CHECK PODE INATIVAR OUTRO CHECK, 
+        # COMO É O CASO DO LASTFOLDER QUE SÓ FAZ SENTIDO SE O PRESERVE ESTIVER HABILITADO. LAST FOLDER SO FICA POSSIVEL CHECKAR SE LAST FOLDER ESTIVER HABILITADO
 
         opts_layout, opts_map = WidgetFactory.create_checkbox_grid(
             opts,
@@ -120,7 +126,15 @@ class LoadFolderLayersDialog(BasePluginMTL):
 
         self.chk_load_missing_only = opts_map["missing_only"]
         self.chk_preserve_structure = opts_map["preserve"]
+        self.chk_last_folder = opts_map["lastfolder"]
         self.chk_backup = opts_map["backup"]
+
+        # last_folder faz sentido apenas se preserve estiver ativado
+        # usa mecanismo de dependência via CheckboxGridWidget/DependentCheckBox
+        try:
+            self.chk_preserve_structure.set_dependents([self.chk_last_folder])
+        except Exception:
+            pass
 
         # --- Botões padrão ---
         buttons_layout, self.action_buttons = WidgetFactory.create_bottom_action_buttons(
@@ -169,6 +183,7 @@ class LoadFolderLayersDialog(BasePluginMTL):
             # Opções
             self.chk_load_missing_only.setChecked(prefs.get("missing_only", False))
             self.chk_preserve_structure.setChecked(prefs.get("preserve", True))
+            self.chk_last_folder.setChecked(prefs.get("lastfolder", False))
             self.chk_backup.setChecked(prefs.get("backup", True))
 
             # backup só se projeto salvo
@@ -201,6 +216,7 @@ class LoadFolderLayersDialog(BasePluginMTL):
                 "types": selected_types,
                 "missing_only": self.chk_load_missing_only.isChecked(),
                 "preserve": self.chk_preserve_structure.isChecked(),
+                "lastfolder": self.chk_last_folder.isChecked(),
                 "backup": self.chk_backup.isChecked(),
                 "window_width": self.width(),
                 "window_height": self.height(),
@@ -282,10 +298,18 @@ class LoadFolderLayersDialog(BasePluginMTL):
 
             if self.chk_preserve_structure.isChecked():
                 rel = os.path.relpath(os.path.dirname(path), folder)
+
+                # Se lastfolder estiver ativo, nem sempre queremos o último nível
+                if self.chk_last_folder.isChecked() and rel not in (".", ""):
+                    parts = rel.split(os.sep)
+                    if len(parts) > 1:
+                        rel = os.path.join(*parts[:-1])
+                    else:
+                        rel = "."
+
                 if rel == ".":
                     ProjectUtils.add_layer(layer, add_to_root=True)
                 else:
-                    s = rel.split(os.sep)
                     group = ProjectUtils.ensure_group(rel)
                     ProjectUtils.add_layer_to_group(layer, group)
             else:
@@ -313,6 +337,7 @@ class LoadFolderLayersDialog(BasePluginMTL):
             "records": records,
             "tool_key": self.TOOL_KEY,
             "preserve": self.chk_preserve_structure.isChecked(),
+            "last_folder": self.chk_last_folder.isChecked(),
             "missing_only": self.chk_load_missing_only.isChecked(),
             "backup_file": backup_file,
             # parent widget used by Steps to show modal progress

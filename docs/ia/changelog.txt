@@ -30,7 +30,38 @@ changelog=
         - Mensagens resumidas exibidas via `QgisMessageUtil`; preferências atualizadas e salvas
         - Risco: Baixo (compatível com chaves de prefs anteriores)
 
+      1.6.8.04
+      - BUG FIX: Camadas não apareciam e QGIS travava após carregar pasta
+        - Remove bloqueio de sinais da árvore de camadas em `LoadFilesStep`.
+        - As camadas passam a aparecer imediatamente sem exigir ação do usuário.
+        - Evita crashes ao interagir com a árvore de camadas durante carregamento.
 
+      1.6.8.05
+      - BUG FIX: "Carregar apenas arquivos ainda NÃO carregados" (modo assíncrono)
+        - `missing_only` agora filtra corretamente registros antes de adicionar ao projeto.
+        - Evita recarregar camadas já presentes no projeto (reduz memória/tempo).
+
+      1.6.8.06
+      - FEATURE: opção "Não agrupar a última pasta" (modo preserve)
+        - Ao ativar, o plugin não cria grupo para a última pasta que contém o arquivo.
+        - Checkbox é automaticamente desabilitado quando "Preservar estrutura" está desligado.
+
+
+
+      1.6.8.07
+      - PADRONIZAÇÃO: tamanho padrão para componentes UI
+        - Adicionado `STANDARD_SIZE` em `Styles.py` e usado para input/button/checkbox/radio.
+        - Substituídos hardcoded `12px` e `min-height: 12px` por constantes (`Styles.INPUT_HEIGHT`, `Styles.BUTTON_HEIGHT`, `Styles.CHECKBOX_SIZE`).
+        - Removido código morto em `Styles.label()` (retorno duplicado).
+
+
+      1.6.8.08
+      - ESTILOS: centralização de botões/inputs e remoção de cores hardcode
+        - Criado Styles.base_button(), Styles.base_input(), Styles.base_checkbox()
+        - Refatorado Styles.file_selector(), Styles.attribute_selector(), Styles.path_selector_widget(), Styles.bottom_action_buttons_widget() para usar estilos base
+        - Unificado Styles.simple_button_widget() para usar Styles.base_button() e removida definição duplicada
+        - Eliminado `#ffffff` hardcoded em botões; agora usa `Styles.COLOR_BUTTON_TEXT`
+        - Removidos blocos hover/pressed/disabled repetidos em múltiplos estilos
 
 
   1.6.7 2026/03/09
