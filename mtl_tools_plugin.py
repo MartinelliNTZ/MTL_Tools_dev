@@ -9,11 +9,11 @@ from qgis.PyQt.QtWidgets import QAction, QMenu, QToolButton, QWidgetAction
 from pathlib import Path
 
 from .utils.ToolKeys import ToolKey
-
 from .utils.QgisMessageUtil import QgisMessageUtil
 from .processing.provider import MTLProvider
 from .core.config.LogCleanupUtils import LogCleanupUtils
 from .core.config.LogUtils import LogUtils
+
 
 
 # ========================================================================

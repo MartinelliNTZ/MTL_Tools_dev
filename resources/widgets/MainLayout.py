@@ -1,6 +1,6 @@
 from qgis.PyQt.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
-    QLineEdit, QMessageBox, QCheckBox, QTextEdit, QComboBox, QListWidget, QDoubleSpinBox, QGridLayout, QFrame
+    QLineEdit, QMessageBox, QCheckBox, QTextEdit, QComboBox, QListWidget, QDoubleSpinBox, QGridLayout, QFrame, QApplication
 )
 from qgis.PyQt.QtWidgets import QLayout, QWidget
 from qgis.PyQt.QtCore import Qt, QPoint
@@ -8,6 +8,93 @@ from qgis.PyQt.QtGui import QCursor
 from typing import Optional
 from ..styles.Styles import Styles
 from .ScrollWidget import ScrollWidget
+from ...core.config.LogUtils import LogUtils
+from ...utils.ToolKeys import ToolKey
+
+logger = LogUtils(tool=ToolKey.MTL_TOOLS_PLUGIN, class_name="MainLayout", level=LogUtils.DEBUG)
+
+class EdgeFrame(QFrame):
+    """QFrame que notifica o MainLayout quando for redimensionado."""
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._owner_layout = None
+
+    def set_owner_layout(self, layout):
+        self._owner_layout = layout
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        try:
+            if self._owner_layout:
+                self._owner_layout._update_border_geometries()
+        except Exception:
+            pass
+
+
+class BorderHitWidget(QWidget):
+    """Widget invisível que representa uma borda "hit-only" para captura de mouse.
+
+    Ele não pinta conteúdo; captura enter/leave/mouse events e delega para MainLayout.
+    """
+    def __init__(self, parent, edge: str, main_layout):
+        super().__init__(parent)
+        self._edge = edge
+        self._layout = main_layout
+        self.setMouseTracking(True)
+        self.setAttribute(Qt.WA_TransparentForMouseEvents, False)
+        self.setStyleSheet("background: rgba(0,0,0,0); border: none;")
+
+    def enterEvent(self, event):
+        try:
+            logger.debug(f"BorderHitWidget.enterEvent: edge={self._edge}")
+        except Exception:
+            pass
+        try:
+            self._layout._update_cursor(self._edge)
+        except Exception:
+            pass
+
+    def leaveEvent(self, event):
+        try:
+            logger.debug(f"BorderHitWidget.leaveEvent: edge={self._edge}")
+        except Exception:
+            pass
+        try:
+            self._layout._update_cursor(None)
+            QApplication.restoreOverrideCursor()
+        except Exception:
+            pass
+
+    def mousePressEvent(self, event):
+        try:
+            logger.debug(f"BorderHitWidget.mousePressEvent: edge={self._edge}")
+        except Exception:
+            pass
+        try:
+            self._layout._start_resize_from_edge(event, self._edge)
+            event.accept()
+        except Exception:
+            pass
+
+    def mouseMoveEvent(self, event):
+        try:
+            if self._layout._resize_active:
+                self._layout._perform_resize_move(event)
+            else:
+                self._layout._update_cursor(self._edge)
+        except Exception:
+            pass
+
+    def mouseReleaseEvent(self, event):
+        try:
+            logger.debug(f"BorderHitWidget.mouseReleaseEvent: edge={self._edge}")
+        except Exception:
+            pass
+        try:
+            self._layout._end_resize()
+            event.accept()
+        except Exception:
+            pass
 
 class MainLayout(QVBoxLayout):
     """Container layout customizado para plugins MTL Tools com suporte a resize.
@@ -42,12 +129,15 @@ class MainLayout(QVBoxLayout):
         self.setContentsMargins(3, 3, 3, 3)
         self.setSpacing(0)
 
-        # container visual
-        self._frame = QFrame(parent)
+        # container visual (frame customizado para atualizar bordas)
+        self._frame = EdgeFrame(parent)
         self._frame.setObjectName("main_container")
         self._frame.setStyleSheet(Styles.main_application())
         self._frame.setMouseTracking(True)  # Ativa rastreamento no frame
-
+        try:
+            self._frame.set_owner_layout(self)
+        except Exception:
+            pass
         # layout interno real (sempre criado, com ou sem scroll)
         self._inner_layout = QVBoxLayout(self._frame)
         self._inner_layout.setContentsMargins(5, 5, 5, 5)
@@ -69,9 +159,21 @@ class MainLayout(QVBoxLayout):
         self._last_pos = None
         self._parent_dialog = parent
         
+        # border hit widgets
+        self._borders = {}
+        try:
+            self._create_border_widgets()
+            self._update_border_geometries()
+        except Exception:
+            pass
         # Ativa rastreamento de mouse para atualizar cursor continuamente
         if parent:
             parent.setMouseTracking(True)
+        try:
+            pname = type(parent).__name__ if parent is not None else None
+            logger.debug(f"MainLayout.__init__: parent={pname}, enable_scroll={enable_scroll}")
+        except Exception:
+            pass
 
     def addWidget(self, widget, *args, **kwargs):
         """
@@ -194,6 +296,10 @@ class MainLayout(QVBoxLayout):
         """Detecta qual borda está sendo apontada."""
         if not self._parent_dialog:
             return None
+        try:
+            logger.debug(f"_get_resize_edge: pos=({pos.x()},{pos.y()})")
+        except Exception:
+            logger.debug("_get_resize_edge: unable to read pos")
         
         rect = self._parent_dialog.rect()
         if pos.x() < self._resize_border and pos.y() < self._resize_border:
@@ -214,6 +320,87 @@ class MainLayout(QVBoxLayout):
             return "bottom"
         return None
 
+    def _create_border_widgets(self):
+        edges = ["left", "right", "top", "bottom", "top-left", "top-right", "bottom-left", "bottom-right"]
+        for e in edges:
+            try:
+                w = BorderHitWidget(self._frame, e, self)
+                w.setObjectName(f"border_hit_{e}")
+                w.setAttribute(Qt.WA_TransparentForMouseEvents, False)
+                w.setMouseTracking(True)
+                w.raise_()
+                self._borders[e] = w
+            except Exception:
+                logger.debug(f"_create_border_widgets: failed for {e}")
+
+    def _update_border_geometries(self):
+        try:
+            if not self._frame:
+                return
+            fw = self._frame.width()
+            fh = self._frame.height()
+            b = self._resize_border
+            if "left" in self._borders:
+                self._borders["left"].setGeometry(0, 0, b, fh)
+            if "right" in self._borders:
+                self._borders["right"].setGeometry(max(0, fw - b), 0, b, fh)
+            if "top" in self._borders:
+                self._borders["top"].setGeometry(0, 0, fw, b)
+            if "bottom" in self._borders:
+                self._borders["bottom"].setGeometry(0, max(0, fh - b), fw, b)
+            if "top-left" in self._borders:
+                self._borders["top-left"].setGeometry(0, 0, b, b)
+            if "top-right" in self._borders:
+                self._borders["top-right"].setGeometry(max(0, fw - b), 0, b, b)
+            if "bottom-left" in self._borders:
+                self._borders["bottom-left"].setGeometry(0, max(0, fh - b), b, b)
+            if "bottom-right" in self._borders:
+                self._borders["bottom-right"].setGeometry(max(0, fw - b), max(0, fh - b), b, b)
+            for w in self._borders.values():
+                w.raise_()
+        except Exception:
+            logger.debug("_update_border_geometries: failed")
+
+    def _start_resize_from_edge(self, event, edge):
+        try:
+            self._resize_active = True
+            self._resize_edge = edge
+            self._last_pos = event.globalPos()
+            logger.debug(f"_start_resize_from_edge: edge={edge}, last_pos=({self._last_pos.x()},{self._last_pos.y()})")
+        except Exception:
+            logger.debug("_start_resize_from_edge: failed")
+
+    def _perform_resize_move(self, event):
+        try:
+            if not (self._resize_active and self._resize_edge and self._last_pos and self._parent_dialog):
+                return
+            delta = event.globalPos() - self._last_pos
+            new_rect = self._parent_dialog.geometry()
+            if "top" in self._resize_edge:
+                new_rect.setTop(new_rect.top() + delta.y())
+            if "bottom" in self._resize_edge:
+                new_rect.setBottom(new_rect.bottom() + delta.y())
+            if "left" in self._resize_edge:
+                new_rect.setLeft(new_rect.left() + delta.x())
+            if "right" in self._resize_edge:
+                new_rect.setRight(new_rect.right() + delta.x())
+            if new_rect.width() >= self._parent_dialog.minimumWidth() and new_rect.height() >= self._parent_dialog.minimumHeight():
+                self._parent_dialog.setGeometry(new_rect)
+                self._last_pos = event.globalPos()
+        except Exception:
+            logger.debug("_perform_resize_move: failed")
+
+    def _end_resize(self):
+        try:
+            self._resize_active = False
+            self._resize_edge = None
+            self._last_pos = None
+            self._update_cursor(None)
+            QApplication.restoreOverrideCursor()
+            logger.debug("_end_resize: resize finished, cursor reset")
+        except Exception:
+            logger.debug("_end_resize: failed")
+
     def _update_cursor(self, edge: Optional[str]):
         """Atualiza cursor baseado na borda detectada."""
         cursors = {
@@ -227,12 +414,35 @@ class MainLayout(QVBoxLayout):
             "bottom-right": Qt.SizeFDiagCursor,
         }
         if self._parent_dialog:
-            self._parent_dialog.setCursor(QCursor(cursors.get(edge, Qt.ArrowCursor)))
+            cur = cursors.get(edge, Qt.ArrowCursor)
+            try:
+                logger.debug(f"_update_cursor: edge={edge} cursor={cur}")
+            except Exception:
+                logger.debug("_update_cursor: unable to log edge")
+            self._parent_dialog.setCursor(QCursor(cur))
 
     def handle_mouse_press(self, event):
         """Inicia resize ao clicar nas bordas."""
         if event.button() == Qt.LeftButton:
-            edge = self._get_resize_edge(event.pos())
+            try:
+                p = event.pos(); g = event.globalPos(); b = event.button()
+                logger.debug(f"handle_mouse_press: pos=({p.x()},{p.y()}), global=({g.x()},{g.y()}), button={b}")
+            except Exception:
+                logger.debug("handle_mouse_press: unable to read event data")
+
+            # Map event global position to parent dialog coordinates to ensure
+            # correct edge detection when events come from child widgets.
+            mapped_pos = None
+            if self._parent_dialog:
+                try:
+                    mapped = self._parent_dialog.mapFromGlobal(event.globalPos())
+                    mapped_pos = QPoint(mapped.x(), mapped.y())
+                except Exception:
+                    mapped_pos = event.pos()
+            else:
+                mapped_pos = event.pos()
+
+            edge = self._get_resize_edge(mapped_pos)
             if edge:
                 self._resize_active = True
                 self._resize_edge = edge
@@ -243,11 +453,42 @@ class MainLayout(QVBoxLayout):
 
     def handle_mouse_move(self, event):
         """Redimensiona a janela ao arrastar."""
-        edge = self._get_resize_edge(event.pos())
-        
+        try:
+            p = event.pos(); g = event.globalPos()
+            logger.debug(f"handle_mouse_move: pos=({p.x()},{p.y()}), global=({g.x()},{g.y()})")
+        except Exception:
+            logger.debug("handle_mouse_move: unable to read event positions")
+
+        # Map event to parent dialog coordinates for edge detection
+        mapped_pos = None
+        if self._parent_dialog:
+            try:
+                mapped = self._parent_dialog.mapFromGlobal(event.globalPos())
+                mapped_pos = QPoint(mapped.x(), mapped.y())
+            except Exception:
+                mapped_pos = event.pos()
+        else:
+            mapped_pos = event.pos()
+
+        edge = self._get_resize_edge(mapped_pos)
+
+        # Log: mouse position relative to parent dialog (mapped from global)
+        if self._parent_dialog:
+            try:
+                w, h = self.get_size()
+                inside = 0 <= mapped_pos.x() <= w and 0 <= mapped_pos.y() <= h
+                logger.debug(f"handle_mouse_move: mapped=({mapped_pos.x()},{mapped_pos.y()}), inside_window={inside}, window_size=({w},{h})")
+            except Exception:
+                logger.debug("handle_mouse_move: unable to compute mapped pos")
+
         # SEMPRE atualiza o cursor baseado na posição atual
         # Mesmo quando não está em resize, isso garante que o cursor resete corretamente
         self._update_cursor(edge)
+        try:
+            geom = self._parent_dialog.geometry()
+            logger.debug(f"handle_mouse_move: geometry=({geom.x()},{geom.y()},{geom.width()},{geom.height()})")
+        except Exception:
+            logger.debug("handle_mouse_move: unable to read geometry")
         
         if self._resize_active and self._resize_edge and self._last_pos and self._parent_dialog:
             delta = event.globalPos() - self._last_pos
@@ -274,6 +515,7 @@ class MainLayout(QVBoxLayout):
             self._resize_edge = None
             self._last_pos = None
             self._update_cursor(None)
+            logger.debug("handle_mouse_release: resize finished, cursor reset")
             event.accept()
             return True
         return False
