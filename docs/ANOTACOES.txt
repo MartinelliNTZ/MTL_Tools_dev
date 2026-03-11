@@ -37,10 +37,13 @@ porem percebi que deveria colocar as coisas em task para deixa mais eficiente ai
 porem preciso ter a buffer em task e entao ir passando plugin/plugin 
 antes de criar qualquer ferramtne preciso analisar melhor criar primeiramente a ui e depois vir gerando metodos SEMPRE
 
+-TODO: a progrees dialog ficou top e resolveu porem as camada continuam invisiveis ate adicionar um grupo ou adcionar uma camda manualmente no qgs
+
 changelog=
   1.6.10 
-    -TODO: a progrees dialog ficou top e resolveu porem as camada continuam invisiveis ate adicionar um grupo ou adcionar uma camda manualmente no qgs
-  -TODO: bug em replace in layouts
+    - CRIADA CLASSE Preferences
+    - cRIADA cLASSE API
+  - bug em replace in layouts CORRIGIDO 
   1.6.9 2026/03/09
     - mechi nos styles padronizacao 
   1.6.8 TEM QUE BOTAR RESUMO AQUI 

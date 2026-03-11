@@ -1,19 +1,10 @@
 # -*- coding: utf-8 -*-
-import os
 
-from qgis.core import QgsProject
-from qgis.PyQt.QtWidgets import (
-    QHBoxLayout, QPushButton, QLineEdit, QMessageBox
-)
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtCore import Qt, QUrl
-from qgis.PyQt.QtGui import QDesktopServices
-
-from ..utils.Preferences import load_tool_prefs, save_tool_prefs
-from ..utils.QgisMessageUtil import QgisMessageUtil
-from ..utils.LayoutsUtils import LayoutsUtils
-from ..utils.ProjectUtils import ProjectUtils
-from ..utils.ToolKeys import ToolKey
+from ..utils import load_tool_prefs, save_tool_prefs
+from ..utils import QgisMessageUtil
+from ..utils import LayoutsUtils
+from ..utils import ProjectUtils
+from ..utils import ToolKey
 from .BasePlugin import BasePluginMTL
 from ..core.ui.WidgetFactory import WidgetFactory
 
@@ -177,7 +168,7 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
         ):
             return
 
-        project = QgsProject.instance()
+        project = ProjectUtils.get_project_instance()
 
         try:
             # BACKUP (se possível)
@@ -202,10 +193,10 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
                 "Substituição concluída"
             )       
         except Exception as e:
-            QMessageBox.critical(
+            QgisMessageUtil.bar_critical(
                 self,
-                "Erro",
-                str(e)
+                str(e),
+                "Erro"
             )
 
 

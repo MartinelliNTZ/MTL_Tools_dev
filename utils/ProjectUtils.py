@@ -20,7 +20,10 @@ class ProjectUtils:
     Utilitários relacionados ao projeto QGIS (.qgz).
     Não possui dependência de UI.
     """
-
+    @staticmethod
+    def get_project_instance() -> QgsProject:
+        """Retorna a instância do projeto QGIS aberto."""
+        return QgsProject.instance()
     @staticmethod
     def is_project_saved(project: QgsProject) -> bool:
         return bool(project.fileName())

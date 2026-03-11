@@ -18,7 +18,7 @@ from .utils.ExplorerUtils import ExplorerUtils
 from .utils.FormatUtils import FormatUtils
 from .utils.LayoutsUtils import LayoutsUtils
 from .utils.PDFUtils import PDFUtils
-from .utils.Preferences import load_tool_prefs, save_tool_prefs
+from .utils.Preferences import load_tool_prefs, save_tool_prefs, Preferences
 from .utils.ProjectUtils import ProjectUtils
 from .utils.StringUtils import StringUtils
 
@@ -79,6 +79,12 @@ from .core.engine_tasks.PointFieldsStep import PointFieldsStep
 from .core.engine_tasks.PolygonFieldsStep import PolygonFieldsStep
 from .core.engine_tasks.SaveVectorStep import SaveVectorStep
 
+# ======
+# CORE UI
+# ======
+from .core.ui.WidgetFactory import WidgetFactory
+
+
 
 # =========================================================
 # PROCESSING PROVIDER
@@ -114,6 +120,8 @@ __all__ = [
     "LayoutsUtils",
     "PDFUtils",
     "Preferences",
+    "load_tool_prefs",
+      "save_tool_prefs",
     "ProjectUtils",
     "StringUtils",
 
@@ -160,6 +168,6 @@ __all__ = [
     "DifferenceFieldsAlgorithm",
     "ElevationAnalisys",
     "ImplementTrail",
-    "MyAlgorithm",
+    "MTLExampleAlgorithm",
     "RasterMassSampler",
 ]
