@@ -46,20 +46,14 @@ class BorderHitWidget(QWidget):
 
     def enterEvent(self, event):
         try:
-            logger.debug(f"BorderHitWidget.enterEvent: edge={self._edge}")
-        except Exception:
-            pass
-        try:
+         #   logger.debug(f"BorderHitWidget.enterEvent: edge={self._edge}")
             self._layout._update_cursor(self._edge)
         except Exception:
             pass
 
     def leaveEvent(self, event):
         try:
-            logger.debug(f"BorderHitWidget.leaveEvent: edge={self._edge}")
-        except Exception:
-            pass
-        try:
+            #logger.debug(f"BorderHitWidget.leaveEvent: edge={self._edge}")
             self._layout._update_cursor(None)
             QApplication.restoreOverrideCursor()
         except Exception:
@@ -67,10 +61,7 @@ class BorderHitWidget(QWidget):
 
     def mousePressEvent(self, event):
         try:
-            logger.debug(f"BorderHitWidget.mousePressEvent: edge={self._edge}")
-        except Exception:
-            pass
-        try:
+            #logger.debug(f"BorderHitWidget.mousePressEvent: edge={self._edge}")
             self._layout._start_resize_from_edge(event, self._edge)
             event.accept()
         except Exception:
@@ -87,10 +78,7 @@ class BorderHitWidget(QWidget):
 
     def mouseReleaseEvent(self, event):
         try:
-            logger.debug(f"BorderHitWidget.mouseReleaseEvent: edge={self._edge}")
-        except Exception:
-            pass
-        try:
+            #logger.debug(f"BorderHitWidget.mouseReleaseEvent: edge={self._edge}")
             self._layout._end_resize()
             event.accept()
         except Exception:
