@@ -4,6 +4,11 @@ import sip
 
 from ..core.task.reverse_geocoding_task import ReverseGeocodeTask
 from ..core.task.altimetry_task import AltimetriaTask
+from ..core.engine_tasks.AsyncPipelineEngine import AsyncPipelineEngine
+from ..core.engine_tasks.ExecutionContext import ExecutionContext
+from ..core.engine_tasks.ReverseGeocodeStep import ReverseGeocodeStep
+from ..core.engine_tasks.AltimetryStep import AltimetryStep
+from ..core.engine_tasks.ParallelStep import ParallelStep
 from ..utils.vector.VectorLayerProjection import VectorLayerProjection
 from .coord_result_dialog import CoordResultDialog
 from ..core.config.LogUtils import LogUtils
@@ -93,50 +98,76 @@ class CoordClickTool(QgsMapTool):
         lat, lon = info["lat"], info["lon"]
 
         # -----------------------------
-        # Reverse Geocode (MODEL)
         # -----------------------------
-        def on_address(result, error):
+        # Use AsyncPipelineEngine with Steps for reverse geocode + altimetry
+        # -----------------------------
+        try:
+            # cancel previous pipeline if running
             try:
-                if error:
-                    if self.logger:
-                        self.logger.warning(f"Reverse geocode error: {error}")
-                    self.dialog.set_address(None)
-                    self.iface.messageBar().pushWarning(
-                        "Geocodificação", error
-                    )
-                else:
-                    if self.logger:
-                        self.logger.debug(f"Reverse geocode result: {result}")
-                    self.dialog.set_address(result)
-            except Exception as e:
-                if self.logger:
-                    self.logger.error(f"on_address handler error: {e}")
+                if hasattr(self, "pipeline_engine") and self.pipeline_engine and self.pipeline_engine.is_running():
+                    self.pipeline_engine.cancel()
+            except Exception:
+                pass
 
-        self.address_task = ReverseGeocodeTask(lat, lon, on_address)
-        QgsApplication.taskManager().addTask(self.address_task)
+            context = ExecutionContext({
+                "lat": lat,
+                "lon": lon,
+                "iface": self.iface,
+                "dialog": self.dialog,
+                "tool_key": "coord_click",
+            })
 
-        # -----------------------------
-        # Altimetria (MODEL)
-        # -----------------------------
-        def on_altitude(value, error):
-            try:
-                if error:
-                    if self.logger:
-                        self.logger.warning(f"Altimetry error: {error}")
-                    self.dialog.set_altitude(None)
-                    self.iface.messageBar().pushWarning(
-                        "Altimetria", error
-                    )
-                else:
-                    if self.logger:
-                        self.logger.debug(f"Altimetry result: {value}")
-                    self.dialog.set_altitude(value)
-            except Exception as e:
-                if self.logger:
-                    self.logger.error(f"on_altitude handler error: {e}")
+            # Reverse geocode and altimetry are independent — run in parallel
+            steps = [
+                ParallelStep([ReverseGeocodeStep(), AltimetryStep()], description="coord_click_geo_alt")
+            ]
 
-        self.alt_task = AltimetriaTask(lat, lon, on_altitude)
-        QgsApplication.taskManager().addTask(self.alt_task)
+            self.pipeline_engine = AsyncPipelineEngine(steps, context)
+            self.pipeline_engine.start()
+        except Exception as e:
+            # Fallback to previous behavior: schedule tasks individually
+            if self.logger:
+                self.logger.warning(f"Pipeline failed, falling back to legacy tasks: {e}")
+
+            def on_address(result, error):
+                try:
+                    if error:
+                        if self.logger:
+                            self.logger.warning(f"Reverse geocode error: {error}")
+                        self.dialog.set_address(None)
+                        self.iface.messageBar().pushWarning(
+                            "Geocodificação", error
+                        )
+                    else:
+                        if self.logger:
+                            self.logger.debug(f"Reverse geocode result: {result}")
+                        self.dialog.set_address(result)
+                except Exception as e2:
+                    if self.logger:
+                        self.logger.error(f"on_address handler error: {e2}")
+
+            self.address_task = ReverseGeocodeTask(lat, lon, on_address)
+            QgsApplication.taskManager().addTask(self.address_task)
+
+            def on_altitude(value, error):
+                try:
+                    if error:
+                        if self.logger:
+                            self.logger.warning(f"Altimetry error: {error}")
+                        self.dialog.set_altitude(None)
+                        self.iface.messageBar().pushWarning(
+                            "Altimetria", error
+                        )
+                    else:
+                        if self.logger:
+                            self.logger.debug(f"Altimetry result: {value}")
+                        self.dialog.set_altitude(value)
+                except Exception as e2:
+                    if self.logger:
+                        self.logger.error(f"on_altitude handler error: {e2}")
+
+            self.alt_task = AltimetriaTask(lat, lon, on_altitude)
+            QgsApplication.taskManager().addTask(self.alt_task)
 
     # --------------------------------------------------
     # Utils

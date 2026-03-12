@@ -348,3 +348,34 @@ MyStep.py (core/engine_tasks/)
 
 Use este documento como referência ao implementar ANY asynchronous pipeline em QGIS.
 
+---
+
+## ▶️ Novo: ParallelStep — execução paralela de Steps independentes
+
+Data: 2026/03/12
+
+Foi introduzido o conceito de `ParallelStep` para permitir execução concorrente
+de steps independentes sem alterar o `AsyncPipelineEngine` (ele continua
+tratando tudo como `BaseStep`).
+
+Regras e comportamento resumido:
+- `ParallelStep` recebe uma lista de `BaseStep` e encapsula todo o paralelismo.
+- Cada sub-step continua criando sua própria `QgsTask` via `create_task(context)`.
+- O `ParallelStep` agenda todas as tasks com `QgsApplication.taskManager().addTask()`.
+- O grupo aguarda todas as tasks finalizarem; se qualquer uma falhar, o grupo
+    cancela as demais e propaga erro para o engine.
+- Os `on_success(context, result)` de cada sub-step são chamados imediatamente
+    quando sua task termina (executados pela própria lógica do `ParallelStep`).
+- O `ParallelStep` chama o `on_success(context, aggregated_result)` quando
+    todo o grupo termina com sucesso; `aggregated_result` é um dict
+    { step_name: result }.
+- Cancelamento do pipeline é propagado para todas as subtasks do grupo.
+
+Boas práticas:
+- Use `ParallelStep` quando os steps forem semanticamente independentes
+    (ex.: chamadas a serviços diferentes, cálculos sem dependência de dados).
+- Continue respeitando as regras do AsyncPipelineEngine: tasks NÃO tocam
+    camadas (layer) e `on_success` deve aplicar mudanças em batch com
+    `blockSignals()` e `QApplication.processEvents()`.
+
+

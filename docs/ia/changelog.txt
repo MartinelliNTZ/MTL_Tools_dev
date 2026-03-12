@@ -15,6 +15,21 @@ changelog=
 
       1.6.8.02
       - LOG / PREFS / GPKG / EXPLORER
+
+  1.6.8.16 2026/03/12
+  - PIPELINE: ParallelStep para execução concorrente de Steps
+    - Adicionado `core/engine_tasks/ParallelStep.py`:
+      - `ParallelStep([step1, step2, ...])` encapsula paralelismo de subtasks
+      - Cria e agenda as tasks dos sub-steps via `create_task(context)`
+      - Aguarda todas finalizarem; em sucesso retorna dict `{step_name: result}`
+      - Em erro: cancela as demais subtasks e propaga a exceção para o engine
+      - Cancelamento do pipeline é propagado para todas as subtasks
+    - Compatibilidade: `AsyncPipelineEngine` não foi alterado na surface API;
+      `ParallelStep` é tratado como `BaseStep` normal (sem mudanças no engine)
+    - Exemplo de uso:
+      - `steps = [ StepA(), ParallelStep([StepB(), StepC(), StepD()]), StepE() ]`
+    - Risco: Baixo — encapsula paralelismo no `ParallelStep`, mantém regras do
+      AsyncPipelineEngine (tasks não tocam layer; on_success aplica em main thread)
         - Adicionado: logging em `plugins/load_folder_layers.py` usando `self.logger` (BasePluginMTL)
         - Persistência: estado do painel "Tipos de Arquivo" (`types_expanded`) salvo/carregado nas preferências
         - Suporte: GeoPackage (`.gpkg`) adicionado ao `FILE_TYPES` e ao `ExplorerUtils.VECTOR_EXTS`

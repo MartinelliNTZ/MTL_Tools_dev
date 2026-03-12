@@ -58,7 +58,29 @@ class AltimetriaTask(QgsTask):
     # CALLBACK FINAL
     # --------------------------------------------------
     def finished(self, success):
-        if success:
-            self.callback(self.result, None)
-        else:
-            self.callback(None, self.error)
+        # Backwards-compatible callback
+        try:
+            if success:
+                if hasattr(self, 'on_success') and callable(getattr(self, 'on_success')):
+                    try:
+                        self.on_success(self.result)
+                    except Exception:
+                        pass
+                if hasattr(self, 'callback') and callable(self.callback):
+                    try:
+                        self.callback(self.result, None)
+                    except Exception:
+                        pass
+            else:
+                if hasattr(self, 'on_error') and callable(getattr(self, 'on_error')):
+                    try:
+                        self.on_error(self.error)
+                    except Exception:
+                        pass
+                if hasattr(self, 'callback') and callable(self.callback):
+                    try:
+                        self.callback(None, self.error)
+                    except Exception:
+                        pass
+        except Exception:
+            pass
