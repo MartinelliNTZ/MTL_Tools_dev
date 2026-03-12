@@ -28,7 +28,8 @@ class MrkParseTask(BaseTask):
         if self.isCanceled():
             return False
 
-        LogUtils(tool=self.tool_key, class_name=self.__class__.__name__).info(
+        logger = LogUtils(tool=self.tool_key, class_name=self.__class__.__name__)
+        logger.info(
             f"Iniciando leitura de MRKs (paths={self.paths}, recursive={self.recursive})"
         )
 
@@ -43,8 +44,11 @@ class MrkParseTask(BaseTask):
             points = MrkParser.parse_folder(
                 base,
                 recursive=self.recursive,
-                extra_fields=self.extra_fields,
+                extra_fields=self.extra_fields,tool_key=self.tool_key
             )
+            logger.info(f"Encontrados {len(points)} pontos em {base}")
+
+            
 
             # 🔴 CRÍTICO: Rastrear pasta específica de cada ponto
             # MrkParser.parse_folder() já retorna p['folder'] (pasta específica onde MRK foi encontrado)
