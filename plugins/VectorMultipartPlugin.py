@@ -50,9 +50,16 @@ class VectorMultipartPlugin(BasePluginMTL):
             )
             return
 
-        layer = self.get_active_vector_layer()
-        if not layer or not self.ensure_has_features(layer):
-            self.logger.warning("Validação falhou: camada inválida ou sem feições")
+        from ..utils.ProjectUtils import ProjectUtils
+        from ..utils.vector.VectorLayerAttributes import VectorLayerAttributes
+        layer = ProjectUtils.get_active_vector_layer(self.iface.activeLayer(), self.logger)
+        if not layer:
+            QgisMessageUtil.bar_critical(self.iface, "Selecione uma camada vetorial")
+            self.logger.warning("Validação falhou: camada inválida")
+            return
+        if not VectorLayerAttributes.ensure_has_features(layer, self.logger):
+            QgisMessageUtil.bar_warning(self.iface, "A camada não possui feições")
+            self.logger.warning("Validação falhou: camada sem feições")
             return
 
         self.logger.debug(f"Camada validada: {layer.name()}, Total de feições: {layer.featureCount()}")

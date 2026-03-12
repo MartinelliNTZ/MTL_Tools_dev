@@ -117,7 +117,9 @@ class CopyAttributes(BasePluginMTL):
             self.logger.warning("Camada de destino inválida")
             return
 
-        if not self.ensure_editable(target):
+        from utils.ProjectUtils import ProjectUtils
+        if not ProjectUtils.ensure_editable(target, self.logger):
+            QgisMessageUtil.bar_critical(self.iface, "A camada precisa estar em edição")
             self.logger.warning("Camada de destino não editável")
             return
 

@@ -85,6 +85,19 @@ class BorderHitWidget(QWidget):
             pass
 
 class MainLayout(QVBoxLayout):
+    def set_appbar_title(self, title: str):
+        """Atualiza o título da AppBar se presente."""
+        appbar = self.get_appbar()
+        if appbar:
+            appbar.set_title(title)
+
+    def get_appbar(self):
+        """Retorna referência para o AppBarWidget se presente."""
+        for i in range(self._inner_layout.count()):
+            widget = self._inner_layout.itemAt(i).widget()
+            if widget and hasattr(widget, "set_title"):
+                return widget
+        return None
     """Container layout customizado para plugins MTL Tools com suporte a resize.
     
     ARQUITETURA:

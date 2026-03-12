@@ -363,28 +363,8 @@ class BasePluginMTL(QDialog):
             f"Erro durante processamento:\n{exc}"
         )
     
-    def open_file(self, path):
-        """Abre um arquivo no explorador padrão.
 
-        Recebe: path (str).
-        Retorna: None.
-        Faz: registra e abre o arquivo se existir.
-        """
-        self.logger.debug(f"Abrindo arquivo: {path}")
-        if path and os.path.exists(path):
-            QDesktopServices.openUrl(QUrl.fromLocalFile(path))
 
-    def open_folder(self, path):
-        """Abre uma pasta no explorador padrão.
-
-        Recebe: path (str).
-        Retorna: None.
-        Faz: registra e abre a pasta se existir.
-        """
-        self.logger.debug(f"Abrindo pasta: {path}")
-        if path and os.path.exists(path):
-            QDesktopServices.openUrl(QUrl.fromLocalFile(path))
-    
     def create_action(self, icon_rel_path, text, callback):
         """Cria e registra uma ação no menu do plugin.
 
@@ -404,73 +384,6 @@ class BasePluginMTL(QDialog):
         self.iface.addPluginToMenu(self.MENU_NAME, action)
         self.actions.append(action)
 
-    def get_active_vector_layer(self, require_editable=False):
-        """Obtém a camada vetorial ativa.
-
-        Recebe: require_editable (bool).
-        Retorna: QgsVectorLayer ou None.
-        Faz: valida tipo da camada e, se solicitado, se está em edição.
-        """
-        self.logger.debug(f"Obtendo camada vetorial ativa. Require editable: {require_editable}")
-        layer = self.iface.activeLayer()
-
-        if not layer or not isinstance(layer, QgsVectorLayer):
-            self.logger.debug("Camada ativa inválida ou não é vetorial")
-            QgisMessageUtil.bar_critical(
-                self.iface,
-                "Selecione uma camada vetorial"
-            )
-            return None
-
-
-        if require_editable and not self.ensure_editable(layer):
-            return None
-
-
-        return layer
-
-    def ensure_has_features(self, layer):
-        """Valida se a camada tem feições.
-
-        Recebe: layer (QgsVectorLayer).
-        Retorna: bool.
-        Faz: verifica contagem de feições e mostra aviso se estiver vazia.
-        """
-        self.logger.debug(f"Verificando feições na camada: {layer.name()}. Total: {layer.featureCount()}")
-        if layer.featureCount() == 0:
-            QgisMessageUtil.bar_warning(
-                self.iface,
-                "A camada não possui feições"
-            )
-            return False
-
-        return True
-    
-    def get_layer_from_combo(self, combo):
-        """DEPRECADO: """
-        """Retorna camada a partir de um combo (QComboBox).
-
-        Recebe: combo (widget com currentData() contendo id de camada).
-        Retorna: QgsMapLayer ou None.
-        Faz: obtém a camada no projeto pelo id armazenado no combo.
-        """
-        return QgsProject.instance().mapLayer(combo.currentData())
-    
-    def ensure_editable(self, layer):
-        """Verifica se a camada está em modo edição.
-
-        Recebe: layer (QgsVectorLayer).
-        Retorna: bool.
-        Faz: mostra erro e retorna False se não estiver em edição.
-        """
-        self.logger.debug(f"Verificando se camada está em edição: {layer.name()}. Editável: {layer.isEditable()}")
-        if not layer.isEditable():
-            QgisMessageUtil.bar_critical(
-                self.iface,
-                "A camada precisa estar em edição"
-            )
-            return False
-        return True
 
     def show_info_dialog(self, title="📘 Instruções"):
         """Mostra diálogo de instruções do plugin.
@@ -483,61 +396,8 @@ class BasePluginMTL(QDialog):
             title = f"📘 Instruções – {self.PLUGIN_NAME}"
             InfoDialog(self.instructions_file, self, title).exec() 
             
-    def show_project_file(self):
-        """Exibe o caminho do arquivo do projeto atual.
 
-        Recebe: self.
-        Retorna: None.
-        Faz: mostra mensagem se projeto não salvo ou modal com o arquivo salvo.
-        """
-        project = QgsProject.instance()
-        fname = project.fileName()
-
-        if not fname:
-            QgisMessageUtil.bar_info(
-                self.iface,
-                "O projeto atual ainda não foi salvo em disco.",
-                "Projeto não salvo"
-            )
-            return
-
-        QgisMessageUtil.modal_result_with_folder(
-            self.iface,
-            "Arquivo do Projeto",
-            "Arquivo atual:",
-            fname
-        )
-    
-    def select_file_to_save(self,  target_line_edit: QLineEdit, filters: str):
-        """Abre diálogo para escolher caminho de salvamento.
-
-        Recebe: target_line_edit (QLineEdit), filters (str).
-        Retorna: None.
-        Faz: atualiza `target_line_edit` com o caminho escolhido.
-        """
-        self.logger.debug(f"Abrindo diálogo para salvar arquivo")
-        f, _ = QFileDialog.getSaveFileName(self, 'Salvar como', target_line_edit.text() or '', filters)
-        if f:
-            self.logger.debug(f"Arquivo selecionado para salvar: {f}")
-            target_line_edit.setText(f)
-
-    def select_file(self, target_line_edit: QLineEdit, filters: str):
-        """Abre diálogo para selecionar arquivo existente.
-
-        Recebe: target_line_edit (QLineEdit), filters (str).
-        Retorna: None.
-        Faz: atualiza `target_line_edit` com o arquivo selecionado.
-        """
-        self.logger.debug(f"Abrindo diálogo para selecionar arquivo")
-        f, _ = QFileDialog.getOpenFileName(
-            self,
-            "Selecionar arquivo",
-            "",
-            filters
-        )
-        if f:
-            self.logger.debug(f"Arquivo selecionado: {f}")
-            target_line_edit.setText(f)
+   
               
     def apply_qml_style(
         self,

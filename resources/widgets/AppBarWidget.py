@@ -4,6 +4,9 @@ from qgis.PyQt.QtCore import Qt, pyqtSignal, QPoint
 
 
 class AppBarWidget(QFrame):
+    def set_title(self, title: str):
+            """Atualiza o título exibido na AppBar."""
+            self.lbl_title.setText(title)
     runClicked = pyqtSignal()
     infoClicked = pyqtSignal()
     closeClicked = pyqtSignal()

@@ -1,3 +1,16 @@
+  1.6.8.21 2026/03/12
+  - AJUSTE DE CONTRATO: utilitários desacoplados da UI
+    - Métodos em ProjectUtils e VectorLayerAttributes não acessam mais iface nem exibem mensagens.
+    - Plugins agora são responsáveis por mostrar mensagens ao usuário (QgisMessageUtil).
+    - Refatoração aplicada em CopyAttributesPlugin, VectorFieldsCalculationPlugin, VectorMultipartPlugin.
+    - Risco: Baixo — separação clara de responsabilidades, arquitetura mais robusta.
+  1.6.8.20 2026/03/12
+  - REFATORAÇÃO: utilitários centralizados e atualizados
+    - get_active_vector_layer e ensure_editable movidos de BasePluginMTL para utils/ProjectUtils.py
+    - ensure_has_features movido de BasePluginMTL para utils/vector/VectorLayerAttributes.py
+    - Todos os plugins que usavam esses métodos atualizados para importar e chamar dos novos locais.
+    - Plugins afetados: CopyAttributesPlugin, VectorFieldsCalculationPlugin, VectorMultipartPlugin.
+    - Risco: Baixo — mudanças localizadas, comportamento preservado.
   1.6.8.18 2026/03/12
   - DOCUMENTAÇÃO: plugins_arquitetura.md e TIPOS_FERRAMENTAS_ATUALIZADO.md
     - Criado docs/plugins_arquitetura.md: arquitetura, contratos, padrões, regras, armadilhas, boas práticas e tabela detalhada dos plugins.

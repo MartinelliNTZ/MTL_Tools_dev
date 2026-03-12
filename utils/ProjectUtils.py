@@ -16,6 +16,34 @@ from qgis.core import QgsMapLayer
 
 
 class ProjectUtils:
+    @staticmethod
+    def get_active_vector_layer(layer, logger=None, require_editable=False):
+        """Valida camada vetorial ativa.
+        Recebe: layer, logger, require_editable (bool).
+        Retorna: QgsVectorLayer ou None.
+        Não acessa iface nem exibe mensagens.
+        """
+        from qgis.core import QgsVectorLayer
+        if logger:
+            logger.debug(f"Validando camada vetorial ativa. Require editable: {require_editable}")
+        if not layer or not isinstance(layer, QgsVectorLayer):
+            if logger:
+                logger.debug("Camada ativa inválida ou não é vetorial")
+            return None
+        if require_editable and not ProjectUtils.ensure_editable(layer, logger):
+            return None
+        return layer
+
+    @staticmethod
+    def ensure_editable(layer, logger=None):
+        """Verifica se a camada está em modo edição.
+        Recebe: layer (QgsVectorLayer), logger.
+        Retorna: bool.
+        Não acessa iface nem exibe mensagens.
+        """
+        if logger:
+            logger.debug(f"Verificando se camada está em edição: {layer.name()}. Editável: {layer.isEditable()}")
+        return layer.isEditable()
     """
     Utilitários relacionados ao projeto QGIS (.qgz).
     Não possui dependência de UI.

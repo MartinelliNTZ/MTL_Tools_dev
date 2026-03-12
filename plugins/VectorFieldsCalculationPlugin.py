@@ -46,8 +46,10 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
         """Entry point: valida, obtém parâmetros e decide entre sync/async."""
         self.logger.info("Iniciando Calcular Campos Vetoriais")
 
-        layer = self.get_active_vector_layer(require_editable=True)
+        from ..utils.ProjectUtils import ProjectUtils
+        layer = ProjectUtils.get_active_vector_layer(self.iface.activeLayer(), self.logger, require_editable=True)
         if not layer:
+            QgisMessageUtil.bar_critical(self.iface, "Selecione uma camada vetorial editável")
             self.logger.warning("Nenhuma camada vetorial editável disponível")
             return
 

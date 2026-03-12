@@ -27,6 +27,16 @@ from qgis.PyQt.QtCore import QVariant
 
 
 class VectorLayerAttributes:
+    @staticmethod
+    def ensure_has_features(layer, logger=None):
+        """Valida se a camada tem feições.
+        Recebe: layer (QgsVectorLayer), logger.
+        Retorna: bool.
+        Não acessa iface nem exibe mensagens.
+        """
+        if logger:
+            logger.debug(f"Verificando feições na camada: {layer.name()}. Total: {layer.featureCount()}")
+        return layer.featureCount() > 0
     """
     Responsável por campos e atributos de camadas vetoriais.
     
