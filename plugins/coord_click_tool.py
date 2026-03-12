@@ -5,7 +5,7 @@ import sip
 from ..core.task.reverse_geocoding_task import ReverseGeocodeTask
 from ..core.task.altimetry_task import AltimetriaTask
 from ..utils.vector.VectorLayerProjection import VectorLayerProjection
-from ..core.ui.coord_result_dialog import CoordResultDialog
+from .coord_result_dialog import CoordResultDialog
 
 
 class CoordClickTool(QgsMapTool):

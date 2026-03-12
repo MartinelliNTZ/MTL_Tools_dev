@@ -1,5 +1,6 @@
 mtlagriculturaetecnologia@gmail.com - 07/04/2026
 martinelli.linesbr2@gmail.com       - 08/04/2026
+martinelli.matheus11@gmail.com      - 04/04/2026
 BUGS CONHECIDOS
     - DroneCordinatesPlugin: MrkParser.parse_folder() não processa TODOS os MRKs da pasta - apenas 1 arquivo [1.6.2 TODO]
       - Encontra 98 MRKs mas retorna apenas 16160 pontos (1 arquivo) em vez de múltiplos de 16160

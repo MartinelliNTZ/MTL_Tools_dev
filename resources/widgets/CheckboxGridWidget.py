@@ -1,4 +1,5 @@
 from qgis.PyQt.QtWidgets import QWidget, QVBoxLayout, QGridLayout, QCheckBox, QLabel
+from typing import List
 from ...resources.styles.Styles import Styles
 
 
@@ -11,7 +12,7 @@ class DependentCheckBox(QCheckBox):
         self._previous_states = {}
         self.stateChanged.connect(self._on_state_changed)
 
-    def set_dependents(self, dependents: list[QCheckBox]):
+    def set_dependents(self, dependents: List[QCheckBox]):
         """Define checkboxes que dependem deste checkbox.
 
         Quando desmarcado, os dependentes são desabilitados e desmarcados.

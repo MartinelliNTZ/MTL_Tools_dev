@@ -63,6 +63,13 @@ changelog=
         - Eliminado `#ffffff` hardcoded em botões; agora usa `Styles.COLOR_BUTTON_TEXT`
         - Removidos blocos hover/pressed/disabled repetidos em múltiplos estilos
 
+        1.6.8.09
+        - BUG FIX: Compatibilidade Python 3.7 (QGIS 3.16)
+          - Corrigido uso de anotações que utilizavam tipos embutidos subscriptáveis (ex.: `list[QCheckBox]`) que causavam o erro `TypeError: 'type' object is not subscriptable` em ambientes Python <3.9.
+          - Arquivo modificado: resources/widgets/CheckboxGridWidget.py — substituído `list[QCheckBox]` por `List[QCheckBox]` e adicionado `from typing import List`.
+          - Risco: Muito Baixo
+            - Mudança localizada no widget; funcionalidade preservada.
+
 
   1.6.7 2026/03/09
       1.6.7.10
