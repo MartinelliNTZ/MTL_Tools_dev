@@ -20,6 +20,7 @@ from ...resources.widgets.InputFieldsWidget import InputFieldsWidget
 
 from ...resources.widgets.SimpleButtonWidget import SimpleButtonWidget
 from ...resources.widgets.CheckboxGridWidget import CheckboxGridWidget
+from ...resources.widgets.ReadOnlyFieldWidget import ReadOnlyFieldWidget
 
 
 
@@ -441,6 +442,52 @@ class WidgetFactory:
         if separator_bottom:
             layout.addWidget(WidgetFactory.create_separator())
         
+        return layout, widget
+
+    @staticmethod
+    def create_readonly_field(
+        *,
+        parent=None,
+        title: str = None,
+        fields: dict = None,
+        num_columns: int = 1,
+        copy_all_button_title: str = None,
+        default_button_title: str = "Copiar",        
+        tool_key: str = None,
+        separator_top: bool = False,
+        separator_bottom: bool = True,
+    ):
+        """
+        Cria um bloco ReadOnlyFieldWidget.
+
+        Parameters
+        ----------
+        fields : dict
+            Dicionário com chaves identificadoras e valores { 'title': str, 'value': Any, 'value_type': str, 'titlebutton': str }
+        num_columns : int
+            Número de colunas para layout
+        copy_all_button_title : str|None
+            Texto do botão "Copiar tudo". Se None, não cria o botão.
+        default_button_title : str
+            Texto padrão para botões individuais
+        """
+        layout = QVBoxLayout()
+        if title:
+            # header handled by widget itself
+            pass
+        if separator_top:
+            layout.addWidget(WidgetFactory.create_separator())
+        widget = ReadOnlyFieldWidget(
+            fields=fields or {},
+            title=title,
+            title_button_copy_all=copy_all_button_title,
+            default_button_title=default_button_title,
+            num_columns=num_columns,
+            parent=parent,
+        )
+        layout.addWidget(widget)
+        if separator_bottom:
+            layout.addWidget(WidgetFactory.create_separator())
         return layout, widget
 
     @staticmethod

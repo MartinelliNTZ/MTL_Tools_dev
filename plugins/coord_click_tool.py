@@ -6,6 +6,8 @@ from ..core.task.reverse_geocoding_task import ReverseGeocodeTask
 from ..core.task.altimetry_task import AltimetriaTask
 from ..utils.vector.VectorLayerProjection import VectorLayerProjection
 from .coord_result_dialog import CoordResultDialog
+from ..core.config.LogUtils import LogUtils
+from ..utils.QgisMessageUtil import QgisMessageUtil
 
 
 class CoordClickTool(QgsMapTool):
@@ -18,8 +20,20 @@ class CoordClickTool(QgsMapTool):
         self.dialog = None
         self.address_task = None
         self.alt_task = None
+        # logger for the map tool
+        try:
+            self.logger = LogUtils(tool="coord_click", class_name="CoordClickTool", level=LogUtils.DEBUG)
+            self.logger.debug("CoordClickTool initialized")
+        except Exception:
+            self.logger = None
 
     def canvasReleaseEvent(self, event):
+        try:
+            if self.logger:
+                self.logger.debug("canvasReleaseEvent triggered")
+        except Exception:
+            pass
+
         snap = self.canvas.snappingUtils().snapToMap(event.pos())
         point = snap.point() if snap.isValid() else self.toMapCoordinates(event.pos())
 
@@ -32,10 +46,37 @@ class CoordClickTool(QgsMapTool):
         # VIEW
         # -----------------------------
         if not self.dialog or not self.dialog.isVisible():
-            self.dialog = CoordResultDialog(self.iface, info)
-            self.dialog.show()
+            try:
+                if self.logger:
+                    self.logger.debug("Creating CoordResultDialog")
+                self.dialog = CoordResultDialog(self.iface, info)
+                self.dialog.show()
+                # ensure dialog is brought to front
+                try:
+                    self.dialog.raise_()
+                    self.dialog.activateWindow()
+                except Exception:
+                    pass
+                if self.logger:
+                    self.logger.debug("CoordResultDialog shown")
+            except Exception as e:
+                # fallback: notify user
+                QgisMessageUtil.bar_critical(self.iface, f"Erro ao abrir diálogo de coordenadas: {e}")
+                if self.logger:
+                    self.logger.error(f"Erro ao criar/mostrar CoordResultDialog: {e}")
         else:
-            self.dialog.update_info(info)
+            try:
+                if self.logger:
+                    self.logger.debug("Updating existing CoordResultDialog")
+                self.dialog.update_info(info)
+                try:
+                    self.dialog.raise_()
+                    self.dialog.activateWindow()
+                except Exception:
+                    pass
+            except Exception as e:
+                if self.logger:
+                    self.logger.error(f"Erro ao atualizar diálogo: {e}")
 
         # -----------------------------
         # Cancela tasks antigas
@@ -43,19 +84,33 @@ class CoordClickTool(QgsMapTool):
         self._cancel_task(self.address_task)
         self._cancel_task(self.alt_task)
 
+        # Se o diálogo não foi criado/atualizado com sucesso, não iniciar tasks.
+        if not self.dialog:
+            if self.logger:
+                self.logger.debug("Dialog not available; skipping tasks scheduling")
+            return
+
         lat, lon = info["lat"], info["lon"]
 
         # -----------------------------
         # Reverse Geocode (MODEL)
         # -----------------------------
         def on_address(result, error):
-            if error:
-                self.dialog.set_address(None)
-                self.iface.messageBar().pushWarning(
-                    "Geocodificação", error
-                )
-            else:
-                self.dialog.set_address(result)
+            try:
+                if error:
+                    if self.logger:
+                        self.logger.warning(f"Reverse geocode error: {error}")
+                    self.dialog.set_address(None)
+                    self.iface.messageBar().pushWarning(
+                        "Geocodificação", error
+                    )
+                else:
+                    if self.logger:
+                        self.logger.debug(f"Reverse geocode result: {result}")
+                    self.dialog.set_address(result)
+            except Exception as e:
+                if self.logger:
+                    self.logger.error(f"on_address handler error: {e}")
 
         self.address_task = ReverseGeocodeTask(lat, lon, on_address)
         QgsApplication.taskManager().addTask(self.address_task)
@@ -64,13 +119,21 @@ class CoordClickTool(QgsMapTool):
         # Altimetria (MODEL)
         # -----------------------------
         def on_altitude(value, error):
-            if error:
-                self.dialog.set_altitude(None)
-                self.iface.messageBar().pushWarning(
-                    "Altimetria", error
-                )
-            else:
-                self.dialog.set_altitude(value)
+            try:
+                if error:
+                    if self.logger:
+                        self.logger.warning(f"Altimetry error: {error}")
+                    self.dialog.set_altitude(None)
+                    self.iface.messageBar().pushWarning(
+                        "Altimetria", error
+                    )
+                else:
+                    if self.logger:
+                        self.logger.debug(f"Altimetry result: {value}")
+                    self.dialog.set_altitude(value)
+            except Exception as e:
+                if self.logger:
+                    self.logger.error(f"on_altitude handler error: {e}")
 
         self.alt_task = AltimetriaTask(lat, lon, on_altitude)
         QgsApplication.taskManager().addTask(self.alt_task)

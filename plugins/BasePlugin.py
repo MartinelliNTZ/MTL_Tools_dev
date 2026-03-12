@@ -113,7 +113,10 @@ class BasePluginMTL(QDialog):
         """
         if title is not None:
             self.PLUGIN_NAME = title
-            self.layout = WidgetFactory.create_main_layout(self, title=title, enable_scroll=enable_scroll)
+        # Garantir que o MainLayout seja sempre criado. Usar PLUGIN_NAME como fallback.
+        self.layout = WidgetFactory.create_main_layout(
+            self, title=(self.PLUGIN_NAME or "MTL Tools"), enable_scroll=enable_scroll
+        )
 
         self.logger.debug(f"Construindo UI para plugin: {self.PLUGIN_NAME}")
 

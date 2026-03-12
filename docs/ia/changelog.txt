@@ -70,6 +70,57 @@ changelog=
           - Risco: Muito Baixo
             - Mudança localizada no widget; funcionalidade preservada.
 
+  1.6.8.10
+  - FEATURE: ReadOnlyFieldWidget (widget exclusivo)
+    - Adicionado `resources/widgets/ReadOnlyFieldWidget.py` — widget para mostrar campos somente-leitura com botão de copiar individual e botão opcional "Copiar tudo".
+    - Integração: `core/ui/WidgetFactory.create_readonly_field()` criada para facilitar uso em dialogs.
+    - Parametros suportados: `title`, `fields` (dict com `title`, `value`, `value_type`, `titlebutton`), `num_columns`, `copy_all_button_title`.
+    - Risco: Muito Baixo — widget novo e localizado, sem impacto em código existente até ser utilizado.
+
+
+  1.6.8.11
+  - UI: botão "Copiar Localização (Completo)" via WidgetFactory
+    - Substituído o botão direto no diálogo por `WidgetFactory.create_simple_button()` em `plugins/coord_result_dialog.py`.
+    - Implementado `CoordResultDialog.copy_all_info()` que agrega WGS, UTM, altitude e endereço e copia para a área de transferência usando `ProjectUtils.set_clipboard_text()`.
+    - Removidos métodos auxiliares não usados: `_line()` e `_copy_button()` do diálogo.
+    - Risco: Muito Baixo — alteração localizada na UI do diálogo; comportamento de cópia preservado e centralizado.
+
+  1.6.8.12
+  - PADRONIZAÇÃO: CoordResultDialog herda BasePluginMTL e usa logger
+    - `plugins/coord_result_dialog.py` agora herda `BasePluginMTL` e chama `self.init(...)` para inicializar `self.logger` e preferências.
+    - Adicionados logs (`self.logger.debug/info/warning`) em pontos chave: `update_info`, `set_altitude`, `set_address`, `copy_all_info`, `copy_address`.
+    - Notificação ao usuário: `QgisMessageUtil.bar_success()` é chamada quando a cópia para a área de transferência ocorre com sucesso.
+    - Persistência: restauração e persistência do último tamanho da janela agora reuse a implementação de `BasePlugin` (`_restore_window_size` / `_persist_window_size`).
+    - Risco: Muito Baixo — padronização da construção do diálogo e adição de logging/feedback visual.
+
+  1.6.8.13
+  - CORREÇÕES: Robustez de diálogo de coordenadas e criação de MainLayout
+    - BasePlugin._build_ui: garante criação incondicional de `MainLayout` (evita `None` em `self.layout._frame`), prevenindo AttributeError durante construção de diálogos.
+    - CoordClickTool: protege a criação/mostra do `CoordResultDialog` e evita agendar tarefas assíncronas se o diálogo não foi criado corretamente (previne callbacks que acessam `self.dialog` = None).
+    - CoordResultDialog:
+      - Adicionado `_build_ui`, `_load_prefs` e `_save_prefs` seguindo padrão `GenerateTrailPlugin` para garantir ordem correta de criação de `self.layout` e widgets.
+      - Moved UI composition to `_build_contents()` and removed direct duplicate construction in `__init__`.
+      - Adicionado botão `Copiar Localização (Completo)` via `WidgetFactory.create_simple_button()` posicionado entre os labels de endereço e os botões inferiores; botão conectado a `copy_all_info()`.
+      - Melhorias de logging e tratamento de erros em pontos críticos de atualização e callbacks.
+    - Risco: Muito Baixo — correções de ordem de inicialização e proteção contra estados parcialmente construídos; comportamento do diálogo preservado.
+
+  1.6.8.14
+  - SESSÃO: Padronização, robustez e correções (resumo da sessão de desenvolvimento)
+    - Compatibilidade e tipagens: finalizada a correção de anotações PEP585 (Python <3.9) em widgets críticos para evitar TypeError em QGIS 3.16.
+    - Novo widget e Factory: `ReadOnlyFieldWidget` adicionado e integrado via `WidgetFactory.create_readonly_field()` para campos somente-leitura com botões de cópia individuais e opcional "copiar tudo".
+    - Clipboard centralizado: `ProjectUtils.set_clipboard_text()` criado/uso consolidado para operações de copiar (endereço, localização completa).
+    - `CoordResultDialog`:
+      - Refatorado para herdar `BasePluginMTL` e usar `MainLayout` através de `_build_ui()` → `_build_contents()` (garante ordem correta de criação dos widgets).
+      - Adicionados métodos `_load_prefs()` e `_save_prefs()` consistentes com outras ferramentas (persistência de tamanho/estado).
+      - Botão `Copiar Localização (Completo)` adicionado via `WidgetFactory.create_simple_button()` e conectado a `copy_all_info()`.
+      - Logs e tratamento de erros reforçados em `update_info`, `set_altitude`, `set_address`, `copy_all_info` e `copy_address`.
+    - `BasePlugin`:
+      - `_build_ui()` alterado para garantir criação incondicional de `MainLayout` (evita `None` em `self.layout._frame`).
+    - `CoordClickTool`:
+      - Protegida a criação/mostra do diálogo; evita agendar tarefas assíncronas quando o diálogo não foi criado corretamente (previne callbacks que acessam `self.dialog` = None).
+      - Garante `raise_()`/`activateWindow()` ao mostrar o diálogo quando possível.
+    - Ajustes menores: `GenerateTrailPlugin` e outros plugins verificados para seguir o padrão `_build_ui` + `self.layout.add_items()` (consistência arquitetural).
+    - Risco: Muito Baixo — foco em ordem de inicialização, tratamento de estados parciais e padronização de UI/Prefs; mudanças localizadas e testáveis.
 
   1.6.7 2026/03/09
       1.6.7.10

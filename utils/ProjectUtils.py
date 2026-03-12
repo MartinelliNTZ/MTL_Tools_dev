@@ -38,6 +38,18 @@ class ProjectUtils:
         return project.homePath() or os.path.expanduser("~")
 
     @staticmethod
+    def set_clipboard_text(text: str) -> bool:
+        """Define o texto do clipboard via Qt. Retorna True se bem-sucedido."""
+        try:
+            from qgis.PyQt.QtGui import QGuiApplication
+            QGuiApplication.clipboard().setText("" if text is None else str(text))
+            return True
+        except Exception as e:
+            logger = LogUtils(tool="project_utils", class_name="ProjectUtils")
+            logger.error(f"Erro ao copiar para clipboard: {e}")
+            return False
+
+    @staticmethod
     def create_project_backup(project: QgsProject) -> str:
         """
         Cria backup do .qgz em subpasta 'backup'.

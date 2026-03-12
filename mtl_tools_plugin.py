@@ -297,8 +297,8 @@ class MTL_Tools:
             # ==================================================
             self._add_toolbar_dropdown(
                 title="Vetores",
-                main_action=self.action_vector_fields,#padrao
-                #main_action=self.action_copy_atributes,#editavel para debug
+                #main_action=self.action_vector_fields,#padrao
+                main_action=self.action_coord_click,#editavel para debug
                 secondary_actions=[     self.action_vector_fields,
                                         self.action_coord_click,    
                                         self.action_copy_atributes,                                                         

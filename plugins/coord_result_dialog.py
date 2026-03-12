@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import (
-    QDialog, QVBoxLayout, QLabel, QPushButton,
-    QHBoxLayout, QLineEdit, QGroupBox
-)
-from qgis.PyQt.QtGui import QGuiApplication
+from .BasePlugin import BasePluginMTL
+from ..core.ui.WidgetFactory import WidgetFactory
+from ..utils.ProjectUtils import ProjectUtils
+from ..utils.QgisMessageUtil import QgisMessageUtil
+from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 
 
-class CoordResultDialog(QDialog):
+class CoordResultDialog(BasePluginMTL):
 
     # ==================================================
     # INIT
@@ -15,143 +15,228 @@ class CoordResultDialog(QDialog):
         super().__init__(iface.mainWindow())
         self.iface = iface
         self.info = info
+        # Inicializa logger e preferences do BasePlugin e constrói UI via _build_ui
+        self.init(tool_key="coord_result", class_name="CoordResultDialog", build_ui=True)
 
+        # Ajustes finais da janela
         self.setWindowTitle("Coordenadas do Ponto")
         self.setMinimumWidth(640)
 
-        self._build_ui()
-        self.update_info(info)
+        # Atualiza com as informações iniciais (widgets já criados em _build_ui)
+        try:
+            self.update_info(info)
+        except Exception:
+            pass
+
+    def _build_ui(self, **kwargs):
+        """Constrói a UI do diálogo: segue o padrão de GenerateTrailPlugin.
+
+        Garante que `super()._build_ui` seja chamado (cria `self.layout`) e
+        que `_build_contents` construa os widgets antes que `_load_prefs` seja executado.
+        """
+        super()._build_ui(
+            title="Coordenadas do Ponto",
+            icon_path="mtl_agro.ico",
+            instructions_file="standard.md",
+            enable_scroll=True
+        )
+        # Construir conteúdo específico do diálogo
+        self._build_contents()
+
+    def _load_prefs(self):
+        """Carrega preferências específicas do diálogo (executado após _build_ui)."""
+        try:
+            self.preferences = load_tool_prefs(self.TOOL_KEY)
+            # Restaurar tamanho da janela se salvo (BasePlugin já faz resize, isto é apenas fallback)
+            w = self.preferences.get('window_width')
+            h = self.preferences.get('window_height')
+            if w and h:
+                try:
+                    self.resize(int(w), int(h))
+                except Exception:
+                    pass
+            self.logger.debug(f"_load_prefs: loaded prefs keys={list(self.preferences.keys())}")
+        except Exception as e:
+            try:
+                self.logger.warning(f"_load_prefs: erro ao carregar preferencias: {e}")
+            except Exception:
+                pass
+
+    def _save_prefs(self):
+        """Salva preferências do diálogo (window size e outras chaves)."""
+        try:
+            self.preferences['window_width'] = self.width()
+            self.preferences['window_height'] = self.height()
+            save_tool_prefs(self.TOOL_KEY, self.preferences)
+            try:
+                self.logger.debug(f"_save_prefs: prefs salvas: {self.preferences.get('window_width')}x{self.preferences.get('window_height')}")
+            except Exception:
+                pass
+        except Exception as e:
+            try:
+                self.logger.warning(f"_save_prefs: erro ao salvar preferencias: {e}")
+            except Exception:
+                pass
 
     # ==================================================
     # UI BUILDER
     # ==================================================
-    def _build_ui(self):
-        self.main_layout = QVBoxLayout()
+    def _build_contents(self):
+        # Build sections and add to BasePlugin MainLayout via add_items
+        items = []
 
-        self.grp_wgs = self._build_wgs_group()
-        self.grp_utm = self._build_utm_group()
-        self.grp_alt = self._build_alt_group()
-        self.grp_addr = self._build_address_group()
+        ro_layout, self.wgs_widget = WidgetFactory.create_readonly_field(
+            parent=self,
+            title="WGS 84 (EPSG:4326)",
+            fields={
+                'lat_dec': {'title': 'Latitude (Decimal)', 'value': ''},
+                'lon_dec': {'title': 'Longitude (Decimal)', 'value': ''},
+                'lat_dms': {'title': 'Latitude (DMS)', 'value': ''},
+                'lon_dms': {'title': 'Longitude (DMS)', 'value': ''},
+            },
+            num_columns=1,
+            copy_all_button_title="Copiar WGS 84 (Completo)",
+        )
+        items.append(ro_layout)
 
-        self.main_layout.addWidget(self.grp_wgs)
-        self.main_layout.addWidget(self.grp_utm)
-        self.main_layout.addWidget(self.grp_alt)
-        self.main_layout.addWidget(self.grp_addr)
-        self.main_layout.addWidget(self._build_close_button())
+        lbl_utm_zone = WidgetFactory.create_label(text="", parent=self)
+        items.append(lbl_utm_zone)
 
-        self.setLayout(self.main_layout)
+        ro_layout2, self.utm_widget = WidgetFactory.create_readonly_field(
+            parent=self,
+            title="UTM SIRGAS 2000",
+            fields={
+                'utm_x': {'title': 'Easting (X)', 'value': ''},
+                'utm_y': {'title': 'Northing (Y)', 'value': ''},
+            },
+            num_columns=1,
+            copy_all_button_title="Copiar UTM (Completo)",
+        )
+        items.append(ro_layout2)
 
-    # ==================================================
-    # GROUPS
-    # ==================================================
-    def _build_wgs_group(self):
-        grp = QGroupBox("WGS 84 (EPSG:4326)")
-        layout = QVBoxLayout()
+        self.lbl_utm_info = WidgetFactory.create_label(text="", parent=self)
+        items.append(self.lbl_utm_info)
 
-        self.lat_dec_edit = self._line_edit()
-        self.lon_dec_edit = self._line_edit()
-        self.lat_dms_edit = self._line_edit()
-        self.lon_dms_edit = self._line_edit()
+        ro_layout3, self.alt_widget = WidgetFactory.create_readonly_field(
+            parent=self,
+            title="Altimetria (OpenTopoData)",
+            fields={'altitude': {'title': 'Altitude aproximada (m)', 'value': 'Carregando...'}},
+            num_columns=1,
+            copy_all_button_title=None,
+        )
+        items.append(ro_layout3)
 
-        layout.addLayout(self._line("Latitude (Decimal)", self.lat_dec_edit))
-        layout.addLayout(self._line("Longitude (Decimal)", self.lon_dec_edit))
-        layout.addLayout(self._line("Latitude (DMS)", self.lat_dms_edit))
-        layout.addLayout(self._line("Longitude (DMS)", self.lon_dms_edit))
+        # Address labels
+        self.lbl_municipio = WidgetFactory.create_label(text="", parent=self)
+        self.lbl_state_district = WidgetFactory.create_label(text="", parent=self)
+        self.lbl_state = WidgetFactory.create_label(text="", parent=self)
+        self.lbl_region = WidgetFactory.create_label(text="", parent=self)
+        self.lbl_country = WidgetFactory.create_label(text="", parent=self)
 
-        self.lbl_utm_zone = QLabel()
-        layout.addWidget(self.lbl_utm_zone)
+        items.extend([
+            self.lbl_municipio,
+            self.lbl_state_district,
+            self.lbl_state,
+            self.lbl_region,
+            self.lbl_country,
+        ])
 
-        layout.addWidget(self._copy_button(
-            "Copiar WGS 84 (Completo)", self.copy_wgs84
-        ))
+        # Botão: Copiar tudo (localização completa) - entre endereço e botões inferiores
+        try:
+            copy_layout, self.btn_copy_all = WidgetFactory.create_simple_button(
+                text="Copiar Localização (Completo)",
+                parent=self,
+                separator_top=False,
+                separator_bottom=False,
+            )
+            # conectar sinal ao helper
+            try:
+                self.btn_copy_all.clicked.connect(self.copy_all_info)
+            except Exception:
+                pass
+            items.append(copy_layout)
+        except Exception:
+            # se factory falhar, seguir sem o botão
+            pass
 
-        grp.setLayout(layout)
-        return grp
+        # Bottom action buttons: Executar (fecha), Fechar (fecha), Info (mostra instruções)
+        btn_layout, _ = WidgetFactory.create_bottom_action_buttons(
+            parent=self,
+            run_callback=lambda: self.close(),
+            close_callback=lambda: self.close(),
+            info_callback=lambda: self.show_info_dialog(),
+            separator_top=False,
+            separator_bottom=False,
+            tool_key="coord_result",
+            run_text="Executar",
+            close_text="Fechar",
+        )
+        items.append(btn_layout)
 
-    def _build_utm_group(self):
-        grp = QGroupBox("UTM SIRGAS 2000")
-        layout = QVBoxLayout()
+        # Add everything to the MainLayout
+        try:
+            self.layout.add_items(items)
+        except Exception:
+            # Fallback: if layout not present, keep local attribute
+            pass
 
-        self.lbl_utm_info = QLabel()
-        layout.addWidget(self.lbl_utm_info)
-
-        self.utm_x_edit = self._line_edit()
-        self.utm_y_edit = self._line_edit()
-
-        layout.addLayout(self._line("Easting (X)", self.utm_x_edit))
-        layout.addLayout(self._line("Northing (Y)", self.utm_y_edit))
-
-        layout.addWidget(self._copy_button(
-            "Copiar UTM (Completo)", self.copy_utm
-        ))
-
-        grp.setLayout(layout)
-        return grp
-
-    def _build_alt_group(self):
-        grp = QGroupBox("Altimetria (OpenTopoData)")
-        layout = QVBoxLayout()
-
-        self.alt_edit = QLineEdit("Carregando...")
-        self.alt_edit.setReadOnly(True)
-
-        layout.addWidget(QLabel("Altitude aproximada (m)"))
-        layout.addWidget(self.alt_edit)
-
-        grp.setLayout(layout)
-        return grp
-
-    def _build_address_group(self):
-        grp = QGroupBox("Localização Administrativa (OSM)")
-        layout = QVBoxLayout()
-
-        self.lbl_municipio = QLabel()
-        self.lbl_state_district = QLabel()
-        self.lbl_state = QLabel()
-        self.lbl_region = QLabel()
-        self.lbl_country = QLabel()
-
-        layout.addWidget(self.lbl_municipio)
-        layout.addWidget(self.lbl_state_district)
-        layout.addWidget(self.lbl_state)
-        layout.addWidget(self.lbl_region)
-        layout.addWidget(self.lbl_country)
-
-        layout.addWidget(self._copy_button(
-            "Copiar Localização (Completo)", self.copy_address
-        ))
-
-        grp.setLayout(layout)
-        return grp
-
-    def _build_close_button(self):
-        btn = QPushButton("Fechar")
-        btn.clicked.connect(self.close)
-        return btn
+    # GROUPS are built via WidgetFactory in _build_contents
 
     # ==================================================
     # HELPERS
     # ==================================================
-    def _line_edit(self):
-        e = QLineEdit()
-        e.setReadOnly(True)
-        return e
 
-    def _line(self, label, edit):
-        h = QHBoxLayout()
-        btn = QPushButton("Copiar")
-        btn.clicked.connect(
-            lambda: QGuiApplication.clipboard().setText(edit.text())
-        )
-        h.addWidget(QLabel(label))
-        h.addWidget(edit)
-        h.addWidget(btn)
-        return h
+    def copy_all_info(self):
+        parts = []
 
-    def _copy_button(self, text, slot):
-        btn = QPushButton(text)
-        btn.clicked.connect(slot)
-        return btn
+        # WGS
+        lat_dec = self.wgs_widget.get_value('lat_dec') or ''
+        lon_dec = self.wgs_widget.get_value('lon_dec') or ''
+        lat_dms = self.wgs_widget.get_value('lat_dms') or ''
+        lon_dms = self.wgs_widget.get_value('lon_dms') or ''
+        parts.append("WGS 84 (EPSG:4326)")
+        parts.append(f"Latitude (Decimal): {lat_dec}")
+        parts.append(f"Longitude (Decimal): {lon_dec}")
+        if lat_dms or lon_dms:
+            parts.append(f"Latitude (DMS): {lat_dms}")
+            parts.append(f"Longitude (DMS): {lon_dms}")
+
+        # UTM
+        parts.append("UTM SIRGAS 2000")
+        parts.append(self.lbl_utm_info.text())
+        utm_x = self.utm_widget.get_value('utm_x') or ''
+        utm_y = self.utm_widget.get_value('utm_y') or ''
+        parts.append(f"Easting (X): {utm_x}")
+        parts.append(f"Northing (Y): {utm_y}")
+
+        # Altitude
+        alt = self.alt_widget.get_value('altitude') or ''
+        parts.append(f"Altitude aproximada (m): {alt}")
+
+        # Address
+        parts.append("Endereço (OSM):")
+        parts.append(self.lbl_municipio.text())
+        parts.append(self.lbl_state_district.text())
+        parts.append(self.lbl_state.text())
+        parts.append(self.lbl_region.text())
+        parts.append(self.lbl_country.text())
+
+        text = "\n".join(parts)
+        ok = ProjectUtils.set_clipboard_text(text)
+        if ok:
+            try:
+                QgisMessageUtil.bar_success(self.iface, "Localização copiada para a área de transferência", title="Copiado")
+            except Exception:
+                pass
+            try:
+                self.logger.info("copy_all_info: conteúdo copiado para área de transferência")
+            except Exception:
+                pass
+        else:
+            try:
+                self.logger.warning("copy_all_info: falha ao copiar para área de transferência")
+            except Exception:
+                pass
 
     # ==================================================
     # UPDATE (USADO PELO MAPTOOL)
@@ -159,16 +244,17 @@ class CoordResultDialog(QDialog):
     def update_info(self, info):
         self.info = info
 
-        # WGS
-        self.lat_dec_edit.setText(f"{info['lat']:.8f}")
-        self.lon_dec_edit.setText(f"{info['lon']:.8f}")
-        self.lat_dms_edit.setText(info['lat_dms'])
-        self.lon_dms_edit.setText(info['lon_dms'])
+        try:
+            self.logger.debug(f"update_info: info={info}")
+        except Exception:
+            pass
 
-        self.lbl_utm_zone.setText(
-            f"Zona UTM: {info['zona_num']}{info['zona_letra']} | "
-            f"Hemisfério: {info['hemisferio']}"
-        )
+        # WGS
+        self.wgs_widget.set_value('lat_dec', f"{info['lat']:.8f}")
+        self.wgs_widget.set_value('lon_dec', f"{info['lon']:.8f}")
+        self.wgs_widget.set_value('lat_dms', info.get('lat_dms', ''))
+        self.wgs_widget.set_value('lon_dms', info.get('lon_dms', ''))
+
 
         # UTM
         self.lbl_utm_info.setText(
@@ -176,20 +262,24 @@ class CoordResultDialog(QDialog):
             f"Hemisfério {info['hemisferio']}"
         )
 
-        self.utm_x_edit.setText(f"{info['utm_x']:.3f}")
-        self.utm_y_edit.setText(f"{info['utm_y']:.3f}")
+        self.utm_widget.set_value('utm_x', f"{info['utm_x']:.3f}")
+        self.utm_widget.set_value('utm_y', f"{info['utm_y']:.3f}")
 
         # Reset async fields
-        self.alt_edit.setText("Carregando...")
+        self.alt_widget.set_value('altitude', "Carregando...")
         self.set_address(None)
 
     # ==================================================
     # TASK CALLBACKS
     # ==================================================
     def set_altitude(self, value):
-        self.alt_edit.setText(
+        self.alt_widget.set_value('altitude',
             "Indisponível" if value is None else f"{value:.2f} m"
         )
+        try:
+            self.logger.debug(f"set_altitude: {value}")
+        except Exception:
+            pass
 
     def set_address(self, data):
         if not data:
@@ -208,31 +298,27 @@ class CoordResultDialog(QDialog):
         self.lbl_region.setText(f"Região: {data.get('region', '-')}")
         self.lbl_country.setText(f"País: {data.get('country', '-')}")
 
-    # ==================================================
-    # COPY
-    # ==================================================
-    def copy_wgs84(self):
-        i = self.info
-        QGuiApplication.clipboard().setText(
-            f"WGS84\n"
-            f"Lat={i['lat']:.8f}\nLon={i['lon']:.8f}\n"
-            f"Lat DMS={i['lat_dms']}\nLon DMS={i['lon_dms']}\n"
-            f"Zona={i['zona_num']}{i['zona_letra']} | Hem={i['hemisferio']}"
-        )
+        try:
+            self.logger.debug(f"set_address: {data}")
+        except Exception:
+            pass
 
-    def copy_utm(self):
-        i = self.info
-        QGuiApplication.clipboard().setText(
-            f"UTM SIRGAS 2000\n"
-            f"EPSG:{i['epsg']}\n"
-            f"X={i['utm_x']:.3f}\nY={i['utm_y']:.3f}"
-        )
 
     def copy_address(self):
-        QGuiApplication.clipboard().setText(
+        text = (
             f"{self.lbl_municipio.text()}\n"
             f"{self.lbl_state_district.text()}\n"
             f"{self.lbl_state.text()}\n"
             f"{self.lbl_region.text()}\n"
             f"{self.lbl_country.text()}"
         )
+        ok = ProjectUtils.set_clipboard_text(text)
+        if ok:
+            try:
+                QgisMessageUtil.bar_success(self.iface, "Endereço copiado para a área de transferência", title="Copiado")
+            except Exception:
+                pass
+            try:
+                self.logger.info("copy_address: endereço copiado")
+            except Exception:
+                pass
