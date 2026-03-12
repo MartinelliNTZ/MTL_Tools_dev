@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 
-#from shapely import points
-from qgis.PyQt.QtWidgets import (
-    QHBoxLayout, QLabel,
-    QPushButton
-)
-from qgis.core import QgsProject, QgsApplication
+from qgis.core import QgsProject
 from ..plugins.BasePlugin import BasePluginMTL
 from ..core.engine_tasks.AsyncPipelineEngine import AsyncPipelineEngine
 from ..core.engine_tasks.ExecutionContext import ExecutionContext
@@ -17,9 +12,7 @@ from ..utils.vector.VectorLayerGeometry import VectorLayerGeometry
 from ..utils.vector.VectorLayerSource import VectorLayerSource
 from ..core.config.LogUtils import LogUtils
 from ..utils.StringUtils import StringUtils
-
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
-from ..resources.styles.Styles import Styles
 from ..utils.ToolKeys import ToolKey
 from ..core.ui.WidgetFactory import WidgetFactory
 from pathlib import Path

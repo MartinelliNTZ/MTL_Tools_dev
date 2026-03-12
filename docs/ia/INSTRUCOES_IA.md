@@ -1,381 +1,246 @@
-# ARQUITETURA_INSTRUCOES_IA.MD
+# instrucoes_ia.md
 
-## Instruções de Arquitetura para AsyncPipelineEngine - Evitar Travamento de Thread Principal
+## 1. Visão Geral do Plugin
 
-**Data**: 02/03/2026  
-**Contexto**: Análise de travamentos críticos em VectorFieldPlugin e otimizações implementadas  
-**Escopo**: Guia arquitetônico para ANY asynchronous pipeline em QGIS
+O MTL Tools é um plugin avançado para QGIS, focado em automação, processamento de dados geoespaciais, manipulação de layouts, integração de logs e execução de pipelines assíncronos. Resolve problemas de travamento, manipulação massiva de dados e padronização de UI, usando arquitetura modular e contratos claros entre componentes.
 
----
+## 2. Estrutura de Pastas
 
-## 🔴 O PROBLEMA CRÍTICO
+```
+MTL_Tools/
+│
+├── core/                # Engine, contratos, UI, configuração, logging
+│   ├── config/          # LogUtils, LogCleanupUtils, locks, estilos
+│   ├── engine_tasks/    # Steps, ParallelStep, ExecutionContext
+│   ├── task/            # BaseTask, tarefas de processamento
+│   ├── ui/              # WidgetFactory, ProgressDialog, InfoDialog
+│
+├── plugins/             # Plugins principais, dialogs, wrappers
+│   ├── logcat/          # UI e modelagem de logs
+│   ├── ...              # Plugins de ferramentas
+│
+├── utils/               # Utilitários: ProjectUtils, Preferences, QgisMessageUtil, etc.
+│   ├── vector/          # Manipulação vetorial
+│   ├── raster/          # Manipulação raster
+│   ├── mrk/             # Manipulação MRK (metadados de drone)
+│
+├── resources/           # Widgets, estilos, ícones, instruções
+│   ├── widgets/         # Widgets exclusivos (AppBar, MainLayout, etc.)
+│   ├── styles/          # Temas visuais
+│   ├── instructions/    # Arquivos de instruções para plugins
+│
+├── docs/                # Documentação técnica e arquitetural
+│   ├── arquitetura/     # Documentos de arquitetura, contratos, padrões
+│   ├── ia/              # instrucoes_ia.md (este arquivo)
+│
+└── log/                 # Logs de execução
+```
 
-Loops síncronos na thread principal **TRAVAM O QGIS**:
+## 3. Principais Módulos do Sistema
 
+### Contratos Técnicos e Regras
+
+- **BasePluginMTL**: Classe base obrigatória para todos os plugins. Garante padronização, persistência, logging e integração. Plugins devem herdar e implementar métodos padrão (`_build_ui`, `run`, `ToolKey`).
+- **WidgetFactory**: Fábrica central de widgets, layouts e componentes UI. Plugins devem construir UI exclusivamente via WidgetFactory, garantindo padronização, modularidade e compatibilidade.
+- **MainLayout**: Layout principal dos dialogs, encapsula scroll, bordas, AppBar.
+- **AppBarWidget**: Barra superior com título, botões de ação (Executar, Info, Fechar).
+- **BottomActionButtonsWidget**: Botões inferiores padronizados (Executar, Fechar, Info).
+- **AttributeSelectorWidget**: Widget exclusivo para seleção de atributos/campos.
+- **Styles**: Centraliza temas visuais, define estilos globais, checkbox, radio, label, etc.
+- **InfoDialog**: Diálogo padronizado para exibir instruções técnicas, renderiza Markdown nativamente ou converte para HTML.
+- **ToolKey**: Enum de identificação de cada ferramenta/plugin.
+- **Preferences**: API para salvar/carregar preferências de cada plugin.
+- **ProjectUtils**: Responsável por operações com projeto QGIS (carregar, salvar, manipular camadas). Plugins não devem acessar QgsProject/QgsApplication diretamente.
+- **AsyncPipelineEngine**: Plugins não criam tasks diretamente; usam steps/pipeline para processamento assíncrono.
+
+### Integração com Resources
+
+- WidgetFactory: construção de UI modular, compatível e padronizada
+- Styles: aplicação de temas visuais
+- InfoDialog: exibição de instruções técnicas, Markdown/HTML
+- resources/widgets: widgets exclusivos para cada função
+- resources/icons: ícones padronizados
+- resources/instructions: arquivos de instruções para cada plugin
+
+### Integração com Utils
+
+- **DependenciesManager**: Garantia de dependências externas antes de operações (ex.: PDF, imagens)
+- **ExplorerUtils**: Entrada de dados, varredura de diretórios, identificação de arquivos
+- **FormatUtils**: Conversão e exibição de valores técnicos (bytes, duração, velocidade)
+- **LayoutsUtils**: Processamento de layouts, substituição de textos
+- **PDFUtils**: Manipulação de PDFs/imagens, logging
+- **Preferences**: Persistência de estado/configuração
+- **ProjectUtils**: Backup, manipulação de camadas, clipboard
+- **QgisMessageUtil**: Exibição de mensagens, feedback ao usuário
+- **StringUtils**: Filtros, drivers, nomes padronizados
+- **ToolKeys**: Enum de identificação, cores, integração com logging
+
+## 4. Contratos Importantes
+
+### BaseStep (`core/engine_tasks/BaseStep.py`)
+- Métodos: `name`, `should_run`, `create_task`, `on_success`, `on_error`
+- Regras: nunca modificar camadas QGIS em worker thread; aplicar mudanças em batch na thread principal.
+- Armadilhas: acessar objetos C++ fora do escopo, não documentar contratos de resultado.
+
+### BaseTask (`core/task/BaseTask.py`)
+- Métodos: `_run`, `on_success`, `on_error`, `finished`, `setProgress`
+- Regras: nunca tocar camadas QGIS; retornar dict/list; usar setProgress.
+- Armadilhas: não checar `isCanceled`, não capturar exceções corretamente.
+
+### ExecutionContext (`core/engine_tasks/ExecutionContext.py`)
+- Métodos: `set`, `get`, `require`, `add_error`, `get_errors`, `cancel`, `is_cancelled`
+- Regras: não armazenar objetos C/C++ fora do escopo; guardar referências leves.
+
+### AsyncPipelineEngine (`core/engine_tasks/AsyncPipelineEngine.py`)
+- Métodos: `start`, `cancel`, `is_running`
+- Regras: tasks nunca tocam camadas; steps aplicam mudanças em batch.
+- Armadilhas: não propagar cancelamento, não tratar erros em on_success.
+
+### ParallelStep (`core/engine_tasks/ParallelStep.py`)
+- Métodos: `create_task`, `on_success`, `on_error`
+- Regras: executar steps independentes em paralelo, propagar erros/cancelamento.
+
+## 5. Fluxo de Execução do Sistema
+
+### Passo a Passo
+1. Plugin é iniciado (ex.: via run padrão)
+2. UI é construída via WidgetFactory
+3. Preferências são carregadas via Preferences
+4. Usuário aciona processamento
+5. AsyncPipelineEngine é criado, steps são registrados
+6. Para cada step:
+   - create_task() retorna task (worker thread)
+   - task executa processamento, retorna resultado serializável
+   - on_success() aplica mudanças em batch na thread principal
+   - processEvents() garante UI responsiva
+7. Resultados são exibidos via QgisMessageUtil
+8. Logs são registrados via LogUtils
+9. Preferências e estado de UI são salvos
+
+### Cancelamento e Erros
+- Cancelamento deve usar break, nunca return, para garantir cleanup
+- Tasks devem checar `isCanceled` periodicamente
+- Erros em tasks são capturados e propagados para o contexto
+- Steps devem validar shape do resultado antes de aplicar
+
+## 6. Padrões de Arquitetura Utilizados
+
+- **Pipeline Pattern**: Orquestra steps sequenciais/paralelos
+- **Step/Task Pattern**: Separação clara entre orquestração (step) e processamento (task)
+- **Separation of Concerns**: UI, lógica, processamento, logging, persistência são separados
+- **Factory Pattern**: WidgetFactory para construção de UI modular
+- **Dependency Inversion**: Plugins dependem de interfaces/contratos, não de implementações diretas
+- **Thread Safety**: Tasks nunca tocam camadas QGIS; mudanças aplicadas na thread principal
+
+## 7. Plugins — Estrutura, Fluxo, Armadilhas e Boas Práticas
+
+- Herdar de BasePluginMTL
+- Usar WidgetFactory para UI (não acessar widgets/core QGIS diretamente)
+- Declarar ToolKey único
+- Salvar preferências via Preferences
+- Integrar ProjectUtils para manipulação de projeto/camadas
+- Ter arquivo de instruções em resources/instructions
+- Ter análise de cenário em docs/analisecenario
+- Implementar método de abertura padrão (exemplo):
 ```python
-# ❌ NUNCA FAÇA ISSO:
-for feat in layer.getFeatures():  # 10k features = 60+ segundos congelado
-    layer.updateFeature(feat)     # Chamada síncrona QGIS
-    # UI não responde, mouse trava, QGIS parece crashed
+def run_copy_attributes(iface):
+    dlg = CopyAttributes(iface)
+    dlg.setModal(False)
+    dlg.show()
+    return dlg
 ```
+- Garantir compatibilidade QGIS 3.16 a 4.0
+- Não adicionar tasks diretamente; usar AsyncPipelineEngine
+- Documentar instruções e análise de cenário
 
-### Por que trava?
-1. **Cada operação é síncrona**: `layer.updateFeature()` bloqueia thread
-2. **Qt não processa eventos**: `QApplication.processEvents()` nunca chamado
-3. **Sem feedback visual**: Usuário pensa que QGIS crashed
-4. **Não cancelável**: Usuário preso, sem escape
+### Armadilhas Comuns
+- Acessar widgets/core do QGIS diretamente
+- Não usar WidgetFactory para UI
+- Não persistir preferências corretamente
+- Adicionar tasks diretamente (deve usar pipeline)
+- Falta de compatibilidade com versões antigas do QGIS
+- Não documentar instruções ou análise de cenário
 
----
+## 8. Utils — Análise Detalhada, Contratos, Armadilhas
 
-## ✅ A SOLUÇÃO: AsyncPipelineEngine
+- **DependenciesManager**: Garantia de dependências externas antes de operações (ex.: PDF, imagens)
+- **ExplorerUtils**: Entrada de dados, varredura de diretórios, identificação de arquivos
+- **FormatUtils**: Conversão e exibição de valores técnicos (bytes, duração, velocidade)
+- **LayoutsUtils**: Processamento de layouts, substituição de textos
+- **PDFUtils**: Manipulação de PDFs/imagens, logging
+- **Preferences**: Persistência de estado/configuração
+- **ProjectUtils**: Backup, manipulação de camadas, clipboard
+- **QgisMessageUtil**: Exibição de mensagens, feedback ao usuário
+- **StringUtils**: Filtros, drivers, nomes padronizados
+- **ToolKeys**: Enum de identificação, cores, integração com logging
 
-### Arquitetura Implementada
+## 9. Resources — Widgets, Estilos, InfoDialog, Modularidade
 
-```
-[Plugin - Thread Principal]
-        ↓
-[AsyncPipelineEngine.start()]
-        ↓
-[QgsApplication.taskManager().addTask(task)]
-        ↓
-[Task roda em Worker Thread]  ← SEM tocar na layer
-        ↓
-[task.on_success()] - Thread Principal
-        ↓
-[Step.on_success()] - Aplica LOTES via blockSignals()
-        ↓
-[Layer edit buffer - BATCH de 2000 features]
-        ↓
-[QApplication.processEvents()] - UI responsiva
-        ↓
-[Task completa, UI atualiza]
-```
+- **WidgetFactory**: Fábrica central de widgets, layouts e componentes UI
+- **Styles**: Centraliza temas visuais, define estilos globais, checkbox, radio, label, etc.
+- **InfoDialog**: Diálogo padronizado para exibir instruções técnicas, renderiza Markdown nativamente ou converte para HTML
+- **resources/widgets**: Widgets exclusivos para cada função
+- **resources/icons**: Ícones padronizados
+- **resources/instructions**: Arquivos de instruções para cada plugin
 
----
+## 10. Logging — Formato, Thread Safety, Integração, Exemplos
 
-## 📋 REGRAS CRÍTICAS
-
-### REGRA 1: Task NUNCA toca em Layer (Worker Thread)
-
+- **LogUtils**: API central, grava eventos em JSONL, usa lock global para thread safety
+- **LogCleanupUtils**: Limpeza e rotação de logs
+- **logcat**: UI para leitura e análise de logs
+- **Formato**: cada linha é um JSON com ts, level, plugin, session_id, thread, tool, class, msg, data
+- **Thread safety**: lock global para escrita concorrente
+- **Integração**: erros críticos enviados ao QGIS MessageLog
+- **Exemplo**:
 ```python
-# ✅ CORRETO: Task calcula e retorna dict
-def _run(self):
-    updates = {}
-    for feat in layer.getFeatures():  # Worker thread
-        value = expensive_calculation(feat)  # CPU-bound, OK aqui
-        updates[feat.id()] = {"field": value}
-    return updates  # Retorna dict, não layer
-
-# ❌ NUNCA: Task toca em layer
-def _run(self):
-    for feat in layer.getFeatures():
-        layer.updateFeature(feat)  # ❌ CRASH: layer não é thread-safe
-```
-
-**POR QUÊ**: QgsVectorLayer NÃO é thread-safe. Apenas thread principal pode tocar.
-
----
-
-### REGRA 2: Step aplica em Batch com blockSignals()
-
-```python
-# ✅ CORRETO: on_success() roda em thread principal
-def on_success(self, context, result):
-    layer = context.get("layer")
-    layer.blockSignals(True)  # Bloqueia sinais QGIS
-    
-    try:
-        for i in range(0, total, chunk):  # chunk = 2000
-            if context.is_cancelled():
-                break  # Cancelável
-            
-            batch_items = dict(items[i:i+chunk])
-            for fid, idx_map in batch_items.items():
-                for idx, val in idx_map.items():
-                    layer.changeAttributeValue(fid, idx, val)
-            
-            QApplication.processEvents()  # UI responsiva a cada batch
-    finally:
-        layer.blockSignals(False)  # SEMPRE desbloqueia
-
-# ❌ NUNCA: Sem batch ou try/finally
-def on_success(self, context, result):
-    for fid, val in result.items():
-        layer.changeAttributeValue(fid, 0, val)  # Sem batch, sem processEvents
-```
-
-**POR QUÊ**: 
-- blockSignals = reduz ~60% overhead de sinais QGIS
-- try/finally = garante desbloqueio mesmo com erro
-- QApplication.processEvents() = permite cancelamento + UI responsiva
-
----
-
-### REGRA 3: Decisão Sync/Async Baseada em Feature Count
-
-```python
-# ✅ CORRETO: featureCount() é confiável
-feature_count = layer.featureCount()  # Instant
-if feature_count >= 1000:  # Threshold empiricamente testado
-    self._start_async_calculation(...)
-
-# ❌ NUNCA: usar compute_size() para decidir sync/async — utilize featureCount()
-# ao invés de usar tamanho de arquivo, conte feições
-feature_count = layer.featureCount()  # rápido e determinista
-if size > 20 * 1024 * 1024:  # 20MB? Pode ser 50k features em memória!
-    self._start_async_calculation(...)
-```
-
-**POR QUÊ**: 
-- featureCount() = O(1), valor exato
-- featureCount() = O(1), confiável; compute_size() pode falhar em camadas em memória
-- Memory layer com 50k features = 10MB estimado, deveria ser async, rodia sync ❌
-
----
-
-### REGRA 4: Validação de CRS Geográfico
-
-```python
-# ✅ CORRETO: Detectar CRS geográfico e forçar AMBOS
-if VectorLayerProjection.is_geographic_crs(layer):
-    if requested_mode == "Cartesiana":  # User pediu Cartesiana em WGS84?
-        QgisMessageUtil.bar_warning(self.iface, 
-            "CRS geográfico com modo Cartesiana → forçando AMBOS")
-        mode = "Ambos"  # Calcula Elipsoidal + Cartesiana
-        mode_altered = True
-
-# ❌ NUNCA: Deixar usuário calcular Cartesiana em WGS84
-# Resultado: valores em graus² (errado!)
-```
-
-**POR QUÊ**: Cartesiano em CRS geográfico (WGS84) gera valores em graus², não metros.
-
----
-
-### REGRA 5: Always Use Try/Finally para Limpeza
-
-```python
-# ✅ CORRETO: Cleanup garantido
-layer.blockSignals(True)
+from core.config.LogUtils import LogUtils
+LogUtils.init(plugin_root)
+logger = LogUtils(tool="coord_click", class_name="CoordClickTool")
+logger.debug("Creating dialog")
 try:
-    # ... processamento ...
-finally:
-    layer.blockSignals(False)  # Sempre executa, mesmo com erro
-
-# ❌ NUNCA: Sem finally
-layer.blockSignals(True)
-# ... processamento ...
-# Se erro aqui, layer fica bloqueada FOREVER
-layer.blockSignals(False)
+    do_something()
+except Exception as exc:
+    logger.exception(exc, code="DIALOG_CREATE_FAIL")
 ```
+- **Armadilhas**: não inicializar LogUtils, escrita sem lock, rotacionar logs durante escrita
+- **Boas práticas**: usar níveis apropriados, padronizar code, registrar contexto mínimo
 
-**POR QUÊ**: Erro = layer bloqueada = QGIS inútil até reload
+## 11. Pipeline — AsyncPipelineEngine, ParallelStep, ExecutionContext
 
----
+- Separação clara entre cálculo pesado (worker thread) e aplicação de mudanças (thread principal)
+- Contratos: ExecutionContext, BaseTask, BaseStep, AsyncPipelineEngine, ParallelStep
+- Fluxo sequencial: engine.start() → steps → tasks → on_success → UI
+- Fluxo paralelo: ParallelStep cria grupo de tasks, agrega resultados, propaga erros/cancelamento
+- Cancelamento: tasks checam isCanceled, steps usam break para cleanup
+- Erros: capturados em BaseTask, propagados para contexto, engine aborta pipeline
+- Documentar contrato de cada task é obrigatório
 
-### REGRA 6: Cancelamento Deve Usar break, Não return
+## 12. Padronização de Código
 
-```python
-# ✅ CORRETO: Permite processEvents() continuarem
-for i in range(0, total, chunk):
-    if context.is_cancelled():
-        break  # Sai do loop, permite limpeza de finally
-    # ... batch process ...
+- Convenções de nomes: snake_case para funções, CamelCase para classes
+- Classes organizadas por responsabilidade: core, plugins, utils, resources
+- UI construída via WidgetFactory; layouts compostos por MainLayout, AppBar, BottomActionButtons
+- Cada plugin deve implementar método run padrão para abertura de diálogo
+- Novos módulos devem seguir contratos existentes (BaseStep, BaseTask, etc.)
+- Documentação técnica e instruções devem ser mantidas e atualizadas
 
-# ❌ NUNCA: return em loop
-def on_success(self, context, result):
-    for i in range(0, total, chunk):
-        if context.is_cancelled():
-            return  # Sai de on_success(), pula finally
-        # ... batch process ...
-```
+## 13. Como uma IA Deve Interagir com o Projeto
 
-**POR QUÊ**: return = pula finally = layer não desbloqueia = CRASH
-
----
-
-## 📊 CHECKLIST ANTES DE IMPLEMENTAR AsyncPipelineEngine
-
-- [ ] Task roda em worker thread (SEM tocar layer)
-- [ ] Task retorna dict com updates, NÃO layer modificada
-- [ ] Step.on_success() roda em thread principal
-- [ ] Step usa blockSignals(True) antes de loop
-- [ ] Step usa try/finally para desbloquear
-- [ ] Step chama QApplication.processEvents() em cada batch
-- [ ] Step usa break para cancelamento (não return)
-- [x] Decisão sync/async agora baseia-se em featureCount() e limiar de feições
-- [ ] Detecção CRS geográfico + warning se Cartesiana
-- [ ] Batch size é 2000 (empiricamente testado)
-- [ ] Logs incluem feature_count e modo (sync/async)
-- [ ] Nenhuma chamada a layer.commitChanges() na task
-- [ ] Nenhuma chamada a layer.addAttribute() na worker thread
-- [ ] Todos os campos faltantes criados em on_success() ANTES do loop
+- Lógica de negócio: core/engine_tasks, core/task, utils/
+- Steps: core/engine_tasks/
+- Tasks: core/task/
+- Widgets/UI: resources/widgets/, core/ui/WidgetFactory.py
+- Configurações: utils/Preferences.py, core/config/
+- Para adicionar novas funcionalidades:
+  - Criar novo step/task seguindo contratos
+  - Construir UI via WidgetFactory
+  - Registrar logs via LogUtils
+  - Salvar preferências via Preferences
+  - Documentar contratos, instruções e análise de cenário
+  - Garantir compatibilidade e modularidade
 
 ---
 
-## 🚨 SINAIS DE ALERTA (BUGS COMUNS)
-
-### Sinal 1: UI Trava por 30+ segundos
-**Causa provável**: Loop síncrono sem batching  
-**Solução**: Usar AsyncPipelineEngine + featureCount() >= 1000
-
-### Sinal 2: "Layer is locked" errors
-**Causa provável**: blockSignals() não desbloqueado (ou finally faltando)  
-**Solução**: Adicionar try/finally com blockSignals(False)
-
-### Sinal 3: "This action cannot be performed in a worker thread"
-**Causa provável**: Task tocando em layer.updateFeature()  
-**Solução**: Task deve apenas calcular, retornar dict
-
-### Sinal 4: Memory leak ao cancelar
-**Causa provável**: Contexto não limpo, referências circulares  
-**Solução**: ExecutionContext deve ter cleanup em on_cancelled()
-
-### Sinal 5: QGIS não responde a cliques durante processamento
-**Causa provável**: QApplication.processEvents() faltando no loop  
-**Solução**: Adicionar entre cada batch (a cada 2000 features)
-
----
-
-## 📈 PERFORMANCE TUNING
-
-### Batch Size
-```python
-chunk = 2000  # Testado empiricamente
-# Se < 2000: Mais processEvents(), mais overhead
-# Se > 2000: Menos processEvents(), menos responsivo
-```
-
-### Feature Count Threshold
-```python
-threshold_features = 1000  # Ponto de inflexão
-# < 1000: Rápido em síncrono puro
-# >= 1000: Assíncrono para não travar
-```
-
-### BlockSignals Trade-off
-```python
-layer.blockSignals(True)  # ~60% menos overhead
-# Com: mais rápido
-# Sem: muitos sinais QGIS emitidos, mais lento
-```
-
----
-
-## 🏗️ ARQUITETURA PROPOSTA PARA NOVO PLUGIN
-
-```
-MyPlugin.py
-├── run_my_tool()  # Entry point, thread principal
-│   ├── Validação básica (CRS, camada, etc)
-│   ├── featureCount() para decidir sync/async
-│   └── Se async: self._start_async_calculation()
-│
-├── _start_async_calculation()
-│   ├── ExecutionContext()
-│   ├── MyTask() - vai rodar em worker thread
-│   ├── MyStep() - vai rodar em thread principal
-│   └── AsyncPipelineEngine.start()
-│
-MyTask.py (core/task/)
-├── _run()  # Worker thread
-│   ├── Calcula valores (sem tocar layer)
-│   └── return {'updates': {fid: {field: val}}, 'missing_fields': [...]}
-│
-MyStep.py (core/engine_tasks/)
-├── create_task()  # Cria MyTask
-├── on_success()  # Thread principal
-│   ├── Cria campos faltantes
-│   ├── layer.blockSignals(True)
-│   ├── try:
-│   │   ├── for batch in batches:
-│   │   │   ├── layer.changeAttributeValue()
-│   │   │   └── QApplication.processEvents()
-│   └── finally:
-│       └── layer.blockSignals(False)
-│
-└── on_error()  # Tratamento de erro
-```
-
----
-
-## 📚 REFERÊNCIAS DE CÓDIGO
-
-**Problema Original**: [ANALISE_THREAD_SAFETY.md](../ANALISE_THREAD_SAFETY.md)
-
-**Implementação Real**:
-- [vector_field_plugin.py](plugins/vector_field_plugin.py) - linhas 82-115 (decisão sync/async)
-- [PointFieldsStep.py](core/engine_tasks/PointFieldsStep.py) - linhas 104-137 (blockSignals)
-- [LineFieldsStep.py](core/engine_tasks/LineFieldsStep.py) - linhas 88-123 (blockSignals)
-- [PolygonFieldsStep.py](core/engine_tasks/PolygonFieldsStep.py) - linhas 104-137 (blockSignals)
-
----
-
-## ✅ VALIDAÇÃO FINAL
-
-```
-✓ Log 02/03/2026: Feature count 1500 → Assíncrono
-✓ LineFieldsTask: Computou 1500 features em worker thread
-✓ LineFieldsStep: Aplicou batch 0-1500 com blockSignals()
-✓ UI responsiva durante processamento
-✓ Sem travamento de thread principal
-```
-
----
-
-## 🎯 RESUMO
-
-**NÃO FAÇA**:
-- ❌ Loop síncrono na thread principal (< 1000 features OK, > 1000 TRAVA)
-- ❌ Task tocando em layer (não é thread-safe)
-- ❌ sem blockSignals() (overhead massivo)
-- ❌ Sem try/finally (layer fica bloqueada)
-- ❌ return em loop de cancelamento (pula finally)
-- ✅ usar featureCount() para decisão sync/async, limiar nas preferências
-
-**FAÇA**:
-- ✅ featureCount() >= 1000 → AsyncPipelineEngine
-- ✅ Task calcula em worker thread, retorna dict
-- ✅ Step.on_success() aplica em batch com blockSignals()
-- ✅ try/finally com blockSignals(False)
-- ✅ break para cancelamento (não return)
-- ✅ QApplication.processEvents() a cada batch
-- ✅ Detectar CRS geográfico, avisar usuário
-
----
-
-**Fim do Guia Arquitetônico**
-
-Use este documento como referência ao implementar ANY asynchronous pipeline em QGIS.
-
----
-
-## ▶️ Novo: ParallelStep — execução paralela de Steps independentes
-
-Data: 2026/03/12
-
-Foi introduzido o conceito de `ParallelStep` para permitir execução concorrente
-de steps independentes sem alterar o `AsyncPipelineEngine` (ele continua
-tratando tudo como `BaseStep`).
-
-Regras e comportamento resumido:
-- `ParallelStep` recebe uma lista de `BaseStep` e encapsula todo o paralelismo.
-- Cada sub-step continua criando sua própria `QgsTask` via `create_task(context)`.
-- O `ParallelStep` agenda todas as tasks com `QgsApplication.taskManager().addTask()`.
-- O grupo aguarda todas as tasks finalizarem; se qualquer uma falhar, o grupo
-    cancela as demais e propaga erro para o engine.
-- Os `on_success(context, result)` de cada sub-step são chamados imediatamente
-    quando sua task termina (executados pela própria lógica do `ParallelStep`).
-- O `ParallelStep` chama o `on_success(context, aggregated_result)` quando
-    todo o grupo termina com sucesso; `aggregated_result` é um dict
-    { step_name: result }.
-- Cancelamento do pipeline é propagado para todas as subtasks do grupo.
-
-Boas práticas:
-- Use `ParallelStep` quando os steps forem semanticamente independentes
-    (ex.: chamadas a serviços diferentes, cálculos sem dependência de dados).
-- Continue respeitando as regras do AsyncPipelineEngine: tasks NÃO tocam
-    camadas (layer) e `on_success` deve aplicar mudanças em batch com
-    `blockSignals()` e `QApplication.processEvents()`.
+Qualquer IA pode entender a arquitetura, contratos, padrões, fluxos, armadilhas, recomendações e integração do MTL Tools lendo apenas este arquivo.
 
 

@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import os
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtGui import QIcon
-from qgis.core import QgsVectorLayer, QgsWkbTypes, QgsMapLayerProxyModel
-
+from qgis.core import QgsVectorLayer, QgsMapLayerProxyModel
 from ..utils.ToolKeys import ToolKey
 from ..core.config.LogUtils import LogUtils
 from ..utils.QgisMessageUtil import QgisMessageUtil

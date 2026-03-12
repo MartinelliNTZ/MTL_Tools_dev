@@ -1,3 +1,8 @@
+  1.6.8.18 2026/03/12
+  - DOCUMENTAÇÃO: plugins_arquitetura.md e TIPOS_FERRAMENTAS_ATUALIZADO.md
+    - Criado docs/plugins_arquitetura.md: arquitetura, contratos, padrões, regras, armadilhas, boas práticas e tabela detalhada dos plugins.
+    - Criado docs/arquitetura/TIPOS_FERRAMENTAS_ATUALIZADO.md: contratos técnicos, padrões, riscos e recomendações para tipos de ferramentas.
+    - Documentação profunda e concisa, seguindo padrão de LOGGING_SYSTEM.md e PIPELINE_ENGINE.md.
 
 changelog=
 1.6.8 2026/03/09
@@ -16,27 +21,12 @@ changelog=
       1.6.8.02
       - LOG / PREFS / GPKG / EXPLORER
 
-  1.6.8.16 2026/03/12
-  - PIPELINE: ParallelStep para execução concorrente de Steps
-    - Adicionado `core/engine_tasks/ParallelStep.py`:
-      - `ParallelStep([step1, step2, ...])` encapsula paralelismo de subtasks
-      - Cria e agenda as tasks dos sub-steps via `create_task(context)`
-      - Aguarda todas finalizarem; em sucesso retorna dict `{step_name: result}`
-      - Em erro: cancela as demais subtasks e propaga a exceção para o engine
-      - Cancelamento do pipeline é propagado para todas as subtasks
-    - Compatibilidade: `AsyncPipelineEngine` não foi alterado na surface API;
-      `ParallelStep` é tratado como `BaseStep` normal (sem mudanças no engine)
-    - Exemplo de uso:
-      - `steps = [ StepA(), ParallelStep([StepB(), StepC(), StepD()]), StepE() ]`
-    - Risco: Baixo — encapsula paralelismo no `ParallelStep`, mantém regras do
-      AsyncPipelineEngine (tasks não tocam layer; on_success aplica em main thread)
-        - Adicionado: logging em `plugins/load_folder_layers.py` usando `self.logger` (BasePluginMTL)
-        - Persistência: estado do painel "Tipos de Arquivo" (`types_expanded`) salvo/carregado nas preferências
-        - Suporte: GeoPackage (`.gpkg`) adicionado ao `FILE_TYPES` e ao `ExplorerUtils.VECTOR_EXTS`
-        - ExplorerUtils: `load_raster_from_file()` implementado como método estático wrapper (parâmetro nomeado `external_tool_key="untraceable"`)
-        - ProjectUtils: `ensure_group()` usa `s = rel_path.split(os.sep)` para clareza ao criar grupos aninhados
-        - Clean-up: remoção do override `show_info()` em `load_folder_layers` (usa `show_info_dialog()` da classe-base)
-        - Risco: Baixo (muda apenas logging, prefs e delega carregamento de rasters para wrapper estático)
+
+  1.6.8.17 2026/03/12
+  - DOCUMENTAÇÃO: plugins.md
+    - Criado arquivo `docs/plugins.md` com tabela detalhada dos plugins, análise individual e atualização dos tipos de ferramentas.
+    - Inclui: tipo, classe, uso de task, entrada, saída, risco.
+    - Plugins de Processing não incluídos.
 
       1.6.8.03
       - ESTATÍSTICAS: métricas por arquivos/feições/tamanho
@@ -561,6 +551,11 @@ changelog=
       - RISCO: Baixo
         ✓ Behavior mantido: items ainda vão para scroll ou layout dependendo de enable_scroll
         ✓ Tests: DroneCoordinates, GenerateTrailPlugin, CopyAttributesPlugin funcionando
+
+1.6.8.19 2026/03/12
+- DOCUMENTAÇÃO: instrucoes_ia.md
+  - Criado ou atualizado docs/ia/INSTRUCOES_IA.md: síntese arquitetural completa para IA, cobrindo módulos, contratos, padrões, regras, fluxo, padronização e integração.
+  - Documento serve como fonte única para compreensão e extensão por agentes IA.
     1.6.5.8
     - APLICAÇÃO DE ESTILOS: InputFieldsWidget + SimpleButtonWidget
       - Renomeado FullScreenButtonWidget → SimpleButtonWidget (nome mais apropriado)
