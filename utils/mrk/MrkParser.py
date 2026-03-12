@@ -80,6 +80,40 @@ class MrkParser:
                 break
 
         return points
+    @staticmethod
+    def _generate_folder_fields(file_dir: str, base_folder: str) -> dict:
+        """
+        Gera pasta1..pastaN subindo na hierarquia a partir da pasta do arquivo
+        até chegar na pasta base selecionada.
+        """
+
+        folders = []
+        current = file_dir
+        base_folder = os.path.abspath(base_folder)
+
+        while True:
+            name = os.path.basename(current)
+            if name:
+                folders.append(name)
+
+            parent = os.path.dirname(current)
+
+            if os.path.abspath(parent) == base_folder:
+                base_name = os.path.basename(base_folder)
+                if base_name:
+                    folders.append(base_name)
+                break
+
+            if parent == current:  # chegou na raiz
+                break
+
+            current = parent
+
+        data = {}
+        for i, f in enumerate(folders, 1):
+            data[f"pasta{i}"] = f
+
+        return data
 
     @staticmethod
     def to_point_layer(points, name="MRK_Pontos", extra_fields=None):
