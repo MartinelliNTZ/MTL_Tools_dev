@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import List, Dict
 
 from ..core.config.LogUtils import LogUtils
-from .ProjectUtils import ProjectUtils
 from .vector.VectorLayerSource import VectorLayerSource
 from .raster.RasterLayerSource import RasterLayerSource
 

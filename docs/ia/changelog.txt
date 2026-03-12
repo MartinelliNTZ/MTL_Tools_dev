@@ -399,6 +399,18 @@ changelog=
         ✓ Padrão seguido (compatível com análises existentes v1.6.5, 1.6.6)
     1.6.7.1# COMEÇA AQUI
 
+1.6.8.15 2026/03/12
+  - EXPORT: reexportar utilitários em `utils.__init__`
+    - Adicionadas importações públicas em `utils/__init__.py` para facilitar
+      o acesso às classes principais das subpastas:
+      - `vector`: VectorLayerSource, VectorLayerGeometry, VectorLayerProjection,
+        VectorLayerMetrics, VectorLayerAttributes
+      - `raster`: RasterLayerSource, RasterLayerProcessing, RasterLayerProjection,
+        RasterLayerRendering, RasterLayerMetrics, RasterVectorBridge
+      - `mrk`: MrkParser, PhotoMetadata
+    - Risco: Muito Baixo — apenas re-exporta classes já existentes para
+      conveniência; comportamento inalterado.
+
 
 
   1.6.6 2026/03/09

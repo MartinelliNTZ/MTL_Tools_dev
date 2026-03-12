@@ -18,10 +18,6 @@ class CoordResultDialog(BasePluginMTL):
         # Inicializa logger e preferences do BasePlugin e constrói UI via _build_ui
         self.init(tool_key="coord_result", class_name="CoordResultDialog", build_ui=True)
 
-        # Ajustes finais da janela
-        self.setWindowTitle("Coordenadas do Ponto")
-        self.setMinimumWidth(640)
-
         # Atualiza com as informações iniciais (widgets já criados em _build_ui)
         try:
             self.update_info(info)
@@ -29,19 +25,90 @@ class CoordResultDialog(BasePluginMTL):
             pass
 
     def _build_ui(self, **kwargs):
-        """Constrói a UI do diálogo: segue o padrão de GenerateTrailPlugin.
-
-        Garante que `super()._build_ui` seja chamado (cria `self.layout`) e
-        que `_build_contents` construa os widgets antes que `_load_prefs` seja executado.
-        """
+        """Constrói a UI do diálogo: segue o padrão de GenerateTrailPlugin.        """
         super()._build_ui(
             title="Coordenadas do Ponto",
             icon_path="mtl_agro.ico",
             instructions_file="standard.md",
             enable_scroll=True
         )
-        # Construir conteúdo específico do diálogo
-        self._build_contents()
+
+        ro_layout, self.wgs_widget = WidgetFactory.create_readonly_field(
+            parent=self,
+            title="WGS 84 (EPSG:4326)",
+            fields={
+                'lat_dec': {'title': 'Latitude (Decimal)', 'value': ''},
+                'lon_dec': {'title': 'Longitude (Decimal)', 'value': ''},
+                'lat_dms': {'title': 'Latitude (DMS)', 'value': ''},
+                'lon_dms': {'title': 'Longitude (DMS)', 'value': ''},
+            },
+            num_columns=1,
+            copy_all_button_title="Copiar WGS 84 (Completo)",
+        )
+
+        ro_layout2, self.utm_widget = WidgetFactory.create_readonly_field(
+            parent=self,
+            title="UTM SIRGAS 2000",
+            fields={
+                'utm_x': {'title': 'Easting (X)', 'value': ''},
+                'utm_y': {'title': 'Northing (Y)', 'value': ''},
+            },
+            num_columns=1,
+            copy_all_button_title="Copiar UTM (Completo)",
+            separator_bottom=False,
+        )
+        self.lbl_utm_info = WidgetFactory.create_label(text="", parent=self)
+
+        ro_layout3, self.alt_widget = WidgetFactory.create_readonly_field(
+            parent=self,
+            title="Altimetria (OpenTopoData)",
+            fields={'altitude': {'title': 'Altitude aproximada (m)', 'value': 'Carregando...'}},
+            num_columns=1,
+            copy_all_button_title=None,
+            separator_top=True,
+        )
+        # Address labels
+        self.lbl_municipio = WidgetFactory.create_label(text="", parent=self)
+        self.lbl_state_district = WidgetFactory.create_label(text="", parent=self)
+        self.lbl_state = WidgetFactory.create_label(text="", parent=self)
+        self.lbl_region = WidgetFactory.create_label(text="", parent=self)
+        self.lbl_country = WidgetFactory.create_label(text="", parent=self)
+
+        # Botão: Copiar tudo (localização completa) - entre endereço e botões inferiores
+        copy_layout, self.btn_copy_all = WidgetFactory.create_simple_button(
+            text="Copiar Localização (Completo)",
+            parent=self,
+            separator_top=False,
+            separator_bottom=False,
+        )
+        self.btn_copy_all.clicked.connect(self.copy_all_info)
+        # Bottom action buttons: Executar (fecha), Fechar (fecha), Info (mostra instruções)
+        btn_layout, _ = WidgetFactory.create_bottom_action_buttons(
+            parent=self,
+            run_callback=lambda: self.close(),
+            close_callback=lambda: self.close(),
+            info_callback=lambda: self.show_info_dialog(),
+            separator_top=False,
+            separator_bottom=False,
+            tool_key="coord_result",
+            run_text="Executar",
+            close_text="Fechar",
+        )
+        # Add everything in a single call
+        self.layout.add_items([
+            ro_layout,
+            ro_layout2,
+            self.lbl_utm_info,
+            ro_layout3,
+            self.lbl_municipio,
+            self.lbl_state_district,
+            self.lbl_state,
+            self.lbl_region,
+            self.lbl_country,
+            copy_layout,
+            btn_layout,
+        ])
+
 
     def _load_prefs(self):
         """Carrega preferências específicas do diálogo (executado após _build_ui)."""
@@ -78,109 +145,6 @@ class CoordResultDialog(BasePluginMTL):
             except Exception:
                 pass
 
-    # ==================================================
-    # UI BUILDER
-    # ==================================================
-    def _build_contents(self):
-        # Build sections and add to BasePlugin MainLayout via add_items
-        items = []
-
-        ro_layout, self.wgs_widget = WidgetFactory.create_readonly_field(
-            parent=self,
-            title="WGS 84 (EPSG:4326)",
-            fields={
-                'lat_dec': {'title': 'Latitude (Decimal)', 'value': ''},
-                'lon_dec': {'title': 'Longitude (Decimal)', 'value': ''},
-                'lat_dms': {'title': 'Latitude (DMS)', 'value': ''},
-                'lon_dms': {'title': 'Longitude (DMS)', 'value': ''},
-            },
-            num_columns=1,
-            copy_all_button_title="Copiar WGS 84 (Completo)",
-        )
-        items.append(ro_layout)
-
-        lbl_utm_zone = WidgetFactory.create_label(text="", parent=self)
-        items.append(lbl_utm_zone)
-
-        ro_layout2, self.utm_widget = WidgetFactory.create_readonly_field(
-            parent=self,
-            title="UTM SIRGAS 2000",
-            fields={
-                'utm_x': {'title': 'Easting (X)', 'value': ''},
-                'utm_y': {'title': 'Northing (Y)', 'value': ''},
-            },
-            num_columns=1,
-            copy_all_button_title="Copiar UTM (Completo)",
-        )
-        items.append(ro_layout2)
-
-        self.lbl_utm_info = WidgetFactory.create_label(text="", parent=self)
-        items.append(self.lbl_utm_info)
-
-        ro_layout3, self.alt_widget = WidgetFactory.create_readonly_field(
-            parent=self,
-            title="Altimetria (OpenTopoData)",
-            fields={'altitude': {'title': 'Altitude aproximada (m)', 'value': 'Carregando...'}},
-            num_columns=1,
-            copy_all_button_title=None,
-        )
-        items.append(ro_layout3)
-
-        # Address labels
-        self.lbl_municipio = WidgetFactory.create_label(text="", parent=self)
-        self.lbl_state_district = WidgetFactory.create_label(text="", parent=self)
-        self.lbl_state = WidgetFactory.create_label(text="", parent=self)
-        self.lbl_region = WidgetFactory.create_label(text="", parent=self)
-        self.lbl_country = WidgetFactory.create_label(text="", parent=self)
-
-        items.extend([
-            self.lbl_municipio,
-            self.lbl_state_district,
-            self.lbl_state,
-            self.lbl_region,
-            self.lbl_country,
-        ])
-
-        # Botão: Copiar tudo (localização completa) - entre endereço e botões inferiores
-        try:
-            copy_layout, self.btn_copy_all = WidgetFactory.create_simple_button(
-                text="Copiar Localização (Completo)",
-                parent=self,
-                separator_top=False,
-                separator_bottom=False,
-            )
-            # conectar sinal ao helper
-            try:
-                self.btn_copy_all.clicked.connect(self.copy_all_info)
-            except Exception:
-                pass
-            items.append(copy_layout)
-        except Exception:
-            # se factory falhar, seguir sem o botão
-            pass
-
-        # Bottom action buttons: Executar (fecha), Fechar (fecha), Info (mostra instruções)
-        btn_layout, _ = WidgetFactory.create_bottom_action_buttons(
-            parent=self,
-            run_callback=lambda: self.close(),
-            close_callback=lambda: self.close(),
-            info_callback=lambda: self.show_info_dialog(),
-            separator_top=False,
-            separator_bottom=False,
-            tool_key="coord_result",
-            run_text="Executar",
-            close_text="Fechar",
-        )
-        items.append(btn_layout)
-
-        # Add everything to the MainLayout
-        try:
-            self.layout.add_items(items)
-        except Exception:
-            # Fallback: if layout not present, keep local attribute
-            pass
-
-    # GROUPS are built via WidgetFactory in _build_contents
 
     # ==================================================
     # HELPERS
@@ -223,38 +187,25 @@ class CoordResultDialog(BasePluginMTL):
 
         text = "\n".join(parts)
         ok = ProjectUtils.set_clipboard_text(text)
-        if ok:
-            try:
-                QgisMessageUtil.bar_success(self.iface, "Localização copiada para a área de transferência", title="Copiado")
-            except Exception:
-                pass
-            try:
-                self.logger.info("copy_all_info: conteúdo copiado para área de transferência")
-            except Exception:
-                pass
-        else:
-            try:
-                self.logger.warning("copy_all_info: falha ao copiar para área de transferência")
-            except Exception:
-                pass
+        if ok:   
+            QgisMessageUtil.bar_success(self.iface, "Localização copiada para a área de transferência", title="Copiado")   
+            self.logger.info("copy_all_info: conteúdo copiado para área de transferência") 
+        else:  
+            self.logger.warning("copy_all_info: falha ao copiar para área de transferência")
+   
 
     # ==================================================
     # UPDATE (USADO PELO MAPTOOL)
     # ==================================================
     def update_info(self, info):
-        self.info = info
-
-        try:
-            self.logger.debug(f"update_info: info={info}")
-        except Exception:
-            pass
+        self.info = info        
+        self.logger.debug(f"update_info: info={info}")
 
         # WGS
         self.wgs_widget.set_value('lat_dec', f"{info['lat']:.8f}")
         self.wgs_widget.set_value('lon_dec', f"{info['lon']:.8f}")
         self.wgs_widget.set_value('lat_dms', info.get('lat_dms', ''))
         self.wgs_widget.set_value('lon_dms', info.get('lon_dms', ''))
-
 
         # UTM
         self.lbl_utm_info.setText(
@@ -313,12 +264,7 @@ class CoordResultDialog(BasePluginMTL):
             f"{self.lbl_country.text()}"
         )
         ok = ProjectUtils.set_clipboard_text(text)
-        if ok:
-            try:
-                QgisMessageUtil.bar_success(self.iface, "Endereço copiado para a área de transferência", title="Copiado")
-            except Exception:
-                pass
-            try:
-                self.logger.info("copy_address: endereço copiado")
-            except Exception:
-                pass
+        if ok:            
+            QgisMessageUtil.bar_success(self.iface, "Endereço copiado para a área de transferência", title="Copiado")
+            self.logger.info("copy_address: endereço copiado")
+

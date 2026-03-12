@@ -17,3 +17,4 @@ from .PDFUtils import PDFUtils
 from .Preferences import load_tool_prefs, save_tool_prefs, Preferences
 from .ProjectUtils import ProjectUtils
 from .StringUtils import StringUtils
+
