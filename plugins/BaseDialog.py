@@ -30,7 +30,7 @@ class BaseDialog(QDialog):
     def _build_ui(
         self,
         title: Optional[str] = None,
-        icon_path: Optional[str] = "mtl_agro.ico",
+        icon_path: Optional[str] = "cadmus_icon.ico",
         enable_scroll: bool = True,
         minimum_size=(300, 300),
         **kwargs
@@ -53,7 +53,7 @@ class BaseDialog(QDialog):
         """
         self.logger.debug(f"Construindo UI para plugin: {self.PLUGIN_NAME}")
         self.layout = WidgetFactory.create_main_layout(
-            self, title=title, enable_scroll=enable_scroll, icon_path=None
+            self, title=title, enable_scroll=enable_scroll, icon_path="cadmus_icon.png"
         )                
         # Garantir que o MainLayout seja sempre criado. Usar PLUGIN_NAME como fallback.      
         self.setWindowFlags(Qt.Dialog | Qt.FramelessWindowHint)

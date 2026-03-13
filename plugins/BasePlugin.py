@@ -92,7 +92,7 @@ class BasePluginMTL(BaseDialog):
     def _build_ui(
         self,
         title: Optional[str] = None,
-        icon_path: Optional[str] = "mtl_agro.ico",
+        icon_path: Optional[str] = "cadmus_icon.ico",
         instructions_file: Optional[str] = "standard.md",
         enable_scroll: bool = True,
         **kwargs

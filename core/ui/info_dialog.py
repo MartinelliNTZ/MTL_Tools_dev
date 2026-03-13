@@ -35,7 +35,7 @@ class InfoDialog(BaseDialog):
 
       
         self.layout.addWidget(browser)
-        btn_layout, btn_widget = WidgetFactory.create_simple_button(text="Fechar", parent=self)
+        btn_layout, btn_widget = WidgetFactory.create_simple_button(text="Fechar", parent=self,spacing=20)
         try:
             btn_widget.clicked.connect(self.close)
         except Exception:
