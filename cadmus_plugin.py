@@ -277,8 +277,9 @@ class CadmusPlugin:
             # ==================================================
             self._add_toolbar_dropdown(
                 title="Layouts",
-                #main_action=self.action_replace_layouts,
-                main_action=self.action_export_all,
+
+                main_action=self.action_export_all,#STARD
+                #main_action=self.action_replace_layouts, #DEBUG
                 secondary_actions=[ self.action_export_all,
                                     self.action_replace_layouts,
                                     ]
@@ -297,8 +298,8 @@ class CadmusPlugin:
             # ==================================================
             self._add_toolbar_dropdown(
                 title="Vetores",
-                #main_action=self.action_vector_fields,#padrao
-                main_action=self.action_coord_click,#editavel para debug
+                main_action=self.action_vector_fields,#padrao
+                #main_action=self.action_coord_click,#editavel para debug
                 secondary_actions=[     self.action_vector_fields,
                                         self.action_coord_click,    
                                         self.action_copy_atributes,                                                         

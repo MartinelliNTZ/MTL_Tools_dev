@@ -1,4 +1,5 @@
 <RCC>
-    <qresource prefix="/plugins/SlopeLineGenerator">
+    <qresource prefix="/plugins/cadmus">
+        <file>icons/icon.png</file>
     </qresource>
 </RCC>
