@@ -32,6 +32,7 @@ class BaseDialog(QDialog):
         title: Optional[str] = None,
         icon_path: Optional[str] = "mtl_agro.ico",
         enable_scroll: bool = True,
+        minimum_size=(300, 300),
         **kwargs
     ):
         """Constrói a interface do plugin.
@@ -43,11 +44,11 @@ class BaseDialog(QDialog):
         """
         if title is not None:
             self.PLUGIN_NAME = title
-        self.set_layout(enable_scroll=enable_scroll, icon_path=icon_path, title=self.PLUGIN_NAME)        
+        self.set_layout(enable_scroll=enable_scroll, icon_path=icon_path, title=self.PLUGIN_NAME, minimum_size=minimum_size)        
 
     
     
-    def set_layout(self, enable_scroll=True,icon_path=None, title="MTL Tools"):
+    def set_layout(self, enable_scroll=True,icon_path=None, title="MTL Tools", minimum_size=(300, 300)):
         """Define o layout principal do plugin.
         """
         self.logger.debug(f"Construindo UI para plugin: {self.PLUGIN_NAME}")
@@ -58,7 +59,7 @@ class BaseDialog(QDialog):
         self.setWindowFlags(Qt.Dialog | Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground, True)
         # Tamanho mínimo padrão: 300x300 (persistido em preferências)
-        self.setMinimumSize(300, 300)
+        self.setMinimumSize(*minimum_size)
         # Size grip (resize visual indicator)
         self.size_grip = QSizeGrip(self.layout._frame)
         self.size_grip.setFixedSize(16, 16)

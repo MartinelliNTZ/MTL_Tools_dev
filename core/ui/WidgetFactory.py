@@ -1,7 +1,7 @@
 from qgis.core import QgsVectorLayer, QgsWkbTypes, QgsMapLayerProxyModel, QgsProject
 from qgis.PyQt.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
-    QLineEdit, QMessageBox, QCheckBox, QTextEdit, QComboBox, QListWidget, QDoubleSpinBox, QGridLayout, QFrame
+    QLineEdit, QMessageBox, QCheckBox, QTextEdit, QTextBrowser, QComboBox, QListWidget, QDoubleSpinBox, QGridLayout, QFrame
 )
 from qgis.PyQt.QtCore import QObject, QEvent, Qt
 from qgis.PyQt.QtWidgets import QLayout, QWidget
@@ -198,6 +198,17 @@ class WidgetFactory:
             layout.addWidget(WidgetFactory.create_separator())
 
         return layout, widget
+    
+    @staticmethod
+    def create_text_browser(*, parent=None, open_external_links: bool = True, read_only: bool = True):
+        """Create and configure a QTextBrowser with project defaults.
+
+        Returns a configured QTextBrowser instance.
+        """
+        browser = QTextBrowser(parent)
+        browser.setOpenExternalLinks(open_external_links)
+        browser.setReadOnly(read_only)
+        return browser
     
     def create_main_layout(self, title: str="Title", enable_scroll: bool=False):
         """
@@ -712,9 +723,8 @@ class WidgetFactory:
         widget.setStyleSheet(Styles.simple_button_widget())
         layout.addWidget(widget)
         layout.addSpacing(spacing)
-        if separator_bottom:
-                
-                layout.addWidget(WidgetFactory.create_separator())
+        if separator_bottom:                
+            layout.addWidget(WidgetFactory.create_separator())
         
         return layout, widget
 

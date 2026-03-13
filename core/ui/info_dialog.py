@@ -1,12 +1,7 @@
 import os
-
 from ...core.config.LogUtils import LogUtils
 from ...plugins.BaseDialog import BaseDialog
-from qgis.PyQt.QtWidgets import (
-    QDialog, QVBoxLayout, QPushButton, QTextBrowser
-)
-from qgis.PyQt.QtCore import Qt
-
+from ...core.ui.WidgetFactory import WidgetFactory
 
 class InfoDialog(BaseDialog):
     def __init__(self, instructions_path: str, parent=None, title="MTL Tools"):
@@ -15,15 +10,9 @@ class InfoDialog(BaseDialog):
         self.logger.debug(f"Inicializando InfoDialog com arquivo: {instructions_path}")
 
         # Use BaseDialog layout builder so dialogs share the same shell
-        self._build_ui(title=title, enable_scroll=False)
+        self._build_ui(title=title, enable_scroll=False, minimum_size=(700, 550))
 
-        # prefer explicit window title and sensible minimum size
-        self.setWindowTitle(title)
-        self.setMinimumWidth(700)
-        self.setMinimumHeight(550)
-
-        browser = QTextBrowser()
-        browser.setOpenExternalLinks(True)
+        browser = WidgetFactory.create_text_browser(parent=self)
 
         if os.path.exists(instructions_path):
             with open(instructions_path, "r", encoding="utf-8") as f:
@@ -44,21 +33,16 @@ class InfoDialog(BaseDialog):
                 f"Arquivo de instruções não encontrado:\n{instructions_path}"
             )
 
-        # add browser and close button to the shared layout
-        if hasattr(self, 'layout') and self.layout is not None:
-            self.layout.addWidget(browser)
-            btn = QPushButton("Fechar")
-            btn.clicked.connect(self.close)
-            self.layout.addWidget(btn, alignment=Qt.AlignRight)
-            self.logger.debug(f"InfoDialog UI construída com sucesso usando BaseDialog layout.")
-        else:
-            # fallback: use a local layout if BaseDialog failed to create one
-            layout = QVBoxLayout(self)
-            layout.addWidget(browser)
-            btn = QPushButton("Fechar")
-            btn.clicked.connect(self.close)
-            layout.addWidget(btn, alignment=Qt.AlignRight)
-            self.logger.warning("BaseDialog layout não encontrado. Usando layout local para InfoDialog.")
+      
+        self.layout.addWidget(browser)
+        btn_layout, btn_widget = WidgetFactory.create_simple_button(text="Fechar", parent=self)
+        try:
+            btn_widget.clicked.connect(self.close)
+        except Exception:
+            pass
+        self.layout.addLayout(btn_layout)
+        self.logger.debug(f"InfoDialog UI construída com sucesso usando BaseDialog layout.")
+    
 
     def _markdown_to_html(self, text: str) -> str:
         """
