@@ -2,7 +2,6 @@
 import os
 from PyQt5.QtGui import QIcon
 from qgis.core import QgsProcessingProvider
-from .my_algorithm import MTLExampleAlgorithm
 from .raster_mass_sampler import RasterMassSampler
 from .difference_fields_algorithm import DifferenceFieldsAlgorithm
 from .attribute_statistics import AttributeStatisticsAlgorithm
@@ -13,7 +12,6 @@ class MTLProvider(QgsProcessingProvider):
 
     def loadAlgorithms(self):
         print("[DEBUG] Registrando algoritmos MTL…")
-        self.addAlgorithm(MTLExampleAlgorithm())
         self.addAlgorithm(RasterMassSampler())
         self.addAlgorithm(DifferenceFieldsAlgorithm())  
         self.addAlgorithm(AttributeStatisticsAlgorithm())        
