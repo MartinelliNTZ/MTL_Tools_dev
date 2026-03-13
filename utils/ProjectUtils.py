@@ -200,14 +200,6 @@ class ProjectUtils:
         
     
     @staticmethod
-    def remove_layer_from_project2(layer: QgsMapLayer):
-        if not layer:
-            return
-        project = QgsProject.instance()
-        if project.mapLayer(layer.id()):
-            project.removeMapLayer(layer.id())
-    
-    @staticmethod
     def is_file_in_project(file_path: str) -> bool:
         """
         Verifica se existe uma camada no projeto cujo source corresponde ao arquivo informado.
@@ -264,15 +256,6 @@ class ProjectUtils:
         except Exception as e:
             logger = LogUtils(tool="project_utils", class_name="ProjectUtils")
             logger.error(f"Erro ao remover arquivo do projeto: {e}")
-            return False
-
-    @staticmethod
-    def remove_file_from_project_hard(file_path: str) -> bool:
-        """
-        Remove a camada do projeto e tenta liberar completamente o datasource
-        (incluindo OGR), reduzindo ao máximo locks de arquivo.
-        """
-        if not file_path:
             return False
 
     # ------------------------------------------------------------------
@@ -334,63 +317,6 @@ class ProjectUtils:
             return layer
         except Exception:
             return None
-
-        target = Path(file_path).resolve()
-        project = QgsProject.instance()
-
-        layer_to_remove = None
-        layer_id = None
-
-        # 1. localizar camada
-        for lid, layer in project.mapLayers().items():
-            if not isinstance(layer, QgsVectorLayer):
-                continue
-
-            source = layer.source()
-            if not source:
-                continue
-
-            layer_path = Path(source.split("|")[0]).resolve()
-            if layer_path == target:
-                layer_to_remove = layer
-                layer_id = lid
-                break
-
-        if layer_to_remove is None:
-            return False
-
-        try:
-            # 2. garantir que não está em edição
-            if layer_to_remove.isEditable():
-                # rollback força o provider a soltar locks
-                layer_to_remove.rollBack()
-
-            # 3. remover do projeto
-            project.removeMapLayer(layer_id)
-
-            # 4. quebrar referências explícitas
-            layer_to_remove = None
-
-            # 5. processar eventos Qt (Windows é sensível a isso)
-            QApplication.processEvents()
-
-            # 6. forçar coleta de lixo
-            gc.collect()
-
-            return True
-
-        except Exception as e:
-            logger = LogUtils(tool="project_utils", class_name="ProjectUtils")
-            logger.error(
-                f"Erro ao remover camada e liberar datasource: {e}"
-            )
-            return False
-
-
-
-
-
-
 
 
 

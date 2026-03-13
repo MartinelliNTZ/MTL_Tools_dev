@@ -11,6 +11,7 @@ qgisMaximumVersion=3.99
 category=Vector
 tags=layouts, automation, processing, vector, raster, statistics, drone
 icon=icon.png
+plugin_dependencies=PyPDF2,Pillow
 hasProcessingProvider=yes
 experimental=False
 deprecated=False

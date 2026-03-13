@@ -30,7 +30,7 @@ class ToolKey:
     TOOL_KEY_COLORS = {
         # === Toolbar / ações principais ===
         CADMUS_PLUGIN: "#804E0A",  # laranja claro → plugin principal
-        EXPORT_ALL_LAYOUTS: "#4ECDC4",  # turquesa → exportação / layout
+        EXPORT_ALL_LAYOUTS: "#4ECDC4",  # turquesa → exportação / layout        1
         DRONE_COORDINATES: "#45B7D1",  # azul → coordenadas / espacial
         LOAD_FOLDER_LAYERS: "#96CEB4",  # verde → carga de dados
         REPLACE_IN_LAYOUTS: "#F8C471",  # laranja → alteração / replace
