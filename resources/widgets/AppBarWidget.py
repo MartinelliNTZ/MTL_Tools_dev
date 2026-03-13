@@ -1,6 +1,9 @@
 # resources/widgets/AppBarWidget.py
+from ...core.config.LogUtils import LogUtils
 from qgis.PyQt.QtWidgets import QFrame, QLabel, QPushButton, QHBoxLayout
 from qgis.PyQt.QtCore import Qt, pyqtSignal, QPoint
+from qgis.PyQt.QtGui import QPixmap
+import os
 
 
 class AppBarWidget(QFrame):
@@ -15,6 +18,7 @@ class AppBarWidget(QFrame):
         self,
         *,
         title: str,
+        icon_path: str = None,
         show_run: bool = False,
         show_info: bool = False,
         show_close: bool = True,
@@ -22,6 +26,13 @@ class AppBarWidget(QFrame):
     ):
         super().__init__(parent)
         self.setObjectName("app_bar")
+        self.logger = LogUtils(tool="Untraceable", class_name=self.__class__.__name__, level=LogUtils.DEBUG)
+        self.logger.debug(f"Inicializando AppBarWidget com arquivo: {icon_path}")
+        if icon_path:
+            # Resolve icon relative to resources/ (AppBarWidget is in resources/widgets)
+            icon_path = os.path.normpath(
+                os.path.join(os.path.dirname(__file__), "..", "icons", icon_path)
+            )
 
         self._drag_pos: QPoint = None
 
@@ -29,6 +40,27 @@ class AppBarWidget(QFrame):
         layout.setContentsMargins(12, 0, 12, 0)
         layout.setSpacing(8)
 
+        # optional icon label
+        self.lbl_icon = None
+        if icon_path:
+            try:
+                if os.path.exists(icon_path):
+                    pix = QPixmap(icon_path)
+                    if not pix.isNull():
+                        self.lbl_icon = QLabel()
+                        self.lbl_icon.setPixmap(pix.scaled(20, 20, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+                        self.lbl_icon.setObjectName("app_bar_icon")
+                        layout.addWidget(self.lbl_icon)
+                        self.logger.debug(f"Ícone carregado com sucesso para AppBar: {icon_path}")
+                    else:
+                        self.logger.warning(f"Ícone encontrado mas inválido para AppBar: {icon_path}")
+                else:                    self.logger.warning(f"Ícone não encontrado para AppBar: {icon_path}")
+            except Exception as e:
+                self.logger.error(f"Erro ao carregar ícone para AppBar: {icon_path}. Detalhes: {e}")                
+        else:
+            self.logger.debug("Nenhum ícone fornecido para AppBar.")
+            
+        
         self.lbl_title = QLabel(title)
         self.lbl_title.setObjectName("app_bar_title")
         self.lbl_title.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)

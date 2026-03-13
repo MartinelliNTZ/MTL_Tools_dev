@@ -53,7 +53,7 @@ class BaseDialog(QDialog):
         """
         self.logger.debug(f"Construindo UI para plugin: {self.PLUGIN_NAME}")
         self.layout = WidgetFactory.create_main_layout(
-            self, title=title, enable_scroll=enable_scroll
+            self, title=title, enable_scroll=enable_scroll, icon_path=None
         )                
         # Garantir que o MainLayout seja sempre criado. Usar PLUGIN_NAME como fallback.      
         self.setWindowFlags(Qt.Dialog | Qt.FramelessWindowHint)

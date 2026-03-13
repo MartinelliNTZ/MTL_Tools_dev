@@ -64,6 +64,7 @@ class WidgetFactory:
         *,
         parent,
         title: str,
+        icon_path: str = None,
         on_run=None,
         on_info=None,
         on_close=None,
@@ -73,6 +74,7 @@ class WidgetFactory:
     ):
         app_bar = AppBarWidget(
             title=title,
+            icon_path=icon_path,
             show_run=show_run,
             show_info=show_info,
             show_close=show_close,
@@ -210,7 +212,7 @@ class WidgetFactory:
         browser.setReadOnly(read_only)
         return browser
     
-    def create_main_layout(self, title: str="Title", enable_scroll: bool=False):
+    def create_main_layout(self, title: str="Title", enable_scroll: bool=False, icon_path: str = None):
         """
         Criar layout principal com AppBar.
         
@@ -228,6 +230,7 @@ class WidgetFactory:
         app_bar = WidgetFactory.create_app_bar(
             parent=self,
             title=title,
+            icon_path=icon_path,
         )
         
         # Adicionar app_bar ao INÍCIO do _inner_layout (fora do scroll)

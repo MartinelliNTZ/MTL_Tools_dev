@@ -1,3 +1,7 @@
 1.7.1 2026 03 12
   -1.7.1.1  
     - #começa aqui
+    -1.7.1.2
+      - Propagate plugin `icon_path` into AppBarWidget and render icon
+      - Add `WidgetFactory.create_text_browser` helper
+      - Use `WidgetFactory.create_simple_button` in `InfoDialog`
