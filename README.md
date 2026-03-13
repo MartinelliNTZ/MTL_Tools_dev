@@ -2,14 +2,14 @@
 Logcat Tool Documentation
 
 Ferramenta de visualização, análise e filtragem de logs em tempo real
-para o plugin MTL Tools, inspirada no Logcat do Android Studio.
+para o plugin Cadmus, inspirada no Logcat do Android Studio.
 """
 
 # ============================================================
 # OVERVIEW
 # ============================================================
 
-O Logcat é uma ferramenta integrada ao MTL Tools que permite visualizar,
+O Logcat é uma ferramenta integrada ao Cadmus que permite visualizar,
 filtrar e analisar logs gerados pelo plugin em tempo real.
 
 ## Características Principais
@@ -26,8 +26,8 @@ filtrar e analisar logs gerados pelo plugin em tempo real.
 # ACESSO
 # ============================================================
 
-1. Abra o QGIS com o plugin MTL Tools ativado
-2. Vá para Menu: MTL Tools > Sistema > Logcat - Viewer de Logs
+1. Abra o QGIS com o plugin Cadmus ativado
+2. Vá para Menu: Cadmus > Sistema > Logcat - Viewer de Logs
 3. O diálogo abrirá com a sessão mais recente pré-selecionada
 
 # ============================================================
@@ -107,13 +107,13 @@ Detalhes completos incluem:
 
 Os logs são armazenados em formato JSONL (JSON Lines):
 - Um evento por linha
-- Arquivo: raiz/log/mtl_tools_YYYYMMDD_HHMMSS_pidPPPPPP.log
+- Arquivo: raiz/log/cadmus_YYYYMMDD_HHMMSS_pidPPPPPP.log
 
 Exemplo:
 {
   "ts": "2026-01-22T11:28:52",
   "level": "INFO",
-  "plugin": "MTL Tools",
+  "plugin": "Cadmus",
   "plugin_version": "1.3.0",
   "session_id": "8bd9e92c-6f18-4583-b75d-0e77589dd2af",
   "pid": 122308,

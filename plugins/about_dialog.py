@@ -13,7 +13,7 @@ class AboutDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.setWindowTitle("Sobre o MTL Tools")
+        self.setWindowTitle("Sobre o Cadmus")
         self.setMinimumWidth(420)
 
         main_layout = QVBoxLayout(self)
@@ -36,7 +36,7 @@ class AboutDialog(QDialog):
         # =====================================================
         # INFORMAÇÕES
         # =====================================================
-        lbl_title = QLabel("<h2>MTL Tools</h2>")
+        lbl_title = QLabel("<h2>Cadmus</h2>")
         lbl_title.setAlignment(Qt.AlignCenter)
 
         lbl_info = QLabel(

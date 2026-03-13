@@ -11,7 +11,7 @@ from .ScrollWidget import ScrollWidget
 from ...core.config.LogUtils import LogUtils
 from ...utils.ToolKeys import ToolKey
 
-logger = LogUtils(tool=ToolKey.MTL_TOOLS_PLUGIN, class_name="MainLayout", level=LogUtils.DEBUG)
+logger = LogUtils(tool=ToolKey.CADMUS_PLUGIN, class_name="MainLayout", level=LogUtils.DEBUG)
 
 class EdgeFrame(QFrame):
     """QFrame que notifica o MainLayout quando for redimensionado."""
@@ -98,7 +98,7 @@ class MainLayout(QVBoxLayout):
             if widget and hasattr(widget, "set_title"):
                 return widget
         return None
-    """Container layout customizado para plugins MTL Tools com suporte a resize.
+    """Container layout customizado para plugins Cadmus com suporte a resize.
     
     ARQUITETURA:
     ============

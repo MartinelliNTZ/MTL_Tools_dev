@@ -62,7 +62,7 @@ Exemplo de linha (JSONL):
 {
   "ts": "2026-03-12T14:00:00",
   "level": "ERROR",
-  "plugin": "MTL Tools",
+  "plugin": "Cadmus",
   "session_id": "...",
   "thread": "Thread-1",
   "tool": "coord_click",
@@ -84,7 +84,7 @@ Sincronização e Thread-safety
 Inicialização de Sessão
 ----------------------
 - `LogUtils.init(plugin_root)` é chamada uma vez por processo. Ela:
-  - gera `session_id` (UUID) e nome de arquivo `mtl_tools_<ts>_pid<pid>.log`;
+  - gera `session_id` (UUID) e nome de arquivo `cadmus_<ts>_pid<pid>.log`;
   - cria diretório `log/` se necessário;
   - grava um evento inicial `LOG_START`.
 - Se `init()` não for chamada, `LogUtils` cria uma sessão fallback com `Path.cwd()`.

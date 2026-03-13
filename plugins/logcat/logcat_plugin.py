@@ -1,5 +1,5 @@
 """
-Plugin wrapper para integração do Logcat ao MTL Tools.
+Plugin wrapper para integração do Logcat ao Cadmus.
 
 Este arquivo serve como ponto de entrada para a ferramenta Logcat,
 permitindo que ela seja invocada a partir do menu do plugin.

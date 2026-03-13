@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-MTL_TOOLS.logic.attribute_statistics_model
+Cadmus.logic.attribute_statistics_model
 Lógica reutilizável para cálculo de estatísticas de atributos.
 Projetado para ser independente da view/GUI e reaproveitável por outras ferramentas.
 """

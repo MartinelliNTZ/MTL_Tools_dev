@@ -59,7 +59,7 @@ class LogcatDialog(QDialog):
         self._logger = self._get_logger()
         self._logger.info("LogcatDialog inicialização começando")
         
-        # Calcular plugin_root: vai 5 níveis acima (ui -> logcat -> plugins -> MTL_Tools)
+        # Calcular plugin_root: vai 5 níveis acima (ui -> logcat -> plugins -> Cadmus)
         plugin_root = Path(__file__).resolve().parent.parent.parent.parent
         self.plugin_root = Path(plugin_root)
         self.log_dir = self.plugin_root / "log"
@@ -88,7 +88,7 @@ class LogcatDialog(QDialog):
         self.search_debounce_timeout_ms = 300  # Esperar 300ms sem digitação para aplicar filtro
         
         # Configuração da janela
-        self.setWindowTitle("MTL Tools - Logcat")
+        self.setWindowTitle("Cadmus - Logcat")
         self.setMinimumSize(1000, 600)
         self.setModal(False)
         

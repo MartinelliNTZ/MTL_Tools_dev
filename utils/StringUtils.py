@@ -3,7 +3,7 @@
 
 
 class StringUtils:
-    APP_NAME = "MTL Tools"
+    APP_NAME = "Cadmus"
     #Filtros de arquivos
     FILTER_ALL = "All files (*.*)"
     FILTER_VECTOR = "Shapefile (*.shp);;GeoPackage (*.gpkg);;GeoJSON (*.geojson *.json);;KML (*.kml);;CSV (*.csv)"

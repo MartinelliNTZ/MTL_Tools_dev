@@ -3,7 +3,7 @@ martinelli.matheus11@gmail.com        01/01/2000  - 01/01/2000 - 04/04/2026
 mtlagriculturaetecnologia@gmail.com   01/01/2000  - 01/01/2000 - 07/04/2026
 martinelli.linesbr2@gmail.com         01/01/2000  - 01/01/2000 - 08/04/2026
 cpunova963@gmail.com                  01/01/2000  - 11/03/2026 - 08/04/2026
-martinelli.linesbr@hotmail.com        12/03/2026  - 01/01/2000 - 11/04/2026
+martinelli.linesbr@hotmail.com        12/03/2026  - 13/03/2026 - 11/04/2026
 BUGS CONHECIDOS
     - DroneCordinatesPlugin: MrkParser.parse_folder() não processa TODOS os MRKs da pasta - apenas 1 arquivo [1.6.2 TODO]
       - Encontra 98 MRKs mas retorna apenas 16160 pontos (1 arquivo) em vez de múltiplos de 16160
@@ -17,7 +17,7 @@ ferramentas = name                              tipo                            
     - 03: Salvar, Fechar e Reabrir Projeto      instantânea                     RestartQGISPlugin           crítico/alteração QGZ
     - 04: Carregar Pasta de Arquivos            janela                          LoadFolderLayersPlugin      alteração QGZ
     - 05: Gerar Rastro de Implemento            janela                          GenerateTrailPlugin         nenhum
-    - 06: Sobre o MTL Tools                     janela                          AboutDialog                 nenhum
+    - 06: Sobre o Cadmus                    janela                          AboutDialog                 nenhum
     - 07: Capturar Coordenadas                  instantânea+resultado           CoordClickTool              travamento da task
     - 08: Calcular Campos Vetoriais             instantânea                     VectorFieldPlugin          manipulação de vetores
     - 09: Obter Coordenadas de Drone            janela                          DroneCoordinatesPlugin      travamento por excesso de dados
@@ -135,7 +135,7 @@ changelog=
       - Referências restantes apenas em utils/log_utils.py (classe original) e docs/ANOTACOES.txt (documentação)
       - Padrão unificado: logger = LogUtilsNew(tool=tool_key, class_name=ClassName) → logger.info/debug/error/exception()
     - REMOÇÃO de base_tool do menu principal
-      - Removido: action_base_tool, run_base_tool() method de mtl_tools_plugin.py
+      - Removido: action_base_tool, run_base_tool() method de Cadmus_plugin.py
       - Removido: BASE_TOOL constant de tool_keys.py e mapeamentos de cores
       - Preservado: BaseTool class em plugins/base_tool.py para uso futuro
       - Classe agora usa TOOL_KEY = "base_tool" (string literal)
@@ -191,7 +191,7 @@ changelog=
   1.5.12 2026/03/02
   - bug corrigido> v - LogCat Viewer: Loop infinito na sessão + memory leak em lambda + scroll reset corrigido (3 bugs críticos consolidados)
   - bug corrigido> v - VectorFieldPlugin: Cálculo automático trava em arquivos KML - não permitir em KML
-  - MTL_Tools: Migração de LogUtils para LogUtilsNew (class_name="MTL_Tools") mantendo LogUtils.init() para compatibilidade
+  - Cadmus: Migração de LogUtils para LogUtilsNew (class_name="Cadmus") mantendo LogUtils.init() para compatibilidade
   - VectorFieldPlugin: OTIMIZAÇÃO CRÍTICA - Feature count threshold substitui compute_size() para decisão sync/async (featureCount() é O(1) e confiável)
   - VectorFieldPlugin: Threshold empírico = 1000 features (< 1000 = sync rápido, >= 1000 = async obrigatório para não travar UI)
   - VectorFieldPlugin: Memory layers (`memory:`) SEMPRE rodam assíncrono (compute_size() retorna 0, causava sync em 50k features)

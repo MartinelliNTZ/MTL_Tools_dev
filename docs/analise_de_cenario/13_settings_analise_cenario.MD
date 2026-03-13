@@ -1,8 +1,8 @@
-# Análise de Cenário – Configurações MTL Tools
+# Análise de Cenário – Configurações Cadmus
 
 **Visão Geral**
 
-O plugin de Configurações centraliza preferências globais do MTL Tools, permitindo ao usuário definir método de cálculo vetorial (Elipsoidal, Cartesiana, Ambos), precisão de campos geométricos em casas decimais e limiar de processamento assíncrono em MB. Preferências são persistidas em arquivos JSON na pasta de preferências do usuário e carregadas automaticamente ao iniciar ferramentas dependentes. Interface intuitiva com rádio buttons em grid (3 colunas), spinbox para precisão (0-10) e limiar (MB).
+O plugin de Configurações centraliza preferências globais do Cadmus, permitindo ao usuário definir método de cálculo vetorial (Elipsoidal, Cartesiana, Ambos), precisão de campos geométricos em casas decimais e limiar de processamento assíncrono em MB. Preferências são persistidas em arquivos JSON na pasta de preferências do usuário e carregadas automaticamente ao iniciar ferramentas dependentes. Interface intuitiva com rádio buttons em grid (3 colunas), spinbox para precisão (0-10) e limiar (MB).
 
 **Objetivo**
 
@@ -10,7 +10,7 @@ Centralizar configurações em um único ponto de acesso, eliminando necessidade
 
 **Fluxo resumido**
 
-- Entrada: usuário acessa Menu → MTL Tools → Configurações MTL Tools.
+- Entrada: usuário acessa Menu → Cadmus → Configurações Cadmus.
 - Carregamento: `_load_prefs()` carrega preferências salvas via `load_tool_prefs(ToolKey.SETTINGS)`.
 - Renderização: `_build_ui()` constrói interface com 3 seções:
   1. Link para Pasta de Preferências (abre via `QDesktopServices.openUrl()`).

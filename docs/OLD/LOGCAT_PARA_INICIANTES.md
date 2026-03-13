@@ -1,6 +1,6 @@
 # 📚 LOGCAT VIEWER - Aula para Iniciantes
 
-**Um guia MUITO simples (como se você fosse um cachorro!) para entender como funciona o sistema de logs do MTL Tools**
+**Um guia MUITO simples (como se você fosse um cachorro!) para entender como funciona o sistema de logs do Cadmus**
 
 ---
 
@@ -51,12 +51,12 @@ Imagine que LOGCAT é uma **máquina de café**. Ela tem várias partes:
 
 ## 🔥 PEÇA 1: LOG FILES (Os Arquivos de Log)
 
-**O que é?** Pasta `plugins/MTL_Tools/log/` com arquivos `.jsonl` (JSON Line).
+**O que é?** Pasta `plugins/Cadmus/log/` com arquivos `.jsonl` (JSON Line).
 
 **Estrutura de um arquivo:**
 ```jsonl
-{"ts":"2026-03-02T20:07:15.123", "level":"INFO", "plugin":"MTL_Tools", "tool":"vector_field", "msg":"Iniciando cálculo", "thread":"MainThread"}
-{"ts":"2026-03-02T20:07:16.456", "level":"ERROR", "plugin":"MTL_Tools", "tool":"vector_field", "msg":"Feature count 0", "data":{"layer":"XYZ"}}
+{"ts":"2026-03-02T20:07:15.123", "level":"INFO", "plugin":"Cadmus", "tool":"vector_field", "msg":"Iniciando cálculo", "thread":"MainThread"}
+{"ts":"2026-03-02T20:07:16.456", "level":"ERROR", "plugin":"Cadmus", "tool":"vector_field", "msg":"Feature count 0", "data":{"layer":"XYZ"}}
 ```
 
 **Por que JSON Line?** 
@@ -121,7 +121,7 @@ entry = LogEntry(
     ts="2026-03-02T20:07:15",
     level="INFO",
     msg="Iniciando",
-    plugin="MTL_Tools",
+    plugin="Cadmus",
     tool="vector_field",
     thread="MainThread"
 )
@@ -254,7 +254,7 @@ class LogTableModel(QAbstractTableModel):
 **Componentes na tela:**
 ```
 ┌─────────────────────────────────────────────┐
-│ LogCat Viewer - MTL Tools                   │
+│ LogCat Viewer - Cadmus                   │
 ├─────────────────────────────────────────────┤
 │ [Sessão: ▼] [Nível: ERROR ▼] [Buscar: ___] │  ← Filtros
 ├─────────────────────────────────────────────┤
@@ -393,7 +393,7 @@ class LogFileWatcher(QThread):
 │ 10. LogDetailDialog abre mostrando TODOS os detalhes:   │
 │     ├─ Timestamp completo (20:07:15.123)                │
 │     ├─ Thread que executou (MainThread)                 │
-│     ├─ Plugin que gerou o log (MTL_Tools)               │
+│     ├─ Plugin que gerou o log (Cadmus)               │
 │     ├─ Ferramenta específica (vector_field)             │
 │     └─ JSON completo (para debug)                       │
 └─────────────────────────────────────────────────────────┘

@@ -13,7 +13,7 @@ Permitir transferir atributos entre camadas vetoriais de forma controlada, prese
 ## 🛠️ Como usar
 
 ### 1️⃣ Abrir a ferramenta
-Menu → MTL Tools → Copiar Atributos
+Menu → Cadmus → Copiar Atributos
 
 ### 2️⃣ Selecionar camadas
 - `Camada destino`: a camada que receberá os campos

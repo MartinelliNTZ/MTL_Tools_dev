@@ -1,7 +1,7 @@
 ## 📦 Bibliotecas necessárias
 # 🧾 Export All Layouts — Guia de Uso
 
-ExportAllLayouts é uma ferramenta do pacote **MTL Tools** para exportar todos os layouts do projeto em PDF e/ou PNG, com opções adicionais de união de arquivos e controle de sobrescrita.
+ExportAllLayouts é uma ferramenta do pacote **Cadmus** para exportar todos os layouts do projeto em PDF e/ou PNG, com opções adicionais de união de arquivos e controle de sobrescrita.
 
 ---
 
@@ -19,7 +19,7 @@ Automatizar a exportação em lote de layouts, oferecendo:
 ## 🛠️ Como usar
 
 ### 1️⃣ Abra a ferramenta
-Menu → MTL Tools → Export All Layouts
+Menu → Cadmus → Export All Layouts
 
 ### 2️⃣ Defina formatos
 Marque `Exportar PDF` e/ou `Exportar PNG`.

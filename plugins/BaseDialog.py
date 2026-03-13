@@ -48,7 +48,7 @@ class BaseDialog(QDialog):
 
     
     
-    def set_layout(self, enable_scroll=True,icon_path=None, title="MTL Tools", minimum_size=(300, 300)):
+    def set_layout(self, enable_scroll=True,icon_path=None, title="Cadmus", minimum_size=(300, 300)):
         """Define o layout principal do plugin.
         """
         self.logger.debug(f"Construindo UI para plugin: {self.PLUGIN_NAME}")

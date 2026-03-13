@@ -4,7 +4,7 @@ from ...plugins.BaseDialog import BaseDialog
 from ...core.ui.WidgetFactory import WidgetFactory
 
 class InfoDialog(BaseDialog):
-    def __init__(self, instructions_path: str, parent=None, title="MTL Tools"):
+    def __init__(self, instructions_path: str, parent=None, title="Cadmus"):
         super().__init__(parent)
         self.logger = LogUtils(tool="Untraceable", class_name=self.__class__.__name__, level=LogUtils.DEBUG)
         self.logger.debug(f"Inicializando InfoDialog com arquivo: {instructions_path}")

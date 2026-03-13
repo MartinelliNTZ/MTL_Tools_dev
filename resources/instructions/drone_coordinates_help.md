@@ -1,5 +1,5 @@
 # 📘 Obter Coordenadas de Drone (MRK) – Manual de Utilização  
-Ferramenta do pacote **MTL Tools** para geração de **pontos e trajetos de voo de drone** a partir de arquivos **MRK** (DJI).
+Ferramenta do pacote **Cadmus** para geração de **pontos e trajetos de voo de drone** a partir de arquivos **MRK** (DJI).
 
 ---
 
@@ -106,7 +106,7 @@ Se nenhum QML for informado, a ferramenta pode aplicar um **estilo padrão do pl
 ## ▶ Como usar
 
 ### 1. Abrir a ferramenta  
-Menu → **MTL Tools** → **Agricultura de Precisão** → *Obter Coordenadas de Drone*
+Menu → **Cadmus** → **Agricultura de Precisão** → *Obter Coordenadas de Drone*
 
 ---
 

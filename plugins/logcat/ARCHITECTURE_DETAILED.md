@@ -22,7 +22,7 @@
 
 ## VISÃO GERAL
 
-O Logcat é uma ferramenta de análise de logs em tempo real para o plugin MTL Tools. É inspirado no Logcat do Android Studio e segue uma arquitetura em camadas com separação clara entre backend (sem dependências Qt) e UI (Qt).
+O Logcat é uma ferramenta de análise de logs em tempo real para o plugin Cadmus. É inspirado no Logcat do Android Studio e segue uma arquitetura em camadas com separação clara entre backend (sem dependências Qt) e UI (Qt).
 
 ### Princípios de Design
 

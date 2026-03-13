@@ -2,12 +2,12 @@
 
 ## 1. Visão Geral do Plugin
 
-O MTL Tools é um plugin avançado para QGIS, focado em automação, processamento de dados geoespaciais, manipulação de layouts, integração de logs e execução de pipelines assíncronos. Resolve problemas de travamento, manipulação massiva de dados e padronização de UI, usando arquitetura modular e contratos claros entre componentes.
+O Cadmus é um plugin avançado para QGIS, focado em automação, processamento de dados geoespaciais, manipulação de layouts, integração de logs e execução de pipelines assíncronos. Resolve problemas de travamento, manipulação massiva de dados e padronização de UI, usando arquitetura modular e contratos claros entre componentes.
 
 ## 2. Estrutura de Pastas
 
 ```
-MTL_Tools/
+Cadmus/
 │
 ├── core/                # Engine, contratos, UI, configuração, logging
 │   ├── config/          # LogUtils, LogCleanupUtils, locks, estilos
@@ -241,6 +241,6 @@ except Exception as exc:
 
 ---
 
-Qualquer IA pode entender a arquitetura, contratos, padrões, fluxos, armadilhas, recomendações e integração do MTL Tools lendo apenas este arquivo.
+Qualquer IA pode entender a arquitetura, contratos, padrões, fluxos, armadilhas, recomendações e integração do Cadmus lendo apenas este arquivo.
 
 

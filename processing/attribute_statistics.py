@@ -93,7 +93,7 @@ class AttributeStatisticsAlgorithm(QgsProcessingAlgorithm):
         return "attribute_statistics_mtl"
 
     def displayName(self):
-        return "Estatísticas de Atributos (MTL Tools)"
+        return "Estatísticas de Atributos (Cadmus)"
 
     def group(self):
         return "Estatística"

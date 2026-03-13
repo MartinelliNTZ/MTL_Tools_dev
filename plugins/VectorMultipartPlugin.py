@@ -32,7 +32,7 @@ class VectorMultipartPlugin(BasePluginMTL):
 
     def unload(self):
         for a in self.actions:
-            self.iface.removePluginMenu("MTL Tools", a)
+            self.iface.removePluginMenu("Cadmus", a)
 
     # --------------------------------------------------
     # CONTROLLER

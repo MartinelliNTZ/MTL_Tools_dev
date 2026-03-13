@@ -12,7 +12,7 @@ class QgisMessageUtil:
     Todos os métodos aceitam `iface` (QgisInterface) como primeiro argumento.
     """
 
-    DEFAULT_LOG_TAG = "MTL_Tools"
+    DEFAULT_LOG_TAG = "Cadmus"
     NOICON = QMessageBox.NoIcon
     INFO_ICON = QMessageBox.Information
     WARNING_ICON = QMessageBox.Warning

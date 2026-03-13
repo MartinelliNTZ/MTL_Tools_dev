@@ -1,16 +1,16 @@
-# Plugins do MTL Tools — Arquitetura, Contratos e Boas Práticas
+# Plugins do Cadmus — Arquitetura, Contratos e Boas Práticas
 
 Data: 2026/03/12
 
 Resumo
 ------
-Este documento descreve de forma técnica o subsistema de plugins do MTL Tools:
+Este documento descreve de forma técnica o subsistema de plugins do Cadmus:
 - Estrutura, contratos, padrões de implementação, integração com QGIS
 - Regras obrigatórias, armadilhas, recomendações operacionais
 - Tabela detalhada dos plugins
-# 🧰 MTL Tools
+# 🧰 Cadmus
 
-**MTL Tools** é um conjunto de ferramentas avançadas para o QGIS voltado à **automação de layouts**, **processamento de dados vetoriais e raster** e **otimização de fluxos cartográficos** 🗺️⚙️  
+**Cadmus** é um conjunto de ferramentas avançadas para o QGIS voltado à **automação de layouts**, **processamento de dados vetoriais e raster** e **otimização de fluxos cartográficos** 🗺️⚙️  
 O plugin reúne soluções para **exportação em lote**, **edição massiva de layouts**, **análises estatísticas**, **amostragem de rasters**, **cálculos automatizados de atributos** e **ferramentas interativas de apoio**, reduzindo etapas manuais e aumentando a produtividade no QGIS.
 
 ---
@@ -85,7 +85,7 @@ O plugin reúne soluções para **exportação em lote**, **edição massiva de 
 
 ---
 
-### ℹ️ Sobre o MTL Tools
+### ℹ️ Sobre o Cadmus
     Janela informativa com **dados técnicos, autoria, versão e links oficiais** do plugin.  
     Utilizada como referência rápida e acesso a suporte.
 
@@ -221,7 +221,7 @@ Contratos e Regras Obrigatórias
   - Integrar ProjectUtils para manipulação de projeto/camadas
   - Ter arquivo de instruções em resources/instructions
   - Ter análise de cenário em docs/analisecenario
-  - Ser declarados em mtl_tools_plugin.py
+  - Ser declarados em Cadmus_plugin.py
   - Implementar método de abertura padrão (exemplo):
     ```python
     def run_copy_attributes(iface):
@@ -280,7 +280,7 @@ Tabela Detalhada dos Plugins
 | 03  | Salvar, Fechar e Reabrir      | Instantânea                 | _RestartExecutor           | Não      | Projeto QGIS    | Projeto QGIS  | Crítico/alteração QGZ |
 | 04  | Carregar Pasta de Arquivos    | Janela                      | LoadFolderLayersDialog     | Sim      | Arquivos        | Camadas QGIS  | Alteração QGZ |
 | 05  | Gerar Rastro de Implemento    | Janela                      | GenerateTrailPlugin        | Sim      | Camada Vetorial | Camada Vetorial| Nenhum |
-| 06  | Sobre o MTL Tools             | Janela                      | AboutDialog                | Não      | Nenhum          | Informações   | Nenhum |
+| 06  | Sobre o Cadmus             | Janela                      | AboutDialog                | Não      | Nenhum          | Informações   | Nenhum |
 | 07  | Capturar Coordenadas          | Instantânea+Resultado        | CoordClickTool             | Sim      | Canvas QGIS     | Diálogo       | Travamento da task |
 | 08  | Calcular Campos Vetoriais     | Instantânea                 | VectorFieldsCalculationPlugin | Sim  | Camada Vetorial | Camada Vetorial| Manipulação de vetores |
 | 09  | Obter Coordenadas de Drone    | Janela                      | DroneCordinates            | Sim      | Arquivos MRK    | Camada Vetorial| Travamento por excesso de dados |

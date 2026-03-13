@@ -51,7 +51,7 @@ def _install_global_error_handler():
     sys.excepthook = handle_exception
 
 
-class MTL_Tools:
+class CadmusPlugin:
     def __init__(self, iface):
         self.iface = iface
         self.menu = None
@@ -65,7 +65,7 @@ class MTL_Tools:
     # =====================================================
     def initGui(self):
         # Instalar proteção global contra crashes
-        #QgisMessageUtil.bar_info(self.iface, "Iniciando MTL Tools...")
+        #QgisMessageUtil.bar_info(self.iface, "Iniciando Cadmus...")
         _install_global_error_handler()
         
         plugin_root = Path(__file__).resolve().parent
@@ -73,7 +73,7 @@ class MTL_Tools:
         # mantém só os últimos 15 logs
         LogCleanupUtils.keep_last_n(plugin_root, keep=15)
         # Inicializar logger UMA VEZ como atributo da classe
-        self.logger = LogUtils(tool=self.TOOL_KEY, class_name="MTL_Tools")
+        self.logger = LogUtils(tool=self.TOOL_KEY, class_name="Cadmus")
         self.logger.info("Plugin inicializado")
         self.logger.info("SYSTEM: Global error handler instalado para capturar crashes")
         # -------------------------
@@ -90,9 +90,9 @@ class MTL_Tools:
         # 2) CRIAR TOOLBAR EXCLUSIVA
         # -------------------------
         try:
-            self.toolbar = self.iface.addToolBar("MTL Tools")
-            self.toolbar.setObjectName("MTL_Tools_Toolbar")
-            self.logger.debug("Toolbar MTL Tools criada com sucesso")
+            self.toolbar = self.iface.addToolBar("Cadmus")
+            self.toolbar.setObjectName("Cadmus_Toolbar")
+            self.logger.debug("Toolbar Cadmus criada com sucesso")
         except Exception as e:
             self.logger.error(f"Erro ao criar toolbar: {str(e)}")
             return
@@ -101,12 +101,12 @@ class MTL_Tools:
         # 3) MENU PRINCIPAL E SUBMENUS
         # -------------------------
         try:
-            self.menu = QMenu("MTL Tools", self.iface.mainWindow())
-            self.menu.setObjectName("MTL_Tools")
+            self.menu = QMenu("Cadmus", self.iface.mainWindow())
+            self.menu.setObjectName("Cadmus")
             standard_menu = self.iface.firstRightStandardMenu()
             self.iface.mainWindow().menuBar().insertMenu(standard_menu.menuAction(), self.menu)
             self.menu.clear()
-            self.logger.debug("Menu MTL Tools criado com sucesso")
+            self.logger.debug("Menu Cadmus criado com sucesso")
         except Exception as e:
             self.logger.error(f"Erro ao criar menu principal: {str(e)}")
             return
@@ -179,7 +179,7 @@ class MTL_Tools:
 
             # 6-About Dialog
             about_icon = os.path.join(os.path.dirname(__file__),"resources", "icons", "about.ico")
-            self.action_about_dialog = QAction(QIcon(about_icon), "Sobre o MTL Tools", self.iface.mainWindow())
+            self.action_about_dialog = QAction(QIcon(about_icon), "Sobre o Cadmus", self.iface.mainWindow())
             self.action_about_dialog.triggered.connect(self.run_about_dialog)
             
             # 12-Logcat Tool
@@ -342,7 +342,7 @@ class MTL_Tools:
                 self.action_multpart,
                 self.action_copy_atributes
             ])
-            self.logger.info("MTL Tools: GUI inicializada com sucesso")
+            self.logger.info("Cadmus: GUI inicializada com sucesso")
         except Exception as e:
             self.logger.error(f"Erro ao salvar ações para cleanup: {str(e)}")
 
@@ -362,7 +362,7 @@ class MTL_Tools:
         try:
             # Remover ações do menu e toolbar
             for act in self.actions:
-                self.iface.removePluginMenu("MTL Tools", act)
+                self.iface.removePluginMenu("Cadmus", act)
                 self.iface.removeToolBarIcon(act)
             self.logger.info("Ações removidas com sucesso")
         except Exception as e:
@@ -376,7 +376,7 @@ class MTL_Tools:
         except Exception as e:
             self.logger.error(f"Erro ao remover toolbar: {str(e)}")
         
-        self.logger.info("Plugin MTL Tools descarregado")
+        self.logger.info("Plugin Cadmus descarregado")
             
             
 #===========================FERRAMENTAS INSTANTANEAS DE SISTEMA===================================================================
@@ -577,12 +577,12 @@ class MTL_Tools:
     def run_about_dialog(self):
         try:
             from .plugins.about_dialog import run_about_dialog
-            self.logger.info("Abrindo diálogo: Sobre o MTL Tools")
+            self.logger.info("Abrindo diálogo: Sobre o Cadmus")
             run_about_dialog(self.iface)
-            self.logger.info("Diálogo Sobre MTL Tools fechado")
+            self.logger.info("Diálogo Sobre Cadmus fechado")
         except Exception as e:
-            self.logger.error(f"Erro ao executar Sobre o MTL Tools: {str(e)}")
-            QgisMessageUtil.bar_critical(self.iface, f"Erro ao abrir Sobre MTL Tools:\n{str(e)}")
+            self.logger.error(f"Erro ao executar Sobre o Cadmus: {str(e)}")
+            QgisMessageUtil.bar_critical(self.iface, f"Erro ao abrir Sobre Cadmus:\n{str(e)}")
         
     # =====================================================
     # EXECUTAR: Copiar Atributos entre Camadas

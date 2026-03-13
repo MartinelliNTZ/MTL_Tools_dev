@@ -18,7 +18,7 @@ class ToolKeyColorProvider:
     # Mapeamento padrão (fallback se não conseguir importar ToolKey)
     DEFAULT_COLORS = {
         # === Toolbar / ações principais ===
-        "mtl_tools_plugin": "#804E0A",
+        "Cadmus_plugin": "#804E0A",
         "export_all_layouts": "#4ECDC4",
         "drone_coordinates": "#45B7D1",
         "load_folder_layers": "#96CEB4",
@@ -77,7 +77,7 @@ class ToolKeyColorProvider:
         Retorna cor para a ferramenta.
         
         Args:
-            tool_key: Chave da ferramenta (ex: "mtl_tools_plugin", "coord_click_tool")
+            tool_key: Chave da ferramenta (ex: "Cadmus_plugin", "coord_click_tool")
         
         Returns:
             Cor em hexadecimal

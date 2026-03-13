@@ -1,12 +1,12 @@
-# 📘 Configurações MTL Tools — Guia Rápido e Intuitivo
+# 📘 Configurações Cadmus — Guia Rápido e Intuitivo
 
-Breve: gerencia preferências globais do MTL Tools, incluindo método de cálculo vetorial, precisão de campos e limiar de processamento assíncrono. ⚙️
+Breve: gerencia preferências globais do Cadmus, incluindo método de cálculo vetorial, precisão de campos e limiar de processamento assíncrono. ⚙️
 
 ---
 
 ## ▶ Passo a passo (rápido) ✅
 
-1. Abra: Menu → **MTL Tools** → **Configurações MTL Tools**
+1. Abra: Menu → **Cadmus** → **Configurações Cadmus**
 2. Na seção **Método de Cálculo Vetorial**, escolha:
    - **Elipsoidal**: Calcula considerando a forma da Terra (mais preciso para grandes distâncias). 🌍
    - **Cartesiana**: Calcula em linha reta (rápido, útil para áreas pequenas). 📐
@@ -32,7 +32,7 @@ Breve: gerencia preferências globais do MTL Tools, incluindo método de cálcul
 - **Não tem certeza?** Deixe no padrão (Elipsoidal, Precisão 2, Limiar 20 MB). 🎯
 - **Camadas grandes em memória?** Reduza o "Limiar assíncrono" para forçar processamento assíncrono mais cedo. 🚀
 - **Quer máxima precisão?** Aumente a "Precisão de campos vetoriais" para 4 ou 6 casas decimais. 🔬
-- As preferências são **globais** — aplicadas a todos os plugins do MTL Tools. 🌐
+- As preferências são **globais** — aplicadas a todos os plugins do Cadmus. 🌐
 
 ---
 
@@ -56,7 +56,7 @@ Breve: gerencia preferências globais do MTL Tools, incluindo método de cálcul
 
 ## 🔧 Preferências e suporte
 
-- **Arquivo de configuração**: Localizado em `C:\Users\[seu_user]\AppData\Roaming\QGIS\QGIS3\profiles\[seu_perfil]\python\plugins\MTL_Tools\prefs\`
+- **Arquivo de configuração**: Localizado em `C:\Users\[seu_user]\AppData\Roaming\QGIS\QGIS3\profiles\[seu_perfil]\python\plugins\Cadmus\prefs\`
 - **Formato**: Arquivos `.json` para cada ferramenta (ex.: `settings.json`).
 - **Backup**: Faça backup da pasta de preferências antes de atualizações do plugin. 💾
 - Em caso de problema, delete o arquivo `settings.json` e as configurações voltarão ao padrão. 🔄

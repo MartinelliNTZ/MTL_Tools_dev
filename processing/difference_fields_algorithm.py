@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# FILE: MTL_TOOLS/processing/difference_fields_provider.py
+# FILE: Cadmus/processing/difference_fields_provider.py
 
 import os
 from PyQt5.QtGui import QIcon

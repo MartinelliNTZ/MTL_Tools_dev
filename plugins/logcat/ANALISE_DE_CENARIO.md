@@ -22,7 +22,7 @@
 
 **Fluxo**:
 ```
-1. Abre Logcat (Menu > MTL Tools > Logcat)
+1. Abre Logcat (Menu > Cadmus > Logcat)
 2. Vê sessão atual já carregada
 3. Executa a ferramenta que causa o bug
 4. Logs novos aparecem na tabela automaticamente (a cada ~1s)

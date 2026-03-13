@@ -1,10 +1,10 @@
-# Resources do MTL Tools — Arquitetura, Widgets, Estilos e Dialogs
+# Resources do Cadmus — Arquitetura, Widgets, Estilos e Dialogs
 
 Data: 2026/03/12
 
 Resumo
 ------
-Este documento descreve de forma técnica o subsistema de resources do MTL Tools:
+Este documento descreve de forma técnica o subsistema de resources do Cadmus:
 - Estrutura, contratos, padrões de implementação, integração com plugins
 - Papel da WidgetFactory, InfoDialog, estilos e widgets
 - Recomendações operacionais e armadilhas

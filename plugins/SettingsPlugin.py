@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-SettingsPlugin - Configurações do MTL Tools
+SettingsPlugin - Configurações do Cadmus
 
 Exibe preferências do aplicativo e configurações de cálculo vetorial.
 """
@@ -19,7 +19,7 @@ from ..utils.StringUtils import StringUtils
 
 class SettingsPlugin(BasePluginMTL):
     """
-    Plugin de configurações do MTL Tools.
+    Plugin de configurações do Cadmus.
     
     Permite ao usuário:
     - Acessar preferências do aplicativo
@@ -39,7 +39,7 @@ class SettingsPlugin(BasePluginMTL):
         self.logger.debug("Construindo interface de configurações")
         
         super()._build_ui(
-            title="Configurações MTL Tools",
+            title="Configurações Cadmus",
             icon_path="system.ico",
             instructions_file="settings_help.md"
         )
@@ -200,7 +200,7 @@ class SettingsPlugin(BasePluginMTL):
         self.close()
 
     def _on_open_preferences(self):
-        """Abre a pasta de preferências do MTL Tools."""
+        """Abre a pasta de preferências do Cadmus."""
         self.logger.debug("Abrindo pasta de preferências")
         
         from ..utils.Preferences import PREF_FOLDER

@@ -1,10 +1,10 @@
-# Utils do MTL Tools — Arquitetura, Contratos e Boas Práticas
+# Utils do Cadmus — Arquitetura, Contratos e Boas Práticas
 
 Data: 2026/03/12
 
 Resumo
 ------
-Este documento descreve de forma técnica o subsistema de utilitários (utils) do MTL Tools:
+Este documento descreve de forma técnica o subsistema de utilitários (utils) do Cadmus:
 - Estrutura, contratos, padrões de implementação, integração com plugins
 - Regras obrigatórias, armadilhas, recomendações operacionais
 - Análise detalhada de cada utilitário

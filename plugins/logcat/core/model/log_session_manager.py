@@ -36,7 +36,7 @@ class LogSessionManager:
         
         # Encontrar todos os .log
         log_files = sorted(
-            self.log_directory.glob("mtl_tools_*.log"),
+            self.log_directory.glob("Cadmus_*.log"),
             key=lambda p: p.stat().st_mtime,
             reverse=True  # Mais recentes primeiro
         )

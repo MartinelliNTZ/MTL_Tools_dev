@@ -1,10 +1,10 @@
-# Configurações MTL Tools
+# Configurações Cadmus
 
 ## Visão Geral
-O diálogo de Configurações permite que você personalize o comportamento do MTL Tools de acordo com suas necessidades.
+O diálogo de Configurações permite que você personalize o comportamento do Cadmus de acordo com suas necessidades.
 
 ## Preferências do Aplicativo
-Clique no link **"Abrir Pasta de Preferências"** para acessar a pasta onde todas as preferências do MTL Tools são armazenadas.
+Clique no link **"Abrir Pasta de Preferências"** para acessar a pasta onde todas as preferências do Cadmus são armazenadas.
 
 As preferências são salvas em:
 ```

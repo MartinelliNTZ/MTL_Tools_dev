@@ -6,7 +6,7 @@ Breve: converte geometrias multipart em singlepart (ou vice-versa), permitindo s
 
 ## ▶ Passo a passo (rápido) ✅
 
-1. Abra: Menu → **MTL Tools** → **Converter Multipart**
+1. Abra: Menu → **Cadmus** → **Converter Multipart**
 2. Selecione a **camada vetorial** (pontos, linhas ou polígonos). 🗂️
 3. Decida o escopo:
    - **Apenas selecionadas**: Se houver feições selecionadas, confirme se quer converter só essas. ✂️

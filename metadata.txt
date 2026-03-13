@@ -1,15 +1,15 @@
 [general]
-name=MTL Tools
+name=Cadmus
 qgisMinimumVersion=3.16
-qgisMaximumVersion=4.00
-version=1.5.12
+qgisMaximumVersion=3.99
+version=2.0.0
 author=Matheus A.S. Martinelli
 email=martinelli.matheus11@gmail.com
 about=Conjunto de ferramentas avançadas para automação de layouts, substituições em massa e exportações profissionais no QGIS.
-description=MTL Tools é um plugin para QGIS que agiliza fluxos de trabalho cartográficos com exportação em lote de layouts (PDF/PNG), substituição de textos em massa, automação de tarefas e ferramentas de processamento para dados vetoriais e raster.
+description=Cadmus é um plugin para QGIS que agiliza fluxos de trabalho cartográficos com exportação em lote de layouts (PDF/PNG), substituição de textos em massa, automação de tarefas e ferramentas de processamento para dados vetoriais e raster.
 category=Vector,Raster,Layout,Automation,Processing
 tags=layout,export,pdf,png,automation,replace,text,processing,vector,raster,statistics,sampling,qgis
-icon=icons/mtl_tools_icon.png
+icon=cadmus_icon.png
 homepage=https://github.com/MartinelliNTZ/mtl-tools-repo
 tracker=https://github.com/MartinelliNTZ/mtl-tools-repo/issues
 repository=https://raw.githubusercontent.com/MartinelliNTZ/mtl-tools-repo/main/plugins.xml

@@ -10,7 +10,7 @@ Permitir reinicialização rápida do QGIS sem perder alterações, útil em wor
 
 **Fluxo resumido**
 
-- Entrada: usuário clica Menu → MTL Tools → Salvar, Fechar e Reabrir Projeto.
+- Entrada: usuário clica Menu → Cadmus → Salvar, Fechar e Reabrir Projeto.
 - Validação 1: `QgsProject.instance().fileName()` verifica se projeto foi salvo.
   - Se **não salvo**: dialog "Deseja salvar agora?" → `getSaveFileName()` → `project.write(save_path)`.
   - Se **cancelado**: retorna sem fazer nada.

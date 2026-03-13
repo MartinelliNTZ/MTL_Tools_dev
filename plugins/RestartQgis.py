@@ -2,7 +2,7 @@
 """
 Ferramenta: Salvar, Fechar e Reabrir Projeto
 Autor: Matheus Martinelli
-Parte do plugin: MTL Tools
+Parte do plugin: Cadmus
 
 Responsabilidades:
 - UI: Exibir diálogos e mensagens via QgisMessageUtil

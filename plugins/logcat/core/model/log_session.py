@@ -13,11 +13,11 @@ class LogSession:
     """
     Representa uma sessão de log (arquivo .log).
     
-    Nomes de arquivo esperados: mtl_tools_YYYYMMDD_HHMMSS_pidPPPPPP.log
+    Nomes de arquivo esperados: Cadmus_YYYYMMDD_HHMMSS_pidPPPPPP.log
     """
     
     # Regex para extrair timestamp e PID do nome do arquivo
-    FILE_PATTERN = re.compile(r"mtl_tools_(\d{8})_(\d{6})_pid(\d+)\.log")
+    FILE_PATTERN = re.compile(r"Cadmus_(\d{8})_(\d{6})_pid(\d+)\.log")
     
     def __init__(self, log_file_path: Path):
         """

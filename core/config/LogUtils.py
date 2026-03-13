@@ -17,7 +17,7 @@ except ImportError:
     QGIS_AVAILABLE = False
 
 class LogUtils:
-    #C:\Users\<usuario>\AppData\Roaming\QGIS\QGIS3\MTLTools
+    #C:\Users\<usuario>\AppData\Roaming\QGIS\QGIS3\Cadmus
     DEBUG = "DEBUG"
     INFO = "INFO"
     WARNING = "WARNING"
@@ -35,7 +35,7 @@ class LogUtils:
 
     _session_id = None
     _log_file = None
-    _plugin_name = "MTL Tools"
+    _plugin_name = "Cadmus"
     _plugin_version = "unknown"
     _initialized = False
 
@@ -53,7 +53,7 @@ class LogUtils:
 
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         pid = os.getpid()
-        cls._log_file = log_dir / f"mtl_tools_{ts}_pid{pid}.log"
+        cls._log_file = log_dir / f"cadmus_{ts}_pid{pid}.log"
 
         cls._initialized = True
 

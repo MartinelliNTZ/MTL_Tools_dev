@@ -1,5 +1,5 @@
 # 🔄 Salvar, Fechar e Reabrir Projeto – Manual de Utilização
-Ferramenta do pacote **MTL Tools** para reiniciar **QGIS com o projeto atual** de forma automática.
+Ferramenta do pacote **Cadmus** para reiniciar **QGIS com o projeto atual** de forma automática.
 
 ---
 
@@ -37,7 +37,7 @@ Se certos recursos não respondem mas QGIS não completamente congelado.
 ## ▶ Como usar
 
 ### 1. Abrir a ferramenta
-Menu → **MTL Tools** → **Sistema** → **Salvar, Fechar e Reabrir Projeto**
+Menu → **Cadmus** → **Sistema** → **Salvar, Fechar e Reabrir Projeto**
 
 ---
 

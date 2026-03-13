@@ -35,7 +35,7 @@ class BasePluginMTL(BaseDialog):
     preferences = {}
     """Dicionario de status"""
     settings_preferences = {}
-    """Preferências globais do aplicativo (MTL Tools Settings)"""
+    """Preferências globais do aplicativo (Cadmus Settings)"""
 
 
 
@@ -49,7 +49,7 @@ class BasePluginMTL(BaseDialog):
         class_name : str
             Nome da classe para logging (padrão: BasePluginMTL)
         load_settings_prefs : bool
-            Se True, carrega preferências globais do MTL Tools Settings (padrão: False)
+            Se True, carrega preferências globais do Cadmus Settings (padrão: False)
         build_ui : bool
             Se True, constrói a interface de usuário (padrão: True)
         """
@@ -61,7 +61,7 @@ class BasePluginMTL(BaseDialog):
         
         # Carregar preferências globais do Settings se solicitado
         if load_settings_prefs:
-            self.logger.debug("Carregando preferências globais do MTL Tools Settings")
+            self.logger.debug("Carregando preferências globais do Cadmus Settings")
             self.settings_preferences = load_tool_prefs(ToolKey.SETTINGS)
             self.logger.debug(f"Preferências globais carregadas: {list(self.settings_preferences.keys())}")
         else:
@@ -78,7 +78,7 @@ class BasePluginMTL(BaseDialog):
             self.logger.debug("Construção de UI desabilitada")
 
     """
-    Classe base para plugins do MTL Tools.
+    Classe base para plugins do Cadmus.
 
     Centraliza funcionalidades comuns aos plugins, como:
     - Criação de ações de menu

@@ -4,10 +4,10 @@ Re-exports principais para o package `resources`.
 
 Este arquivo expõe as classes mais usadas presentes em
 `resources.widgets` e `resources.styles` para importações
-como `from MTL_Tools.resources import AppBarWidget`.
+como `from Cadmus.resources import AppBarWidget`.
 """
 
-from .resources_rc import *
+from ..resources_rc import *
 
 # Styles
 from .styles.BaseStyles import BaseStyles

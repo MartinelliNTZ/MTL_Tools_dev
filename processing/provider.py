@@ -24,14 +24,14 @@ class MTLProvider(QgsProcessingProvider):
         
 
     def id(self):
-        return "mtl_tools"
+        return "cadmus"
 
     def name(self):
-        return "MTL Tools"
+        return "Cadmus"
 
     def longName(self):
-        return "MTL Tools – Processamento"
+        return "Cadmus – Processamento"
     
     def icon(self):
-        path = os.path.join(os.path.dirname(__file__), "..", "resources","icons", "mtl_tools_icon.ico")
+        path = os.path.join(os.path.dirname(__file__), "..", "resources","icons", "cadmus_icon.ico")
         return QIcon(path)

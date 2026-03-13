@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Utility helpers for MTL Tools.
-
-This module exists to make `MTL_Tools.utils` a regular Python package and
+"""Utility helpers for Cadmus.
 support legacy imports that assume it is a package.
 """
 

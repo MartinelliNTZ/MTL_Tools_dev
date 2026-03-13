@@ -1,6 +1,6 @@
 # 🧩 Substituir Texto em Layouts — Guia Completo de Uso
 
-Bem-vindo à ferramenta **Substituir Texto em Layouts** do pacote **MTL Tools**!  
+Bem-vindo à ferramenta **Substituir Texto em Layouts** do pacote **Cadmus**!  
 Ela foi desenvolvida para automatizar substituições de texto em massa dentro dos *Layouts* do QGIS, permitindo atualizar dezenas ou centenas de rótulos em questão de segundos com total segurança, rastreabilidade completa via backup automático e log detalhado de operações.
 
 ---
@@ -25,7 +25,7 @@ Use quando precisar:
 ### 1️⃣ Acessando a Ferramenta
 No menu do QGIS:
 
-**MTL Tools → Replace Text in Layouts**
+**Cadmus → Replace Text in Layouts**
 
 A janela principal será exibida com os campos necessários.
 
@@ -141,7 +141,7 @@ A ferramenta **lembra automaticamente** de suas preferências de uso:
 
 **Onde ficam armazenadas:**
 - 📁 `~/.qgis3/` (pasta oculta do QGIS no seu perfil do Windows)
-- 🗂️ Arquivo: `plugins/MTL_Tools_prefs.json` (ou similar, conforme versão)
+- 🗂️ Arquivo: `plugins/Cadmus_prefs.json` (ou similar, conforme versão)
 
 Essas preferências são **carregadas automaticamente** ao abrir a ferramenta novamente, economizando tempo em operações repetitivas.
 

@@ -31,7 +31,7 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
     def _build_ui(self, **kwargs):
         super()._build_ui(
             title="Substituir Texto em Layouts",
-            icon_path="mtl_tools_icon.png",
+            icon_path="Cadmus_icon.png",
             instructions_file="replace_in_layouts_help.md",
             enable_scroll=False,
         )

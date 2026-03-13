@@ -7,7 +7,7 @@ Breve: gera o polígono que representa a faixa ocupada por um implemento a parti
 
 ## ▶ Passo a passo (rápido) ✅
 
-1. Abra: Menu → **MTL Tools** → **Gerar Rastro Implemento**
+1. Abra: Menu → **Cadmus** → **Gerar Rastro Implemento**
 2. Selecione a **camada de linhas (INPUT)**. 🗂️
 3. Informe o **Tamanho do implemento (metros)** — ex.: 12, 16, 24. 📏
 4. (Opcional) Marque **Salvar em arquivo** e escolha o caminho/fomato (recomendado: `.gpkg`). 💾

@@ -6,7 +6,7 @@ Breve: calcula campos de coordenadas (X, Y) para pontos, comprimento para linhas
 
 ## ▶ Passo a passo (rápido) ✅
 
-1. Abra: Menu → **MTL Tools** → **Calcular Campos Vetoriais**
+1. Abra: Menu → **Cadmus** → **Calcular Campos Vetoriais**
 2. Selecione a **camada vetorial** (pontos, linhas ou polígonos). 🗂️
 3. (Opcional) Acesse **Configurações** para escolher:
    - **Método de cálculo**: Elipsoidal, Cartesiana ou Ambos. ⚙️
@@ -54,7 +54,7 @@ Breve: calcula campos de coordenadas (X, Y) para pontos, comprimento para linhas
 
 ## 🔧 Preferências e suporte
 
-- Acesse **Configurações MTL Tools** para ajustar:
+- Acesse **Configurações Cadmus** para ajustar:
   - **Método de cálculo** padrão (Elipsoidal, Cartesiana ou Ambos)
   - **Precisão padrão** para campos novos
   - **Limiar assíncrono** (quando o processamento fica assíncrono)
