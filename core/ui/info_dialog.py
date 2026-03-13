@@ -1,19 +1,26 @@
 import os
+
+from ...core.config.LogUtils import LogUtils
+from ...plugins.BaseDialog import BaseDialog
 from qgis.PyQt.QtWidgets import (
     QDialog, QVBoxLayout, QPushButton, QTextBrowser
 )
 from qgis.PyQt.QtCore import Qt
 
 
-class InfoDialog(QDialog):
+class InfoDialog(BaseDialog):
     def __init__(self, instructions_path: str, parent=None, title="MTL Tools"):
         super().__init__(parent)
+        self.logger = LogUtils(tool="Untraceable", class_name=self.__class__.__name__, level=LogUtils.DEBUG)
+        self.logger.debug(f"Inicializando InfoDialog com arquivo: {instructions_path}")
 
+        # Use BaseDialog layout builder so dialogs share the same shell
+        self._build_ui(title=title, enable_scroll=False)
+
+        # prefer explicit window title and sensible minimum size
         self.setWindowTitle(title)
         self.setMinimumWidth(700)
         self.setMinimumHeight(550)
-
-        layout = QVBoxLayout(self)
 
         browser = QTextBrowser()
         browser.setOpenExternalLinks(True)
@@ -32,24 +39,33 @@ class InfoDialog(QDialog):
                 html = self._markdown_to_html(md_text)
                 browser.setHtml(html)
 
-
         else:
             browser.setPlainText(
                 f"Arquivo de instruções não encontrado:\n{instructions_path}"
             )
 
-        layout.addWidget(browser)
-
-        btn = QPushButton("Fechar")
-        btn.clicked.connect(self.close)
-        layout.addWidget(btn, alignment=Qt.AlignRight)
+        # add browser and close button to the shared layout
+        if hasattr(self, 'layout') and self.layout is not None:
+            self.layout.addWidget(browser)
+            btn = QPushButton("Fechar")
+            btn.clicked.connect(self.close)
+            self.layout.addWidget(btn, alignment=Qt.AlignRight)
+            self.logger.debug(f"InfoDialog UI construída com sucesso usando BaseDialog layout.")
+        else:
+            # fallback: use a local layout if BaseDialog failed to create one
+            layout = QVBoxLayout(self)
+            layout.addWidget(browser)
+            btn = QPushButton("Fechar")
+            btn.clicked.connect(self.close)
+            layout.addWidget(btn, alignment=Qt.AlignRight)
+            self.logger.warning("BaseDialog layout não encontrado. Usando layout local para InfoDialog.")
 
     def _markdown_to_html(self, text: str) -> str:
         """
         Conversão simples de Markdown para HTML
         Compatível com QGIS 3.16 (sem setMarkdown)
         """
-
+        self.logger.debug("Convertendo Markdown para HTML (fallback)")
         import re
 
         html = text

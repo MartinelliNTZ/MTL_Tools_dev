@@ -1,3 +1,4 @@
+from .BaseDialog import BaseDialog
 from qgis.PyQt.QtWidgets import (
     QDialog, QAction,QFileDialog, QLineEdit,QSizeGrip
 )
@@ -26,14 +27,11 @@ from ..utils.StringUtils import StringUtils
 # -------------------------------------------------------------
 #  PLUGIN BasePluginMTL
 # -------------------------------------------------------------
-class BasePluginMTL(QDialog):
+class BasePluginMTL(BaseDialog):
     APP_NAME = StringUtils.APP_NAME
     TOOL_KEY = "base_plugin"  # Identificador padrão
     PLUGIN_NAME = ""
-    layout = None
     prefs = None
-    """obsolet"""
-    logger = None
     preferences = {}
     """Dicionario de status"""
     settings_preferences = {}
@@ -99,48 +97,7 @@ class BasePluginMTL(QDialog):
         enable_scroll: bool = True,
         **kwargs
     ):
-        """Constrói a interface do plugin.
-
-        Recebe: title (str|None), icon_path (str), instructions_file (str), enable_scroll (bool).
-        Retorna: None.
-        Faz: configura layout, ícone, tamanho da janela (padrão 300x300, persistido em prefs), 
-             caminho de instruções e scroll opcional.
-        
-        ARQUITETURA (MainLayout encapsula scroll):
-        - MainLayout cria ScrollWidget internamente se enable_scroll=True
-        - Plugin apenas atribui self.layout = WidgetFactory.create_main_layout()
-        - Responsabilidade única: MainLayout gerencia scroll, plugin usa add_items()
-        """
-        if title is not None:
-            self.PLUGIN_NAME = title
-        # Garantir que o MainLayout seja sempre criado. Usar PLUGIN_NAME como fallback.
-        self.layout = WidgetFactory.create_main_layout(
-            self, title=(self.PLUGIN_NAME or "MTL Tools"), enable_scroll=enable_scroll
-        )
-
-        self.logger.debug(f"Construindo UI para plugin: {self.PLUGIN_NAME}")
-
-        self.setWindowFlags(Qt.Dialog | Qt.FramelessWindowHint)
-        self.setAttribute(Qt.WA_TranslucentBackground, True)
-        # Tamanho mínimo padrão: 300x300 (persistido em preferências)
-        self.setMinimumSize(300, 300)
-        self.setWindowTitle(f"MTL Tools — {self.PLUGIN_NAME}")
-
-        # Size grip (resize visual indicator)
-        self.size_grip = QSizeGrip(self.layout._frame)
-        self.size_grip.setFixedSize(16, 16)
-        self.layout.addWidget(
-            self.size_grip,
-            alignment=Qt.AlignBottom | Qt.AlignRight
-        )
-
-        # Ícone
-        icon_path = os.path.join(
-            os.path.dirname(__file__), "..", "resources", "icons", icon_path
-        )
-        if os.path.exists(icon_path):
-            self.setWindowIcon(QIcon(icon_path))
-            self.logger.debug(f"Ícone carregado de: {icon_path}")
+        super()._build_ui(title=title, icon_path=icon_path, enable_scroll=enable_scroll)
 
         # instruções
         self.instructions_file = os.path.join(
@@ -150,9 +107,10 @@ class BasePluginMTL(QDialog):
             "instructions",
             instructions_file
         )
-
         # Restaurar tamanho da janela se foi persistido
         self._restore_window_size()
+        
+
 
     def _restore_window_size(self):
         """
@@ -194,25 +152,7 @@ class BasePluginMTL(QDialog):
         self._save_prefs()
         super().closeEvent(event)
 
-    def mousePressEvent(self, event):
-        """Delega evento de mouse para detecção de bordas e início de resize do MainLayout."""
-        if self.layout and hasattr(self.layout, 'handle_mouse_press'):
-            if self.layout.handle_mouse_press(event):
-                return
-        super().mousePressEvent(event)
 
-    def mouseMoveEvent(self, event):
-        """Delega evento de mouse para atualização de cursor e resize do MainLayout.        """
-        if self.layout and hasattr(self.layout, 'handle_mouse_move'):
-            self.layout.handle_mouse_move(event)
-        super().mouseMoveEvent(event)
-
-    def mouseReleaseEvent(self, event):
-        """Delega evento de mouse para finalização de resize do MainLayout."""
-        if self.layout and hasattr(self.layout, 'handle_mouse_release'):
-            if self.layout.handle_mouse_release(event):
-                return
-        super().mouseReleaseEvent(event)
 
     def start_stats(self, input_obj=None,modal_info = "YES",total_files=None):
         try:
@@ -392,6 +332,7 @@ class BasePluginMTL(QDialog):
         Retorna: None.
         Faz: abre `InfoDialog` com o arquivo de instruções, se existir.
         """
+        self.logger.debug("Exibindo diálogo de informações")
         if hasattr(self, "instructions_file"):
             title = f"📘 Instruções – {self.PLUGIN_NAME}"
             InfoDialog(self.instructions_file, self, title).exec() 
