@@ -2,6 +2,9 @@
 from qgis.core import QgsTask
 import json
 import urllib.request
+from urllib.parse import urlparse
+import http.client
+from ..config.LogUtils import LogUtils
 
 
 class ReverseGeocodeTask(QgsTask):
@@ -31,13 +34,66 @@ class ReverseGeocodeTask(QgsTask):
                 "&localityLanguage=pt"
             )
 
-            req = urllib.request.Request(
-                url,
-                headers={"User-Agent": "MTL-Tools-QGIS"}
-            )
+            # Validação de segurança: aceitar apenas esquemas http/https
+            parsed = urlparse(url)
+            if parsed.scheme.lower() not in ("http", "https"):
+                self.error = f"Invalid URL scheme: {parsed.scheme}"
+                return False
 
-            with urllib.request.urlopen(req, timeout=15) as response:
-                data = json.loads(response.read().decode("utf-8"))
+            # Follow redirects (max 5) using http.client and validate scheme on redirects
+            max_redirects = 5
+            current_url = url
+            logger = LogUtils(tool="reverse_geocode", class_name="ReverseGeocodeTask")
+            for hop in range(max_redirects + 1):
+                parsed = urlparse(current_url)
+                host = parsed.hostname
+                port = parsed.port
+                path = parsed.path or "/"
+                if parsed.query:
+                    path = path + "?" + parsed.query
+                try:
+                    if parsed.scheme.lower() == "https":
+                        conn = http.client.HTTPSConnection(host, port=port, timeout=15)
+                    else:
+                        conn = http.client.HTTPConnection(host, port=port, timeout=15)
+                    conn.request("GET", path, headers={"User-Agent": "MTL-Tools-QGIS"})
+                    resp = conn.getresponse()
+                    status = resp.status
+                    if 300 <= status < 400:
+                        # Redirect
+                        location = resp.getheader("Location")
+                        conn.close()
+                        logger.info(f"Redirect {status} -> {location}", code="REDIRECT_FOLLOW")
+                        if not location:
+                            self.error = f"Redirect without Location header (status {status})"
+                            return False
+                        # Resolve relative redirects
+                        new_parsed = urlparse(location)
+                        if not new_parsed.scheme:
+                            # relative URL
+                            from urllib.parse import urljoin
+                            current_url = urljoin(current_url, location)
+                        else:
+                            current_url = location
+                        # validate scheme
+                        new_scheme = urlparse(current_url).scheme.lower()
+                        if new_scheme not in ("http", "https"):
+                            self.error = f"Invalid redirect scheme: {new_scheme}"
+                            return False
+                        # continue to next hop
+                        continue
+                    elif status != 200:
+                        self.error = f"HTTP error {status}"
+                        conn.close()
+                        return False
+                    else:
+                        data = json.loads(resp.read().decode("utf-8"))
+                        conn.close()
+                        break
+                except Exception as e:
+                    logger.exception(e, code="HTTP_REQUEST_ERROR")
+                    self.error = str(e)
+                    return False
 
             admin = data.get("localityInfo", {}).get("administrative", [])
 
@@ -89,28 +145,29 @@ class ReverseGeocodeTask(QgsTask):
     # --------------------------------------------------
     def finished(self, success):
         # Backwards-compatible callback + pipeline hooks
+        logger = LogUtils(tool="reverse_geocode", class_name="ReverseGeocodeTask")
         try:
             if success:
                 if hasattr(self, 'on_success') and callable(getattr(self, 'on_success')):
                     try:
                         self.on_success(self.result)
-                    except Exception:
-                        pass
+                    except Exception as exc:
+                        logger.exception(exc, code="FINISHED_ON_SUCCESS_ERROR")
                 if hasattr(self, 'callback') and callable(self.callback):
                     try:
                         self.callback(self.result, None)
-                    except Exception:
-                        pass
+                    except Exception as exc:
+                        logger.exception(exc, code="FINISHED_CALLBACK_ERROR")
             else:
                 if hasattr(self, 'on_error') and callable(getattr(self, 'on_error')):
                     try:
                         self.on_error(self.error)
-                    except Exception:
-                        pass
+                    except Exception as exc:
+                        logger.exception(exc, code="FINISHED_ON_ERROR_ERROR")
                 if hasattr(self, 'callback') and callable(self.callback):
                     try:
                         self.callback(None, self.error)
-                    except Exception:
-                        pass
-        except Exception:
-            pass
+                    except Exception as exc:
+                        logger.exception(exc, code="FINISHED_CALLBACK_ERROR")
+        except Exception as exc:
+            logger.exception(exc, code="FINISHED_UNKNOWN_ERROR")

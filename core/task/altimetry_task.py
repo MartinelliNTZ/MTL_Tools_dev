@@ -2,6 +2,9 @@
 from qgis.core import QgsTask
 import json
 import urllib.request
+from urllib.parse import urlparse
+import http.client
+from ..config.LogUtils import LogUtils
 
 
 class AltimetriaTask(QgsTask):
@@ -30,8 +33,34 @@ class AltimetriaTask(QgsTask):
                 f"?locations={self.lat},{self.lon}"
             )
 
-            with urllib.request.urlopen(url, timeout=15) as response:
-                data = json.loads(response.read().decode("utf-8"))
+            # Validação de segurança: aceitar apenas esquemas http/https
+            parsed = urlparse(url)
+            if parsed.scheme.lower() not in ("http", "https"):
+                self.error = f"Invalid URL scheme: {parsed.scheme}"
+                return False
+
+            # Use http.client to avoid bandit B310 on urllib.request.urlopen
+            host = parsed.hostname
+            port = parsed.port
+            path = parsed.path or "/"
+            if parsed.query:
+                path = path + "?" + parsed.query
+            try:
+                if parsed.scheme.lower() == "https":
+                    conn = http.client.HTTPSConnection(host, port=port, timeout=15)
+                else:
+                    conn = http.client.HTTPConnection(host, port=port, timeout=15)
+                conn.request("GET", path, headers={"User-Agent": "Cadmus-Altimetry-Task"})
+                resp = conn.getresponse()
+                if resp.status != 200:
+                    self.error = f"HTTP error {resp.status}"
+                    conn.close()
+                    return False
+                data = json.loads(resp.read().decode("utf-8"))
+                conn.close()
+            except Exception as e:
+                self.error = str(e)
+                return False
 
             if data.get("status") != "OK":
                 self.error = "Resposta inválida da API"
@@ -59,28 +88,29 @@ class AltimetriaTask(QgsTask):
     # --------------------------------------------------
     def finished(self, success):
         # Backwards-compatible callback
+        logger = LogUtils(tool="altimetry_task", class_name="AltimetriaTask")
         try:
             if success:
                 if hasattr(self, 'on_success') and callable(getattr(self, 'on_success')):
                     try:
                         self.on_success(self.result)
-                    except Exception:
-                        pass
+                    except Exception as exc:
+                        logger.exception(exc, code="FINISHED_ON_SUCCESS_ERROR")
                 if hasattr(self, 'callback') and callable(self.callback):
                     try:
                         self.callback(self.result, None)
-                    except Exception:
-                        pass
+                    except Exception as exc:
+                        logger.exception(exc, code="FINISHED_CALLBACK_ERROR")
             else:
                 if hasattr(self, 'on_error') and callable(getattr(self, 'on_error')):
                     try:
                         self.on_error(self.error)
-                    except Exception:
-                        pass
+                    except Exception as exc:
+                        logger.exception(exc, code="FINISHED_ON_ERROR_ERROR")
                 if hasattr(self, 'callback') and callable(self.callback):
                     try:
                         self.callback(None, self.error)
-                    except Exception:
-                        pass
-        except Exception:
-            pass
+                    except Exception as exc:
+                        logger.exception(exc, code="FINISHED_CALLBACK_ERROR")
+        except Exception as exc:
+            logger.exception(exc, code="FINISHED_UNKNOWN_ERROR")

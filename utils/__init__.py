@@ -1,18 +1,30 @@
 # -*- coding: utf-8 -*-
 """Utility helpers for Cadmus.
-support legacy imports that assume it is a package.
+
+Este __init__ expõe apenas submódulos seguros que não causam
+importação circular com `core.config.LogUtils`.
+
+Não incluir módulos que importam `LogUtils` (ex.: `LayoutsUtils`,
+`PDFUtils`, `ProjectUtils`, `ExplorerUtils`) para evitar ciclos durante
+o carregamento do pacote.
 """
 
-# Expose commonly used utilities here if desirable (optional)
-# For now, keep this file minimal to avoid introducing unintended dependencies.
+# Apenas exportar utilitários seguros (sem dependência direta de LogUtils)
 from .ToolKeys import ToolKey
 from .QgisMessageUtil import QgisMessageUtil
 from .DependenciesManager import DependenciesManager
-from .ExplorerUtils import ExplorerUtils
 from .FormatUtils import FormatUtils
-from .LayoutsUtils import LayoutsUtils
-from .PDFUtils import PDFUtils
 from .Preferences import load_tool_prefs, save_tool_prefs, Preferences
-from .ProjectUtils import ProjectUtils
 from .StringUtils import StringUtils
+
+__all__ = [
+	"ToolKey",
+	"QgisMessageUtil",
+	"DependenciesManager",
+	"FormatUtils",
+	"load_tool_prefs",
+	"save_tool_prefs",
+	"Preferences",
+	"StringUtils",
+]
 

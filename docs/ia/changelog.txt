@@ -8,3 +8,26 @@
 1.7.1.3
   - Rename plugin mentions from `MTL_Tools`/`mtl_tools` to `Cadmus`/`cadmus`
     - Updated: `processing/provider.py`, `core/config/LogUtils.py`, `resources/__init__.py`, docs and IDE metadata
+1.7.1.4
+  - Fix import cycle causing ImportError on startup
+    - Removed `ExplorerUtils` import from `utils/__init__.py` to avoid circular import between `core.config.LogUtils` and `utils` package
+    - This prevents `ImportError: cannot import name 'LogUtils'` during plugin load
+  1.7.1.5
+    - Security: validar esquema de URL antes de abrir conexões
+      - `core/task/altimetry_task.py`: validar `urlparse(url).scheme` aceita apenas `http/https` antes de `urlopen`
+      - `core/task/reverse_geocoding_task.py`: validar `urlparse(url).scheme` aceita apenas `http/https` antes de `Request`/`urlopen`
+      - Previne uso acidental de esquemas inseguros (ex.: `file://`, `ftp://`)
+  1.7.1.6
+    - Replace silent exception handlers with structured logging
+      - `core/task/altimetry_task.py`: log exceptions in `finished()` using `LogUtils` instead of silent `pass`
+      - `core/task/reverse_geocoding_task.py`: log exceptions in `finished()` using `LogUtils` instead of silent `pass`
+      - Ensures errors are captured in plugin JSONL logs and QGIS message log when critical
+  1.7.1.7
+    - Security: avoid Bandit B310 by replacing `urllib.request.urlopen` with `http.client` requests
+      - `core/task/altimetry_task.py`: use `http.client.HTTPSConnection`/`HTTPConnection` with validated scheme
+      - `core/task/reverse_geocoding_task.py`: same replacement and validation
+      - Adds explicit `User-Agent`, checks HTTP status and returns descriptive errors
+  1.7.1.8
+    - ReverseGeocode: follow HTTP 3xx redirects (max 5)
+      - `core/task/reverse_geocoding_task.py`: follow `Location` headers, resolve relative redirects, validate redirect schemes
+      - Log redirect locations and errors via `LogUtils`
