@@ -7,6 +7,7 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.core import QgsApplication
 from qgis.PyQt.QtWidgets import QAction, QMenu, QToolButton, QWidgetAction
 from pathlib import Path
+from .resources import *
 
 from .utils.ToolKeys import ToolKey
 from .utils.QgisMessageUtil import QgisMessageUtil
