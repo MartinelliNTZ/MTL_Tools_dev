@@ -35,10 +35,10 @@ Instrucoes: 1, 2, 3, 4,  5, 8, 9, 10, 11, 13
     metadada organizar
     license=GPL-2.0
 changelog=
+	2.0.2 - readme.md
+	2.0.1 -padronizacao
   2.0.0
-  - MUDANCA DE nome para cadmus
-
-  
+  - MUDANCA DE nome para cadmus  
   1.7.2
     -Refactor InfoDialog and BaseDialog to enhance UI construction and logging
   1.7.1
