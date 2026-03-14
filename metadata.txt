@@ -15,9 +15,9 @@ plugin_dependencies=PyPDF2,Pillow
 hasProcessingProvider=yes
 experimental=False
 deprecated=False
-homepage=//github.com/MartinelliNTZ/Cadmus
-repository=//github.com/MartinelliNTZ/Cadmus
-tracker=//github.com/MartinelliNTZ/Cadmus/issues
+homepage=https://github.com/MartinelliNTZ/Cadmus
+repository=https://github.com/MartinelliNTZ/Cadmus
+tracker=https://github.com/MartinelliNTZ/Cadmus/issues
 
 
 changelog=    
