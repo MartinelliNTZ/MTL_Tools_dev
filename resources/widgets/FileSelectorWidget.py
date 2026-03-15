@@ -11,7 +11,7 @@ from qgis.PyQt.QtWidgets import QFileDialog
 class FileSelectorWidget(QWidget):
     """
 
-    """    
+    """
     MODE_OPEN = "open"
     MODE_SAVE = "save"
 
@@ -20,7 +20,7 @@ class FileSelectorWidget(QWidget):
         *,
         checkbox_text="Arquivo?",
         label_text="Arquivo:",
-        file_filter=StringUtils.FILTER_ALL,        
+        file_filter=StringUtils.FILTER_ALL,
         mode=MODE_OPEN,
         parent=None
     ):
@@ -68,9 +68,7 @@ class FileSelectorWidget(QWidget):
             )
         )
 
-
         self._update_enabled_state()
-
 
     def _update_enabled_state(self):
         enabled = self._chk.isChecked()
@@ -91,7 +89,7 @@ class FileSelectorWidget(QWidget):
 
     def set_file_path(self, path: str):
         self._txt.setText(path or "")
-        
+
     def select_file(self, line_edit, file_filter, mode):
         if mode == FileSelectorWidget.MODE_SAVE:
             path, _ = QFileDialog.getSaveFileName(

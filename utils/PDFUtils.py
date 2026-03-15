@@ -23,9 +23,9 @@ class PDFUtils:
     def _get_logger(cls):
         """Retorna instância do logger."""
         if cls._logger is None:
-                cls._logger = LogUtils(
-                    tool="pdf_utils", class_name="PDFUtils", level=LogUtils.DEBUG
-                )
+            cls._logger = LogUtils(
+                tool="pdf_utils", class_name="PDFUtils", level=LogUtils.DEBUG
+            )
         return cls._logger
 
     @staticmethod

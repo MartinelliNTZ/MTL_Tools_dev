@@ -191,9 +191,8 @@ class SelectorWidget(QWidget):
                 self._browse_multiple_files(initial_dir)
             elif self._mode == self.MODE_SAVE:
                 self._browse_save_file(initial_dir)
-        except Exception as e:            
+        except Exception as e:
             logger.exception(e)
-
 
     def _get_initial_directory(self) -> str:
         """Retorna diretório inicial para dialog."""

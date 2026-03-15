@@ -64,10 +64,7 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
         # Verificar se a camada é KML (não editável)
         source = layer.source().lower()
         if (
-            source.endswith(".kml")
-            or "|layername=" in source
-            and source.startswith("file://")
-            and ".kml" in source
+            source.endswith(".kml") or "|layername=" in source and source.startswith("file://") and ".kml" in source
         ):
             self.logger.warning("Camada KML não pode ser editada")
             QgisMessageUtil.bar_critical(

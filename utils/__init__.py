@@ -17,10 +17,9 @@ from .FormatUtils import FormatUtils
 from .StringUtils import StringUtils
 
 __all__ = [
-	"ToolKey",
-	"QgisMessageUtil",
-	"DependenciesManager",
-	"FormatUtils",
-	"StringUtils",
+    "ToolKey",
+    "QgisMessageUtil",
+    "DependenciesManager",
+    "FormatUtils",
+    "StringUtils",
 ]
-

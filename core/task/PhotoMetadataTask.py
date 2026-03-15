@@ -34,7 +34,6 @@ class PhotoMetadataTask(BaseTask):
         # Extrair lista de fotos a serem cruzadas (campo 'foto')
         # 🔴 IMPORTANTE: Também extrair 'mrk_folder' se disponível (para múltiplos voos)
         pontos = []
-        has_mrk_folder = False
 
         for feat in layer.getFeatures():
             foto = feat.attribute("foto")
@@ -55,12 +54,11 @@ class PhotoMetadataTask(BaseTask):
                 mrk_folder = feat.attribute("mrk_folder")
                 if mrk_folder:
                     ponto["mrk_folder"] = mrk_folder
-                    has_mrk_folder = True
 
             pontos.append(ponto)
 
         logger.info(
-            f"Pontos extraídos da camada",
+            "Pontos extraídos da camada",
             data={
                 "total_pontos": len(pontos),
                 "com_mrk_folder": sum(1 for p in pontos if "mrk_folder" in p),

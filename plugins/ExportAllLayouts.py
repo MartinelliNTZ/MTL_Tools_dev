@@ -286,7 +286,7 @@ class ExportAllLayoutsDialog(BasePluginMTL):
 
             if progress.is_canceled():
                 self.logger.warning(
-                    f"Exportação cancelada pelo usuário em layout {i+1}/{total}"
+                    f"Exportação cancelada pelo usuário em layout {i + 1}/{total}"
                 )
                 break
 

@@ -209,8 +209,8 @@ class BasePluginMTL(BaseDialog):
                         self.preferences["eta"] = time.time() + (
                             self.preferences["current_features"] / avg_feat
                         )
-                    TAM = f"{self.preferences.get('current_features',0)} feats"
-                    msg = f"Iniciando: features={self.preferences.get('current_features',0)}"
+                    TAM = f"{self.preferences.get('current_features', 0)} feats"
+                    msg = f"Iniciando: features={self.preferences.get('current_features', 0)}"
                     if modal_info == "YES":
                         QgisMessageUtil.bar_info(
                             self.iface, msg, "Estatisticas", duration=5
@@ -300,9 +300,9 @@ class BasePluginMTL(BaseDialog):
                     f"Tempo total: {FormatUtils.time_interval(total_time)}\n"
                     f"Tamanho: {FormatUtils.bytes(current_size)}\n"
                     f"Feições: {current_features}\n"
-                    f"Velocidade média(bytes/s): {FormatUtils.speed(self.preferences.get('avg_speed',0))}\n"
-                    f"Velocidade média(feats/s): {FormatUtils.pretty(self.preferences.get('avg_speed_features',0))}\n"
-                    f"Velocidade média(files/s): {FormatUtils.pretty(self.preferences.get('avg_speed_files',0))}\n"
+                    f"Velocidade média(bytes/s): {FormatUtils.speed(self.preferences.get('avg_speed', 0))}\n"
+                    f"Velocidade média(feats/s): {FormatUtils.pretty(self.preferences.get('avg_speed_features', 0))}\n"
+                    f"Velocidade média(files/s): {FormatUtils.pretty(self.preferences.get('avg_speed_files', 0))}\n"
                 )
                 self.logger.info(msg)
                 if modal_info == "YES":
@@ -409,7 +409,7 @@ class BasePluginMTL(BaseDialog):
 
         if ok:
             layer.triggerRepaint()
-            self.logger.debug(f"Estilo QML aplicado com sucesso")
+            self.logger.debug("Estilo QML aplicado com sucesso")
 
         return bool(ok)
 

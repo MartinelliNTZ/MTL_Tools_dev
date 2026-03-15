@@ -54,3 +54,11 @@ FIX: CORREÇÕES NO LOGCAT (IO E UI)
 - Corrigida a indentação e métodos em `plugins/logcat/ui/log_table_model.py` (mover
   `append_entries` para dentro da classe, tooltips seguros, tratamento de cores),
   prevenindo erros/syntax issues que podiam travar o diálogo do Logcat.
+1.7.1.12
+
+FIX: CORREÇÃO EM cadmus_plugin.py - _logger_global
+
+- Adiciona declaração `global _logger_global` dentro de `handle_exception` em
+  `cadmus_plugin.py` para evitar erro F823 (variável definida no escopo externo
+  referenciada antes da atribuição) e garantir logging consistente de exceções
+  não tratadas.

@@ -1,0 +1,41 @@
+.\processing\attribute_statistics.py:196:9: F841 local variable 'prefs_before' is assigned to but never used
+.\processing\difference_fields_algorithm.py:147:17: W503 line break before binary operator
+.\processing\difference_fields_algorithm.py:148:17: W503 line break before binary operator
+.\processing\model\attribute_statistics_model.py:173:17: W503 line break before binary operator
+.\processing\model\attribute_statistics_model.py:174:17: W503 line break before binary operator
+.\processing\model\attribute_statistics_model.py:175:17: W503 line break before binary operator
+.\processing\model\attribute_statistics_model.py:176:17: W503 line break before binary operator
+.\processing\provider.py:21:51: W291 trailing whitespace
+.\processing\provider.py:22:17: W291 trailing whitespace
+.\processing\raster_mass_sampler.py:14:1: F811 redefinition of unused 'os' from line 2
+.\processing\raster_mass_sampler.py:25:1: F811 redefinition of unused 're' from line 15
+.\processing\raster_mass_sampler.py:72:9: F841 local variable 'prefs' is assigned to but never used
+.\resources\widgets\MainLayout.py:107:1: W293 blank line contains whitespace
+.\resources\widgets\MainLayout.py:114:1: W293 blank line contains whitespace
+.\resources\widgets\MainLayout.py:123:1: W293 blank line contains whitespace
+.\resources\widgets\MainLayout.py:318:13: W503 line break before binary operator
+.\resources\widgets\MainLayout.py:323:13: W503 line break before binary operator
+.\resources\widgets\MainLayout.py:328:13: W503 line break before binary operator
+.\resources\widgets\MainLayout.py:405:17: W503 line break before binary operator
+.\resources\widgets\MainLayout.py:406:17: W503 line break before binary operator
+.\resources\widgets\MainLayout.py:407:17: W503 line break before binary operator
+.\resources\widgets\MainLayout.py:422:17: W503 line break before binary operator
+.\resources\widgets\MainLayout.py:460:17: F841 local variable 'p' is assigned to but never used
+.\resources\widgets\MainLayout.py:461:17: F841 local variable 'g' is assigned to but never used
+.\resources\widgets\MainLayout.py:462:17: F841 local variable 'b' is assigned to but never used
+.\resources\widgets\MainLayout.py:490:13: F841 local variable 'p' is assigned to but never used
+.\resources\widgets\MainLayout.py:491:13: F841 local variable 'g' is assigned to but never used
+.\resources\widgets\MainLayout.py:512:13: F841 local variable 'geom' is assigned to but never used
+.\resources\widgets\MainLayout.py:518:13: W503 line break before binary operator
+.\resources\widgets\MainLayout.py:519:13: W503 line break before binary operator
+.\resources\widgets\MainLayout.py:520:13: W503 line break before binary operator
+.\resources\widgets\MainLayout.py:537:17: W503 line break before binary operator
+.\resources\widgets\RadioButtonGridWidget.py:124:27: F541 f-string is missing placeholders
+.\resources\widgets\RadioButtonGridWidget.py:139:27: F541 f-string is missing placeholders
+.\utils\ProjectUtils.py:10:1: F811 redefinition of unused 'QgsMapLayer' from line 6
+.\utils\ProjectUtils.py:122:21: F841 local variable 'geom_type' is assigned to but never used
+.\utils\QgisMessageUtil.py:74:21: F541 f-string is missing placeholders
+.\utils\QgisMessageUtil.py:216:9: F841 local variable 'btn_cancel' is assigned to but never used
+.\utils\vector\VectorLayerAttributes.py:24:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerAttributes.py:31:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerAttributes.py:36:1: W293 blank line contains whitespace

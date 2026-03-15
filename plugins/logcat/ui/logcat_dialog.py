@@ -304,8 +304,7 @@ class LogcatDialog(QDialog):
         if self.current_session:
             for i in range(self.combo_sessions.count()):
                 if (
-                    self.combo_sessions.itemData(i).log_file_path
-                    == self.current_session.log_file_path
+                    self.combo_sessions.itemData(i).log_file_path == self.current_session.log_file_path
                 ):
                     self.combo_sessions.setCurrentIndex(
                         i
@@ -594,8 +593,7 @@ class LogcatDialog(QDialog):
         """Restaura posição anterior do scroll de forma confiável."""
         try:
             if (
-                hasattr(self, "_saved_scroll_value")
-                and self._saved_scroll_value is not None
+                hasattr(self, "_saved_scroll_value") and self._saved_scroll_value is not None
             ):
                 scrollbar = self.table_view.verticalScrollBar()
                 saved_val = (
@@ -708,13 +706,13 @@ class LogcatDialog(QDialog):
         class_count = len(self.filter_engine.class_filter)
 
         self.btn_filter_level.setText(
-            f"All" if not level_count else f"{level_count} selected"
+            "All" if not level_count else f"{level_count} selected"
         )
         self.btn_filter_tool.setText(
-            f"All" if not tool_count else f"{tool_count} selected"
+            "All" if not tool_count else f"{tool_count} selected"
         )
         self.btn_filter_class.setText(
-            f"All" if not class_count else f"{class_count} selected"
+            "All" if not class_count else f"{class_count} selected"
         )
 
     def _on_table_double_click(self, index: QModelIndex):
@@ -829,7 +827,7 @@ class LogcatDialog(QDialog):
             if self.current_session:
                 status_text = f"Showing {displayed}/{total} entries | Session: {self.current_session.display_name}"
             else:
-                status_text = f"No session loaded"
+                status_text = "No session loaded"
 
             self.label_status.setText(status_text)
         except Exception as e:

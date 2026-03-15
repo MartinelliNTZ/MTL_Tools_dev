@@ -91,9 +91,9 @@ class LogMultipleDetailDialog(QDialog):
         """Retorna todas as entradas formatadas juntas."""
         lines = []
         for idx, entry in enumerate(self.entries, 1):
-            lines.append(f"{'='*60}")
+            lines.append(f"{'=' * 60}")
             lines.append(f"Entry {idx}/{len(self.entries)}")
-            lines.append(f"{'='*60}")
+            lines.append(f"{'=' * 60}")
             lines.append(entry.get_full_details())
             lines.append("")
         return "\n".join(lines)

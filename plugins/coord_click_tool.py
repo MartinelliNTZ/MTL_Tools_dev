@@ -87,9 +87,7 @@ class CoordClickTool(QgsMapTool):
         try:
             # cancel previous pipeline if running
             if (
-                hasattr(self, "pipeline_engine")
-                and self.pipeline_engine
-                and self.pipeline_engine.is_running()
+                hasattr(self, "pipeline_engine") and self.pipeline_engine and self.pipeline_engine.is_running()
             ):
                 self.pipeline_engine.cancel()
             context = ExecutionContext(

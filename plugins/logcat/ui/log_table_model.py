@@ -122,38 +122,6 @@ class LogTableModel(QAbstractTableModel):
         self._entries.clear()
         self.endResetModel()
 
-    def append_entries(self, entries: List[LogEntry]) -> None:
-        """
-        Adiciona novas entradas ao final.
-        Mais eficiente que set_entries para atualizações incrementais.
-        """
-        try:
-            if not entries:
-                return
-
-            entries_count = len(entries)
-            start_row = len(self._entries)
-            end_row = start_row + entries_count - 1
-
-            self.beginInsertRows(QModelIndex(), start_row, end_row)
-            try:
-                self._entries.extend(entries)
-            finally:
-                self.endInsertRows()
-
-        except Exception as e:
-            self._logger.error(
-                f"Erro em append_entries: {e}",
-                error_type=type(e).__name__,
-                entries_count=len(entries) if entries else 0,
-            )
-
-    def clear(self) -> None:
-        """Limpa todas as entradas."""
-        self.beginResetModel()
-        self._entries.clear()
-        self.endResetModel()
-
     def rowCount(self, parent: QModelIndex = QModelIndex()) -> int:
         """Retorna número de linhas."""
         if parent.isValid():

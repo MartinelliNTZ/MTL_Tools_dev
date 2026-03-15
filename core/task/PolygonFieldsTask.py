@@ -39,7 +39,7 @@ class PolygonFieldsTask(BaseTask):
             return False
 
         self.logger.info(
-            f"PolygonFieldsTask._run: START - calculando áreas no arquivo original"
+            "PolygonFieldsTask._run: START - calculando áreas no arquivo original"
         )
 
         # nudge progress bar immediately
@@ -48,7 +48,6 @@ class PolygonFieldsTask(BaseTask):
         # New approach: do not modify the layer in the worker thread.
         # Compute a mapping of feature id -> { field_name: value }
         updates = {}
-        missing_fields = set()
 
         total = self.layer.featureCount() or 0
         count = 0

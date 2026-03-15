@@ -242,6 +242,7 @@ class LoadFolderLayersDialog(BasePluginMTL):
                 backup_file = ProjectUtils.create_project_backup(QgsProject.instance())
             except Exception as e:
                 backup_file = None
+                self.logger.error(f"Erro criando backup do projeto: {e}", code="BACKUP_ERROR")
 
         # coletar extensões selecionadas
         extensions = []
@@ -327,8 +328,7 @@ class LoadFolderLayersDialog(BasePluginMTL):
         self.finish_stats()
         QgisMessageUtil.modal_info(
             self.iface,
-            f"Foram carregados {loaded_count} arquivos.\n"
-            + (f"Backup criado: {backup_file}" if backup_file else ""),
+            f"Foram carregados {loaded_count} arquivos."
         )
 
     def _run_async_pipeline(self, folder: str, records: list, backup_file: str = None):
@@ -380,13 +380,11 @@ class LoadFolderLayersDialog(BasePluginMTL):
 
     def _on_async_finished(self, context: ExecutionContext):
         loaded = context.get("loaded_count", 0)
-        backup = context.get("backup_file") or context.get("backup_file", None)
         self.finish_stats()
         self.logger.info(f"_on_async_finished: loaded={loaded}", code="ASYNC_FINISH")
         QgisMessageUtil.bar_info(
             self.iface,
-            f"Execução assíncrona concluída. Foram carregados {loaded} arquivos.\n"
-            + (f"Backup: {backup}" if backup else ""),
+            f"Execução assíncrona concluída. Foram carregados {loaded} arquivos."
         )
 
     def _on_async_error(self, errors):

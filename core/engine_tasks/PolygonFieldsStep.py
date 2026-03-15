@@ -100,7 +100,7 @@ class PolygonFieldsStep(BaseStep):
                     logger.info("PolygonFieldsStep: cancelado durante aplicação")
                     break
 
-                batch_items = dict(items[i : i + chunk])
+                batch_items = dict(items[i: i + chunk])
                 for fid, idx_map in batch_items.items():
                     for idx, val in idx_map.items():
                         try:
@@ -110,7 +110,7 @@ class PolygonFieldsStep(BaseStep):
                                 f"PolygonFieldsStep: falha ao aplicar fid={fid} idx={idx} err={e}"
                             )
                 logger.debug(
-                    f"Applied edit-buffer batch {i}-{i+len(batch_items)} items={len(batch_items)}"
+                    f"Applied edit-buffer batch {i}-{i + len(batch_items)} items={len(batch_items)}"
                 )
                 QApplication.processEvents()
         finally:

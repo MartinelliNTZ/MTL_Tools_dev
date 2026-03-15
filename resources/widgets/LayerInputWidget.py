@@ -125,19 +125,19 @@ class LayerInputWidget(QWidget):
         if isinstance(old, QgsVectorLayer):
             try:
                 old.selectionChanged.disconnect(self._update_selection_state)
-            except Exception as e:                
+            except Exception as e:
                 logger.exception(e)
-
 
     # --------------------------------------------------
     # Auto select
     # --------------------------------------------------
+
     def _try_select_active_layer(self):
         try:
             from qgis.utils import iface
 
             layer = iface.activeLayer()
-        except Exception as e:            
+        except Exception as e:
             logger.error(f"Erro ao obter activeLayer: {e}")
             layer = None
 

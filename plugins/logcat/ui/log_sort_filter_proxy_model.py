@@ -161,9 +161,7 @@ class LogSortFilterProxyModel(QSortFilterProxyModel):
 
             try:
                 if (
-                    not hasattr(source_model, "COLUMNS")
-                    or col < 0
-                    or col >= len(source_model.COLUMNS)
+                    not hasattr(source_model, "COLUMNS") or col < 0 or col >= len(source_model.COLUMNS)
                 ):
                     return False
             except Exception as e:
@@ -194,9 +192,7 @@ class LogSortFilterProxyModel(QSortFilterProxyModel):
 
                     # Validação rigorosa de índices
                     if (
-                        entries
-                        and 0 <= left_row < len(entries)
-                        and 0 <= right_row < len(entries)
+                        entries and 0 <= left_row < len(entries) and 0 <= right_row < len(entries)
                     ):
                         entry_left = entries[left_row]
                         entry_right = entries[right_row]

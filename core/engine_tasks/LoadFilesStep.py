@@ -74,7 +74,7 @@ class LoadFilesStep(BaseStep):
                     )
                     break
 
-                batch = valid[i : i + chunk]
+                batch = valid[i: i + chunk]
 
                 for rec in batch:
                     try:
@@ -153,7 +153,7 @@ class LoadFilesStep(BaseStep):
                     logger.error(f"LoadFilesStep: processEvents failed: {e}")
 
                 logger.info(
-                    f"Batch {i}-{i+len(batch)-1} adicionadas; progresso {loaded}/{total}"
+                    f"Batch {i}-{i + len(batch) - 1} adicionadas; progresso {loaded}/{total}"
                 )
         finally:
             try:

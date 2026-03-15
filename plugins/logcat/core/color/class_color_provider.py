@@ -55,38 +55,38 @@ class ClassColorProvider:
         Lightness: 0-100
         """
         # Normalizar
-        h = hue / 360.0
-        s = saturation / 100.0
-        l = lightness / 100.0
+        hue_norm = hue / 360.0
+        sat_norm = saturation / 100.0
+        light_norm = lightness / 100.0
 
-        if s == 0:
+        if sat_norm == 0:
             # Sem saturação = cinza
-            v = int(l * 255)
-            return f"#{v:02X}{v:02X}{v:02X}"
+            gray_value = int(light_norm * 255)
+            return f"#{gray_value:02X}{gray_value:02X}{gray_value:02X}"
 
         # Fórmula HSL -> RGB
-        def hue2rgb(p, q, t):
-            if t < 0:
-                t += 1
-            if t > 1:
-                t -= 1
-            if t < 1 / 6:
-                return p + (q - p) * 6 * t
-            if t < 1 / 2:
-                return q
-            if t < 2 / 3:
-                return p + (q - p) * (2 / 3 - t) * 6
-            return p
+        def hue2rgb(rgb_p, rgb_q, temp_hue):
+            if temp_hue < 0:
+                temp_hue += 1
+            if temp_hue > 1:
+                temp_hue -= 1
+            if temp_hue < 1 / 6:
+                return rgb_p + (rgb_q - rgb_p) * 6 * temp_hue
+            if temp_hue < 1 / 2:
+                return rgb_q
+            if temp_hue < 2 / 3:
+                return rgb_p + (rgb_q - rgb_p) * (2 / 3 - temp_hue) * 6
+            return rgb_p
 
-        q = l * (1 + s) if l < 0.5 else l + s - l * s
-        p = 2 * l - q
+        rgb_q = light_norm * (1 + sat_norm) if light_norm < 0.5 else light_norm + sat_norm - light_norm * sat_norm
+        rgb_p = 2 * light_norm - rgb_q
 
-        r = hue2rgb(p, q, h + 1 / 3)
-        g = hue2rgb(p, q, h)
-        b = hue2rgb(p, q, h - 1 / 3)
+        red = hue2rgb(rgb_p, rgb_q, hue_norm + 1 / 3)
+        green = hue2rgb(rgb_p, rgb_q, hue_norm)
+        blue = hue2rgb(rgb_p, rgb_q, hue_norm - 1 / 3)
 
         return "#{:02X}{:02X}{:02X}".format(
-            int(round(r * 255)), int(round(g * 255)), int(round(b * 255))
+            int(round(red * 255)), int(round(green * 255)), int(round(blue * 255))
         )
 
     def get_color(self, class_name: str) -> str:
