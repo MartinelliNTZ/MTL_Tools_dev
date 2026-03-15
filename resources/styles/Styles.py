@@ -5,13 +5,9 @@ Responsável apenas por DEFINIR estilos, não por aplicar lógica.
 """
 
 from .BaseStyles import BaseStyles
-from .CoffeTheme import CoffeTheme
 
 
 class Styles(BaseStyles):
-
-   
-
 
     @staticmethod
     def calc_checkbox_grid_height(num_items: int, items_per_row: int = 1) -> int:
@@ -180,7 +176,7 @@ class Styles(BaseStyles):
     def collapsible_parameters():
         """
         Estilo para CollapsibleParametersWidget (parâmetros avançados expansíveis).
-        
+
         Componentes:
         - Header: background degradado, borda inferior
         - Ícone: seta direcionável (→ ↓)
@@ -240,7 +236,6 @@ class Styles(BaseStyles):
         }}
         """
 
-
     # ==========================================================
     # WIDGETS
     # ==========================================================
@@ -288,7 +283,6 @@ class Styles(BaseStyles):
         {Styles.checkbox()}
         margin: 4px;
         """
-
 
     @staticmethod
     def bottom_action_buttons_widget():

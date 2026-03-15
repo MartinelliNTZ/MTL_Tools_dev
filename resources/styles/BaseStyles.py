@@ -12,7 +12,8 @@ class BaseStyles:
     """
     Estilos base reutilizáveis entre diversos widgets.
     """
-        # ==========================================================
+
+    # ==========================================================
     # TEMA (CORES)
     # ==========================================================
 
@@ -40,7 +41,9 @@ class BaseStyles:
     COLOR_COLLAPSIBLE_HEADER_START = CoffeTheme.COLOR_COLLAPSIBLE_HEADER_START
     COLOR_COLLAPSIBLE_HEADER_END = CoffeTheme.COLOR_COLLAPSIBLE_HEADER_END
 
-    COLOR_COLLAPSIBLE_HEADER_HOVER_START = CoffeTheme.COLOR_COLLAPSIBLE_HEADER_HOVER_START
+    COLOR_COLLAPSIBLE_HEADER_HOVER_START = (
+        CoffeTheme.COLOR_COLLAPSIBLE_HEADER_HOVER_START
+    )
     COLOR_COLLAPSIBLE_HEADER_HOVER_END = CoffeTheme.COLOR_COLLAPSIBLE_HEADER_HOVER_END
     COLOR_CHECKBOX_BG = CoffeTheme.COLOR_CHECKBOX_BG
 
@@ -66,7 +69,7 @@ class BaseStyles:
     ITEM_HEIGHT = CoffeTheme.ITEM_HEIGHT
     LAYOUT_V_SPACING = CoffeTheme.LAYOUT_V_SPACING
     LAYOUT_H_SPACING = CoffeTheme.LAYOUT_H_SPACING
-    CONTENT_PADDING = CoffeTheme.CONTENT_PADDING    
+    CONTENT_PADDING = CoffeTheme.CONTENT_PADDING
     CHECKBOX_SIZE = CoffeTheme.CHECKBOX_SIZE
     RADIO_SIZE = CoffeTheme.RADIO_SIZE
 
@@ -161,6 +164,7 @@ class BaseStyles:
             background: {BaseStyles.COLOR_PRIMARY_DARK};
         }}
         """
+
     @staticmethod
     def checkbox():
         return f"""
@@ -210,7 +214,7 @@ class BaseStyles:
 
     @staticmethod
     def button():
-        
+
         return f"""
         QPushButton {{
             background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
