@@ -43,11 +43,7 @@ class QgisMessageUtil:
 
     @staticmethod
     def modal_result_with_folder(
-        iface,
-        title: str,   
-        message: str,     
-        folder_path: str,
-        parent=None
+        iface, title: str, message: str, folder_path: str, parent=None
     ):
         """
         Exibe QMessageBox modal com:
@@ -69,58 +65,59 @@ class QgisMessageUtil:
         """
         try:
             folder_url = QUrl.fromLocalFile(folder_path).toString()
-            
+
             # Tentar usar parent widget fornecido, caso contrário usar mainWindow
             parent_widget = parent if parent else iface.mainWindow()
-            
+
             if parent_widget is None:
                 QgisMessageUtil.log(
                     f"[modal_result_with_folder] AVISO: parent_widget é None, usando fallback",
-                    level=Qgis.Warning
+                    level=Qgis.Warning,
                 )
                 parent_widget = None
-            
+
             msg = QMessageBox(parent_widget)
             msg.setWindowTitle(title)
             msg.setIcon(QMessageBox.Information)
             msg.setTextFormat(Qt.RichText)
-            
+
             text = (
                 f"<b>{message}</b> .<br><br>"
                 f"<b>Pasta:</b> <a href='{folder_url}'>{folder_path}</a>"
             )
-            
+
             msg.setText(text)
             result = msg.exec()
-            
+
             QgisMessageUtil.log(
                 f"[modal_result_with_folder] Diálogo exibido com sucesso: {title}",
-                level=Qgis.Info
+                level=Qgis.Info,
             )
             return result
-            
+
         except Exception as e:
             QgisMessageUtil.log(
                 f"[modal_result_with_folder] ERRO ao exibir diálogo: {str(e)}",
-                level=Qgis.Critical
+                level=Qgis.Critical,
             )
             QgisMessageUtil.log(
-                f"Traceback: {traceback.format_exc()}",
-                level=Qgis.Critical
+                f"Traceback: {traceback.format_exc()}", level=Qgis.Critical
             )
             # Fallback: tentar exibir via message bar
             try:
-                if iface and hasattr(iface, 'messageBar'):
+                if iface and hasattr(iface, "messageBar"):
                     iface.messageBar().pushMessage(
                         title,
-                        message.replace('<b>', '').replace('</b>', '').replace('<br><br>', ' | '),
+                        message.replace("<b>", "")
+                        .replace("</b>", "")
+                        .replace("<br><br>", " | "),
                         Qgis.Critical,
-                        duration=10
+                        duration=10,
                     )
             except Exception as fallback_e:
                 QgisMessageUtil.log(
                     f"[modal_result_with_folder] Fallback também falhou: {str(fallback_e)}",
-                    level=Qgis.Critical
+                    level=Qgis.Critical,
                 )
 
     @staticmethod
@@ -138,7 +135,9 @@ class QgisMessageUtil:
 
     @staticmethod
     def bar_critical(iface, message, title="Erro", duration=5):
-        QgisMessageUtil._push_message_bar(iface, title, message, Qgis.Critical, duration)
+        QgisMessageUtil._push_message_bar(
+            iface, title, message, Qgis.Critical, duration
+        )
 
     # ------------------------------
     # Modals (bloqueantes)
@@ -172,8 +171,11 @@ class QgisMessageUtil:
     @staticmethod
     def confirm(iface, message, title="Confirmação"):
         resp = QMessageBox.question(
-            iface.mainWindow(), title, message,
-            QMessageBox.Yes | QMessageBox.No, QMessageBox.No
+            iface.mainWindow(),
+            title,
+            message,
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
         )
         return resp == QMessageBox.Yes
 
@@ -198,9 +200,9 @@ class QgisMessageUtil:
     @staticmethod
     def log(message, level=Qgis.Info, tag=None):
         """Escreve no log do QGIS (QgsMessageLog)."""
-        QgsMessageLog.logMessage(str(message), tag or QgisMessageUtil.DEFAULT_LOG_TAG, level)
-        
-   
+        QgsMessageLog.logMessage(
+            str(message), tag or QgisMessageUtil.DEFAULT_LOG_TAG, level
+        )
 
     @staticmethod
     def ask_field_conflict(iface, field_name):
@@ -241,10 +243,12 @@ class QgisMessageUtil:
         return "cancel"
 
     @staticmethod
-    def confirm_destructive(parent, title: str, html_text: str,icon = QMessageBox.Warning, red_text=None) -> bool:
+    def confirm_destructive(
+        parent, title: str, html_text: str, icon=QMessageBox.Warning, red_text=None
+    ) -> bool:
         if red_text:
-            html_text = f"<b style='color:red'>{red_text}</b><br><br>"+html_text
-        
+            html_text = f"<b style='color:red'>{red_text}</b><br><br>" + html_text
+
         msg = QMessageBox(parent)
         msg.setWindowTitle(title)
         msg.setIcon(icon)

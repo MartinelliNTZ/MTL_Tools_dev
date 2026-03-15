@@ -1,4 +1,7 @@
+# -*- coding: utf-8 -*-
 import time
+
+
 class FormatUtils:
 
     @staticmethod
@@ -25,6 +28,7 @@ class FormatUtils:
         if m:
             return f"{m}m{s}s"
         return f"{s}s"
+
     @staticmethod
     def clock(ts: float) -> str:
         if not ts:

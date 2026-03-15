@@ -10,46 +10,46 @@ Responsável por:
 
 import os
 import sys
-from pathlib import Path
+
 from qgis.PyQt.QtCore import QProcess
-from qgis.PyQt.QtWidgets import QProgressDialog, QApplication, QMessageBox
+from qgis.PyQt.QtWidgets import QProgressDialog
 from .QgisMessageUtil import QgisMessageUtil
 
 
 class DependenciesManager:
     """Gerencia validação e instalação de dependências externas."""
-    
+
     # Mapeamento de dependências: nome_requerimento -> (módulo_import, script_instalação)
     DEPENDENCIES = {
-        'PyPDF2': {
-            'import': 'PyPDF2',
-            'script': 'install_pypdf2.bat',
-            'description': 'Unir/mesclar arquivos PDF',
-            'pip': 'PyPDF2'
+        "PyPDF2": {
+            "import": "PyPDF2",
+            "script": "install_pypdf2.bat",
+            "description": "Unir/mesclar arquivos PDF",
+            "pip": "PyPDF2",
         },
-        'Pillow': {
-            'import': 'PIL',
-            'script': 'install_pillow.cmd',
-            'description': 'Processar e converter imagens (PNG)',
-            'pip': 'Pillow'
-        }
+        "Pillow": {
+            "import": "PIL",
+            "script": "install_pillow.cmd",
+            "description": "Processar e converter imagens (PNG)",
+            "pip": "Pillow",
+        },
     }
-    
+
     @staticmethod
     def check_dependency(dependency_name: str) -> bool:
         """
         Verifica se uma dependência está instalada.
-        
+
         Parameters
         ----------
         dependency_name : str
             Nome da dependência (ex: 'PyPDF2', 'Pillow')
-        
+
         Returns
         -------
         bool
             True se instalada, False caso contrário
-        
+
         Example
         -------
         if not DependenciesManager.check_dependency('PyPDF2'):
@@ -57,38 +57,38 @@ class DependenciesManager:
         """
         if dependency_name not in DependenciesManager.DEPENDENCIES:
             return False
-        
+
         dep_info = DependenciesManager.DEPENDENCIES[dependency_name]
-        module_name = dep_info['import']
-        
+        module_name = dep_info["import"]
+
         try:
             __import__(module_name)
             return True
         except ImportError:
             return False
-    
+
     @staticmethod
     def get_dependency_info(dependency_name: str) -> dict:
         """
         Retorna informações sobre uma dependência.
-        
+
         Returns
         -------
         dict
             Dicionário com 'import', 'script', 'description', 'pip'
         """
         return DependenciesManager.DEPENDENCIES.get(dependency_name, {})
-    
+
     @staticmethod
     def get_install_script_path(dependency_name: str) -> str:
         """
         Retorna caminho completo do script de instalação.
-        
+
         Parameters
         ----------
         dependency_name : str
             Nome da dependência (ex: 'PyPDF2', 'Pillow')
-        
+
         Returns
         -------
         str
@@ -96,25 +96,25 @@ class DependenciesManager:
         """
         if dependency_name not in DependenciesManager.DEPENDENCIES:
             return ""
-        
+
         dep_info = DependenciesManager.DEPENDENCIES[dependency_name]
-        script_name = dep_info['script']
-        
+        script_name = dep_info["script"]
+
         # Procurar em caminhos padrão
         possible_paths = [
             # Relativo ao arquivo atual
-            os.path.join(os.path.dirname(__file__), '..', 'core', 'lib', script_name),
+            os.path.join(os.path.dirname(__file__), "..", "core", "lib", script_name),
             # Relativo ao projeto
             os.path.join(os.path.dirname(__file__), script_name),
         ]
-        
+
         for path in possible_paths:
             abs_path = os.path.abspath(path)
             if os.path.exists(abs_path):
                 return abs_path
-        
+
         return ""
-    
+
     @staticmethod
     def install_dependency(dependency_name: str) -> bool:
         """
@@ -131,13 +131,15 @@ class DependenciesManager:
         if not dep_info:
             return False
 
-        pip_name = dep_info.get('pip', dependency_name)
+        pip_name = dep_info.get("pip", dependency_name)
 
-        python_exe = sys.executable or 'python'
+        python_exe = sys.executable or "python"
 
         # Use QProcess.startDetached como fallback (sem UI). Retorna True se o
         # processo foi iniciado corretamente.
-        started = QProcess.startDetached(python_exe, ["-m", "pip", "install", "--user", pip_name])
+        started = QProcess.startDetached(
+            python_exe, ["-m", "pip", "install", "--user", pip_name]
+        )
         if started:
             QgisMessageUtil.bar_info(None, f"Instalação iniciada: {pip_name}")
             return True
@@ -158,11 +160,13 @@ class DependenciesManager:
         if not dep_info:
             return False
 
-        pip_name = dep_info.get('pip', dependency_name)
-        python_exe = sys.executable or 'python'
+        pip_name = dep_info.get("pip", dependency_name)
+        python_exe = sys.executable or "python"
 
         parent = iface.mainWindow() if iface else None
-        progress = QProgressDialog(f"Instalando dependência {pip_name}...", "Cancelar", 0, 0, parent)
+        progress = QProgressDialog(
+            f"Instalando dependência {pip_name}...", "Cancelar", 0, 0, parent
+        )
         progress.setWindowTitle("Instalando dependências")
         progress.setAutoClose(True)
         progress.setModal(True)
@@ -175,7 +179,9 @@ class DependenciesManager:
             if exit_code == 0:
                 QgisMessageUtil.bar_info(iface, f"Dependência instalada: {pip_name}")
             else:
-                QgisMessageUtil.modal_error(iface, f"Falha ao instalar {pip_name}. Código: {exit_code}")
+                QgisMessageUtil.modal_error(
+                    iface, f"Falha ao instalar {pip_name}. Código: {exit_code}"
+                )
 
         def _on_error(err):
             progress.close()
@@ -190,17 +196,17 @@ class DependenciesManager:
             return False
 
         return True
-    
+
     @staticmethod
     def validate_dependencies(required_dependencies: list) -> dict:
         """
         Valida múltiplas dependências de uma vez.
-        
+
         Parameters
         ----------
         required_dependencies : list
             Lista de nomes de dependências (ex: ['PyPDF2', 'Pillow'])
-        
+
         Returns
         -------
         dict
@@ -209,7 +215,7 @@ class DependenciesManager:
                 'missing': [],         # Dependências faltantes
                 'present': []          # Dependências presentes
             }
-        
+
         Example
         -------
         result = DependenciesManager.validate_dependencies(['PyPDF2', 'Pillow'])
@@ -218,15 +224,15 @@ class DependenciesManager:
         """
         missing = []
         present = []
-        
+
         for dep_name in required_dependencies:
             if DependenciesManager.check_dependency(dep_name):
                 present.append(dep_name)
             else:
                 missing.append(dep_name)
-        
+
         return {
-            'all_present': len(missing) == 0,
-            'missing': missing,
-            'present': present
+            "all_present": len(missing) == 0,
+            "missing": missing,
+            "present": present,
         }

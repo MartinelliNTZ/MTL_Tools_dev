@@ -4,15 +4,10 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 from qgis.core import QgsProject, QgsMapLayer, QgsVectorLayer
-from qgis.PyQt.QtWidgets import QApplication
+
 from ..core.config.LogUtils import LogUtils
-from pathlib import Path
-import gc
-from pathlib import Path
 from typing import Union, Optional
 from qgis.core import QgsMapLayer
-
-
 
 
 class ProjectUtils:
@@ -23,9 +18,11 @@ class ProjectUtils:
         Retorna: QgsVectorLayer ou None.
         Não acessa iface nem exibe mensagens.
         """
-        from qgis.core import QgsVectorLayer
+
         if logger:
-            logger.debug(f"Validando camada vetorial ativa. Require editable: {require_editable}")
+            logger.debug(
+                f"Validando camada vetorial ativa. Require editable: {require_editable}"
+            )
         if not layer or not isinstance(layer, QgsVectorLayer):
             if logger:
                 logger.debug("Camada ativa inválida ou não é vetorial")
@@ -42,16 +39,21 @@ class ProjectUtils:
         Não acessa iface nem exibe mensagens.
         """
         if logger:
-            logger.debug(f"Verificando se camada está em edição: {layer.name()}. Editável: {layer.isEditable()}")
+            logger.debug(
+                f"Verificando se camada está em edição: {layer.name()}. Editável: {layer.isEditable()}"
+            )
         return layer.isEditable()
+
     """
     Utilitários relacionados ao projeto QGIS (.qgz).
     Não possui dependência de UI.
     """
+
     @staticmethod
     def get_project_instance() -> QgsProject:
         """Retorna a instância do projeto QGIS aberto."""
         return QgsProject.instance()
+
     @staticmethod
     def is_project_saved(project: QgsProject) -> bool:
         return bool(project.fileName())
@@ -70,6 +72,7 @@ class ProjectUtils:
         """Define o texto do clipboard via Qt. Retorna True se bem-sucedido."""
         try:
             from qgis.PyQt.QtGui import QGuiApplication
+
             QGuiApplication.clipboard().setText("" if text is None else str(text))
             return True
         except Exception as e:
@@ -141,7 +144,9 @@ class ProjectUtils:
                     try:
                         total += f.stat().st_size
                     except Exception as e:
-                        logger = LogUtils(tool="project_utils", class_name="ProjectUtils")
+                        logger = LogUtils(
+                            tool="project_utils", class_name="ProjectUtils"
+                        )
                         logger.error(f"Erro ao ler arquivo durante compute_size: {e}")
                         return total
 
@@ -154,7 +159,7 @@ class ProjectUtils:
             return total
 
         return p.stat().st_size
-    
+
     @staticmethod
     def is_layer_in_project(layer: QgsMapLayer) -> bool:
         """
@@ -176,7 +181,6 @@ class ProjectUtils:
             return False
 
     @staticmethod
-    
     def remove_layer_from_project(layer: QgsMapLayer) -> bool:
         """
         Remove a camada informada do projeto QGIS aberto.
@@ -200,8 +204,7 @@ class ProjectUtils:
             logger = LogUtils(tool="project_utils", class_name="ProjectUtils")
             logger.error(f"Erro ao remover camada do projeto: {e}")
             return False
-        
-    
+
     @staticmethod
     def is_file_in_project(file_path: str) -> bool:
         """
@@ -231,6 +234,7 @@ class ProjectUtils:
             logger = LogUtils(tool="project_utils", class_name="ProjectUtils")
             logger.error(f"Erro ao verificar arquivo no projeto: {e}")
             return False
+
     @staticmethod
     def remove_file_from_project(file_path: str) -> bool:
         """
@@ -326,8 +330,3 @@ class ProjectUtils:
             logger = LogUtils(tool="project_utils", class_name="ProjectUtils")
             logger.error(f"Erro ao inserir layer no grupo: {e}")
             return None
-
-
-
-
-

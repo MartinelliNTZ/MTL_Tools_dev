@@ -2,11 +2,8 @@
 from pathlib import Path
 from qgis.core import (
     QgsVectorFileWriter,
-    QgsProject,
-    QgsVectorLayer,
     QgsWkbTypes,
     QgsVectorLayer,
-    QgsVectorFileWriter,
     QgsProject,
 )
 from typing import Optional, Tuple

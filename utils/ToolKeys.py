@@ -1,16 +1,16 @@
-
+# -*- coding: utf-8 -*-
 
 
 class ToolKey:
     # plugins/
-    CADMUS_PLUGIN  = "cadmus_plugin"
+    CADMUS_PLUGIN = "cadmus_plugin"
     EXPORT_ALL_LAYOUTS = "export_all_layouts"
     DRONE_COORDINATES = "drone_coordinates"
     LOAD_FOLDER_LAYERS = "load_folder_layers"
     REPLACE_IN_LAYOUTS = "replace_in_layouts"
     RESTART_QGIS = "restart_qgis"
     GERAR_RASTRO_IMPLEMENTO = "gerar_rastro_implemento"
-    COORD_CLICK_TOOL = "coord_click_tool"    
+    COORD_CLICK_TOOL = "coord_click_tool"
     COPY_ATTRIBUTES = "copy_attributes"
     CONVERTER_MULTIPART = "converter_multipart"
     SETTINGS = "settings"
@@ -41,7 +41,6 @@ class ToolKey:
         CONVERTER_MULTIPART: "#F5A962",  # laranja-pêssego → conversão geométrica
         SETTINGS: "#95A5A6",  # cinza → configurações / sistema
         VECTOR_FIELDS: "#C39BD3",  # púrpura → cálculos vetoriais
-
         # === Processing / análises ===
         ATTRIBUTE_STATISTICS: "#F7DC6F",  # amarelo → estatística
         DIFFERENCE_FIELDS: "#BB8FCE",  # roxo → comparação
@@ -50,5 +49,3 @@ class ToolKey:
         RASTER_MASS_SAMPLER: "#F1948A",  # coral → raster pesado
         ELEVATION_ANALISYS: "#5DADE2",  # azul médio → relevo
     }
-
-

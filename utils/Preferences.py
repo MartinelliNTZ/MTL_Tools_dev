@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import json
 from qgis.PyQt.QtCore import QStandardPaths
@@ -6,12 +7,12 @@ from ..core.config.LogUtils import LogUtils
 # module logger for preferences utils
 logger = LogUtils(tool="preferences", class_name="Preferences")
 
+
 class Preferences:
     """Gerencia as preferências do plugin, armazenando em um JSON local."""
-    
+
     PREF_FOLDER = os.path.join(
-        QStandardPaths.writableLocation(QStandardPaths.AppDataLocation),
-        "MTLTools"
+        QStandardPaths.writableLocation(QStandardPaths.AppDataLocation), "MTLTools"
     )
 
     PREF_FILE = os.path.join(PREF_FOLDER, "mtl_prefs.json")
@@ -37,11 +38,13 @@ class Preferences:
         Preferences._ensure_pref_folder()
         with open(Preferences.PREF_FILE, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4)
+
     @staticmethod
     def load_tool_prefs(tool_key):
         """Carrega apenas as prefs da ferramenta específica."""
         prefs = Preferences.load_prefs()
         return prefs.get(tool_key, {})
+
     @staticmethod
     def save_tool_prefs(tool_key, values: dict):
         """Salva prefs de uma ferramenta específica."""
@@ -49,12 +52,13 @@ class Preferences:
         prefs[tool_key] = values
         Preferences.save_prefs(prefs)
 
+
 PREF_FOLDER = os.path.join(
-    QStandardPaths.writableLocation(QStandardPaths.AppDataLocation),
-    "MTLTools"
+    QStandardPaths.writableLocation(QStandardPaths.AppDataLocation), "MTLTools"
 )
 
 PREF_FILE = os.path.join(PREF_FOLDER, "mtl_prefs.json")
+
 
 def _ensure_pref_folder():
     """DEPRECATED USE Preferences._ensure_pref_folder() instead."""
@@ -62,6 +66,7 @@ def _ensure_pref_folder():
     if not os.path.exists(PREF_FILE):
         with open(PREF_FILE, "w", encoding="utf-8") as f:
             f.write("{}")
+
 
 def load_prefs():
     """DEPRECATED USE Preferences.load_prefs() instead."""
@@ -73,16 +78,19 @@ def load_prefs():
         logger.error(f"Erro ao carregar deprecated preferences file: {e}")
         return {}
 
+
 def save_prefs(data):
     """DEPRECATED USE Preferences.save_prefs() instead."""
     _ensure_pref_folder()
     with open(PREF_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4)
 
+
 def load_tool_prefs(tool_key):
     """DEPRECATED USE Preferences.load_tool_prefs() instead."""
     prefs = load_prefs()
     return prefs.get(tool_key, {})
+
 
 def save_tool_prefs(tool_key, values: dict):
     """DEPRECATED USE Preferences.save_tool_prefs() instead."""

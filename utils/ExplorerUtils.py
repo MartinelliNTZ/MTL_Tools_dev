@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 from pathlib import Path
 from typing import List, Dict
@@ -7,7 +8,19 @@ from .vector.VectorLayerSource import VectorLayerSource
 from .raster.RasterLayerSource import RasterLayerSource
 
 
-VECTOR_EXTS = {".shp", ".geojson", ".json", ".kml", ".kmz", ".gpx", ".csv", ".tab", ".las", ".laz", ".gpkg"}
+VECTOR_EXTS = {
+    ".shp",
+    ".geojson",
+    ".json",
+    ".kml",
+    ".kmz",
+    ".gpx",
+    ".csv",
+    ".tab",
+    ".las",
+    ".laz",
+    ".gpkg",
+}
 RASTER_EXTS = {".tif", ".tiff", ".ecw", ".jp2", ".asc"}
 
 
@@ -61,12 +74,16 @@ class ExplorerUtils:
         rtype = record.get("type")
 
         if rtype == "raster":
-            layer = RasterLayerSource().load_raster_from_file(path, external_tool_key=tool_key)
+            layer = RasterLayerSource().load_raster_from_file(
+                path, external_tool_key=tool_key
+            )
             if layer:
                 logger.info(f"Raster criado: {path}")
             return layer
         else:
-            layer = VectorLayerSource().load_vector_layer_from_file(path, external_tool_key=tool_key)
+            layer = VectorLayerSource().load_vector_layer_from_file(
+                path, external_tool_key=tool_key
+            )
             if layer:
                 logger.info(f"Vector criado: {path}")
             return layer

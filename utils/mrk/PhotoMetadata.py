@@ -91,7 +91,7 @@ class PhotoMetadata:
         # Processar cada grupo de pontos com sua pasta correspondente
         for folder, folder_points in points_by_folder.items():
             logger.info(
-                f"Processando grupo de fotos",
+                "Processando grupo de fotos",
                 code="PHOTO_FOLDER_PROCESSING",
                 data={"folder": folder, "point_count": len(folder_points)},
             )
@@ -100,7 +100,7 @@ class PhotoMetadata:
             photo_index = PhotoMetadata._index_photos(folder, recursive=False)
 
             logger.info(
-                f"Fotos indexadas para pasta",
+                "Fotos indexadas para pasta",
                 code="PHOTO_INDEX_COMPLETE",
                 data={
                     "folder": folder,
@@ -121,7 +121,7 @@ class PhotoMetadata:
                 if not meta:
                     missing_count += 1
                     logger.debug(
-                        f"Foto não encontrada no índice",
+                        "Foto não encontrada no índice",
                         code="PHOTO_MATCH_FAILED",
                         data={
                             "folder": folder,
@@ -147,7 +147,7 @@ class PhotoMetadata:
                 if exif_filled >= 5:  # Sucesso: 5+ campos EXIF preenchidos
                     success_count += 1
                     logger.debug(
-                        f"Metadata enriquecida com sucesso",
+                        "Metadata enriquecida com sucesso",
                         code="PHOTO_MATCH_SUCCESS",
                         data={
                             "folder": folder,
@@ -160,7 +160,7 @@ class PhotoMetadata:
                 elif exif_filled >= 1:  # Sucesso parcial: 1-4 campos EXIF
                     partial_count += 1
                     logger.debug(
-                        f"Metadata enriquecida parcialmente",
+                        "Metadata enriquecida parcialmente",
                         code="PHOTO_MATCH_PARTIAL",
                         data={
                             "folder": folder,
@@ -172,7 +172,7 @@ class PhotoMetadata:
                 else:  # Falha: apenas filesystem, sem EXIF
                     failed_count += 1
                     logger.warning(
-                        f"Falha ao extrair EXIF de foto",
+                        "Falha ao extrair EXIF de foto",
                         code="PHOTO_EXIF_FAILED",
                         data={
                             "folder": folder,
@@ -231,7 +231,7 @@ class PhotoMetadata:
                     all_files.append((root, fname))
 
         logger.info(
-            f"Fotos identificadas",
+            "Fotos identificadas",
             code="PHOTO_FILES_FOUND",
             data={
                 "total_jpg_files": len(all_files),
@@ -260,7 +260,7 @@ class PhotoMetadata:
                 st = os.stat(path)
             except Exception as e:
                 logger.debug(
-                    f"Erro ao acessar arquivo",
+                    "Erro ao acessar arquivo",
                     code="PHOTO_STAT_ERROR",
                     data={"arquivo": fname, "caminho": path, "erro": str(e)},
                 )
@@ -315,7 +315,7 @@ class PhotoMetadata:
 
                     exif_success += 1
                     logger.debug(
-                        f"EXIF extraído com sucesso",
+                        "EXIF extraído com sucesso",
                         code="PHOTO_EXIF_SUCCESS",
                         data={
                             "numero_sequencial": num,
@@ -331,7 +331,7 @@ class PhotoMetadata:
                 exif_failed += 1
                 exif_error = str(e)
                 logger.debug(
-                    f"Falha ao extrair EXIF",
+                    "Falha ao extrair EXIF",
                     code="PHOTO_EXIF_ERROR",
                     data={
                         "numero_sequencial": num,
@@ -348,7 +348,7 @@ class PhotoMetadata:
             percent_done = i / total
             if percent_done >= next_log:
                 logger.info(
-                    f"Progresso de indexação",
+                    "Progresso de indexação",
                     code="PHOTO_INDEXING_PROGRESS",
                     data={
                         "percentual": int(percent_done * 100),
@@ -362,7 +362,7 @@ class PhotoMetadata:
 
         # Resumo final
         logger.info(
-            f"Indexação concluída",
+            "Indexação concluída",
             code="PHOTO_INDEXING_COMPLETE",
             data={
                 "total_fotos_indexadas": len(index),
