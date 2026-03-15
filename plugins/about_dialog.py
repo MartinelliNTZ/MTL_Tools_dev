@@ -43,10 +43,10 @@ class AboutDialog(QDialog):
             <b>Criador:</b> MTL Agricultura e Tecnologia<br>
             <b>Local:</b> Palmas - Tocantins - Brasil<br>
             <b>Email:</b> <a href="mailto:martinelli.matheus11@gmail.com">martinelli.matheus11@gmail.com</a><br>
-            <b>Site:</b> <a href="https://github.com/MartinelliNTZ/mtl-tools-repo">https://github.com/MartinelliNTZ/mtl-tools-repo</a><br>
+            <b>Site:</b> <a href="https://github.com/MartinelliNTZ/Cadmus">https://github.com/MartinelliNTZ/Cadmus</a><br>
             <b>GitHub:</b>
-            <a href="https://github.com/MartinelliNTZ/mtl-tools-repo">
-            https://github.com/MartinelliNTZ/mtl-tools-repo</a>
+            <a href="https://github.com/MartinelliNTZ/Cadmus">
+            https://github.com/MartinelliNTZ/Cadmus</a>
             """
         )
 
