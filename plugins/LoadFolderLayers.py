@@ -1,20 +1,9 @@
 # -*- coding: utf-8 -*-
 import os
-import re
-from pathlib import Path
-from datetime import datetime
-import shutil
-
-from qgis.core import (
-    QgsProject,
-)
-
+from qgis.core import QgsProject
 from ..plugins.BasePlugin import BasePluginMTL
 from ..core.ui.WidgetFactory import WidgetFactory
-from ..utils.Preferences import (
-    load_tool_prefs,
-    save_tool_prefs,
-)
+from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.ExplorerUtils import ExplorerUtils
 from ..utils.ProjectUtils import ProjectUtils
@@ -23,10 +12,10 @@ from ..core.engine_tasks.LoadFilesStep import LoadFilesStep
 from ..core.engine_tasks.ExecutionContext import ExecutionContext
 
 
-
 # ============================================================
 #  ** Janela Principal da Ferramenta **
 # ============================================================
+
 
 class LoadFolderLayersDialog(BasePluginMTL):
 
@@ -58,7 +47,7 @@ class LoadFolderLayersDialog(BasePluginMTL):
             self.TOOL_KEY,
             "LoadFolderLayersDialog",
             load_settings_prefs=False,
-            build_ui=True
+            build_ui=True,
         )
 
     def _build_ui(self, **kwargs):
@@ -67,7 +56,7 @@ class LoadFolderLayersDialog(BasePluginMTL):
             title="Carregar Pasta de Arquivos",
             icon_path="load_folder.ico",
             instructions_file="load_folder_layers.md",
-            enable_scroll=False
+            enable_scroll=False,
         )
 
         # --- Tipos de arquivo dentro de seção colapsável ---
@@ -105,14 +94,14 @@ class LoadFolderLayersDialog(BasePluginMTL):
             "missing_only": "Carregar apenas arquivos ainda NÃO carregados no projeto",
             "preserve": "Criar grupos conforme estrutura de pastas/subpastas",
             "lastfolder": "Não agrupar a última pasta",
-            "backup": "Criar backup do projeto antes de carregar (somente se salvo)",            
+            "backup": "Criar backup do projeto antes de carregar (somente se salvo)",
         }
-        #cmo funciona F:\TTG\FEV_2026\FAZ_UNIAO\OLD\file.shp)
-        #crie os grupo TTG  - FEV_2026 - FAZ_UNIAO - MAS NAO CARREGUE O OLD, POIS É A ULTIMA PASTA
+        # cmo funciona F:\TTG\FEV_2026\FAZ_UNIAO\OLD\file.shp)
+        # crie os grupo TTG  - FEV_2026 - FAZ_UNIAO - MAS NAO CARREGUE O OLD, POIS É A ULTIMA PASTA
         # MODO PRESERVE COM LASTFOLDER DESABILITADO: F:\TTG\FEV_2026\FAZ_UNIAO\OLD\file.shp -> GRUPOS: TTG  - FEV_2026 - FAZ_UNIAO - OLD
-        #VEJA QUE O MODO LASTFOLDER SO FAZ SENTIDO SE O MODO PRESERVE ESTIVER HABILITADO. SE O MODO PRESERVE ESTIVER DESABILITADO, 
+        # VEJA QUE O MODO LASTFOLDER SO FAZ SENTIDO SE O MODO PRESERVE ESTIVER HABILITADO. SE O MODO PRESERVE ESTIVER DESABILITADO,
         # O LASTFOLDER NAO TEM EFEITO, POIS NAO SERA CRIADA NENHUMA ESTRUTURA DE GRUPOS, INDEPENDENTE DO VALOR DE LASTFOLDER
-        # POR ISSO ANALISE O GRID DE CHECKBOX E TENTE IMPLEMENTAR UM SISTEMA ONDE DETERMINADO CHECK PODE INATIVAR OUTRO CHECK, 
+        # POR ISSO ANALISE O GRID DE CHECKBOX E TENTE IMPLEMENTAR UM SISTEMA ONDE DETERMINADO CHECK PODE INATIVAR OUTRO CHECK,
         # COMO É O CASO DO LASTFOLDER QUE SÓ FAZ SENTIDO SE O PRESERVE ESTIVER HABILITADO. LAST FOLDER SO FICA POSSIVEL CHECKAR SE LAST FOLDER ESTIVER HABILITADO
 
         opts_layout, opts_map = WidgetFactory.create_checkbox_grid(
@@ -137,27 +126,30 @@ class LoadFolderLayersDialog(BasePluginMTL):
             self.logger.error(f"Erro {e}")
 
         # --- Botões padrão ---
-        buttons_layout, self.action_buttons = WidgetFactory.create_bottom_action_buttons(
-            parent=self,
-            run_callback=self.execute_tool,
-            close_callback=self.close,
-            info_callback=self.show_info_dialog,
-            tool_key=self.TOOL_KEY,
-            run_text="Carregar Arquivos",
+        buttons_layout, self.action_buttons = (
+            WidgetFactory.create_bottom_action_buttons(
+                parent=self,
+                run_callback=self.execute_tool,
+                close_callback=self.close,
+                info_callback=self.show_info_dialog,
+                tool_key=self.TOOL_KEY,
+                run_text="Carregar Arquivos",
+            )
         )
 
         # Adicionar tudo ao layout principal
-        self.layout.add_items([
-            folder_layout,
-            coll_layout,
-            opts_layout,
-            buttons_layout,
-        ])
+        self.layout.add_items(
+            [
+                folder_layout,
+                coll_layout,
+                opts_layout,
+                buttons_layout,
+            ]
+        )
 
         # Carregar preferências
         self.logger.debug("Construindo interface de usuário", code="UI_BUILD")
         self._load_prefs()
-
 
     # ------------------------------------------------------------------
     # Nota: `show_info` deste plugin foi removido. Use `show_info_dialog()` da classe-base.
@@ -205,7 +197,9 @@ class LoadFolderLayersDialog(BasePluginMTL):
     def _save_prefs(self):
         # Salva preferências de forma simples (assume widgets existem)
         try:
-            selected_types = [label for label, chk in self.chk_types.items() if chk.isChecked()]
+            selected_types = [
+                label for label, chk in self.chk_types.items() if chk.isChecked()
+            ]
             paths = self.folder_selector.get_paths()
             folder = paths[0] if paths else ""
 
@@ -231,7 +225,7 @@ class LoadFolderLayersDialog(BasePluginMTL):
     def execute_tool(self):
 
         # Pasta (usa API do path selector)
-    
+
         paths = self.folder_selector.get_paths()
         folder = paths[0].strip() if paths else ""
         self.start_stats(folder)
@@ -256,22 +250,35 @@ class LoadFolderLayersDialog(BasePluginMTL):
                 extensions.extend(self.FILE_TYPES.get(label, []))
 
         if not extensions:
-            QgisMessageUtil.bar_warning(self.iface, "Selecione pelo menos um tipo de arquivo.")
+            QgisMessageUtil.bar_warning(
+                self.iface, "Selecione pelo menos um tipo de arquivo."
+            )
             return
 
         # scan via ExplorerUtils
         records = ExplorerUtils.scan_folder(folder, extensions, self.TOOL_KEY)
-        self.logger.info(f"scan_folder retornou {len(records)} registros", code="SCAN_COMPLETE")
+        self.logger.info(
+            f"scan_folder retornou {len(records)} registros", code="SCAN_COMPLETE"
+        )
 
         # decidir entre execução síncrona ou assíncrona baseado no número de arquivos
         total_files = len(records)
         if total_files > self.ASYNC_THRESHOLD:
-            self.logger.info(f"Arquivos ({total_files}) acima do limiar ({self.ASYNC_THRESHOLD}), usando execução assíncrona", code="EXEC_STRATEGY")
-            return self._run_async_pipeline(folder=folder, records=records, backup_file=backup_file)
+            self.logger.info(
+                f"Arquivos ({total_files}) acima do limiar ({self.ASYNC_THRESHOLD}), usando execução assíncrona",
+                code="EXEC_STRATEGY",
+            )
+            return self._run_async_pipeline(
+                folder=folder, records=records, backup_file=backup_file
+            )
         else:
-            self.logger.info(f"Arquivos ({total_files}) dentro do limiar ({self.ASYNC_THRESHOLD}), usando execução síncrona", code="EXEC_STRATEGY")
-            return self._run_sync_pipeline(folder=folder, records=records, backup_file=backup_file)
-
+            self.logger.info(
+                f"Arquivos ({total_files}) dentro do limiar ({self.ASYNC_THRESHOLD}), usando execução síncrona",
+                code="EXEC_STRATEGY",
+            )
+            return self._run_sync_pipeline(
+                folder=folder, records=records, backup_file=backup_file
+            )
 
     def _run_sync_pipeline(self, folder: str, records: list, backup_file: str = None):
         """Executa o carregamento de forma síncrona (comportamento atual)."""
@@ -314,11 +321,14 @@ class LoadFolderLayersDialog(BasePluginMTL):
                 ProjectUtils.add_layer(layer, add_to_root=True)
 
             loaded_count += 1
-            self.logger.debug(f"Layer carregada e adicionada: {path}", code="LAYER_ADDED")
+            self.logger.debug(
+                f"Layer carregada e adicionada: {path}", code="LAYER_ADDED"
+            )
         self.finish_stats()
         QgisMessageUtil.modal_info(
             self.iface,
-            f"Foram carregados {loaded_count} arquivos.\n" + (f"Backup criado: {backup_file}" if backup_file else "")
+            f"Foram carregados {loaded_count} arquivos.\n"
+            + (f"Backup criado: {backup_file}" if backup_file else ""),
         )
 
     def _run_async_pipeline(self, folder: str, records: list, backup_file: str = None):
@@ -328,19 +338,23 @@ class LoadFolderLayersDialog(BasePluginMTL):
         no thread principal em lote (bloqueando signals do layer tree)
         para reduzir impacto na UI.
         """
-        self.logger.info("_run_async_pipeline: iniciando pipeline assíncrona", code="ASYNC_START")
+        self.logger.info(
+            "_run_async_pipeline: iniciando pipeline assíncrona", code="ASYNC_START"
+        )
 
-        ctx = ExecutionContext({
-            "folder": folder,
-            "records": records,
-            "tool_key": self.TOOL_KEY,
-            "preserve": self.chk_preserve_structure.isChecked(),
-            "last_folder": self.chk_last_folder.isChecked(),
-            "missing_only": self.chk_load_missing_only.isChecked(),
-            "backup_file": backup_file,
-            # parent widget used by Steps to show modal progress
-            "parent": self,
-        })
+        ctx = ExecutionContext(
+            {
+                "folder": folder,
+                "records": records,
+                "tool_key": self.TOOL_KEY,
+                "preserve": self.chk_preserve_structure.isChecked(),
+                "last_folder": self.chk_last_folder.isChecked(),
+                "missing_only": self.chk_load_missing_only.isChecked(),
+                "backup_file": backup_file,
+                # parent widget used by Steps to show modal progress
+                "parent": self,
+            }
+        )
 
         engine = AsyncPipelineEngine(
             steps=[LoadFilesStep()],
@@ -351,10 +365,17 @@ class LoadFolderLayersDialog(BasePluginMTL):
 
         try:
             engine.start()
-            QgisMessageUtil.bar_info(self.iface, "Execução em background iniciada. Verifique o log para progresso.")
+            QgisMessageUtil.bar_info(
+                self.iface,
+                "Execução em background iniciada. Verifique o log para progresso.",
+            )
         except Exception as e:
-            self.logger.error(f"Falha iniciando pipeline assíncrona: {e}", code="ASYNC_ERROR")
-            QgisMessageUtil.bar_critical(self.iface, f"Erro iniciando execução assíncrona: {e}")
+            self.logger.error(
+                f"Falha iniciando pipeline assíncrona: {e}", code="ASYNC_ERROR"
+            )
+            QgisMessageUtil.bar_critical(
+                self.iface, f"Erro iniciando execução assíncrona: {e}"
+            )
         return None
 
     def _on_async_finished(self, context: ExecutionContext):
@@ -362,11 +383,18 @@ class LoadFolderLayersDialog(BasePluginMTL):
         backup = context.get("backup_file") or context.get("backup_file", None)
         self.finish_stats()
         self.logger.info(f"_on_async_finished: loaded={loaded}", code="ASYNC_FINISH")
-        QgisMessageUtil.bar_info(self.iface, f"Execução assíncrona concluída. Foram carregados {loaded} arquivos.\n" + (f"Backup: {backup}" if backup else ""))
+        QgisMessageUtil.bar_info(
+            self.iface,
+            f"Execução assíncrona concluída. Foram carregados {loaded} arquivos.\n"
+            + (f"Backup: {backup}" if backup else ""),
+        )
 
     def _on_async_error(self, errors):
         self.logger.error(f"_on_async_error: {errors}", code="ASYNC_ERROR")
-        QgisMessageUtil.modal_error(self.iface, f"Erro na execução assíncrona: {errors}")
+        QgisMessageUtil.modal_error(
+            self.iface, f"Erro na execução assíncrona: {errors}"
+        )
+
 
 # Função pública
 def run_load_folder_layers(iface):

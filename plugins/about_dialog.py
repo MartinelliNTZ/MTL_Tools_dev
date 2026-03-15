@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
-from qgis.PyQt.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
-)
+from qgis.PyQt.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QPixmap
-from qgis.PyQt.QtCore import QUrl
 
 
 class AboutDialog(QDialog):
@@ -22,8 +19,7 @@ class AboutDialog(QDialog):
         # LOGO
         # =====================================================
         logo_path = os.path.join(
-            os.path.dirname(__file__),
-            "..", "resources","icons", "mtl_agro.png"
+            os.path.dirname(__file__), "..", "resources", "icons", "mtl_agro.png"
         )
 
         if os.path.exists(logo_path):

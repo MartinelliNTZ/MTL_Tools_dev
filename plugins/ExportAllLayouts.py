@@ -1,15 +1,8 @@
 # -*- coding: utf-8 -*-
-"""
-ExportAllLayoutsDialog - Exportar todos os layouts em PDF/PNG
-
-Plugin refatorado para estender BasePluginMTL com WidgetFactory para UI padronizada.
-"""
-
 import os
 import re
 from qgis.core import QgsProject, QgsLayoutExporter
-from qgis.PyQt.QtCore import QCoreApplication, QUrl
-
+from qgis.PyQt.QtCore import QCoreApplication
 from ..plugins.BasePlugin import BasePluginMTL
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.PDFUtils import PDFUtils
@@ -23,7 +16,7 @@ from ..core.ui.ProgressDialog import ProgressDialog
 class ExportAllLayoutsDialog(BasePluginMTL):
     """
     Plugin para exportar todos os layouts do projeto em PDF e/ou PNG.
-    
+
     Estende BasePluginMTL para:
     - Interface padronizada com MainLayout + AppBar
     - Persistência automática de preferências via _save_prefs()
@@ -32,39 +25,39 @@ class ExportAllLayoutsDialog(BasePluginMTL):
     """
 
     TOOL_KEY = ToolKey.EXPORT_ALL_LAYOUTS
-    
+
     # Mapeamento de opções para checkboxes (chave: label)
     CHECKBOX_OPTIONS = {
         "export_pdf": "Exportar PDF",
         "export_png": "Exportar PNG",
         "merge_pdf": "Unir PDFs em PDF final",
         "merge_png": "Unir PNGs em PDF final",
-        "replace_existing": "Substituir arquivos existentes"
+        "replace_existing": "Substituir arquivos existentes",
     }
 
     def __init__(self, iface):
         super().__init__(iface.mainWindow())
         self.iface = iface
-        
+
         # Inicializar com BasePluginMTL
         self.init(
             self.TOOL_KEY,
             "ExportAllLayoutsDialog",
             load_settings_prefs=False,
-            build_ui=True
+            build_ui=True,
         )
 
     def _build_ui(self, **kwargs):
         """Constrói a interface de exportação com WidgetFactory."""
         self.logger.debug("Construindo UI de exportação de layouts")
-        
+
         super()._build_ui(
             title="Exportar Todos os Layouts",
             icon_path="export_icon.ico",
             instructions_file="export_all_layouts_help.md",
-            enable_scroll=False  # Simples, cabe na tela
+            enable_scroll=False,  # Simples, cabe na tela
         )
-        
+
         self.logger.info("Construindo componentes de interface")
 
         # ========== SEÇÃO 1: Opções de Exportação (Grid Checkboxes - 2 colunas) ==========
@@ -74,22 +67,24 @@ class ExportAllLayoutsDialog(BasePluginMTL):
             checked_by_default=False,
             title="Opções de Exportação",
             separator_top=False,
-            separator_bottom=True
+            separator_bottom=True,
         )
         self.logger.debug("Grid de checkboxes de exportação criado")
 
         # ========== SEÇÃO 2: Max Width para PNGs ==========
-        max_width_layout, self.max_width_input = WidgetFactory.create_input_fields_widget(
-            fields_dict={
-                'max_width': {
-                    'title': 'Max Width para PNG (px):',
-                    'type': 'int',
-                    'default': 3500
-                }
-            },
-            parent=self,
-            separator_top=False,
-            separator_bottom=True
+        max_width_layout, self.max_width_input = (
+            WidgetFactory.create_input_fields_widget(
+                fields_dict={
+                    "max_width": {
+                        "title": "Max Width para PNG (px):",
+                        "type": "int",
+                        "default": 3500,
+                    }
+                },
+                parent=self,
+                separator_top=False,
+                separator_bottom=True,
+            )
         )
         self.logger.debug("Widget de Max Width criado")
 
@@ -99,7 +94,7 @@ class ExportAllLayoutsDialog(BasePluginMTL):
             title="Pasta de saída:",
             mode="folder",
             separator_top=False,
-            separator_bottom=False
+            separator_bottom=False,
         )
         self.logger.debug("Path Selector de pasta de saída criado")
 
@@ -112,25 +107,29 @@ class ExportAllLayoutsDialog(BasePluginMTL):
         self.logger.debug("Botão 'Usar pasta do projeto' criado")
 
         # ========== SEÇÃO 4: Botões de Ação ==========
-        buttons_layout, self.action_buttons = WidgetFactory.create_bottom_action_buttons(
-            parent=self,
-            run_callback=self.execute_tool,
-            close_callback=self.close,
-            info_callback=self.show_info_dialog,
-            tool_key=self.TOOL_KEY,
-            run_text="Exportar"
+        buttons_layout, self.action_buttons = (
+            WidgetFactory.create_bottom_action_buttons(
+                parent=self,
+                run_callback=self.execute_tool,
+                close_callback=self.close,
+                info_callback=self.show_info_dialog,
+                tool_key=self.TOOL_KEY,
+                run_text="Exportar",
+            )
         )
         self.logger.debug("Botões de ação criados")
 
         # ========== ADICIONAR TODOS OS ITEMS AO LAYOUT ==========
-        self.layout.add_items([
-            checkboxes_layout,
-            max_width_layout,
-            folder_layout,
-            btn_project_layout,
-            buttons_layout
-        ])
-        
+        self.layout.add_items(
+            [
+                checkboxes_layout,
+                max_width_layout,
+                folder_layout,
+                btn_project_layout,
+                buttons_layout,
+            ]
+        )
+
         self.logger.info("Interface de exportação construída com sucesso")
 
     def _load_prefs(self):
@@ -157,7 +156,7 @@ class ExportAllLayoutsDialog(BasePluginMTL):
 
         # Max Width
         max_width = self.preferences.get("max_width", 3500)
-        self.max_width_input.set_value('max_width', max_width)
+        self.max_width_input.set_value("max_width", max_width)
         self.logger.debug(f"Max width carregado: {max_width}px")
 
         # Pasta de saída
@@ -171,27 +170,35 @@ class ExportAllLayoutsDialog(BasePluginMTL):
         self.logger.debug("Salvando preferências de exportação")
 
         # Checkboxes
-        self.preferences['export_pdf'] = self.checkbox_map["export_pdf"].isChecked()
-        self.preferences['export_png'] = self.checkbox_map["export_png"].isChecked()
-        self.preferences['merge_pdf'] = self.checkbox_map["merge_pdf"].isChecked()
-        self.preferences['merge_png'] = self.checkbox_map["merge_png"].isChecked()
-        self.preferences['replace_existing'] = self.checkbox_map["replace_existing"].isChecked()
+        self.preferences["export_pdf"] = self.checkbox_map["export_pdf"].isChecked()
+        self.preferences["export_png"] = self.checkbox_map["export_png"].isChecked()
+        self.preferences["merge_pdf"] = self.checkbox_map["merge_pdf"].isChecked()
+        self.preferences["merge_png"] = self.checkbox_map["merge_png"].isChecked()
+        self.preferences["replace_existing"] = self.checkbox_map[
+            "replace_existing"
+        ].isChecked()
 
         # Max Width
         max_width_values = self.max_width_input.get_values()
-        self.preferences['max_width'] = int(max_width_values.get('max_width', 3500))
+        self.preferences["max_width"] = int(max_width_values.get("max_width", 3500))
 
         # Pasta
         paths = self.folder_selector.get_paths()
-        pasta = paths[0] if paths else os.path.join(QgsProject.instance().homePath(), "exports")
-        self.preferences['output_folder'] = pasta
+        pasta = (
+            paths[0]
+            if paths
+            else os.path.join(QgsProject.instance().homePath(), "exports")
+        )
+        self.preferences["output_folder"] = pasta
 
         # Tamanho da janela (automático via BasePlugin)
-        self.preferences['window_width'] = self.width()
-        self.preferences['window_height'] = self.height()
+        self.preferences["window_width"] = self.width()
+        self.preferences["window_height"] = self.height()
 
         save_tool_prefs(self.TOOL_KEY, self.preferences)
-        self.logger.info(f"Preferências salvas: PDF={self.preferences['export_pdf']}, PNG={self.preferences['export_png']}")
+        self.logger.info(
+            f"Preferências salvas: PDF={self.preferences['export_pdf']}, PNG={self.preferences['export_png']}"
+        )
 
     def _set_folder_to_project(self):
         """Callback do botão 'Usar pasta do projeto'."""
@@ -204,7 +211,7 @@ class ExportAllLayoutsDialog(BasePluginMTL):
     def execute_tool(self):
         """
         Executa a exportação de todos os layouts.
-        
+
         Valida dependências (PyPDF2, Pillow) oferecendo instalação automática.
         """
         self.logger.info("Iniciando exportação de layouts")
@@ -217,37 +224,43 @@ class ExportAllLayoutsDialog(BasePluginMTL):
         replace_existing = self.checkbox_map["replace_existing"].isChecked()
 
         max_width_values = self.max_width_input.get_values()
-        max_width = int(max_width_values.get('max_width', 3500))
+        max_width = int(max_width_values.get("max_width", 3500))
 
         paths = self.folder_selector.get_paths()
-        output_folder = paths[0] if paths else os.path.join(QgsProject.instance().homePath(), "exports")
-        
+        output_folder = (
+            paths[0]
+            if paths
+            else os.path.join(QgsProject.instance().homePath(), "exports")
+        )
+
         # Validação básica
         if not export_pdf and not export_png:
-            QgisMessageUtil.modal_error(self.iface, "Selecione pelo menos um formato (PDF ou PNG)")
+            QgisMessageUtil.modal_error(
+                self.iface, "Selecione pelo menos um formato (PDF ou PNG)"
+            )
             return
 
         os.makedirs(output_folder, exist_ok=True)
         self.logger.info(f"Pasta de saída: {output_folder}")
 
         # ========== VALIDAÇÃO DE DEPENDÊNCIAS ==========
-        if merge_pdf and not DependenciesManager.check_dependency('PyPDF2'):
+        if merge_pdf and not DependenciesManager.check_dependency("PyPDF2"):
             if QgisMessageUtil.confirm(
                 self.iface,
                 "Para unir PDFs é necessário instalar o pacote PyPDF2.\n\nDeseja instalar agora?",
-                "Biblioteca necessária"
+                "Biblioteca necessária",
             ):
-                DependenciesManager.install_dependency('PyPDF2')
+                DependenciesManager.install_dependency("PyPDF2")
             else:
                 merge_pdf = False
 
-        if merge_png and not DependenciesManager.check_dependency('Pillow'):
+        if merge_png and not DependenciesManager.check_dependency("Pillow"):
             if QgisMessageUtil.confirm(
                 self.iface,
                 "Para unir PNGs em PDF é necessário instalar o pacote Pillow.\n\nDeseja instalar agora?",
-                "Biblioteca necessária"
+                "Biblioteca necessária",
             ):
-                DependenciesManager.install_dependency('Pillow')
+                DependenciesManager.install_dependency("Pillow")
             else:
                 merge_png = False
 
@@ -259,7 +272,7 @@ class ExportAllLayoutsDialog(BasePluginMTL):
         png_list = []
         total = len(layouts)
         self.logger.info(f"Iniciando exportação de {total} layout(s)")
-        
+
         # Criar ProgressDialog DEPOIS de calcular total
         progress = ProgressDialog("Exportando layouts...", "Cancelar", 0, total, self)
         progress.show()
@@ -272,11 +285,13 @@ class ExportAllLayoutsDialog(BasePluginMTL):
             QCoreApplication.processEvents()
 
             if progress.is_canceled():
-                self.logger.warning(f"Exportação cancelada pelo usuário em layout {i+1}/{total}")
+                self.logger.warning(
+                    f"Exportação cancelada pelo usuário em layout {i+1}/{total}"
+                )
                 break
 
             # Sanitizar nome do layout
-            nome = re.sub(r'[<>:"/\\|?*]', '', layout.name().strip())
+            nome = re.sub(r'[<>:"/\\|?*]', "", layout.name().strip())
             pdf_path = os.path.join(output_folder, f"{nome}.pdf")
             png_path = os.path.join(output_folder, f"{nome}.png")
 
@@ -295,7 +310,9 @@ class ExportAllLayoutsDialog(BasePluginMTL):
                 ok_pdf = ok_png = True
 
                 if export_pdf:
-                    result = exporter.exportToPdf(pdf_path, QgsLayoutExporter.PdfExportSettings())
+                    result = exporter.exportToPdf(
+                        pdf_path, QgsLayoutExporter.PdfExportSettings()
+                    )
                     ok_pdf = result == QgsLayoutExporter.Success
                     if ok_pdf:
                         pdf_list.append(pdf_path)
@@ -304,7 +321,9 @@ class ExportAllLayoutsDialog(BasePluginMTL):
                         erros.append(f"Falha ao exportar PDF: {nome}")
 
                 if export_png:
-                    result = exporter.exportToImage(png_path, QgsLayoutExporter.ImageExportSettings())
+                    result = exporter.exportToImage(
+                        png_path, QgsLayoutExporter.ImageExportSettings()
+                    )
                     ok_png = result == QgsLayoutExporter.Success
                     if ok_png:
                         png_list.append(png_path)
@@ -320,11 +339,13 @@ class ExportAllLayoutsDialog(BasePluginMTL):
                 self.logger.error(erro_msg)
                 erros.append(erro_msg)
 
-        self.logger.info(f"Loop de exportação concluído: {sucesso}/{total} layouts processados com sucesso")
-        
+        self.logger.info(
+            f"Loop de exportação concluído: {sucesso}/{total} layouts processados com sucesso"
+        )
+
         progress.set_value(total)
         self.logger.debug("ProgressDialog : progresso setado para 100%")
-        
+
         progress.close()
         self.logger.debug("ProgressDialog: diálogo fechado")
 
@@ -333,8 +354,7 @@ class ExportAllLayoutsDialog(BasePluginMTL):
         if merge_pdf and pdf_list:
             self.logger.debug(f"Unindo {len(pdf_list)} PDFs")
             ok, msg_text = PDFUtils.merge_pdfs(
-                pdf_list,
-                os.path.join(output_folder, "_PDF_UNICO_FINAL.pdf")
+                pdf_list, os.path.join(output_folder, "_PDF_UNICO_FINAL.pdf")
             )
             if ok:
                 self.logger.info(f"✓ PDFs unidos com sucesso: {msg_text}")
@@ -346,11 +366,13 @@ class ExportAllLayoutsDialog(BasePluginMTL):
         # ========== UNIR PNGs ==========
         merge_png_success = False
         if merge_png and png_list:
-            self.logger.info(f"Iniciando merge de {len(png_list)} PNGs em PDF (max_width={max_width}px)")
+            self.logger.info(
+                f"Iniciando merge de {len(png_list)} PNGs em PDF (max_width={max_width}px)"
+            )
             ok, msg_text = PDFUtils.merge_pngs_to_pdf(
                 png_list,
                 os.path.join(output_folder, "_PNG_MERGED_FINAL.pdf"),
-                max_width
+                max_width,
             )
             if ok:
                 self.logger.info(f"✓ PNGs unidos com sucesso: {msg_text}")
@@ -360,13 +382,15 @@ class ExportAllLayoutsDialog(BasePluginMTL):
                 erros.append(f"Falha ao unir PNGs: {msg_text}")
 
         # ========== RESULTADO FINAL ==========
-        self.logger.info(f"Início da montagem de mensagem de resultado. Total: {sucesso} sucessos, {len(erros)} erros")
-        
+        self.logger.info(
+            f"Início da montagem de mensagem de resultado. Total: {sucesso} sucessos, {len(erros)} erros"
+        )
+
         texto = ""
         if erros:
             texto += "<b>⚠️ Erros encontrados:</b><br>" + "<br>".join(erros) + "<br><br>"
             self.logger.warning(f"Erros detectados na exportação: {len(erros)}")
-        
+
         # Resumo de sucessos
         sucesso_text = f"<b>✓ {sucesso}</b> layout(s) exportado(s) com sucesso!"
         if merge_pdf_success:
@@ -375,10 +399,12 @@ class ExportAllLayoutsDialog(BasePluginMTL):
         if merge_png_success:
             sucesso_text += "<br><b>✓ PNGs unidos</b> em _PNG_MERGED_FINAL.pdf"
             self.logger.debug("✓ Merge de PNGs realizado")
-        
+
         texto += sucesso_text
 
-        self.logger.info(f"Exportação concluída: {sucesso} layout(s) bem-sucedido(s), {len(erros)} erro(s), PDF merge={merge_pdf_success}, PNG merge={merge_png_success}")
+        self.logger.info(
+            f"Exportação concluída: {sucesso} layout(s) bem-sucedido(s), {len(erros)} erro(s), PDF merge={merge_pdf_success}, PNG merge={merge_png_success}"
+        )
 
         self.logger.debug("Tentando exibir diálogo modal de resultado...")
         try:
@@ -387,11 +413,15 @@ class ExportAllLayoutsDialog(BasePluginMTL):
                 "Exportação de Layouts Concluída",
                 texto,
                 output_folder,
-                parent=self
+                parent=self,
             )
-            self.logger.debug("✓ Diálogo de resultado exibido com sucesso e fechado pelo usuário")
+            self.logger.debug(
+                "✓ Diálogo de resultado exibido com sucesso e fechado pelo usuário"
+            )
         except Exception as modal_error:
-            self.logger.error(f"Erro ao exibir diálogo de resultado: {str(modal_error)}")
+            self.logger.error(
+                f"Erro ao exibir diálogo de resultado: {str(modal_error)}"
+            )
             raise
 
 

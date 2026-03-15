@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Modelo Qt para tabela de logs.
 

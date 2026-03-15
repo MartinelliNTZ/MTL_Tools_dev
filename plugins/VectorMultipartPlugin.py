@@ -1,14 +1,10 @@
-# tools/vector_multipart_tool.py
 # -*- coding: utf-8 -*-
-
-import os
-from qgis.PyQt.QtWidgets import QAction
-from qgis.core import QgsVectorLayer, QgsWkbTypes, QgsFeedback
-
+from qgis.core import QgsVectorLayer, QgsFeedback
 from ..utils.vector.VectorLayerGeometry import VectorLayerGeometry
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.ToolKeys import ToolKey
 from .BasePlugin import BasePluginMTL
+
 
 class VectorMultipartPlugin(BasePluginMTL):
 
@@ -19,16 +15,15 @@ class VectorMultipartPlugin(BasePluginMTL):
         self.init(
             tool_key=ToolKey.CONVERTER_MULTIPART,
             class_name="VectorMultipartPlugin",
-            build_ui=False
+            build_ui=False,
         )
 
     def initGui(self):
         self.create_action(
             "../resources/icons/vector_multpart.ico",
             "Converter para Multipart",
-            self.run_multpart
+            self.run_multpart,
         )
-
 
     def unload(self):
         for a in self.actions:
@@ -39,20 +34,20 @@ class VectorMultipartPlugin(BasePluginMTL):
     # --------------------------------------------------
     def run_multpart(self):
         self.logger.info("Iniciando conversão de multipart para singlepart")
-        
+
         layer = self.iface.activeLayer()
 
         if not layer or not isinstance(layer, QgsVectorLayer):
             self.logger.debug("Camada ativa inválida ou não é vetorial")
-            QgisMessageUtil.bar_critical(
-                self.iface,
-                "Selecione uma camada vetorial"
-            )
+            QgisMessageUtil.bar_critical(self.iface, "Selecione uma camada vetorial")
             return
 
         from ..utils.ProjectUtils import ProjectUtils
         from ..utils.vector.VectorLayerAttributes import VectorLayerAttributes
-        layer = ProjectUtils.get_active_vector_layer(self.iface.activeLayer(), self.logger)
+
+        layer = ProjectUtils.get_active_vector_layer(
+            self.iface.activeLayer(), self.logger
+        )
         if not layer:
             QgisMessageUtil.bar_critical(self.iface, "Selecione uma camada vetorial")
             self.logger.warning("Validação falhou: camada inválida")
@@ -62,7 +57,9 @@ class VectorMultipartPlugin(BasePluginMTL):
             self.logger.warning("Validação falhou: camada sem feições")
             return
 
-        self.logger.debug(f"Camada validada: {layer.name()}, Total de feições: {layer.featureCount()}")
+        self.logger.debug(
+            f"Camada validada: {layer.name()}, Total de feições: {layer.featureCount()}"
+        )
         already_editing = layer.isEditable()
 
         # 🔔 Confirmação
@@ -71,7 +68,9 @@ class VectorMultipartPlugin(BasePluginMTL):
             self.logger.debug(f"Feições selecionadas: {layer.selectedFeatureCount()}")
         else:
             msg = "Converter TODAS as feições para multipart?"
-            self.logger.debug("Nenhuma feição selecionada - será convertida toda a camada")
+            self.logger.debug(
+                "Nenhuma feição selecionada - será convertida toda a camada"
+            )
 
         if not QgisMessageUtil.confirm(self.iface, msg):
             self.logger.debug("Usuário cancelou a operação")
@@ -83,30 +82,28 @@ class VectorMultipartPlugin(BasePluginMTL):
             layer.startEditing()
 
         feedback = QgsFeedback()
-        
+
         only_selected = layer.selectedFeatureCount() > 0
-        self.logger.info(f"Executando conversão para multipart - Apenas selecionadas: {only_selected}")
-        
+        self.logger.info(
+            f"Executando conversão para multipart - Apenas selecionadas: {only_selected}"
+        )
+
         ok = VectorLayerGeometry.singleparts_to_multparts(
-            layer,
-            feedback,
-            only_selected=only_selected
+            layer, feedback, only_selected=only_selected
         )
 
         if not ok:
             self.logger.warning("Operação cancelada ou falhou durante conversão")
             layer.rollBack()
-            QgisMessageUtil.bar_warning(
-                self.iface,
-                "Operação cancelada pelo usuário"
-            )
+            QgisMessageUtil.bar_warning(self.iface, "Operação cancelada pelo usuário")
             return
 
         # 🔒 Se já estava em edição → NÃO salva
         if already_editing:
-            self.logger.info("Geometrias convertidas para multipart (não salvas - camada já estava em edição)")
+            self.logger.info(
+                "Geometrias convertidas para multipart (não salvas - camada já estava em edição)"
+            )
             QgisMessageUtil.bar_success(
-                self.iface,
-                "Geometrias convertidas para multipart (não salvas)"
+                self.iface, "Geometrias convertidas para multipart (não salvas)"
             )
             return

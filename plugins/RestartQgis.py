@@ -1,15 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Ferramenta: Salvar, Fechar e Reabrir Projeto
-Autor: Matheus Martinelli
-Parte do plugin: Cadmus
-
-Responsabilidades:
-- UI: Exibir diálogos e mensagens via QgisMessageUtil
-- Lógica de Projeto: Delegada a ProjectUtils
-- Execução do Script: Gerenciada por _RestartExecutor
-- Logging: Estruturado via LogUtilsNew
-"""
 import os
 from qgis.PyQt.QtCore import QCoreApplication, QProcess
 from typing import Optional
@@ -20,20 +9,19 @@ from ..utils.QgisMessageUtil import QgisMessageUtil
 logger = LogUtils(tool="restart_qgis", class_name="RestartQGIS")
 
 
-
 class _RestartExecutor:
     """Responsável pela execução do restart do QGIS.
-    
+
     Separação de responsabilidades:
     - Criar script .bat
     - Executar script de forma segura
     - Gerenciar sinais Qt para fechar a aplicação
     """
-    
+
     @staticmethod
     def get_qgis_executable() -> Optional[str]:
         """Obtém o executável real do QGIS diretamente do Qt.
-        
+
         Returns:
             Caminho do executável ou None se não encontrado.
         """
@@ -41,10 +29,10 @@ class _RestartExecutor:
         if exe and os.path.exists(exe):
             logger.debug("QGIS executable found", qgis_exe=exe)
             return exe
-        
+
         logger.warning("QGIS executable not found", exe=exe)
         return None
-    
+
     @staticmethod
     def create_restart_script(project_path: str) -> Optional[list]:
         """Prepara comando (lista) para reabrir QGIS com o projeto.
@@ -56,32 +44,29 @@ class _RestartExecutor:
         if not qgis_exec:
             logger.error(
                 "Cannot prepare restart command: QGIS executable not found",
-                code="RESTART_NO_EXEC"
+                code="RESTART_NO_EXEC",
             )
             return None
 
         try:
             cmd = [qgis_exec, project_path]
-            logger.info(
-                "Restart command prepared",
-                code="RESTART_CMD_OK",
-                cmd=cmd
-            )
+            logger.info("Restart command prepared", code="RESTART_CMD_OK", cmd=cmd)
             return cmd
         except Exception as e:
             logger.error(
                 "Failed to prepare restart command",
                 code="RESTART_CMD_ERROR",
-                error=str(e)
+                error=str(e),
             )
             return None
-    
+
     @staticmethod
     def execute_restart(cmd: list) -> None:
         """Registra callback para executar `cmd` quando o QGIS estiver saindo.
 
         O comando é executado com `shell=False` para evitar injeção de shell (B602).
         """
+
         def _run_cmd():
             try:
                 exe = cmd[0]
@@ -91,47 +76,53 @@ class _RestartExecutor:
                     logger.info(
                         "Restart command executed (detached)",
                         code="RESTART_EXECUTED",
-                        cmd=cmd
+                        cmd=cmd,
                     )
                 else:
                     logger.critical(
                         "Failed to start detached process",
                         code="RESTART_EXEC_ERROR",
-                        cmd=cmd
+                        cmd=cmd,
                     )
             except Exception as e:
                 logger.critical(
                     "Failed to execute restart command",
                     code="RESTART_EXEC_ERROR",
-                    error=str(e)
+                    error=str(e),
                 )
 
         app = QCoreApplication.instance()
         app.aboutToQuit.connect(_run_cmd)
-        logger.info("Restart queued: will execute on QGIS shutdown", code="RESTART_QUEUED")
+        logger.info(
+            "Restart queued: will execute on QGIS shutdown", code="RESTART_QUEUED"
+        )
 
 
 def run_restart_qgis(iface) -> None:
     """Fluxo principal: Salvar projeto, criar script restart e fechar QGIS.
-    
+
     Responsabilidades delegadas:
     - ProjectUtils: Verificação de projeto salvo, save/write do projeto
     - QgisMessageUtil: Exibição de mensagens e diálogos UI
     - _RestartExecutor: Criação e execução do script de restart
     - logger: Logging estruturado de cada etapa
-    
+
     Args:
         iface: QgisInterface do QGIS
     """
     project = QgsProject.instance()
     project_path = project.fileName()
-    
-    logger.info("Restart QGIS initiated", code="RESTART_START", project_path=project_path or "<unsaved>")
-    
+
+    logger.info(
+        "Restart QGIS initiated",
+        code="RESTART_START",
+        project_path=project_path or "<unsaved>",
+    )
+
     # 1) Verificar se o projeto está salvo
     if not project_path:
         logger.warning("Project not saved, asking user to save", code="RESTART_NO_SAVE")
-        
+
         # Usar QgisMessageUtil para diálogo
         save_now = QgisMessageUtil.confirm(
             iface,
@@ -140,83 +131,89 @@ def run_restart_qgis(iface) -> None:
                 "Para reiniciar o QGIS, é necessário salvar o arquivo.\n"
                 "Deseja salvar agora?"
             ),
-            title="Projeto não salvo"
+            title="Projeto não salvo",
         )
-        
+
         if not save_now:
             logger.info("User cancelled restart", code="RESTART_CANCELLED_NO_SAVE")
             QgisMessageUtil.bar_warning(
                 iface,
                 "Sem salvar o projeto, o QGIS não pode ser reaberto automaticamente.",
-                title="Ação cancelada"
+                title="Ação cancelada",
             )
             return
-        
+
         # Solicitar caminho do arquivo
         save_path, _ = iface.getSaveFileName(
-            iface.mainWindow(),
-            "Salvar Projeto",
-            "",
-            "Projetos QGIS (*.qgz)"
+            iface.mainWindow(), "Salvar Projeto", "", "Projetos QGIS (*.qgz)"
         )
-        
+
         if not save_path:
-            logger.info("User cancelled save dialog", code="RESTART_CANCELLED_SAVE_DIALOG")
+            logger.info(
+                "User cancelled save dialog", code="RESTART_CANCELLED_SAVE_DIALOG"
+            )
             return
-        
+
         # Usar ProjectUtils para salvar (delegação de responsabilidade)
         try:
             project.write(save_path)
             project_path = save_path
-            logger.info("Project saved successfully", code="RESTART_SAVED", path=save_path)
+            logger.info(
+                "Project saved successfully", code="RESTART_SAVED", path=save_path
+            )
         except Exception as e:
-            logger.error("Failed to save project", code="RESTART_SAVE_ERROR", error=str(e))
+            logger.error(
+                "Failed to save project", code="RESTART_SAVE_ERROR", error=str(e)
+            )
             QgisMessageUtil.modal_error(
-                iface,
-                f"Erro ao salvar projeto: {str(e)}",
-                title="Erro"
+                iface, f"Erro ao salvar projeto: {str(e)}", title="Erro"
             )
             return
-    
+
     # 2) Gravar alterações antes de fechar
     try:
         project.write(project_path)
-        logger.info("Project changes saved", code="RESTART_CHANGES_SAVED", path=project_path)
+        logger.info(
+            "Project changes saved", code="RESTART_CHANGES_SAVED", path=project_path
+        )
     except Exception as e:
-        logger.error("Failed to save project changes", code="RESTART_SAVE_CHANGES_ERROR", error=str(e))
+        logger.error(
+            "Failed to save project changes",
+            code="RESTART_SAVE_CHANGES_ERROR",
+            error=str(e),
+        )
         QgisMessageUtil.modal_error(
-            iface,
-            f"Erro ao salvar alterações: {str(e)}",
-            title="Erro"
+            iface, f"Erro ao salvar alterações: {str(e)}", title="Erro"
         )
         return
-    
+
     # 3) Criar script .bat para reabrir QGIS
     cmd = _RestartExecutor.create_restart_script(project_path)
 
     if not cmd:
         logger.critical(
-            "Cannot restart: failed to prepare restart command",
-            code="RESTART_NO_CMD"
+            "Cannot restart: failed to prepare restart command", code="RESTART_NO_CMD"
         )
         QgisMessageUtil.modal_error(
             iface,
             "Não foi possível encontrar o executável do QGIS.\n"
             "O reinício automático não será executado.",
-            title="Erro"
+            title="Erro",
         )
         return
 
     # 4) Executar restart (agendado para aboutToQuit)
-    logger.info("Executing restart sequence (scheduled)", code="RESTART_EXECUTING", cmd=cmd)
+    logger.info(
+        "Executing restart sequence (scheduled)", code="RESTART_EXECUTING", cmd=cmd
+    )
     _RestartExecutor.execute_restart(cmd)
-    
+
     # 5) Fechar QGIS
     logger.info("Closing QGIS to start restart", code="RESTART_CLOSING")
     QgisMessageUtil.bar_info(
         iface,
         "QGIS será reiniciado em alguns segundos...",
         title="Reiniciando",
-        duration=2
+        duration=2,
     )
     iface.mainWindow().close()

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Carregador de logs com suporte a leitura incremental.
 
@@ -5,7 +6,7 @@ Lê apenas linhas novas, sem reler o arquivo inteiro.
 """
 
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 from ..model.log_entry import LogEntry
 import logging
 
@@ -20,6 +21,7 @@ except Exception:
         from .....core.config.log_sync import LOG_FILE_LOCK
     except Exception:
         import threading
+
         LOG_FILE_LOCK = threading.Lock()
 
 # Logger local para evitar dependência em LogUtils durante import
@@ -107,7 +109,9 @@ class LogLoader:
                     # Atualizar offset
                     self._offset = f.tell()
             except Exception as e:
-                logger.exception("Erro em load_incremental ao ler arquivo de log: %s", str(e))
+                logger.exception(
+                    "Erro em load_incremental ao ler arquivo de log: %s", str(e)
+                )
                 return entries
 
         return entries

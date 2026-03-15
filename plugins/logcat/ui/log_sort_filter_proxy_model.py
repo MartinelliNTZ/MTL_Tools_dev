@@ -1,11 +1,11 @@
+# -*- coding: utf-8 -*-
 """
 Proxy model para tabela de logs com suporte a sort.
 
 Permite ordenar por qualquer coluna em ordem crescente/decrescente.
 """
 
-from qgis.PyQt.QtCore import Qt, QSortFilterProxyModel, QDateTime, QModelIndex
-from pathlib import Path
+from qgis.PyQt.QtCore import Qt, QSortFilterProxyModel, QModelIndex
 
 
 class LogSortFilterProxyModel(QSortFilterProxyModel):

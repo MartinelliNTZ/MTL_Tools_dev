@@ -1,11 +1,11 @@
+# -*- coding: utf-8 -*-
 """
 Monitoramento de arquivos de log em tempo real.
 
 Detecta quando o arquivo cresce e notifica observadores.
 """
 from pathlib import Path
-from typing import Callable, Optional, List
-from datetime import datetime, timedelta
+from typing import Callable, Optional
 import threading
 import time
 import logging
@@ -14,20 +14,20 @@ import logging
 class LogFileWatcher:
     """
     Monitora mudanças em arquivo de log em tempo real.
-    
+
     Usa timer + checagem de tamanho (simples e portável).
     Notifica callbacks quando há novas linhas.
     """
-    
+
     def __init__(
         self,
         log_file_path: Path,
         on_change: Optional[Callable] = None,
-        check_interval: float = 0.5
+        check_interval: float = 0.5,
     ):
         """
         Inicializa o watcher.
-        
+
         Args:
             log_file_path: Path para o arquivo .log
             on_change: Callable() chamado quando arquivo muda
@@ -36,7 +36,7 @@ class LogFileWatcher:
         self.log_file_path = Path(log_file_path)
         self.on_change = on_change
         self.check_interval = check_interval
-        
+
         self._is_watching = False
         self._watch_thread: Optional[threading.Thread] = None
         self._last_size = 0
@@ -44,24 +44,24 @@ class LogFileWatcher:
         self._lock = threading.Lock()
         # Logger local (não importa LogUtils para evitar loops durante init)
         self.logger = logging.getLogger("Cadmus.logcat.LogFileWatcher")
-    
+
     def start(self) -> None:
         """Inicia monitoramento em thread separada."""
         with self._lock:
             if self._is_watching:
                 return
-            
+
             self._is_watching = True
             self._update_file_stats()
-            
+
             # NÃO usar daemon=True - garantir limpeza apropriada
             self._watch_thread = threading.Thread(
                 target=self._watch_loop,
                 daemon=False,  # Não é daemon - aguarda stop()
-                name="LogFileWatcher"
+                name="LogFileWatcher",
             )
             self._watch_thread.start()
-    
+
     def stop(self) -> None:
         """Para o monitoramento com segurança máxima."""
         try:
@@ -82,7 +82,7 @@ class LogFileWatcher:
 
         except Exception as e:
             self.logger.error(f"Erro ao parar monitoramento: {e}")
-        
+
     def _update_file_stats(self) -> None:
         """Atualiza tamanho e mtime do arquivo."""
         try:
@@ -92,19 +92,19 @@ class LogFileWatcher:
                 self._last_mtime = stat.st_mtime
         except Exception as e:
             self.logger.error(f"Erro ao atualizar estatísticas do arquivo: {e}")
-    
+
     def _has_changed(self) -> bool:
         """Verifica se o arquivo foi modificado."""
         try:
             if not self.log_file_path.exists():
                 return False
-            
+
             stat = self.log_file_path.stat()
             return stat.st_size != self._last_size or stat.st_mtime != self._last_mtime
         except Exception as e:
             self.logger.error(f"Erro ao checar mudanças no arquivo: {e}")
             return False
-    
+
     def _watch_loop(self) -> None:
         """
         Loop de monitoramento (executado em thread).
@@ -143,7 +143,7 @@ class LogFileWatcher:
                     self._is_watching = False
             except Exception as e:
                 self.logger.error(f"Erro ao finalizar monitoramento: {e}")
-        
+
     def is_watching(self) -> bool:
         """Retorna True se está monitorando."""
         with self._lock:

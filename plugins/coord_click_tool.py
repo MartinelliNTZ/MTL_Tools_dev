@@ -12,7 +12,6 @@ from ..core.engine_tasks.ParallelStep import ParallelStep
 from ..utils.vector.VectorLayerProjection import VectorLayerProjection
 from .coord_result_dialog import CoordResultDialog
 from ..core.config.LogUtils import LogUtils
-from ..utils.QgisMessageUtil import QgisMessageUtil
 
 
 class CoordClickTool(QgsMapTool):

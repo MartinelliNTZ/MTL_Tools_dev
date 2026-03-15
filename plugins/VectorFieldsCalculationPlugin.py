@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import QAction
-from qgis.core import QgsVectorLayer, QgsWkbTypes, QgsApplication
-import os
-
+from qgis.core import QgsWkbTypes
 from ..utils.vector.VectorLayerAttributes import VectorLayerAttributes
 from ..utils.vector.VectorLayerMetrics import VectorLayerMetrics
 from ..utils.vector.VectorLayerProjection import VectorLayerProjection
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.ToolKeys import ToolKey
-from ..utils.ProjectUtils import ProjectUtils
 from ..core.engine_tasks.AsyncPipelineEngine import AsyncPipelineEngine
 from ..core.engine_tasks.ExecutionContext import ExecutionContext
 from ..core.engine_tasks.PointFieldsStep import PointFieldsStep
@@ -18,7 +14,7 @@ from .BasePlugin import BasePluginMTL
 
 
 class VectorFieldsCalculationPlugin(BasePluginMTL):
-    
+
     def __init__(self, iface):
         self.iface = iface
         self.actions = []
@@ -26,14 +22,14 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
             tool_key=ToolKey.VECTOR_FIELDS,
             class_name="VectorFieldsCalculationPlugin",
             build_ui=False,
-            load_settings_prefs=True
+            load_settings_prefs=True,
         )
 
     def initGui(self):
         self.create_action(
             "../resources/icons/vector_field.png",
             "Calcular Campos Vetoriais",
-            self.run_vector_field
+            self.run_vector_field,
         )
 
     def unload(self):
@@ -47,9 +43,14 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
         self.logger.info("Iniciando Calcular Campos Vetoriais")
 
         from ..utils.ProjectUtils import ProjectUtils
-        layer = ProjectUtils.get_active_vector_layer(self.iface.activeLayer(), self.logger, require_editable=True)
+
+        layer = ProjectUtils.get_active_vector_layer(
+            self.iface.activeLayer(), self.logger, require_editable=True
+        )
         if not layer:
-            QgisMessageUtil.bar_critical(self.iface, "Selecione uma camada vetorial editável")
+            QgisMessageUtil.bar_critical(
+                self.iface, "Selecione uma camada vetorial editável"
+            )
             self.logger.warning("Nenhuma camada vetorial editável disponível")
             return
 
@@ -62,12 +63,17 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
 
         # Verificar se a camada é KML (não editável)
         source = layer.source().lower()
-        if source.endswith('.kml') or '|layername=' in source and source.startswith('file://') and '.kml' in source:
+        if (
+            source.endswith(".kml")
+            or "|layername=" in source
+            and source.startswith("file://")
+            and ".kml" in source
+        ):
             self.logger.warning("Camada KML não pode ser editada")
             QgisMessageUtil.bar_critical(
-                self.iface, 
+                self.iface,
                 "❌ Arquivos KML não são editáveis.\n\n"
-                "Converta a camada para GeoPackage (.gpkg) ou Shapefile (.shp) antes de usar esta ferramenta."
+                "Converta a camada para GeoPackage (.gpkg) ou Shapefile (.shp) antes de usar esta ferramenta.",
             )
             return
 
@@ -78,7 +84,10 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
         step_map = {
             QgsWkbTypes.PointGeometry: (PointFieldsStep, self._prepare_point_fields),
             QgsWkbTypes.LineGeometry: (LineFieldsStep, self._prepare_line_fields),
-            QgsWkbTypes.PolygonGeometry: (PolygonFieldsStep, self._prepare_polygon_fields),
+            QgsWkbTypes.PolygonGeometry: (
+                PolygonFieldsStep,
+                self._prepare_polygon_fields,
+            ),
         }
 
         if geom_type not in step_map:
@@ -99,21 +108,29 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
             return
 
         # Decidir entre sync/async baseado em feature count (mais confiável que tamanho de arquivo)
-        precision = int(self.settings_preferences.get('vector_field_precision', 2))
-        
+        precision = int(self.settings_preferences.get("vector_field_precision", 2))
+
         # Feature count é muito mais confiável que compute_size() para decidir
         # Threshold: 1000 features = sempre assíncrono (evita UI travada)
         feature_count = layer.featureCount()
         # valor padrão de segurança
-        threshold_features = int(self.settings_preferences.get('async_threshold_features', 1000))
-        
-        self.logger.debug(f"Feature count: {feature_count}, Threshold: {threshold_features} features")
+        threshold_features = int(
+            self.settings_preferences.get("async_threshold_features", 1000)
+        )
+
+        self.logger.debug(
+            f"Feature count: {feature_count}, Threshold: {threshold_features} features"
+        )
 
         try:
             # SEMPRE usar assíncrono para evitar travamento da UI
             # Feature count > 1000 ou qualquer memória layer = assíncrono obrigatório
-            if feature_count >= threshold_features or layer.source().startswith("memory:"):
-                self.logger.info(f"Usando processamento assíncrono (features={feature_count})")
+            if feature_count >= threshold_features or layer.source().startswith(
+                "memory:"
+            ):
+                self.logger.info(
+                    f"Usando processamento assíncrono (features={feature_count})"
+                )
                 self._start_async_calculation(
                     layer, step_class, field_map, mode_altered, precision
                 )
@@ -122,8 +139,10 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
                 # Descomentar a linha abaixo para forçar SEMPRE assíncrono
                 # self.logger.info("Forçando processamento assíncrono para consistência")
                 # self._start_async_calculation(layer, step_class, field_map, mode_altered, precision)
-                
-                self.logger.info("Usando processamento síncrono (features={})".format(feature_count))
+
+                self.logger.info(
+                    "Usando processamento síncrono (features={})".format(feature_count)
+                )
                 self._execute_sync_calculation(
                     layer, field_map, mode_altered, precision
                 )
@@ -156,7 +175,9 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
 
     def _prepare_line_fields(self, layer):
         """Prepara field_map para cálculo de comprimento."""
-        requested_mode = self.settings_preferences.get('calculation_method', 'Elipsoidal')
+        requested_mode = self.settings_preferences.get(
+            "calculation_method", "Elipsoidal"
+        )
         calc_mode, mode_altered = self._resolve_calculation_mode(layer, requested_mode)
 
         field_map = VectorLayerAttributes.resolve_field_names_for_calculation(
@@ -175,7 +196,9 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
 
     def _prepare_polygon_fields(self, layer):
         """Prepara field_map para cálculo de área."""
-        requested_mode = self.settings_preferences.get('calculation_method', 'Elipsoidal')
+        requested_mode = self.settings_preferences.get(
+            "calculation_method", "Elipsoidal"
+        )
         calc_mode, mode_altered = self._resolve_calculation_mode(layer, requested_mode)
 
         field_map = VectorLayerAttributes.resolve_field_names_for_calculation(
@@ -196,7 +219,9 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
 
     def _resolve_calculation_mode(self, layer, requested_mode):
         """Valida e ajusta modo de cálculo (CRS geográfico com Cartesiana -> Ambos)."""
-        if requested_mode != "Cartesiana" or VectorLayerProjection.is_geographic_crs(layer):
+        if requested_mode != "Cartesiana" or VectorLayerProjection.is_geographic_crs(
+            layer
+        ):
             return requested_mode, False
 
         self.logger.warning("CRS geográfico com modo Cartesiana -> mudando para Ambos")
@@ -230,12 +255,16 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
         """Executa o cálculo de forma síncrona (bloqueador)."""
         try:
             geom_type = layer.geometryType()
-            self.logger.debug(f"Iniciando cálculo síncrono para geometria tipo {geom_type}")
+            self.logger.debug(
+                f"Iniciando cálculo síncrono para geometria tipo {geom_type}"
+            )
 
             if geom_type == QgsWkbTypes.PointGeometry:
                 # XY sempre em 8 casas, ignorar preferência
                 const_prec = 8
-                self.logger.debug(f"Criando campos de coordenadas com precisão {const_prec}")
+                self.logger.debug(
+                    f"Criando campos de coordenadas com precisão {const_prec}"
+                )
                 VectorLayerAttributes.create_point_coordinate_fields(
                     layer, field_map, precision=const_prec
                 )
@@ -247,31 +276,47 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
 
             elif geom_type == QgsWkbTypes.LineGeometry:
                 self.logger.debug("Criando campos de comprimento")
-                VectorLayerAttributes.create_point_coordinate_fields(layer, field_map, precision=precision)
+                VectorLayerAttributes.create_point_coordinate_fields(
+                    layer, field_map, precision=precision
+                )
                 if "Elipsoidal" in field_map:
                     self.logger.debug("Calculando comprimento elispoidal")
                     VectorLayerMetrics.calculate_line_length(
-                        layer, field_map["Elipsoidal"], use_ellipsoidal=True, precision=precision
+                        layer,
+                        field_map["Elipsoidal"],
+                        use_ellipsoidal=True,
+                        precision=precision,
                     )
                 if "Cartesiana" in field_map:
                     self.logger.debug("Calculando comprimento cartesiano")
                     VectorLayerMetrics.calculate_line_length(
-                        layer, field_map["Cartesiana"], use_ellipsoidal=False, precision=precision
+                        layer,
+                        field_map["Cartesiana"],
+                        use_ellipsoidal=False,
+                        precision=precision,
                     )
                 msg = "Comprimento de linhas calculado com sucesso"
 
             elif geom_type == QgsWkbTypes.PolygonGeometry:
                 self.logger.debug("Criando campos de área")
-                VectorLayerAttributes.create_point_coordinate_fields(layer, field_map, precision=precision)
+                VectorLayerAttributes.create_point_coordinate_fields(
+                    layer, field_map, precision=precision
+                )
                 if "Elipsoidal" in field_map:
                     self.logger.debug("Calculando área elispoidal")
                     VectorLayerMetrics.calculate_polygon_area(
-                        layer, field_map["Elipsoidal"], use_ellipsoidal=True, precision=precision
+                        layer,
+                        field_map["Elipsoidal"],
+                        use_ellipsoidal=True,
+                        precision=precision,
                     )
                 if "Cartesiana" in field_map:
                     self.logger.debug("Calculando área cartesiana")
                     VectorLayerMetrics.calculate_polygon_area(
-                        layer, field_map["Cartesiana"], use_ellipsoidal=False, precision=precision
+                        layer,
+                        field_map["Cartesiana"],
+                        use_ellipsoidal=False,
+                        precision=precision,
                     )
                 msg = "Área de polígonos calculada com sucesso"
 
@@ -284,15 +329,17 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
             self.logger.error(f"Erro no cálculo síncrono: {str(e)}")
             raise
 
-    def _start_async_calculation(self, layer, step_class, field_map, mode_altered, precision):
+    def _start_async_calculation(
+        self, layer, step_class, field_map, mode_altered, precision
+    ):
         """Inicia pipeline assíncrona com AsyncPipelineEngine.
-        
+
         Contexto:
         - A task executa em thread de trabalho; ela **não** toca na camada,
           apenas calcula os valores e devolve um mapeamento de atualizações.
         - O step correspondente roda no thread principal e aplica os atributos
           à camada existente em lotes (via provider.changeAttributeValues).
-        
+
         Resultado: UI não trava, arquivo original recebe os novos campos e
         valores sem criar vetores temporários.
         """
@@ -320,7 +367,7 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
                 context=context,
                 on_finished=self._on_async_finished,
                 on_error=self._on_async_error,
-                on_cancelled=self._on_async_cancelled
+                on_cancelled=self._on_async_cancelled,
             )
 
             engine.start()
@@ -328,16 +375,18 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
 
         except Exception as e:
             self.logger.error(f"Erro ao iniciar pipeline: {str(e)}")
-            QgisMessageUtil.bar_critical(self.iface, f"Erro ao iniciar cálculo: {str(e)}")
+            QgisMessageUtil.bar_critical(
+                self.iface, f"Erro ao iniciar cálculo: {str(e)}"
+            )
             raise
 
     def _on_async_finished(self, context):
         """Callback de sucesso da pipeline assíncrona."""
         self.logger.info("Cálculo assíncrono finalizado com sucesso!")
-        
+
         layer = context.get("layer")
         mode_altered = context.get("mode_altered", False)
-        
+
         if layer:
             geom_type = layer.geometryType()
             if geom_type == QgsWkbTypes.PointGeometry:
@@ -346,11 +395,11 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
                 msg = "Comprimento de linhas calculado com sucesso"
             else:
                 msg = "Área de polígonos calculada com sucesso"
-            
+
             if not mode_altered:
                 QgisMessageUtil.bar_success(self.iface, msg)
                 self.logger.info(msg)
-        
+
         # terminar estatísticas
         try:
             self.finish_stats()

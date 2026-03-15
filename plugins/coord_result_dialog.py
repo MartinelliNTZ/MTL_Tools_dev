@@ -16,7 +16,9 @@ class CoordResultDialog(BasePluginMTL):
         self.iface = iface
         self.info = info
         # Inicializa logger e preferences do BasePlugin e constrói UI via _build_ui
-        self.init(tool_key="coord_result", class_name="CoordResultDialog", build_ui=True)
+        self.init(
+            tool_key="coord_result", class_name="CoordResultDialog", build_ui=True
+        )
 
         # Atualiza com as informações iniciais (widgets já criados em _build_ui)
         try:
@@ -25,22 +27,22 @@ class CoordResultDialog(BasePluginMTL):
             self.logger.error(f"Error {e}")
 
     def _build_ui(self, **kwargs):
-        """Constrói a UI do diálogo: segue o padrão de GenerateTrailPlugin.        """
+        """Constrói a UI do diálogo: segue o padrão de GenerateTrailPlugin."""
         super()._build_ui(
             title="Coordenadas do Ponto",
             icon_path="mtl_agro.ico",
             instructions_file="coord_click_help.md",
-            enable_scroll=True
+            enable_scroll=True,
         )
 
         ro_layout, self.wgs_widget = WidgetFactory.create_readonly_field(
             parent=self,
             title="WGS 84 (EPSG:4326)",
             fields={
-                'lat_dec': {'title': 'Latitude (Decimal)', 'value': ''},
-                'lon_dec': {'title': 'Longitude (Decimal)', 'value': ''},
-                'lat_dms': {'title': 'Latitude (DMS)', 'value': ''},
-                'lon_dms': {'title': 'Longitude (DMS)', 'value': ''},
+                "lat_dec": {"title": "Latitude (Decimal)", "value": ""},
+                "lon_dec": {"title": "Longitude (Decimal)", "value": ""},
+                "lat_dms": {"title": "Latitude (DMS)", "value": ""},
+                "lon_dms": {"title": "Longitude (DMS)", "value": ""},
             },
             num_columns=1,
             copy_all_button_title="Copiar WGS 84 (Completo)",
@@ -50,8 +52,8 @@ class CoordResultDialog(BasePluginMTL):
             parent=self,
             title="UTM SIRGAS 2000",
             fields={
-                'utm_x': {'title': 'Easting (X)', 'value': ''},
-                'utm_y': {'title': 'Northing (Y)', 'value': ''},
+                "utm_x": {"title": "Easting (X)", "value": ""},
+                "utm_y": {"title": "Northing (Y)", "value": ""},
             },
             num_columns=1,
             copy_all_button_title="Copiar UTM (Completo)",
@@ -62,7 +64,12 @@ class CoordResultDialog(BasePluginMTL):
         ro_layout3, self.alt_widget = WidgetFactory.create_readonly_field(
             parent=self,
             title="Altimetria (OpenTopoData)",
-            fields={'altitude': {'title': 'Altitude aproximada (m)', 'value': 'Carregando...'}},
+            fields={
+                "altitude": {
+                    "title": "Altitude aproximada (m)",
+                    "value": "Carregando...",
+                }
+            },
             num_columns=1,
             copy_all_button_title=None,
             separator_top=True,
@@ -95,34 +102,37 @@ class CoordResultDialog(BasePluginMTL):
             close_text="Fechar",
         )
         # Add everything in a single call
-        self.layout.add_items([
-            ro_layout,
-            ro_layout2,
-            self.lbl_utm_info,
-            ro_layout3,
-            self.lbl_municipio,
-            self.lbl_state_district,
-            self.lbl_state,
-            self.lbl_region,
-            self.lbl_country,
-            copy_layout,
-            btn_layout,
-        ])
-
+        self.layout.add_items(
+            [
+                ro_layout,
+                ro_layout2,
+                self.lbl_utm_info,
+                ro_layout3,
+                self.lbl_municipio,
+                self.lbl_state_district,
+                self.lbl_state,
+                self.lbl_region,
+                self.lbl_country,
+                copy_layout,
+                btn_layout,
+            ]
+        )
 
     def _load_prefs(self):
         """Carrega preferências específicas do diálogo (executado após _build_ui)."""
         try:
             self.preferences = load_tool_prefs(self.TOOL_KEY)
             # Restaurar tamanho da janela se salvo (BasePlugin já faz resize, isto é apenas fallback)
-            w = self.preferences.get('window_width')
-            h = self.preferences.get('window_height')
+            w = self.preferences.get("window_width")
+            h = self.preferences.get("window_height")
             if w and h:
                 try:
                     self.resize(int(w), int(h))
                 except Exception as e:
                     self.logger.error(f"Error {e}")
-            self.logger.debug(f"_load_prefs: loaded prefs keys={list(self.preferences.keys())}")
+            self.logger.debug(
+                f"_load_prefs: loaded prefs keys={list(self.preferences.keys())}"
+            )
         except Exception as e:
             try:
                 self.logger.warning(f"_load_prefs: erro ao carregar preferencias: {e}")
@@ -132,11 +142,13 @@ class CoordResultDialog(BasePluginMTL):
     def _save_prefs(self):
         """Salva preferências do diálogo (window size e outras chaves)."""
         try:
-            self.preferences['window_width'] = self.width()
-            self.preferences['window_height'] = self.height()
+            self.preferences["window_width"] = self.width()
+            self.preferences["window_height"] = self.height()
             save_tool_prefs(self.TOOL_KEY, self.preferences)
             try:
-                self.logger.debug(f"_save_prefs: prefs salvas: {self.preferences.get('window_width')}x{self.preferences.get('window_height')}")
+                self.logger.debug(
+                    f"_save_prefs: prefs salvas: {self.preferences.get('window_width')}x{self.preferences.get('window_height')}"
+                )
             except Exception as e:
                 self.logger.error(f"Error {e}")
         except Exception as e:
@@ -144,7 +156,6 @@ class CoordResultDialog(BasePluginMTL):
                 self.logger.warning(f"_save_prefs: erro ao salvar preferencias: {e}")
             except Exception as e:
                 self.logger.error(f"Error {e}")
-
 
     # ==================================================
     # HELPERS
@@ -154,10 +165,10 @@ class CoordResultDialog(BasePluginMTL):
         parts = []
 
         # WGS
-        lat_dec = self.wgs_widget.get_value('lat_dec') or ''
-        lon_dec = self.wgs_widget.get_value('lon_dec') or ''
-        lat_dms = self.wgs_widget.get_value('lat_dms') or ''
-        lon_dms = self.wgs_widget.get_value('lon_dms') or ''
+        lat_dec = self.wgs_widget.get_value("lat_dec") or ""
+        lon_dec = self.wgs_widget.get_value("lon_dec") or ""
+        lat_dms = self.wgs_widget.get_value("lat_dms") or ""
+        lon_dms = self.wgs_widget.get_value("lon_dms") or ""
         parts.append("WGS 84 (EPSG:4326)")
         parts.append(f"Latitude (Decimal): {lat_dec}")
         parts.append(f"Longitude (Decimal): {lon_dec}")
@@ -168,13 +179,13 @@ class CoordResultDialog(BasePluginMTL):
         # UTM
         parts.append("UTM SIRGAS 2000")
         parts.append(self.lbl_utm_info.text())
-        utm_x = self.utm_widget.get_value('utm_x') or ''
-        utm_y = self.utm_widget.get_value('utm_y') or ''
+        utm_x = self.utm_widget.get_value("utm_x") or ""
+        utm_y = self.utm_widget.get_value("utm_y") or ""
         parts.append(f"Easting (X): {utm_x}")
         parts.append(f"Northing (Y): {utm_y}")
 
         # Altitude
-        alt = self.alt_widget.get_value('altitude') or ''
+        alt = self.alt_widget.get_value("altitude") or ""
         parts.append(f"Altitude aproximada (m): {alt}")
 
         # Address
@@ -187,25 +198,32 @@ class CoordResultDialog(BasePluginMTL):
 
         text = "\n".join(parts)
         ok = ProjectUtils.set_clipboard_text(text)
-        if ok:   
-            QgisMessageUtil.bar_success(self.iface, "Localização copiada para a área de transferência", title="Copiado")   
-            self.logger.info("copy_all_info: conteúdo copiado para área de transferência") 
-        else:  
-            self.logger.warning("copy_all_info: falha ao copiar para área de transferência")
-   
+        if ok:
+            QgisMessageUtil.bar_success(
+                self.iface,
+                "Localização copiada para a área de transferência",
+                title="Copiado",
+            )
+            self.logger.info(
+                "copy_all_info: conteúdo copiado para área de transferência"
+            )
+        else:
+            self.logger.warning(
+                "copy_all_info: falha ao copiar para área de transferência"
+            )
 
     # ==================================================
     # UPDATE (USADO PELO MAPTOOL)
     # ==================================================
     def update_info(self, info):
-        self.info = info        
+        self.info = info
         self.logger.debug(f"update_info: info={info}")
 
         # WGS
-        self.wgs_widget.set_value('lat_dec', f"{info['lat']:.8f}")
-        self.wgs_widget.set_value('lon_dec', f"{info['lon']:.8f}")
-        self.wgs_widget.set_value('lat_dms', info.get('lat_dms', ''))
-        self.wgs_widget.set_value('lon_dms', info.get('lon_dms', ''))
+        self.wgs_widget.set_value("lat_dec", f"{info['lat']:.8f}")
+        self.wgs_widget.set_value("lon_dec", f"{info['lon']:.8f}")
+        self.wgs_widget.set_value("lat_dms", info.get("lat_dms", ""))
+        self.wgs_widget.set_value("lon_dms", info.get("lon_dms", ""))
 
         # UTM
         self.lbl_utm_info.setText(
@@ -213,19 +231,19 @@ class CoordResultDialog(BasePluginMTL):
             f"Hemisfério {info['hemisferio']}"
         )
 
-        self.utm_widget.set_value('utm_x', f"{info['utm_x']:.3f}")
-        self.utm_widget.set_value('utm_y', f"{info['utm_y']:.3f}")
+        self.utm_widget.set_value("utm_x", f"{info['utm_x']:.3f}")
+        self.utm_widget.set_value("utm_y", f"{info['utm_y']:.3f}")
 
         # Reset async fields
-        self.alt_widget.set_value('altitude', "Carregando...")
+        self.alt_widget.set_value("altitude", "Carregando...")
         self.set_address(None)
 
     # ==================================================
     # TASK CALLBACKS
     # ==================================================
     def set_altitude(self, value):
-        self.alt_widget.set_value('altitude',
-            "Indisponível" if value is None else f"{value:.2f} m"
+        self.alt_widget.set_value(
+            "altitude", "Indisponível" if value is None else f"{value:.2f} m"
         )
         try:
             self.logger.debug(f"set_altitude: {value}")
@@ -254,7 +272,6 @@ class CoordResultDialog(BasePluginMTL):
         except Exception as e:
             self.logger.error(f"Error {e}")
 
-
     def copy_address(self):
         text = (
             f"{self.lbl_municipio.text()}\n"
@@ -264,7 +281,10 @@ class CoordResultDialog(BasePluginMTL):
             f"{self.lbl_country.text()}"
         )
         ok = ProjectUtils.set_clipboard_text(text)
-        if ok:            
-            QgisMessageUtil.bar_success(self.iface, "Endereço copiado para a área de transferência", title="Copiado")
+        if ok:
+            QgisMessageUtil.bar_success(
+                self.iface,
+                "Endereço copiado para a área de transferência",
+                title="Copiado",
+            )
             self.logger.info("copy_address: endereço copiado")
-
