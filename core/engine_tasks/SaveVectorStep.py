@@ -51,7 +51,6 @@ class SaveVectorStep(BaseStep):
 
         if not result:
             logger.error("SaveVectorStep: falha ao salvar camada")
-            raise RuntimeError("SaveVectorStep: falha ao salvar camada.")
 
-        logger.info(f"SaveVectorStep.on_success: camada salva com sucesso")
+        logger.info("SaveVectorStep.on_success: camada salva com sucesso")
         context.set("layer", result)

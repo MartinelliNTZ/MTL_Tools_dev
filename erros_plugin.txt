@@ -1,0 +1,1595 @@
+.\cadmus_plugin.py:32:16: F823 local variable '_logger_global' defined in enclosing scope on line 27 referenced before assignment
+.\core\engine_tasks\LineFieldsStep.py:102:43: E203 whitespace before ':'
+.\core\engine_tasks\LoadFilesStep.py:77:32: E203 whitespace before ':'
+.\core\engine_tasks\PointFieldsStep.py:104:43: E203 whitespace before ':'
+.\core\engine_tasks\PolygonFieldsStep.py:103:43: E203 whitespace before ':'
+.\core\task\BufferLayerTask.py:3:1: F401 '..config.LogUtils.LogUtils' imported but unused
+.\core\task\BufferLayerTask.py:5:1: F401 'time' imported but unused
+.\core\task\BufferLayerTask.py:9:1: E303 too many blank lines (3)
+.\core\task\BufferLayerTask.py:40:101: E501 line too long (109 > 100 characters)
+.\core\task\BufferLayerTask.py:67:25: E251 unexpected spaces around keyword / parameter equals
+.\core\task\BufferLayerTask.py:67:27: E251 unexpected spaces around keyword / parameter equals
+.\core\task\DronePhotosTask.py:3:1: F401 'os' imported but unused
+.\core\task\DronePhotosTask.py:9:1: E302 expected 2 blank lines, found 1
+.\core\task\ExplodeHugeLayerTask.py:1:1: F401 'processing' imported but unused
+.\core\task\ExplodeHugeLayerTask.py:2:1: F401 'qgis.core.QgsVectorLayer' imported but unused
+.\core\task\ExplodeHugeLayerTask.py:4:1: F401 '..config.LogUtils.LogUtils' imported but unused
+.\core\task\ExplodeHugeLayerTask.py:6:1: F401 'time' imported but unused
+.\core\task\ExplodeHugeLayerTask.py:8:1: E302 expected 2 blank lines, found 1
+.\core\task\ExplodeHugeLayerTask.py:24:101: E501 line too long (106 > 100 characters)
+.\core\task\LineFieldsTask.py:2:1: F401 'os' imported but unused
+.\core\task\LineFieldsTask.py:3:1: F401 'tempfile' imported but unused
+.\core\task\LineFieldsTask.py:4:1: F401 'qgis.core.QgsVectorLayer' imported but unused
+.\core\task\LineFieldsTask.py:5:1: F401 'qgis.PyQt.QtCore.QVariant' imported but unused
+.\core\task\LineFieldsTask.py:7:1: F401 '..config.LogUtils.LogUtils' imported but unused
+.\core\task\LineFieldsTask.py:35:13: F541 f-string is missing placeholders
+.\core\task\LoadFilesTask.py:3:1: F401 'typing.Optional' imported but unused
+.\core\task\MrkParseTask.py:47:47: E231 missing whitespace after ','
+.\core\task\MrkParseTask.py:51:1: W293 blank line contains whitespace
+.\core\task\MrkParseTask.py:53:13: E303 too many blank lines (3)
+.\core\task\MrkParseTask.py:54:101: E501 line too long (104 > 100 characters)
+.\core\task\MrkParseTask.py:58:101: E501 line too long (105 > 100 characters)
+.\core\task\PhotoMetadataTask.py:2:1: F401 'typing.Optional' imported but unused
+.\core\task\PhotoMetadataTask.py:2:1: F401 'typing.Dict' imported but unused
+.\core\task\PhotoMetadataTask.py:2:1: F401 'typing.Any' imported but unused
+.\core\task\PhotoMetadataTask.py:34:1: W293 blank line contains whitespace
+.\core\task\PhotoMetadataTask.py:39:1: W293 blank line contains whitespace
+.\core\task\PhotoMetadataTask.py:47:101: E501 line too long (122 > 100 characters)
+.\core\task\PhotoMetadataTask.py:49:1: W293 blank line contains whitespace
+.\core\task\PhotoMetadataTask.py:51:1: W293 blank line contains whitespace
+.\core\task\PhotoMetadataTask.py:57:21: F841 local variable 'has_mrk_folder' is assigned to but never used
+.\core\task\PhotoMetadataTask.py:58:1: W293 blank line contains whitespace
+.\core\task\PhotoMetadataTask.py:61:21: F541 f-string is missing placeholders
+.\core\task\PhotoMetadataTask.py:87:101: E501 line too long (104 > 100 characters)
+.\core\task\PointFieldsTask.py:2:1: F401 'os' imported but unused
+.\core\task\PointFieldsTask.py:3:1: F401 'tempfile' imported but unused
+.\core\task\PointFieldsTask.py:4:1: F401 'qgis.core.QgsVectorLayer' imported but unused
+.\core\task\PointFieldsTask.py:4:1: F401 'qgis.core.QgsField' imported but unused
+.\core\task\PointFieldsTask.py:4:1: F401 'qgis.core.QgsProject' imported but unused
+.\core\task\PointFieldsTask.py:5:1: F401 'qgis.PyQt.QtCore.QVariant' imported but unused
+.\core\task\PointFieldsTask.py:7:1: F401 '...utils.vector.VectorLayerAttributes.VectorLayerAttributes' imported but unused
+.\core\task\PointFieldsTask.py:8:1: F401 '...utils.vector.VectorLayerSource.VectorLayerSource' imported but unused
+.\core\task\PointFieldsTask.py:9:1: F401 '..config.LogUtils.LogUtils' imported but unused
+.\core\task\PointFieldsTask.py:15:1: W293 blank line contains whitespace
+.\core\task\PointFieldsTask.py:21:1: W293 blank line contains whitespace
+.\core\task\PointFieldsTask.py:29:1: W293 blank line contains whitespace
+.\core\task\PointFieldsTask.py:98:1: W391 blank line at end of file
+.\core\task\PolygonFieldsTask.py:2:1: F401 'os' imported but unused
+.\core\task\PolygonFieldsTask.py:3:1: F401 'tempfile' imported but unused
+.\core\task\PolygonFieldsTask.py:4:1: F401 'qgis.core.QgsVectorLayer' imported but unused
+.\core\task\PolygonFieldsTask.py:4:1: F401 'qgis.core.QgsField' imported but unused
+.\core\task\PolygonFieldsTask.py:5:1: F401 'qgis.PyQt.QtCore.QVariant' imported but unused
+.\core\task\PolygonFieldsTask.py:7:1: F401 '...utils.vector.VectorLayerSource.VectorLayerSource' imported but unused
+.\core\task\PolygonFieldsTask.py:8:1: F401 '..config.LogUtils.LogUtils' imported but unused
+.\core\task\PolygonFieldsTask.py:14:1: W293 blank line contains whitespace
+.\core\task\PolygonFieldsTask.py:20:1: W293 blank line contains whitespace
+.\core\task\PolygonFieldsTask.py:29:1: W293 blank line contains whitespace
+.\core\task\PolygonFieldsTask.py:39:13: F541 f-string is missing placeholders
+.\core\task\PolygonFieldsTask.py:44:1: W293 blank line contains whitespace
+.\core\task\PolygonFieldsTask.py:48:9: F841 local variable 'missing_fields' is assigned to but never used
+.\core\task\PolygonFieldsTask.py:105:101: E501 line too long (135 > 100 characters)
+.\core\task\PolygonFieldsTask.py:109:1: W391 blank line at end of file
+.\core\task\SaveVectorLayerTask.py:6:1: F401 'typing.Any' imported but unused
+.\core\task\SaveVectorLayerTask.py:6:1: F401 'typing.Dict' imported but unused
+.\core\task\SaveVectorLayerTask.py:6:1: F401 'typing.List' imported but unused
+.\core\task\SaveVectorLayerTask.py:58:20: W292 no newline at end of file
+.\core\task\TaskFeedback.py:4:1: E302 expected 2 blank lines, found 1
+.\core\task\TaskFeedback.py:6:28: E231 missing whitespace after ','
+.\core\task\TaskFeedback.py:39:44: W292 no newline at end of file
+.\core\task\altimetry_task.py:4:1: F401 'urllib.request' imported but unused
+.\core\task\reverse_geocoding_task.py:4:1: F401 'urllib.request' imported but unused
+.\core\ui\HudProgressBar.py:3:1: F401 'qgis.PyQt.QtGui.QFont' imported but unused
+.\core\ui\ProgressDialog.py:104:101: E501 line too long (107 > 100 characters)
+.\core\ui\ProgressDialog.py:110:68: W292 no newline at end of file
+.\core\ui\WidgetFactory.py:475:101: E501 line too long (129 > 100 characters)
+.\core\ui\info_dialog.py:50:13: F541 f-string is missing placeholders
+.\plugins\BaseDialog.py:1:1: F401 'qgis.PyQt.QtWidgets.QAction' imported but unused
+.\plugins\BaseDialog.py:1:1: F401 'qgis.PyQt.QtWidgets.QFileDialog' imported but unused
+.\plugins\BaseDialog.py:1:1: F401 'qgis.PyQt.QtWidgets.QLineEdit' imported but unused
+.\plugins\BaseDialog.py:2:21: E231 missing whitespace after ','
+.\plugins\BaseDialog.py:2:44: E231 missing whitespace after ','
+.\plugins\BaseDialog.py:4:1: F401 'qgis.core.QgsVectorLayer' imported but unused
+.\plugins\BaseDialog.py:4:1: F401 'qgis.core.QgsWkbTypes' imported but unused
+.\plugins\BaseDialog.py:4:1: F401 'qgis.core.QgsApplication' imported but unused
+.\plugins\BaseDialog.py:4:1: F401 'qgis.core.QgsProject' imported but unused
+.\plugins\BaseDialog.py:4:1: F401 'qgis.core.QgsFeatureRequest' imported but unused
+.\plugins\BaseDialog.py:4:78: E231 missing whitespace after ','
+.\plugins\BaseDialog.py:5:1: F401 'qgis.PyQt.QtGui.QDesktopServices' imported but unused
+.\plugins\BaseDialog.py:5:1: F401 'qgis.PyQt.QtGui.QCursor' imported but unused
+.\plugins\BaseDialog.py:6:1: F401 'qgis.PyQt.QtCore.QUrl' imported but unused
+.\plugins\BaseDialog.py:6:1: F401 'qgis.PyQt.QtCore.QRect' imported but unused
+.\plugins\BaseDialog.py:6:1: F401 'qgis.PyQt.QtCore.QPoint' imported but unused
+.\plugins\BaseDialog.py:9:1: F401 'pathlib.Path' imported but unused
+.\plugins\BaseDialog.py:11:1: F401 'time' imported but unused
+.\plugins\BaseDialog.py:12:1: F401 '..utils.FormatUtils.FormatUtils' imported but unused
+.\plugins\BaseDialog.py:13:1: F401 '..utils.vector.VectorLayerSource.VectorLayerSource' imported but unused
+.\plugins\BaseDialog.py:14:1: F401 '..core.config.LogUtils.LogUtils' imported but unused
+.\plugins\BaseDialog.py:16:1: F401 '..utils.Preferences.load_tool_prefs' imported but unused
+.\plugins\BaseDialog.py:16:1: F401 '..utils.Preferences.save_tool_prefs' imported but unused
+.\plugins\BaseDialog.py:17:1: F401 '..utils.ToolKeys.ToolKey' imported but unused
+.\plugins\BaseDialog.py:18:1: F401 '..utils.QgisMessageUtil.QgisMessageUtil' imported but unused
+.\plugins\BaseDialog.py:19:1: F401 '..utils.ProjectUtils.ProjectUtils' imported but unused
+.\plugins\BaseDialog.py:19:33: E271 multiple spaces after keyword
+.\plugins\BaseDialog.py:20:1: F401 '..utils.StringUtils.StringUtils' imported but unused
+.\plugins\BaseDialog.py:24:1: E303 too many blank lines (3)
+.\plugins\BaseDialog.py:25:1: W293 blank line contains whitespace
+.\plugins\BaseDialog.py:29:1: W293 blank line contains whitespace
+.\plugins\BaseDialog.py:47:101: E501 line too long (124 > 100 characters)
+.\plugins\BaseDialog.py:47:125: W291 trailing whitespace
+.\plugins\BaseDialog.py:49:1: W293 blank line contains whitespace
+.\plugins\BaseDialog.py:50:1: W293 blank line contains whitespace
+.\plugins\BaseDialog.py:51:5: E303 too many blank lines (3)
+.\plugins\BaseDialog.py:51:44: E231 missing whitespace after ','
+.\plugins\BaseDialog.py:51:101: E501 line too long (101 > 100 characters)
+.\plugins\BaseDialog.py:57:10: W291 trailing whitespace
+.\plugins\BaseDialog.py:58:88: W291 trailing whitespace
+.\plugins\BaseDialog.py:70:101: E501 line too long (113 > 100 characters)
+.\plugins\BaseDialog.py:77:1: W293 blank line contains whitespace
+.\plugins\BaseDialog.py:97:1: W293 blank line contains whitespace
+.\plugins\BaseDialog.py:104:12: W292 no newline at end of file
+.\plugins\BasePlugin.py:2:1: F401 'qgis.PyQt.QtWidgets.QDialog' imported but unused
+.\plugins\BasePlugin.py:2:1: F401 'qgis.PyQt.QtWidgets.QFileDialog' imported but unused
+.\plugins\BasePlugin.py:2:1: F401 'qgis.PyQt.QtWidgets.QLineEdit' imported but unused
+.\plugins\BasePlugin.py:2:1: F401 'qgis.PyQt.QtWidgets.QSizeGrip' imported but unused
+.\plugins\BasePlugin.py:3:21: E231 missing whitespace after ','
+.\plugins\BasePlugin.py:3:44: E231 missing whitespace after ','
+.\plugins\BasePlugin.py:5:1: F401 'qgis.core.QgsWkbTypes' imported but unused
+.\plugins\BasePlugin.py:5:1: F401 'qgis.core.QgsApplication' imported but unused
+.\plugins\BasePlugin.py:5:1: F401 'qgis.core.QgsProject' imported but unused
+.\plugins\BasePlugin.py:5:1: F401 'qgis.core.QgsFeatureRequest' imported but unused
+.\plugins\BasePlugin.py:5:78: E231 missing whitespace after ','
+.\plugins\BasePlugin.py:6:1: F401 'qgis.PyQt.QtGui.QDesktopServices' imported but unused
+.\plugins\BasePlugin.py:6:1: F401 'qgis.PyQt.QtGui.QIcon' imported but unused
+.\plugins\BasePlugin.py:6:1: F401 'qgis.PyQt.QtGui.QCursor' imported but unused
+.\plugins\BasePlugin.py:7:1: F401 'qgis.PyQt.QtCore.QUrl' imported but unused
+.\plugins\BasePlugin.py:7:1: F401 'qgis.PyQt.QtCore.Qt' imported but unused
+.\plugins\BasePlugin.py:7:1: F401 'qgis.PyQt.QtCore.QRect' imported but unused
+.\plugins\BasePlugin.py:7:1: F401 'qgis.PyQt.QtCore.QPoint' imported but unused
+.\plugins\BasePlugin.py:10:1: F401 'pathlib.Path' imported but unused
+.\plugins\BasePlugin.py:16:1: F401 '..core.ui.WidgetFactory.WidgetFactory' imported but unused
+.\plugins\BasePlugin.py:21:33: E271 multiple spaces after keyword
+.\plugins\BasePlugin.py:27:1: E303 too many blank lines (4)
+.\plugins\BasePlugin.py:30:1: E302 expected 2 blank lines, found 4
+.\plugins\BasePlugin.py:42:5: E303 too many blank lines (3)
+.\plugins\BasePlugin.py:42:101: E501 line too long (113 > 100 characters)
+.\plugins\BasePlugin.py:43:37: W291 trailing whitespace
+.\plugins\BasePlugin.py:44:1: W293 blank line contains whitespace
+.\plugins\BasePlugin.py:61:1: W293 blank line contains whitespace
+.\plugins\BasePlugin.py:66:101: E501 line too long (107 > 100 characters)
+.\plugins\BasePlugin.py:69:1: W293 blank line contains whitespace
+.\plugins\BasePlugin.py:92:5: E303 too many blank lines (2)
+.\plugins\BasePlugin.py:112:1: W293 blank line contains whitespace
+.\plugins\BasePlugin.py:115:5: E303 too many blank lines (3)
+.\plugins\BasePlugin.py:118:1: W293 blank line contains whitespace
+.\plugins\BasePlugin.py:123:1: W293 blank line contains whitespace
+.\plugins\BasePlugin.py:129:28: E203 whitespace before ','
+.\plugins\BasePlugin.py:134:1: W293 blank line contains whitespace
+.\plugins\BasePlugin.py:139:1: W293 blank line contains whitespace
+.\plugins\BasePlugin.py:142:1: W293 blank line contains whitespace
+.\plugins\BasePlugin.py:148:1: W293 blank line contains whitespace
+.\plugins\BasePlugin.py:157:5: E303 too many blank lines (3)
+.\plugins\BasePlugin.py:157:41: E231 missing whitespace after ','
+.\plugins\BasePlugin.py:157:52: E251 unexpected spaces around keyword / parameter equals
+.\plugins\BasePlugin.py:157:54: E251 unexpected spaces around keyword / parameter equals
+.\plugins\BasePlugin.py:157:60: E231 missing whitespace after ','
+.\plugins\BasePlugin.py:182:101: E501 line too long (113 > 100 characters)
+.\plugins\BasePlugin.py:200:101: E501 line too long (113 > 100 characters)
+.\plugins\BasePlugin.py:201:69: E231 missing whitespace after ','
+.\plugins\BasePlugin.py:202:89: E231 missing whitespace after ','
+.\plugins\BasePlugin.py:208:101: E501 line too long (111 > 100 characters)
+.\plugins\BasePlugin.py:211:101: E501 line too long (110 > 100 characters)
+.\plugins\BasePlugin.py:220:38: E251 unexpected spaces around keyword / parameter equals
+.\plugins\BasePlugin.py:220:40: E251 unexpected spaces around keyword / parameter equals
+.\plugins\BasePlugin.py:230:101: E501 line too long (107 > 100 characters)
+.\plugins\BasePlugin.py:231:101: E501 line too long (111 > 100 characters)
+.\plugins\BasePlugin.py:233:101: E501 line too long (142 > 100 characters)
+.\plugins\BasePlugin.py:242:101: E501 line too long (109 > 100 characters)
+.\plugins\BasePlugin.py:243:101: E501 line too long (113 > 100 characters)
+.\plugins\BasePlugin.py:245:101: E501 line too long (147 > 100 characters)
+.\plugins\BasePlugin.py:248:101: E501 line too long (121 > 100 characters)
+.\plugins\BasePlugin.py:252:101: E501 line too long (126 > 100 characters)
+.\plugins\BasePlugin.py:260:101: E501 line too long (108 > 100 characters)
+.\plugins\BasePlugin.py:260:101: E231 missing whitespace after ','
+.\plugins\BasePlugin.py:261:101: E501 line too long (118 > 100 characters)
+.\plugins\BasePlugin.py:261:111: E231 missing whitespace after ','
+.\plugins\BasePlugin.py:262:101: E501 line too long (115 > 100 characters)
+.\plugins\BasePlugin.py:262:108: E231 missing whitespace after ','
+.\plugins\BasePlugin.py:274:101: E501 line too long (116 > 100 characters)
+.\plugins\BasePlugin.py:284:5: E303 too many blank lines (2)
+.\plugins\BasePlugin.py:284:5: E265 block comment should start with '# '
+.\plugins\BasePlugin.py:285:5: E301 expected 1 blank line, found 0
+.\plugins\BasePlugin.py:293:46: W291 trailing whitespace
+.\plugins\BasePlugin.py:305:1: W293 blank line contains whitespace
+.\plugins\BasePlugin.py:308:5: E303 too many blank lines (3)
+.\plugins\BasePlugin.py:328:5: E303 too many blank lines (2)
+.\plugins\BasePlugin.py:338:67: W291 trailing whitespace
+.\plugins\BasePlugin.py:339:1: W293 blank line contains whitespace
+.\plugins\BasePlugin.py:341:1: W293 blank line contains whitespace
+.\plugins\BasePlugin.py:342:1: W293 blank line contains whitespace
+.\plugins\BasePlugin.py:343:5: E303 too many blank lines (4)
+.\plugins\BasePlugin.py:354:101: E501 line too long (149 > 100 characters)
+.\plugins\BasePlugin.py:369:31: F541 f-string is missing placeholders
+.\plugins\BasePlugin.py:372:1: W293 blank line contains whitespace
+.\plugins\BasePlugin.py:388:10: W291 trailing whitespace
+.\plugins\BasePlugin.py:389:1: W293 blank line contains whitespace
+.\plugins\CopyAttributesPlugin.py:5:1: F401 '..core.config.LogUtils.LogUtils' imported but unused
+.\plugins\CopyAttributesPlugin.py:39:71: W291 trailing whitespace
+.\plugins\CopyAttributesPlugin.py:40:1: W293 blank line contains whitespace
+.\plugins\CopyAttributesPlugin.py:46:10: W291 trailing whitespace
+.\plugins\CopyAttributesPlugin.py:48:71: W291 trailing whitespace
+.\plugins\CopyAttributesPlugin.py:74:1: W293 blank line contains whitespace
+.\plugins\CopyAttributesPlugin.py:78:5: E303 too many blank lines (2)
+.\plugins\CopyAttributesPlugin.py:88:1: W293 blank line contains whitespace
+.\plugins\CopyAttributesPlugin.py:89:5: E303 too many blank lines (2)
+.\plugins\CopyAttributesPlugin.py:92:1: W293 blank line contains whitespace
+.\plugins\CopyAttributesPlugin.py:94:5: E303 too many blank lines (2)
+.\plugins\CopyAttributesPlugin.py:94:27: W291 trailing whitespace
+.\plugins\CopyAttributesPlugin.py:104:5: E301 expected 1 blank line, found 0
+.\plugins\CopyAttributesPlugin.py:137:9: E303 too many blank lines (3)
+.\plugins\CopyAttributesPlugin.py:151:101: E501 line too long (109 > 100 characters)
+.\plugins\CopyAttributesPlugin.py:156:1: E302 expected 2 blank lines, found 1
+.\plugins\DroneCoordinates.py:69:1: W293 blank line contains whitespace
+.\plugins\DroneCoordinates.py:85:1: W293 blank line contains whitespace
+.\plugins\DroneCoordinates.py:103:1: W293 blank line contains whitespace
+.\plugins\DroneCoordinates.py:113:1: W293 blank line contains whitespace
+.\plugins\DroneCoordinates.py:129:1: W293 blank line contains whitespace
+.\plugins\DroneCoordinates.py:135:9: E303 too many blank lines (3)
+.\plugins\ExportAllLayouts.py:11:1: F401 'qgis.PyQt.QtCore.QUrl' imported but unused
+.\plugins\ExportAllLayouts.py:26:1: W293 blank line contains whitespace
+.\plugins\ExportAllLayouts.py:35:1: W293 blank line contains whitespace
+.\plugins\ExportAllLayouts.py:48:1: W293 blank line contains whitespace
+.\plugins\ExportAllLayouts.py:60:1: W293 blank line contains whitespace
+.\plugins\ExportAllLayouts.py:67:1: W293 blank line contains whitespace
+.\plugins\ExportAllLayouts.py:133:1: W293 blank line contains whitespace
+.\plugins\ExportAllLayouts.py:194:101: E501 line too long (124 > 100 characters)
+.\plugins\ExportAllLayouts.py:207:1: W293 blank line contains whitespace
+.\plugins\ExportAllLayouts.py:223:101: E501 line too long (104 > 100 characters)
+.\plugins\ExportAllLayouts.py:224:1: W293 blank line contains whitespace
+.\plugins\ExportAllLayouts.py:247:101: E501 line too long (105 > 100 characters)
+.\plugins\ExportAllLayouts.py:262:1: W293 blank line contains whitespace
+.\plugins\ExportAllLayouts.py:307:101: E501 line too long (102 > 100 characters)
+.\plugins\ExportAllLayouts.py:323:101: E501 line too long (108 > 100 characters)
+.\plugins\ExportAllLayouts.py:324:1: W293 blank line contains whitespace
+.\plugins\ExportAllLayouts.py:327:1: W293 blank line contains whitespace
+.\plugins\ExportAllLayouts.py:349:101: E501 line too long (105 > 100 characters)
+.\plugins\ExportAllLayouts.py:363:101: E501 line too long (119 > 100 characters)
+.\plugins\ExportAllLayouts.py:364:1: W293 blank line contains whitespace
+.\plugins\ExportAllLayouts.py:369:1: W293 blank line contains whitespace
+.\plugins\ExportAllLayouts.py:378:1: W293 blank line contains whitespace
+.\plugins\ExportAllLayouts.py:381:101: E501 line too long (170 > 100 characters)
+.\plugins\GenerateTrailPlugin.py:2:1: F401 'qgis.core.QgsApplication' imported but unused
+.\plugins\GenerateTrailPlugin.py:5:1: F401 '..utils.ProjectUtils.ProjectUtils' imported but unused
+.\plugins\GenerateTrailPlugin.py:23:1: E303 too many blank lines (3)
+.\plugins\GenerateTrailPlugin.py:29:45: W291 trailing whitespace
+.\plugins\GenerateTrailPlugin.py:40:5: E303 too many blank lines (2)
+.\plugins\GenerateTrailPlugin.py:61:53: E231 missing whitespace after ','
+.\plugins\GenerateTrailPlugin.py:128:101: E501 line too long (124 > 100 characters)
+.\plugins\GenerateTrailPlugin.py:130:13: W291 trailing whitespace
+.\plugins\GenerateTrailPlugin.py:137:1: W293 blank line contains whitespace
+.\plugins\GenerateTrailPlugin.py:138:27: W291 trailing whitespace
+.\plugins\GenerateTrailPlugin.py:148:1: W293 blank line contains whitespace
+.\plugins\GenerateTrailPlugin.py:150:101: E501 line too long (156 > 100 characters)
+.\plugins\GenerateTrailPlugin.py:160:41: E201 whitespace after '('
+.\plugins\GenerateTrailPlugin.py:160:101: E501 line too long (136 > 100 characters)
+.\plugins\GenerateTrailPlugin.py:160:135: E202 whitespace before ')'
+.\plugins\GenerateTrailPlugin.py:162:1: W293 blank line contains whitespace
+.\plugins\GenerateTrailPlugin.py:167:1: W293 blank line contains whitespace
+.\plugins\GenerateTrailPlugin.py:175:1: W293 blank line contains whitespace
+.\plugins\GenerateTrailPlugin.py:178:101: E501 line too long (162 > 100 characters)
+.\plugins\GenerateTrailPlugin.py:179:1: W293 blank line contains whitespace
+.\plugins\GenerateTrailPlugin.py:181:1: W293 blank line contains whitespace
+.\plugins\GenerateTrailPlugin.py:182:101: E501 line too long (169 > 100 characters)
+.\plugins\GenerateTrailPlugin.py:183:1: W293 blank line contains whitespace
+.\plugins\GenerateTrailPlugin.py:208:1: W293 blank line contains whitespace
+.\plugins\GenerateTrailPlugin.py:227:101: E501 line too long (116 > 100 characters)
+.\plugins\GenerateTrailPlugin.py:235:1: W293 blank line contains whitespace
+.\plugins\GenerateTrailPlugin.py:242:1: W293 blank line contains whitespace
+.\plugins\GenerateTrailPlugin.py:246:1: W293 blank line contains whitespace
+.\plugins\GenerateTrailPlugin.py:247:5: E303 too many blank lines (3)
+.\plugins\GenerateTrailPlugin.py:247:101: E501 line too long (115 > 100 characters)
+.\plugins\GenerateTrailPlugin.py:258:41: E201 whitespace after '('
+.\plugins\GenerateTrailPlugin.py:259:17: E128 continuation line under-indented for visual indent
+.\plugins\GenerateTrailPlugin.py:260:13: E124 closing bracket does not match visual indentation
+.\plugins\GenerateTrailPlugin.py:266:1: W293 blank line contains whitespace
+.\plugins\GenerateTrailPlugin.py:269:101: E501 line too long (105 > 100 characters)
+.\plugins\GenerateTrailPlugin.py:273:101: E501 line too long (123 > 100 characters)
+.\plugins\GenerateTrailPlugin.py:282:101: E501 line too long (103 > 100 characters)
+.\plugins\GenerateTrailPlugin.py:283:1: W293 blank line contains whitespace
+.\plugins\GenerateTrailPlugin.py:287:5: E303 too many blank lines (2)
+.\plugins\GenerateTrailPlugin.py:377:9: E303 too many blank lines (2)
+.\plugins\GenerateTrailPlugin.py:389:41: E201 whitespace after '('
+.\plugins\GenerateTrailPlugin.py:389:58: E231 missing whitespace after ','
+.\plugins\GenerateTrailPlugin.py:389:101: E501 line too long (119 > 100 characters)
+.\plugins\GenerateTrailPlugin.py:389:118: E202 whitespace before ')'
+.\plugins\GenerateTrailPlugin.py:408:1: W293 blank line contains whitespace
+.\plugins\GenerateTrailPlugin.py:409:37: E201 whitespace after '('
+.\plugins\GenerateTrailPlugin.py:409:100: E202 whitespace before ')'
+.\plugins\GenerateTrailPlugin.py:409:101: E501 line too long (101 > 100 characters)
+.\plugins\GenerateTrailPlugin.py:413:1: E302 expected 2 blank lines, found 1
+.\plugins\GenerateTrailPlugin.py:418:1: W391 blank line at end of file
+.\plugins\LoadFolderLayers.py:3:1: F401 're' imported but unused
+.\plugins\LoadFolderLayers.py:4:1: F401 'pathlib.Path' imported but unused
+.\plugins\LoadFolderLayers.py:5:1: F401 'datetime.datetime' imported but unused
+.\plugins\LoadFolderLayers.py:6:1: F401 'shutil' imported but unused
+.\plugins\LoadFolderLayers.py:27:1: E303 too many blank lines (3)
+.\plugins\LoadFolderLayers.py:31:1: E302 expected 2 blank lines, found 3
+.\plugins\LoadFolderLayers.py:108:86: W291 trailing whitespace
+.\plugins\LoadFolderLayers.py:110:9: E265 block comment should start with '# '
+.\plugins\LoadFolderLayers.py:111:9: E265 block comment should start with '# '
+.\plugins\LoadFolderLayers.py:112:101: E501 line too long (136 > 100 characters)
+.\plugins\LoadFolderLayers.py:113:9: E265 block comment should start with '# '
+.\plugins\LoadFolderLayers.py:113:101: E501 line too long (130 > 100 characters)
+.\plugins\LoadFolderLayers.py:113:131: W291 trailing whitespace
+.\plugins\LoadFolderLayers.py:114:101: E501 line too long (124 > 100 characters)
+.\plugins\LoadFolderLayers.py:115:101: E501 line too long (126 > 100 characters)
+.\plugins\LoadFolderLayers.py:115:127: W291 trailing whitespace
+.\plugins\LoadFolderLayers.py:116:101: E501 line too long (161 > 100 characters)
+.\plugins\LoadFolderLayers.py:162:5: E303 too many blank lines (2)
+.\plugins\LoadFolderLayers.py:169:5: E301 expected 1 blank line, found 0
+.\plugins\LoadFolderLayers.py:234:1: W293 blank line contains whitespace
+.\plugins\LoadFolderLayers.py:249:13: F841 local variable 'e' is assigned to but never used
+.\plugins\LoadFolderLayers.py:269:101: E501 line too long (148 > 100 characters)
+.\plugins\LoadFolderLayers.py:272:101: E501 line too long (147 > 100 characters)
+.\plugins\LoadFolderLayers.py:276:5: E303 too many blank lines (2)
+.\plugins\LoadFolderLayers.py:321:101: E501 line too long (117 > 100 characters)
+.\plugins\LoadFolderLayers.py:354:101: E501 line too long (116 > 100 characters)
+.\plugins\LoadFolderLayers.py:365:101: E501 line too long (159 > 100 characters)
+.\plugins\LoadFolderLayers.py:372:1: E302 expected 2 blank lines, found 1
+.\plugins\ReplaceInLayouts.py:23:1: W293 blank line contains whitespace
+.\plugins\ReplaceInLayouts.py:76:101: E501 line too long (114 > 100 characters)
+.\plugins\ReplaceInLayouts.py:103:5: E303 too many blank lines (3)
+.\plugins\ReplaceInLayouts.py:137:1: W293 blank line contains whitespace
+.\plugins\ReplaceInLayouts.py:163:14: W291 trailing whitespace
+.\plugins\ReplaceInLayouts.py:189:101: E501 line too long (108 > 100 characters)
+.\plugins\ReplaceInLayouts.py:194:14: W291 trailing whitespace
+.\plugins\RestartQgis.py:24:1: E303 too many blank lines (3)
+.\plugins\RestartQgis.py:26:1: W293 blank line contains whitespace
+.\plugins\RestartQgis.py:32:1: W293 blank line contains whitespace
+.\plugins\RestartQgis.py:36:1: W293 blank line contains whitespace
+.\plugins\RestartQgis.py:44:1: W293 blank line contains whitespace
+.\plugins\RestartQgis.py:47:1: W293 blank line contains whitespace
+.\plugins\RestartQgis.py:78:1: W293 blank line contains whitespace
+.\plugins\RestartQgis.py:116:1: W293 blank line contains whitespace
+.\plugins\RestartQgis.py:122:1: W293 blank line contains whitespace
+.\plugins\RestartQgis.py:128:1: W293 blank line contains whitespace
+.\plugins\RestartQgis.py:129:101: E501 line too long (105 > 100 characters)
+.\plugins\RestartQgis.py:130:1: W293 blank line contains whitespace
+.\plugins\RestartQgis.py:134:1: W293 blank line contains whitespace
+.\plugins\RestartQgis.py:145:1: W293 blank line contains whitespace
+.\plugins\RestartQgis.py:154:1: W293 blank line contains whitespace
+.\plugins\RestartQgis.py:162:1: W293 blank line contains whitespace
+.\plugins\RestartQgis.py:166:1: W293 blank line contains whitespace
+.\plugins\RestartQgis.py:180:1: W293 blank line contains whitespace
+.\plugins\RestartQgis.py:186:101: E501 line too long (103 > 100 characters)
+.\plugins\RestartQgis.py:193:1: W293 blank line contains whitespace
+.\plugins\RestartQgis.py:213:1: W293 blank line contains whitespace
+.\plugins\RestartQgis.py:222:31: W292 no newline at end of file
+.\plugins\SettingsPlugin.py:16:1: F401 '..core.config.LogUtils.LogUtils' imported but unused
+.\plugins\SettingsPlugin.py:17:1: F401 '..utils.StringUtils.StringUtils' imported but unused
+.\plugins\SettingsPlugin.py:23:1: W293 blank line contains whitespace
+.\plugins\SettingsPlugin.py:40:1: W293 blank line contains whitespace
+.\plugins\SettingsPlugin.py:46:1: W293 blank line contains whitespace
+.\plugins\SettingsPlugin.py:55:101: E501 line too long (118 > 100 characters)
+.\plugins\SettingsPlugin.py:75:1: W293 blank line contains whitespace
+.\plugins\SettingsPlugin.py:111:21: E251 unexpected spaces around keyword / parameter equals
+.\plugins\SettingsPlugin.py:111:23: E251 unexpected spaces around keyword / parameter equals
+.\plugins\SettingsPlugin.py:113:1: W293 blank line contains whitespace
+.\plugins\SettingsPlugin.py:149:101: E501 line too long (135 > 100 characters)
+.\plugins\SettingsPlugin.py:168:1: W293 blank line contains whitespace
+.\plugins\SettingsPlugin.py:190:1: W293 blank line contains whitespace
+.\plugins\SettingsPlugin.py:198:1: W293 blank line contains whitespace
+.\plugins\SettingsPlugin.py:205:1: W293 blank line contains whitespace
+.\plugins\SettingsPlugin.py:208:1: W293 blank line contains whitespace
+.\plugins\VectorFieldsCalculationPlugin.py:2:1: F401 'qgis.PyQt.QtWidgets.QAction' imported but unused
+.\plugins\VectorFieldsCalculationPlugin.py:3:1: F401 'qgis.core.QgsVectorLayer' imported but unused
+.\plugins\VectorFieldsCalculationPlugin.py:3:1: F401 'qgis.core.QgsApplication' imported but unused
+.\plugins\VectorFieldsCalculationPlugin.py:4:1: F401 'os' imported but unused
+.\plugins\VectorFieldsCalculationPlugin.py:11:1: F401 '..utils.ProjectUtils.ProjectUtils' imported but unused
+.\plugins\VectorFieldsCalculationPlugin.py:21:1: W293 blank line contains whitespace
+.\plugins\VectorFieldsCalculationPlugin.py:49:9: F811 redefinition of unused 'ProjectUtils' from line 11
+.\plugins\VectorFieldsCalculationPlugin.py:50:101: E501 line too long (114 > 100 characters)
+.\plugins\VectorFieldsCalculationPlugin.py:65:101: E501 line too long (116 > 100 characters)
+.\plugins\VectorFieldsCalculationPlugin.py:68:28: W291 trailing whitespace
+.\plugins\VectorFieldsCalculationPlugin.py:70:101: E501 line too long (110 > 100 characters)
+.\plugins\VectorFieldsCalculationPlugin.py:103:1: W293 blank line contains whitespace
+.\plugins\VectorFieldsCalculationPlugin.py:109:1: W293 blank line contains whitespace
+.\plugins\VectorFieldsCalculationPlugin.py:110:101: E501 line too long (102 > 100 characters)
+.\plugins\VectorFieldsCalculationPlugin.py:124:101: E501 line too long (102 > 100 characters)
+.\plugins\VectorFieldsCalculationPlugin.py:125:1: W293 blank line contains whitespace
+.\plugins\VectorFieldsCalculationPlugin.py:126:101: E501 line too long (101 > 100 characters)
+.\plugins\VectorFieldsCalculationPlugin.py:250:101: E501 line too long (107 > 100 characters)
+.\plugins\VectorFieldsCalculationPlugin.py:265:101: E501 line too long (107 > 100 characters)
+.\plugins\VectorFieldsCalculationPlugin.py:289:1: W293 blank line contains whitespace
+.\plugins\VectorFieldsCalculationPlugin.py:295:1: W293 blank line contains whitespace
+.\plugins\VectorFieldsCalculationPlugin.py:337:1: W293 blank line contains whitespace
+.\plugins\VectorFieldsCalculationPlugin.py:340:1: W293 blank line contains whitespace
+.\plugins\VectorFieldsCalculationPlugin.py:349:1: W293 blank line contains whitespace
+.\plugins\VectorFieldsCalculationPlugin.py:353:1: W293 blank line contains whitespace
+.\plugins\VectorMultipartPlugin.py:4:1: F401 'os' imported but unused
+.\plugins\VectorMultipartPlugin.py:5:1: F401 'qgis.PyQt.QtWidgets.QAction' imported but unused
+.\plugins\VectorMultipartPlugin.py:6:1: F401 'qgis.core.QgsWkbTypes' imported but unused
+.\plugins\VectorMultipartPlugin.py:13:1: E302 expected 2 blank lines, found 1
+.\plugins\VectorMultipartPlugin.py:33:5: E303 too many blank lines (2)
+.\plugins\VectorMultipartPlugin.py:42:1: W293 blank line contains whitespace
+.\plugins\VectorMultipartPlugin.py:65:101: E501 line too long (103 > 100 characters)
+.\plugins\VectorMultipartPlugin.py:86:1: W293 blank line contains whitespace
+.\plugins\VectorMultipartPlugin.py:88:101: E501 line too long (103 > 100 characters)
+.\plugins\VectorMultipartPlugin.py:89:1: W293 blank line contains whitespace
+.\plugins\VectorMultipartPlugin.py:107:101: E501 line too long (111 > 100 characters)
+.\plugins\about_dialog.py:8:1: F401 'qgis.PyQt.QtCore.QUrl' imported but unused
+.\plugins\about_dialog.py:26:30: E231 missing whitespace after ','
+.\plugins\about_dialog.py:49:101: E501 line too long (112 > 100 characters)
+.\plugins\about_dialog.py:50:101: E501 line too long (138 > 100 characters)
+.\plugins\coord_click_tool.py:15:1: F401 '..utils.QgisMessageUtil.QgisMessageUtil' imported but unused
+.\plugins\coord_result_dialog.py:113:5: E303 too many blank lines (2)
+.\plugins\coord_result_dialog.py:117:101: E501 line too long (101 > 100 characters)
+.\plugins\coord_result_dialog.py:139:101: E501 line too long (143 > 100 characters)
+.\plugins\coord_result_dialog.py:149:5: E303 too many blank lines (2)
+.\plugins\coord_result_dialog.py:153:5: E301 expected 1 blank line, found 0
+.\plugins\coord_result_dialog.py:190:15: W291 trailing whitespace
+.\plugins\coord_result_dialog.py:191:101: E501 line too long (120 > 100 characters)
+.\plugins\coord_result_dialog.py:191:121: W291 trailing whitespace
+.\plugins\coord_result_dialog.py:192:91: W291 trailing whitespace
+.\plugins\coord_result_dialog.py:193:14: W291 trailing whitespace
+.\plugins\coord_result_dialog.py:195:1: W293 blank line contains whitespace
+.\plugins\coord_result_dialog.py:197:5: E303 too many blank lines (2)
+.\plugins\coord_result_dialog.py:200:5: E301 expected 1 blank line, found 0
+.\plugins\coord_result_dialog.py:201:25: W291 trailing whitespace
+.\plugins\coord_result_dialog.py:228:13: E128 continuation line under-indented for visual indent
+.\plugins\coord_result_dialog.py:229:9: E124 closing bracket does not match visual indentation
+.\plugins\coord_result_dialog.py:258:5: E303 too many blank lines (2)
+.\plugins\coord_result_dialog.py:267:15: W291 trailing whitespace
+.\plugins\coord_result_dialog.py:268:101: E501 line too long (117 > 100 characters)
+.\plugins\coord_result_dialog.py:270:1: W391 blank line at end of file
+.\plugins\logcat\core\color\class_color_provider.py:14:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\class_color_provider.py:18:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\class_color_provider.py:24:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\class_color_provider.py:28:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\class_color_provider.py:38:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\class_color_provider.py:45:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\class_color_provider.py:50:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\class_color_provider.py:59:9: E741 ambiguous variable name 'l'
+.\plugins\logcat\core\color\class_color_provider.py:60:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\class_color_provider.py:65:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\class_color_provider.py:79:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\class_color_provider.py:82:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\class_color_provider.py:86:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\class_color_provider.py:92:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\class_color_provider.py:102:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\class_color_provider.py:105:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\class_color_provider.py:108:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\class_color_provider.py:111:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\tool_key_color_provider.py:13:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\tool_key_color_provider.py:17:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\tool_key_color_provider.py:30:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\tool_key_color_provider.py:38:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\tool_key_color_provider.py:43:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\tool_key_color_provider.py:48:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\tool_key_color_provider.py:54:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\tool_key_color_provider.py:57:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\tool_key_color_provider.py:60:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\tool_key_color_provider.py:65:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\tool_key_color_provider.py:74:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\tool_key_color_provider.py:78:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\tool_key_color_provider.py:81:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\tool_key_color_provider.py:88:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\tool_key_color_provider.py:92:1: W293 blank line contains whitespace
+.\plugins\logcat\core\color\tool_key_color_provider.py:96:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:6:1: F401 'typing.Callable' imported but unused
+.\plugins\logcat\core\filter\log_filter_engine.py:16:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:22:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:32:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:36:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:43:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:47:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:51:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:55:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:64:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:73:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:77:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:81:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:85:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:89:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:93:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:97:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:101:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:103:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:107:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:111:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:113:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:118:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:120:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:133:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:135:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:143:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:147:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:152:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:155:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:158:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:160:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:162:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:166:1: W293 blank line contains whitespace
+.\plugins\logcat\core\filter\log_filter_engine.py:170:1: W293 blank line contains whitespace
+.\plugins\logcat\core\io\log_file_watcher.py:7:1: F401 'typing.List' imported but unused
+.\plugins\logcat\core\io\log_file_watcher.py:8:1: F401 'datetime.datetime' imported but unused
+.\plugins\logcat\core\io\log_file_watcher.py:8:1: F401 'datetime.timedelta' imported but unused
+.\plugins\logcat\core\io\log_file_watcher.py:17:1: W293 blank line contains whitespace
+.\plugins\logcat\core\io\log_file_watcher.py:21:1: W293 blank line contains whitespace
+.\plugins\logcat\core\io\log_file_watcher.py:30:1: W293 blank line contains whitespace
+.\plugins\logcat\core\io\log_file_watcher.py:39:1: W293 blank line contains whitespace
+.\plugins\logcat\core\io\log_file_watcher.py:47:1: W293 blank line contains whitespace
+.\plugins\logcat\core\io\log_file_watcher.py:53:1: W293 blank line contains whitespace
+.\plugins\logcat\core\io\log_file_watcher.py:56:1: W293 blank line contains whitespace
+.\plugins\logcat\core\io\log_file_watcher.py:64:1: W293 blank line contains whitespace
+.\plugins\logcat\core\io\log_file_watcher.py:85:1: W293 blank line contains whitespace
+.\plugins\logcat\core\io\log_file_watcher.py:95:1: W293 blank line contains whitespace
+.\plugins\logcat\core\io\log_file_watcher.py:101:1: W293 blank line contains whitespace
+.\plugins\logcat\core\io\log_file_watcher.py:107:1: W293 blank line contains whitespace
+.\plugins\logcat\core\io\log_file_watcher.py:146:1: W293 blank line contains whitespace
+.\plugins\logcat\core\io\log_loader.py:8:1: F401 'typing.Optional' imported but unused
+.\plugins\logcat\core\model\log_entry.py:16:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_entry.py:28:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_entry.py:32:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_entry.py:43:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_entry.py:48:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_entry.py:65:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_entry.py:77:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_entry.py:86:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_entry.py:92:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_entry.py:103:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_entry.py:111:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_entry.py:113:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_session.py:15:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_session.py:18:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_session.py:21:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_session.py:25:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_session.py:34:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_session.py:37:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_session.py:54:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_session.py:61:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_session.py:66:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_session.py:70:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_session.py:76:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_session.py:83:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_session.py:86:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_session_manager.py:15:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_session_manager.py:19:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_session_manager.py:27:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_session_manager.py:36:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_session_manager.py:43:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_session_manager.py:45:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_session_manager.py:51:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_session_manager.py:58:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_session_manager.py:67:1: W293 blank line contains whitespace
+.\plugins\logcat\core\model\log_session_manager.py:73:1: W293 blank line contains whitespace
+.\plugins\logcat\logcat_plugin.py:7:1: F401 'pathlib.Path' imported but unused
+.\plugins\logcat\logcat_plugin.py:14:1: W293 blank line contains whitespace
+.\plugins\logcat\logcat_plugin.py:17:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_detail_dialog.py:9:1: F401 'qgis.PyQt.QtCore.Qt' imported but unused
+.\plugins\logcat\ui\log_detail_dialog.py:18:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_detail_dialog.py:22:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_detail_dialog.py:32:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_detail_dialog.py:34:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_detail_dialog.py:38:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_detail_dialog.py:47:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_detail_dialog.py:49:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_detail_dialog.py:56:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_detail_dialog.py:59:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_detail_dialog.py:63:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_detail_dialog.py:67:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_detail_dialog.py:70:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_detail_dialog.py:74:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_multiple_detail_dialog.py:10:1: F401 'qgis.PyQt.QtCore.Qt' imported but unused
+.\plugins\logcat\ui\log_multiple_detail_dialog.py:19:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_multiple_detail_dialog.py:23:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_multiple_detail_dialog.py:33:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_multiple_detail_dialog.py:35:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_multiple_detail_dialog.py:39:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_multiple_detail_dialog.py:43:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_multiple_detail_dialog.py:45:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_multiple_detail_dialog.py:48:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_multiple_detail_dialog.py:55:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_multiple_detail_dialog.py:63:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_multiple_detail_dialog.py:65:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_multiple_detail_dialog.py:68:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_multiple_detail_dialog.py:72:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_multiple_detail_dialog.py:76:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_multiple_detail_dialog.py:80:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_multiple_detail_dialog.py:83:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_multiple_detail_dialog.py:94:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_multiple_detail_dialog.py:100:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\log_sort_filter_proxy_model.py:7:1: F401 'qgis.PyQt.QtCore.QDateTime' imported but unused
+.\plugins\logcat\ui\log_sort_filter_proxy_model.py:8:1: F401 'pathlib.Path' imported but unused
+.\plugins\logcat\ui\log_sort_filter_proxy_model.py:116:101: E501 line too long (113 > 100 characters)
+.\plugins\logcat\ui\log_sort_filter_proxy_model.py:274:101: E501 line too long (114 > 100 characters)
+.\plugins\logcat\ui\log_table_model.py:124:5: F811 redefinition of unused 'append_entries' from line 92
+.\plugins\logcat\ui\log_table_model.py:150:5: F811 redefinition of unused 'clear' from line 118
+.\plugins\logcat\ui\log_table_model.py:233:101: E501 line too long (108 > 100 characters)
+.\plugins\logcat\ui\logcat_dialog.py:8:1: F401 'typing.Set' imported but unused
+.\plugins\logcat\ui\logcat_dialog.py:9:1: F401 'datetime.datetime' imported but unused
+.\plugins\logcat\ui\logcat_dialog.py:9:1: F401 'datetime.timedelta' imported but unused
+.\plugins\logcat\ui\logcat_dialog.py:13:1: F401 'qgis.PyQt.QtWidgets.QDateTimeEdit' imported but unused
+.\plugins\logcat\ui\logcat_dialog.py:13:1: F401 'qgis.PyQt.QtWidgets.QCheckBox' imported but unused
+.\plugins\logcat\ui\logcat_dialog.py:13:1: F401 'qgis.PyQt.QtWidgets.QScrollArea' imported but unused
+.\plugins\logcat\ui\logcat_dialog.py:13:1: F401 'qgis.PyQt.QtWidgets.QWidget' imported but unused
+.\plugins\logcat\ui\logcat_dialog.py:19:1: F401 'qgis.PyQt.QtCore.QDateTime' imported but unused
+.\plugins\logcat\ui\logcat_dialog.py:20:1: F401 'qgis.PyQt.QtGui.QIcon' imported but unused
+.\plugins\logcat\ui\logcat_dialog.py:36:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:44:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:48:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:52:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:58:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:62:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:67:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:73:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:77:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:80:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:84:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:90:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:95:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:98:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:101:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:104:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:107:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:110:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:122:13: E306 expected 1 blank line before a nested definition, found 0
+.\plugins\logcat\ui\logcat_dialog.py:125:17: E306 expected 1 blank line before a nested definition, found 0
+.\plugins\logcat\ui\logcat_dialog.py:127:17: E306 expected 1 blank line before a nested definition, found 0
+.\plugins\logcat\ui\logcat_dialog.py:129:17: E306 expected 1 blank line before a nested definition, found 0
+.\plugins\logcat\ui\logcat_dialog.py:131:17: E306 expected 1 blank line before a nested definition, found 0
+.\plugins\logcat\ui\logcat_dialog.py:134:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:138:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:141:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:146:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:150:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:153:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:156:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:165:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:170:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:176:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:182:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:188:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:193:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:196:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:204:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:216:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:221:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:224:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:226:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:229:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:232:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:234:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:239:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:244:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:249:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:253:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:257:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:259:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:261:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:268:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:273:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:276:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:279:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:283:101: E501 line too long (103 > 100 characters)
+.\plugins\logcat\ui\logcat_dialog.py:286:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:289:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:294:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:298:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:302:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:314:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:317:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:325:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:329:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:332:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:338:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:347:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:355:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:368:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:371:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:376:101: E501 line too long (107 > 100 characters)
+.\plugins\logcat\ui\logcat_dialog.py:378:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:385:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:388:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:391:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:397:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:401:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:410:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:414:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:426:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:429:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:435:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:441:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:453:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:457:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:461:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:465:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:469:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:473:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:477:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:494:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:502:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:507:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:510:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:517:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:519:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:526:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:533:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:536:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:539:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:541:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:550:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:556:101: E501 line too long (104 > 100 characters)
+.\plugins\logcat\ui\logcat_dialog.py:561:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:562:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:563:5: E303 too many blank lines (2)
+.\plugins\logcat\ui\logcat_dialog.py:571:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:577:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:581:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:584:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:591:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:595:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:615:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:619:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:625:25: E117 over-indented
+.\plugins\logcat\ui\logcat_dialog.py:631:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:637:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:640:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:646:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:653:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:659:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:661:13: F541 f-string is missing placeholders
+.\plugins\logcat\ui\logcat_dialog.py:664:13: F541 f-string is missing placeholders
+.\plugins\logcat\ui\logcat_dialog.py:667:13: F541 f-string is missing placeholders
+.\plugins\logcat\ui\logcat_dialog.py:669:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:673:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:680:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:684:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:688:101: E501 line too long (101 > 100 characters)
+.\plugins\logcat\ui\logcat_dialog.py:692:101: E501 line too long (101 > 100 characters)
+.\plugins\logcat\ui\logcat_dialog.py:697:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:703:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:709:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:712:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:716:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:720:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:723:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:734:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:742:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:745:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:749:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:753:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:756:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:761:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:769:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:775:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:777:101: E501 line too long (115 > 100 characters)
+.\plugins\logcat\ui\logcat_dialog.py:779:31: F541 f-string is missing placeholders
+.\plugins\logcat\ui\logcat_dialog.py:780:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:784:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:789:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:793:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:802:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:806:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:815:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:827:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:831:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:840:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:849:101: E501 line too long (104 > 100 characters)
+.\plugins\logcat\ui\logcat_dialog.py:851:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:858:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:864:101: E501 line too long (109 > 100 characters)
+.\plugins\logcat\ui\logcat_dialog.py:865:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:870:101: E501 line too long (106 > 100 characters)
+.\plugins\logcat\ui\logcat_dialog.py:871:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:879:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:882:101: E501 line too long (112 > 100 characters)
+.\plugins\logcat\ui\logcat_dialog.py:884:101: E501 line too long (120 > 100 characters)
+.\plugins\logcat\ui\logcat_dialog.py:887:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:896:101: E501 line too long (107 > 100 characters)
+.\plugins\logcat\ui\logcat_dialog.py:898:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:904:101: E501 line too long (107 > 100 characters)
+.\plugins\logcat\ui\logcat_dialog.py:905:1: W293 blank line contains whitespace
+.\plugins\logcat\ui\logcat_dialog.py:911:101: E501 line too long (116 > 100 characters)
+.\plugins\logcat\ui\logcat_dialog.py:916:101: E501 line too long (111 > 100 characters)
+.\processing\attribute_statistics.py:4:1: F401 'datetime.datetime' imported but unused
+.\processing\attribute_statistics.py:9:1: F401 'qgis.PyQt.QtCore.QVariant' imported but unused
+.\processing\attribute_statistics.py:11:1: F401 'qgis.core.QgsProcessingParameterString' imported but unused
+.\processing\attribute_statistics.py:32:46: E271 multiple spaces after keyword
+.\processing\attribute_statistics.py:63:1: E302 expected 2 blank lines, found 1
+.\processing\attribute_statistics.py:105:78: E231 missing whitespace after ','
+.\processing\attribute_statistics.py:105:101: E501 line too long (109 > 100 characters)
+.\processing\attribute_statistics.py:202:9: F841 local variable 'prefs_before' is assigned to but never used
+.\processing\attribute_statistics.py:238:1: W293 blank line contains whitespace
+.\processing\difference_fields_algorithm.py:25:1: E302 expected 2 blank lines, found 1
+.\processing\difference_fields_algorithm.py:33:1: W293 blank line contains whitespace
+.\processing\difference_fields_algorithm.py:57:57: E231 missing whitespace after ','
+.\processing\difference_fields_algorithm.py:106:9: E303 too many blank lines (2)
+.\processing\elevation_analisys.py:22:1: E265 block comment should start with '# '
+.\processing\elevation_analisys.py:47:9: F841 local variable 'prefs' is assigned to but never used
+.\processing\elevation_analisys.py:94:1: W293 blank line contains whitespace
+.\processing\elevation_analisys.py:95:1: W293 blank line contains whitespace
+.\processing\elevation_analisys.py:97:9: E303 too many blank lines (3)
+.\processing\elevation_analisys.py:151:73: E231 missing whitespace after ','
+.\processing\implement_trail.py:2:1: F401 'qgis.core.QgsFeatureSink' imported but unused
+.\processing\implement_trail.py:14:1: E302 expected 2 blank lines, found 1
+.\processing\implement_trail.py:88:9: F841 local variable 'buffer_result' is assigned to but never used
+.\processing\model\attribute_statistics_model.py:10:1: F401 'typing.Tuple' imported but unused
+.\processing\model\attribute_statistics_model.py:10:1: F401 'typing.Any' imported but unused
+.\processing\model\attribute_statistics_model.py:30:1: E303 too many blank lines (3)
+.\processing\model\attribute_statistics_model.py:57:101: E501 line too long (105 > 100 characters)
+.\processing\model\attribute_statistics_model.py:89:101: E501 line too long (112 > 100 characters)
+.\processing\model\attribute_statistics_model.py:153:1: W293 blank line contains whitespace
+.\processing\model\attribute_statistics_model.py:158:101: E501 line too long (111 > 100 characters)
+.\processing\model\attribute_statistics_model.py:168:101: E501 line too long (107 > 100 characters)
+.\processing\model\attribute_statistics_model.py:188:101: E501 line too long (130 > 100 characters)
+.\processing\provider.py:8:1: E265 block comment should start with '# '
+.\processing\provider.py:16:55: W291 trailing whitespace
+.\processing\provider.py:17:58: W291 trailing whitespace
+.\processing\provider.py:18:1: W293 blank line contains whitespace
+.\processing\provider.py:19:1: W293 blank line contains whitespace
+.\processing\provider.py:20:9: E303 too many blank lines (2)
+.\processing\provider.py:21:51: W291 trailing whitespace
+.\processing\provider.py:22:17: W291 trailing whitespace
+.\processing\provider.py:24:1: W293 blank line contains whitespace
+.\processing\provider.py:26:5: E303 too many blank lines (2)
+.\processing\provider.py:34:1: W293 blank line contains whitespace
+.\processing\provider.py:36:73: E231 missing whitespace after ','
+.\processing\raster_mass_sampler.py:14:1: F811 redefinition of unused 'os' from line 2
+.\processing\raster_mass_sampler.py:27:1: F811 redefinition of unused 're' from line 15
+.\processing\raster_mass_sampler.py:44:101: E501 line too long (101 > 100 characters)
+.\processing\raster_mass_sampler.py:49:101: E501 line too long (103 > 100 characters)
+.\processing\raster_mass_sampler.py:54:101: E501 line too long (102 > 100 characters)
+.\processing\raster_mass_sampler.py:55:101: E501 line too long (101 > 100 characters)
+.\processing\raster_mass_sampler.py:75:9: F841 local variable 'prefs' is assigned to but never used
+.\processing\raster_mass_sampler.py:172:73: E231 missing whitespace after ','
+.\processing\raster_mass_sampler.py:222:101: E501 line too long (110 > 100 characters)
+.\resources.py:432:1: E302 expected 2 blank lines, found 1
+.\resources.py:433:101: E501 line too long (101 > 100 characters)
+.\resources.py:435:1: E302 expected 2 blank lines, found 1
+.\resources.py:436:101: E501 line too long (103 > 100 characters)
+.\resources.py:438:1: E305 expected 2 blank lines after class or function definition, found 1
+.\resources\styles\BaseStyles.py:15:9: E116 unexpected indentation (comment)
+.\resources\styles\BaseStyles.py:69:49: W291 trailing whitespace
+.\resources\styles\BaseStyles.py:164:5: E301 expected 1 blank line, found 0
+.\resources\styles\BaseStyles.py:213:1: W293 blank line contains whitespace
+.\resources\styles\CoffeTheme.py:23:8: E114 indentation is not a multiple of 4 (comment)
+.\resources\styles\CoffeTheme.py:112:30: W292 no newline at end of file
+.\resources\styles\Styles.py:8:1: F401 '.CoffeTheme.CoffeTheme' imported but unused
+.\resources\styles\Styles.py:13:1: W293 blank line contains whitespace
+.\resources\styles\Styles.py:16:5: E303 too many blank lines (4)
+.\resources\styles\Styles.py:183:1: W293 blank line contains whitespace
+.\resources\styles\Styles.py:244:5: E303 too many blank lines (2)
+.\resources\styles\Styles.py:248:5: E301 expected 1 blank line, found 0
+.\resources\styles\Styles.py:293:5: E303 too many blank lines (2)
+.\resources\styles\Styles.py:323:12: W292 no newline at end of file
+.\resources\styles\Styles_backup2.py:27:5: E303 too many blank lines (2)
+.\resources\styles\Styles_backup2.py:39:1: W293 blank line contains whitespace
+.\resources\styles\Styles_backup2.py:50:1: W293 blank line contains whitespace
+.\resources\styles\Styles_backup2.py:60:1: W293 blank line contains whitespace
+.\resources\styles\Styles_backup2.py:67:1: W293 blank line contains whitespace
+.\resources\styles\Styles_backup2.py:145:1: W293 blank line contains whitespace
+.\resources\styles\Styles_backup2.py:175:1: W293 blank line contains whitespace
+.\resources\styles\Styles_backup2.py:221:1: W293 blank line contains whitespace
+.\resources\styles\Styles_backup2.py:223:5: E301 expected 1 blank line, found 0
+.\resources\styles\Styles_backup2.py:302:32: W291 trailing whitespace
+.\resources\styles\Styles_backup2.py:303:1: W293 blank line contains whitespace
+.\resources\styles\Styles_backup2.py:333:1: W293 blank line contains whitespace
+.\resources\styles\Styles_backup2.py:358:55: W291 trailing whitespace
+.\resources\styles\Styles_backup2.py:371:1: W293 blank line contains whitespace
+.\resources\styles\Styles_backup2.py:386:56: W291 trailing whitespace
+.\resources\styles\Styles_backup2.py:396:5: E303 too many blank lines (2)
+.\resources\styles\Styles_backup2.py:537:1: W293 blank line contains whitespace
+.\resources\styles\Styles_backup2.py:1153:1: W293 blank line contains whitespace
+.\resources\styles\Styles_backup2.py:1159:1: W293 blank line contains whitespace
+.\resources\styles\Styles_backup2.py:1212:12: W292 no newline at end of file
+.\resources\styles\stylebackup.PY:39:5: E303 too many blank lines (2)
+.\resources\styles\stylebackup.PY:51:1: W293 blank line contains whitespace
+.\resources\styles\stylebackup.PY:64:1: W293 blank line contains whitespace
+.\resources\styles\stylebackup.PY:92:1: W293 blank line contains whitespace
+.\resources\styles\stylebackup.PY:99:1: W293 blank line contains whitespace
+.\resources\styles\stylebackup.PY:364:5: E301 expected 1 blank line, found 0
+.\resources\styles\stylebackup.PY:428:5: E303 too many blank lines (2)
+.\resources\styles\stylebackup.PY:432:5: E301 expected 1 blank line, found 0
+.\resources\styles\stylebackup.PY:444:1: W293 blank line contains whitespace
+.\resources\styles\stylebackup.PY:483:56: W291 trailing whitespace
+.\resources\styles\stylebackup.PY:493:5: E303 too many blank lines (2)
+.\resources\styles\stylebackup.PY:584:1: W293 blank line contains whitespace
+.\resources\widgets\AppBarWidget.py:11:13: E117 over-indented
+.\resources\widgets\AppBarWidget.py:29:101: E501 line too long (108 > 100 characters)
+.\resources\widgets\AppBarWidget.py:51:101: E501 line too long (112 > 100 characters)
+.\resources\widgets\AppBarWidget.py:56:101: E501 line too long (102 > 100 characters)
+.\resources\widgets\AppBarWidget.py:57:21: E701 multiple statements on one line (colon)
+.\resources\widgets\AppBarWidget.py:57:101: E501 line too long (110 > 100 characters)
+.\resources\widgets\AppBarWidget.py:59:101: W291 trailing whitespace
+.\resources\widgets\AppBarWidget.py:62:1: W293 blank line contains whitespace
+.\resources\widgets\AppBarWidget.py:63:1: W293 blank line contains whitespace
+.\resources\widgets\AppBarWidget.py:64:9: E303 too many blank lines (2)
+.\resources\widgets\AttributeSelectorWidget.py:88:5: E301 expected 1 blank line, found 0
+.\resources\widgets\AttributeSelectorWidget.py:88:29: E231 missing whitespace after ','
+.\resources\widgets\AttributeSelectorWidget.py:91:1: W293 blank line contains whitespace
+.\resources\widgets\AttributeSelectorWidget.py:93:5: E303 too many blank lines (3)
+.\resources\widgets\AttributeSelectorWidget.py:97:5: E301 expected 1 blank line, found 0
+.\resources\widgets\BottomActionButtonsWidget.py:7:1: E303 too many blank lines (3)
+.\resources\widgets\BottomActionButtonsWidget.py:31:9: E303 too many blank lines (2)
+.\resources\widgets\CheckboxGridWidget.py:41:1: W293 blank line contains whitespace
+.\resources\widgets\CheckboxGridWidget.py:42:15: E111 indentation is not a multiple of 4
+.\resources\widgets\CheckboxGridWidget.py:43:1: W293 blank line contains whitespace
+.\resources\widgets\CheckboxGridWidget.py:44:1: E302 expected 2 blank lines, found 1
+.\resources\widgets\CheckboxGridWidget.py:48:101: E501 line too long (108 > 100 characters)
+.\resources\widgets\CollapsibleParametersWidget.py:20:39: W291 trailing whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:24:1: F401 'qgis.PyQt.QtGui.QIcon' imported but unused
+.\resources\widgets\CollapsibleParametersWidget.py:31:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:35:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:37:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:41:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:50:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:54:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:58:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:63:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:66:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:72:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:81:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:87:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:92:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:95:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:102:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:104:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:110:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:113:36: W291 trailing whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:114:36: W291 trailing whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:115:36: W291 trailing whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:119:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:122:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:125:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:129:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:133:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:137:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:145:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:149:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:157:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:161:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:171:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:175:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:179:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:187:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:192:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:196:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:201:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:205:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:213:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:217:1: W293 blank line contains whitespace
+.\resources\widgets\CollapsibleParametersWidget.py:226:1: W293 blank line contains whitespace
+.\resources\widgets\FileSelectorWidget.py:14:8: W291 trailing whitespace
+.\resources\widgets\FileSelectorWidget.py:23:44: W291 trailing whitespace
+.\resources\widgets\FileSelectorWidget.py:72:9: E303 too many blank lines (2)
+.\resources\widgets\FileSelectorWidget.py:75:5: E303 too many blank lines (2)
+.\resources\widgets\FileSelectorWidget.py:94:1: W293 blank line contains whitespace
+.\resources\widgets\InputFieldsWidget.py:40:1: W293 blank line contains whitespace
+.\resources\widgets\InputFieldsWidget.py:46:1: W293 blank line contains whitespace
+.\resources\widgets\InputFieldsWidget.py:50:1: W293 blank line contains whitespace
+.\resources\widgets\InputFieldsWidget.py:52:1: W293 blank line contains whitespace
+.\resources\widgets\InputFieldsWidget.py:56:1: W293 blank line contains whitespace
+.\resources\widgets\InputFieldsWidget.py:65:1: W293 blank line contains whitespace
+.\resources\widgets\InputFieldsWidget.py:71:1: W293 blank line contains whitespace
+.\resources\widgets\InputFieldsWidget.py:76:1: W293 blank line contains whitespace
+.\resources\widgets\InputFieldsWidget.py:81:1: W293 blank line contains whitespace
+.\resources\widgets\InputFieldsWidget.py:87:1: W293 blank line contains whitespace
+.\resources\widgets\InputFieldsWidget.py:95:1: W293 blank line contains whitespace
+.\resources\widgets\InputFieldsWidget.py:103:1: W293 blank line contains whitespace
+.\resources\widgets\InputFieldsWidget.py:109:1: W293 blank line contains whitespace
+.\resources\widgets\InputFieldsWidget.py:112:1: W293 blank line contains whitespace
+.\resources\widgets\InputFieldsWidget.py:115:1: W293 blank line contains whitespace
+.\resources\widgets\InputFieldsWidget.py:119:1: W293 blank line contains whitespace
+.\resources\widgets\InputFieldsWidget.py:123:1: W293 blank line contains whitespace
+.\resources\widgets\InputFieldsWidget.py:136:1: W293 blank line contains whitespace
+.\resources\widgets\InputFieldsWidget.py:140:1: W293 blank line contains whitespace
+.\resources\widgets\InputFieldsWidget.py:153:1: W293 blank line contains whitespace
+.\resources\widgets\InputFieldsWidget.py:158:1: W293 blank line contains whitespace
+.\resources\widgets\LayerInputWidget.py:4:1: F401 'qgis.PyQt.QtCore.Qt' imported but unused
+.\resources\widgets\MainLayout.py:1:32: E275 missing whitespace after keyword
+.\resources\widgets\MainLayout.py:1:33: E201 whitespace after '('
+.\resources\widgets\MainLayout.py:1:46: W291 trailing whitespace
+.\resources\widgets\MainLayout.py:2:1: E128 continuation line under-indented for visual indent
+.\resources\widgets\MainLayout.py:14:1: E302 expected 2 blank lines, found 1
+.\resources\widgets\MainLayout.py:104:1: W293 blank line contains whitespace
+.\resources\widgets\MainLayout.py:111:1: W293 blank line contains whitespace
+.\resources\widgets\MainLayout.py:120:1: W293 blank line contains whitespace
+.\resources\widgets\MainLayout.py:182:1: W293 blank line contains whitespace
+.\resources\widgets\MainLayout.py:184:5: E303 too many blank lines (2)
+.\resources\widgets\MainLayout.py:454:17: F841 local variable 'p' is assigned to but never used
+.\resources\widgets\MainLayout.py:455:17: F841 local variable 'g' is assigned to but never used
+.\resources\widgets\MainLayout.py:456:17: F841 local variable 'b' is assigned to but never used
+.\resources\widgets\MainLayout.py:484:13: F841 local variable 'p' is assigned to but never used
+.\resources\widgets\MainLayout.py:485:13: F841 local variable 'g' is assigned to but never used
+.\resources\widgets\MainLayout.py:503:9: E303 too many blank lines (2)
+.\resources\widgets\MainLayout.py:507:13: F841 local variable 'geom' is assigned to but never used
+.\resources\widgets\MainLayout.py:510:1: W293 blank line contains whitespace
+.\resources\widgets\MainLayout.py:511:1: W293 blank line contains whitespace
+.\resources\widgets\MainLayout.py:513:9: E303 too many blank lines (3)
+.\resources\widgets\PathSelectorWidget.py:28:39: W291 trailing whitespace
+.\resources\widgets\PathSelectorWidget.py:88:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:108:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:119:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:123:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:130:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:134:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:138:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:144:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:147:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:150:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:166:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:173:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:179:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:185:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:191:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:195:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:210:101: E501 line too long (130 > 100 characters)
+.\resources\widgets\PathSelectorWidget.py:218:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:224:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:227:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:229:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:237:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:243:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:245:101: E501 line too long (102 > 100 characters)
+.\resources\widgets\PathSelectorWidget.py:252:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:258:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:267:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:273:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:282:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:286:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:291:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:293:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:302:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:308:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:312:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:317:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:324:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:328:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:333:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:338:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:348:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:354:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:358:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:366:1: W293 blank line contains whitespace
+.\resources\widgets\PathSelectorWidget.py:370:1: W391 blank line at end of file
+.\resources\widgets\RadioButtonGridWidget.py:7:101: E501 line too long (101 > 100 characters)
+.\resources\widgets\RadioButtonGridWidget.py:8:1: F401 'qgis.PyQt.QtCore.Qt' imported but unused
+.\resources\widgets\RadioButtonGridWidget.py:15:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:20:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:23:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:26:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:29:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:32:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:36:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:48:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:54:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:55:101: E501 line too long (110 > 100 characters)
+.\resources\widgets\RadioButtonGridWidget.py:56:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:60:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:62:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:67:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:73:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:77:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:80:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:84:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:88:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:93:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:98:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:101:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:105:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:109:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:112:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:113:27: F541 f-string is missing placeholders
+.\resources\widgets\RadioButtonGridWidget.py:114:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:120:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:128:27: F541 f-string is missing placeholders
+.\resources\widgets\RadioButtonGridWidget.py:130:1: W293 blank line contains whitespace
+.\resources\widgets\RadioButtonGridWidget.py:138:1: W293 blank line contains whitespace
+.\resources\widgets\ReadOnlyFieldWidget.py:17:1: F401 'qgis.PyQt.QtCore.Qt' imported but unused
+.\resources\widgets\ReadOnlyFieldWidget.py:42:101: E501 line too long (101 > 100 characters)
+.\resources\widgets\ReadOnlyFieldWidget.py:43:101: E501 line too long (104 > 100 characters)
+.\resources\widgets\ScrollWidget.py:12:1: F401 'qgis.PyQt.QtWidgets.QVBoxLayout' imported but unused
+.\resources\widgets\ScrollWidget.py:22:1: W293 blank line contains whitespace
+.\resources\widgets\ScrollWidget.py:24:1: W293 blank line contains whitespace
+.\resources\widgets\ScrollWidget.py:30:1: W293 blank line contains whitespace
+.\resources\widgets\ScrollWidget.py:34:1: W293 blank line contains whitespace
+.\resources\widgets\ScrollWidget.py:41:1: W293 blank line contains whitespace
+.\resources\widgets\ScrollWidget.py:45:1: W293 blank line contains whitespace
+.\resources\widgets\ScrollWidget.py:49:1: W293 blank line contains whitespace
+.\resources\widgets\ScrollWidget.py:53:1: W293 blank line contains whitespace
+.\resources\widgets\ScrollWidget.py:60:1: W293 blank line contains whitespace
+.\resources\widgets\ScrollWidget.py:72:1: W293 blank line contains whitespace
+.\resources\widgets\ScrollWidget.py:81:1: W293 blank line contains whitespace
+.\resources\widgets\ScrollWidget.py:88:1: W293 blank line contains whitespace
+.\resources\widgets\ScrollWidget.py:94:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:3:101: E501 line too long (101 > 100 characters)
+.\resources\widgets\SelectorWidget.py:28:39: W291 trailing whitespace
+.\resources\widgets\SelectorWidget.py:92:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:112:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:123:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:127:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:134:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:138:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:142:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:148:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:151:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:154:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:170:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:177:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:183:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:189:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:195:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:199:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:216:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:220:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:226:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:229:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:231:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:239:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:245:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:247:101: E501 line too long (102 > 100 characters)
+.\resources\widgets\SelectorWidget.py:254:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:260:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:269:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:275:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:284:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:288:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:293:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:295:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:304:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:310:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:314:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:319:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:326:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:330:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:335:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:340:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:350:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:356:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:360:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:368:1: W293 blank line contains whitespace
+.\resources\widgets\SelectorWidget.py:376:1: W391 blank line at end of file
+.\resources\widgets\SimpleButtonWidget.py:22:1: W293 blank line contains whitespace
+.\resources\widgets\SimpleButtonWidget.py:29:1: W293 blank line contains whitespace
+.\resources\widgets\SimpleButtonWidget.py:33:1: W293 blank line contains whitespace
+.\resources\widgets\SimpleButtonWidget.py:39:1: W293 blank line contains whitespace
+.\utils\DependenciesManager.py:13:1: F401 'pathlib.Path' imported but unused
+.\utils\DependenciesManager.py:15:1: F401 'qgis.PyQt.QtWidgets.QApplication' imported but unused
+.\utils\DependenciesManager.py:15:1: F401 'qgis.PyQt.QtWidgets.QMessageBox' imported but unused
+.\utils\DependenciesManager.py:21:1: W293 blank line contains whitespace
+.\utils\DependenciesManager.py:37:1: W293 blank line contains whitespace
+.\utils\DependenciesManager.py:42:1: W293 blank line contains whitespace
+.\utils\DependenciesManager.py:47:1: W293 blank line contains whitespace
+.\utils\DependenciesManager.py:52:1: W293 blank line contains whitespace
+.\utils\DependenciesManager.py:60:1: W293 blank line contains whitespace
+.\utils\DependenciesManager.py:63:1: W293 blank line contains whitespace
+.\utils\DependenciesManager.py:69:1: W293 blank line contains whitespace
+.\utils\DependenciesManager.py:74:1: W293 blank line contains whitespace
+.\utils\DependenciesManager.py:81:1: W293 blank line contains whitespace
+.\utils\DependenciesManager.py:86:1: W293 blank line contains whitespace
+.\utils\DependenciesManager.py:91:1: W293 blank line contains whitespace
+.\utils\DependenciesManager.py:99:1: W293 blank line contains whitespace
+.\utils\DependenciesManager.py:102:1: W293 blank line contains whitespace
+.\utils\DependenciesManager.py:110:1: W293 blank line contains whitespace
+.\utils\DependenciesManager.py:115:1: W293 blank line contains whitespace
+.\utils\DependenciesManager.py:117:1: W293 blank line contains whitespace
+.\utils\DependenciesManager.py:165:101: E501 line too long (101 > 100 characters)
+.\utils\DependenciesManager.py:178:101: E501 line too long (104 > 100 characters)
+.\utils\DependenciesManager.py:193:1: W293 blank line contains whitespace
+.\utils\DependenciesManager.py:198:1: W293 blank line contains whitespace
+.\utils\DependenciesManager.py:203:1: W293 blank line contains whitespace
+.\utils\DependenciesManager.py:212:1: W293 blank line contains whitespace
+.\utils\DependenciesManager.py:221:1: W293 blank line contains whitespace
+.\utils\DependenciesManager.py:227:1: W293 blank line contains whitespace
+.\utils\ExplorerUtils.py:10:101: E501 line too long (108 > 100 characters)
+.\utils\ExplorerUtils.py:69:101: E501 line too long (101 > 100 characters)
+.\utils\ExplorerUtils.py:72:25: W292 no newline at end of file
+.\utils\FormatUtils.py:2:1: E302 expected 2 blank lines, found 0
+.\utils\FormatUtils.py:28:5: E301 expected 1 blank line, found 0
+.\utils\FormatUtils.py:32:61: W292 no newline at end of file
+.\utils\PDFUtils.py:18:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:21:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:27:101: E501 line too long (101 > 100 characters)
+.\utils\PDFUtils.py:28:13: F841 local variable 'e' is assigned to but never used
+.\utils\PDFUtils.py:30:17: F401 'sys' imported but unused
+.\utils\PDFUtils.py:31:17: E306 expected 1 blank line before a nested definition, found 0
+.\utils\PDFUtils.py:34:21: E306 expected 1 blank line before a nested definition, found 0
+.\utils\PDFUtils.py:36:21: E306 expected 1 blank line before a nested definition, found 0
+.\utils\PDFUtils.py:38:21: E306 expected 1 blank line before a nested definition, found 0
+.\utils\PDFUtils.py:42:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:47:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:52:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:55:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:60:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:69:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:76:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:81:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:83:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:85:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:88:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:96:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:101:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:102:101: E501 line too long (102 > 100 characters)
+.\utils\PDFUtils.py:104:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:108:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:112:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:117:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:124:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:129:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:134:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:137:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:140:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:145:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:155:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:162:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:167:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:168:101: E501 line too long (101 > 100 characters)
+.\utils\PDFUtils.py:169:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:171:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:174:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:179:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:181:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:186:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:193:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:196:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:200:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:205:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:207:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:208:101: E501 line too long (102 > 100 characters)
+.\utils\PDFUtils.py:210:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:214:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:218:1: W293 blank line contains whitespace
+.\utils\PDFUtils.py:223:1: W293 blank line contains whitespace
+.\utils\Preferences.py:9:1: E302 expected 2 blank lines, found 1
+.\utils\Preferences.py:11:1: W293 blank line contains whitespace
+.\utils\Preferences.py:40:5: E301 expected 1 blank line, found 0
+.\utils\Preferences.py:45:5: E301 expected 1 blank line, found 0
+.\utils\Preferences.py:52:1: E305 expected 2 blank lines after class or function definition, found 1
+.\utils\Preferences.py:59:1: E302 expected 2 blank lines, found 1
+.\utils\Preferences.py:66:1: E302 expected 2 blank lines, found 1
+.\utils\Preferences.py:76:1: E302 expected 2 blank lines, found 1
+.\utils\Preferences.py:82:1: E302 expected 2 blank lines, found 1
+.\utils\Preferences.py:87:1: E302 expected 2 blank lines, found 1
+.\utils\Preferences.py:91:22: W292 no newline at end of file
+.\utils\ProjectUtils.py:6:1: F401 'qgis.core.QgsVectorLayer' imported but unused
+.\utils\ProjectUtils.py:7:1: F401 'qgis.PyQt.QtWidgets.QApplication' imported but unused
+.\utils\ProjectUtils.py:9:1: F811 redefinition of unused 'Path' from line 5
+.\utils\ProjectUtils.py:10:1: F401 'gc' imported but unused
+.\utils\ProjectUtils.py:11:1: F811 redefinition of unused 'Path' from line 9
+.\utils\ProjectUtils.py:13:1: F811 redefinition of unused 'QgsMapLayer' from line 6
+.\utils\ProjectUtils.py:18:1: E303 too many blank lines (4)
+.\utils\ProjectUtils.py:26:9: F811 redefinition of unused 'QgsVectorLayer' from line 6
+.\utils\ProjectUtils.py:45:101: E501 line too long (113 > 100 characters)
+.\utils\ProjectUtils.py:55:5: E301 expected 1 blank line, found 0
+.\utils\ProjectUtils.py:119:21: F841 local variable 'geom_type' is assigned to but never used
+.\utils\ProjectUtils.py:157:1: W293 blank line contains whitespace
+.\utils\ProjectUtils.py:179:1: W293 blank line contains whitespace
+.\utils\ProjectUtils.py:180:5: E304 blank lines found after function decorator
+.\utils\ProjectUtils.py:203:1: W293 blank line contains whitespace
+.\utils\ProjectUtils.py:204:1: W293 blank line contains whitespace
+.\utils\ProjectUtils.py:205:5: E303 too many blank lines (2)
+.\utils\ProjectUtils.py:234:5: E301 expected 1 blank line, found 0
+.\utils\ProjectUtils.py:333:1: W391 blank line at end of file
+.\utils\QgisMessageUtil.py:47:20: W291 trailing whitespace
+.\utils\QgisMessageUtil.py:48:22: W291 trailing whitespace
+.\utils\QgisMessageUtil.py:72:1: W293 blank line contains whitespace
+.\utils\QgisMessageUtil.py:75:1: W293 blank line contains whitespace
+.\utils\QgisMessageUtil.py:78:21: F541 f-string is missing placeholders
+.\utils\QgisMessageUtil.py:82:1: W293 blank line contains whitespace
+.\utils\QgisMessageUtil.py:87:1: W293 blank line contains whitespace
+.\utils\QgisMessageUtil.py:92:1: W293 blank line contains whitespace
+.\utils\QgisMessageUtil.py:95:1: W293 blank line contains whitespace
+.\utils\QgisMessageUtil.py:101:1: W293 blank line contains whitespace
+.\utils\QgisMessageUtil.py:202:1: W293 blank line contains whitespace
+.\utils\QgisMessageUtil.py:203:1: W293 blank line contains whitespace
+.\utils\QgisMessageUtil.py:205:5: E303 too many blank lines (3)
+.\utils\QgisMessageUtil.py:214:9: F841 local variable 'btn_cancel' is assigned to but never used
+.\utils\QgisMessageUtil.py:244:63: E231 missing whitespace after ','
+.\utils\QgisMessageUtil.py:244:68: E251 unexpected spaces around keyword / parameter equals
+.\utils\QgisMessageUtil.py:244:70: E251 unexpected spaces around keyword / parameter equals
+.\utils\QgisMessageUtil.py:244:101: E501 line too long (114 > 100 characters)
+.\utils\QgisMessageUtil.py:247:1: W293 blank line contains whitespace
+.\utils\StringUtils.py:5:1: E303 too many blank lines (4)
+.\utils\StringUtils.py:7:5: E265 block comment should start with '# '
+.\utils\StringUtils.py:9:101: E501 line too long (114 > 100 characters)
+.\utils\StringUtils.py:17:23: W291 trailing whitespace
+.\utils\StringUtils.py:18:6: W292 no newline at end of file
+.\utils\ToolKeys.py:4:1: E303 too many blank lines (3)
+.\utils\ToolKeys.py:6:18: E221 multiple spaces before operator
+.\utils\ToolKeys.py:13:42: W291 trailing whitespace
+.\utils\ToolKeys.py:54:1: W391 blank line at end of file
+.\utils\__init__.py:20:1: W191 indentation contains tabs
+.\utils\__init__.py:21:1: W191 indentation contains tabs
+.\utils\__init__.py:22:1: W191 indentation contains tabs
+.\utils\__init__.py:23:1: W191 indentation contains tabs
+.\utils\__init__.py:24:1: W191 indentation contains tabs
+.\utils\__init__.py:26:1: W391 blank line at end of file
+.\utils\mrk\MrkParser.py:9:1: E303 too many blank lines (3)
+.\utils\mrk\MrkParser.py:9:17: W291 trailing whitespace
+.\utils\mrk\MrkParser.py:39:79: E252 missing whitespace around parameter equals
+.\utils\mrk\MrkParser.py:39:80: E252 missing whitespace around parameter equals
+.\utils\mrk\MrkParser.py:39:101: E501 line too long (102 > 100 characters)
+.\utils\mrk\MrkParser.py:67:101: E501 line too long (112 > 100 characters)
+.\utils\mrk\MrkParser.py:69:5: E301 expected 1 blank line, found 0
+.\utils\mrk\MrkParser.py:70:101: E501 line too long (106 > 100 characters)
+.\utils\mrk\MrkParser.py:118:1: W293 blank line contains whitespace
+.\utils\mrk\MrkParser.py:120:25: E303 too many blank lines (2)
+.\utils\mrk\MrkParser.py:124:1: W293 blank line contains whitespace
+.\utils\mrk\MrkParser.py:126:13: E303 too many blank lines (2)
+.\utils\mrk\MrkParser.py:131:101: E501 line too long (104 > 100 characters)
+.\utils\mrk\MrkParser.py:133:5: E301 expected 1 blank line, found 0
+.\utils\mrk\MrkParser.py:149:101: E501 line too long (104 > 100 characters)
+.\utils\mrk\MrkParser.py:150:1: W293 blank line contains whitespace
+.\utils\mrk\MrkParser.py:152:9: E303 too many blank lines (2)
+.\utils\mrk\MrkParser.py:172:5: E301 expected 1 blank line, found 0
+.\utils\mrk\MrkParser.py:175:1: W293 blank line contains whitespace
+.\utils\mrk\MrkParser.py:180:1: W293 blank line contains whitespace
+.\utils\mrk\PhotoMetadata.py:15:23: E231 missing whitespace after ':'
+.\utils\mrk\PhotoMetadata.py:16:21: E231 missing whitespace after ':'
+.\utils\mrk\PhotoMetadata.py:17:23: E231 missing whitespace after ':'
+.\utils\mrk\PhotoMetadata.py:20:25: E231 missing whitespace after ':'
+.\utils\mrk\PhotoMetadata.py:21:22: E231 missing whitespace after ':'
+.\utils\mrk\PhotoMetadata.py:22:22: E231 missing whitespace after ':'
+.\utils\mrk\PhotoMetadata.py:23:22: E231 missing whitespace after ':'
+.\utils\mrk\PhotoMetadata.py:25:24: E231 missing whitespace after ':'
+.\utils\mrk\PhotoMetadata.py:26:24: E231 missing whitespace after ':'
+.\utils\mrk\PhotoMetadata.py:27:22: E231 missing whitespace after ':'
+.\utils\mrk\PhotoMetadata.py:28:21: E231 missing whitespace after ':'
+.\utils\mrk\PhotoMetadata.py:29:24: E231 missing whitespace after ':'
+.\utils\mrk\PhotoMetadata.py:30:24: E231 missing whitespace after ':'
+.\utils\mrk\PhotoMetadata.py:31:23: E231 missing whitespace after ':'
+.\utils\mrk\PhotoMetadata.py:32:24: E231 missing whitespace after ':'
+.\utils\mrk\PhotoMetadata.py:33:18: E231 missing whitespace after ':'
+.\utils\mrk\PhotoMetadata.py:34:22: E231 missing whitespace after ':'
+.\utils\mrk\PhotoMetadata.py:38:5: E303 too many blank lines (2)
+.\utils\mrk\PhotoMetadata.py:40:5: E301 expected 1 blank line, found 0
+.\utils\mrk\PhotoMetadata.py:53:5: E303 too many blank lines (2)
+.\utils\mrk\PhotoMetadata.py:56:101: E501 line too long (103 > 100 characters)
+.\utils\mrk\PhotoMetadata.py:83:1: W293 blank line contains whitespace
+.\utils\mrk\PhotoMetadata.py:86:25: F541 f-string is missing placeholders
+.\utils\mrk\PhotoMetadata.py:90:1: W293 blank line contains whitespace
+.\utils\mrk\PhotoMetadata.py:93:1: W293 blank line contains whitespace
+.\utils\mrk\PhotoMetadata.py:94:25: F541 f-string is missing placeholders
+.\utils\mrk\PhotoMetadata.py:99:1: W293 blank line contains whitespace
+.\utils\mrk\PhotoMetadata.py:111:34: F541 f-string is missing placeholders
+.\utils\mrk\PhotoMetadata.py:119:101: E501 line too long (120 > 100 characters)
+.\utils\mrk\PhotoMetadata.py:121:1: W293 blank line contains whitespace
+.\utils\mrk\PhotoMetadata.py:124:34: F541 f-string is missing placeholders
+.\utils\mrk\PhotoMetadata.py:124:101: E501 line too long (104 > 100 characters)
+.\utils\mrk\PhotoMetadata.py:133:34: F541 f-string is missing placeholders
+.\utils\mrk\PhotoMetadata.py:133:101: E501 line too long (105 > 100 characters)
+.\utils\mrk\PhotoMetadata.py:141:36: F541 f-string is missing placeholders
+.\utils\mrk\PhotoMetadata.py:141:101: E501 line too long (101 > 100 characters)
+.\utils\mrk\PhotoMetadata.py:147:1: W293 blank line contains whitespace
+.\utils\mrk\PhotoMetadata.py:159:101: E501 line too long (146 > 100 characters)
+.\utils\mrk\PhotoMetadata.py:161:1: W293 blank line contains whitespace
+.\utils\mrk\PhotoMetadata.py:186:1: W293 blank line contains whitespace
+.\utils\mrk\PhotoMetadata.py:187:21: F541 f-string is missing placeholders
+.\utils\mrk\PhotoMetadata.py:191:1: W293 blank line contains whitespace
+.\utils\mrk\PhotoMetadata.py:212:30: F541 f-string is missing placeholders
+.\utils\mrk\PhotoMetadata.py:265:1: W293 blank line contains whitespace
+.\utils\mrk\PhotoMetadata.py:267:34: F541 f-string is missing placeholders
+.\utils\mrk\PhotoMetadata.py:275:1: W293 blank line contains whitespace
+.\utils\mrk\PhotoMetadata.py:279:30: F541 f-string is missing placeholders
+.\utils\mrk\PhotoMetadata.py:292:29: F541 f-string is missing placeholders
+.\utils\mrk\PhotoMetadata.py:302:21: F541 f-string is missing placeholders
+.\utils\raster\RasterLayerMetrics.py:4:1: W293 blank line contains whitespace
+.\utils\raster\RasterLayerMetrics.py:11:1: W293 blank line contains whitespace
+.\utils\raster\RasterLayerMetrics.py:16:1: W293 blank line contains whitespace
+.\utils\raster\RasterLayerMetrics.py:32:101: E501 line too long (103 > 100 characters)
+.\utils\raster\RasterLayerMetrics.py:36:101: E501 line too long (109 > 100 characters)
+.\utils\raster\RasterLayerMetrics.py:52:101: E501 line too long (104 > 100 characters)
+.\utils\raster\RasterLayerProcessing.py:4:1: W293 blank line contains whitespace
+.\utils\raster\RasterLayerProcessing.py:11:1: W293 blank line contains whitespace
+.\utils\raster\RasterLayerProcessing.py:16:1: W293 blank line contains whitespace
+.\utils\raster\RasterLayerProcessing.py:28:101: E501 line too long (102 > 100 characters)
+.\utils\raster\RasterLayerProcessing.py:48:101: E501 line too long (101 > 100 characters)
+.\utils\raster\RasterLayerProcessing.py:52:101: E501 line too long (112 > 100 characters)
+.\utils\raster\RasterLayerProcessing.py:56:101: E501 line too long (120 > 100 characters)
+.\utils\raster\RasterLayerProcessing.py:68:101: E501 line too long (102 > 100 characters)
+.\utils\raster\RasterLayerProjection.py:4:1: W293 blank line contains whitespace
+.\utils\raster\RasterLayerProjection.py:11:1: W293 blank line contains whitespace
+.\utils\raster\RasterLayerProjection.py:16:1: W293 blank line contains whitespace
+.\utils\raster\RasterLayerProjection.py:32:101: E501 line too long (110 > 100 characters)
+.\utils\raster\RasterLayerProjection.py:40:101: E501 line too long (113 > 100 characters)
+.\utils\raster\RasterLayerProjection.py:48:101: E501 line too long (117 > 100 characters)
+.\utils\raster\RasterLayerProjection.py:68:101: E501 line too long (113 > 100 characters)
+.\utils\raster\RasterLayerRendering.py:4:1: W293 blank line contains whitespace
+.\utils\raster\RasterLayerRendering.py:11:1: W293 blank line contains whitespace
+.\utils\raster\RasterLayerRendering.py:16:1: W293 blank line contains whitespace
+.\utils\raster\RasterLayerRendering.py:24:101: E501 line too long (111 > 100 characters)
+.\utils\raster\RasterLayerRendering.py:28:101: E501 line too long (113 > 100 characters)
+.\utils\raster\RasterLayerRendering.py:40:101: E501 line too long (104 > 100 characters)
+.\utils\raster\RasterLayerRendering.py:44:101: E501 line too long (114 > 100 characters)
+.\utils\raster\RasterLayerRendering.py:48:101: E501 line too long (121 > 100 characters)
+.\utils\raster\RasterLayerRendering.py:52:101: E501 line too long (105 > 100 characters)
+.\utils\raster\RasterLayerRendering.py:64:101: E501 line too long (108 > 100 characters)
+.\utils\raster\RasterLayerRendering.py:68:101: E501 line too long (105 > 100 characters)
+.\utils\raster\RasterLayerSource.py:2:1: F401 '..ProjectUtils.ProjectUtils' imported but unused
+.\utils\raster\RasterLayerSource.py:6:1: E302 expected 2 blank lines, found 0
+.\utils\raster\RasterLayerSource.py:9:1: W293 blank line contains whitespace
+.\utils\raster\RasterLayerSource.py:16:1: W293 blank line contains whitespace
+.\utils\raster\RasterLayerSource.py:21:1: W293 blank line contains whitespace
+.\utils\raster\RasterLayerSource.py:29:47: W291 trailing whitespace
+.\utils\raster\RasterLayerSource.py:32:1: W293 blank line contains whitespace
+.\utils\raster\RasterLayerSource.py:54:101: E501 line too long (107 > 100 characters)
+.\utils\raster\RasterLayerSource.py:58:101: E501 line too long (109 > 100 characters)
+.\utils\raster\RasterLayerSource.py:74:101: E501 line too long (105 > 100 characters)
+.\utils\raster\RasterVectorBridge.py:4:1: W293 blank line contains whitespace
+.\utils\raster\RasterVectorBridge.py:11:1: W293 blank line contains whitespace
+.\utils\raster\RasterVectorBridge.py:16:1: W293 blank line contains whitespace
+.\utils\raster\RasterVectorBridge.py:24:101: E501 line too long (133 > 100 characters)
+.\utils\raster\RasterVectorBridge.py:28:101: E501 line too long (105 > 100 characters)
+.\utils\raster\RasterVectorBridge.py:32:101: E501 line too long (111 > 100 characters)
+.\utils\raster\RasterVectorBridge.py:36:101: E501 line too long (111 > 100 characters)
+.\utils\raster\RasterVectorBridge.py:40:101: E501 line too long (111 > 100 characters)
+.\utils\raster\RasterVectorBridge.py:44:101: E501 line too long (131 > 100 characters)
+.\utils\raster\RasterVectorBridge.py:48:101: E501 line too long (101 > 100 characters)
+.\utils\raster\RasterVectorBridge.py:52:101: E501 line too long (102 > 100 characters)
+.\utils\raster\RasterVectorBridge.py:56:101: E501 line too long (119 > 100 characters)
+.\utils\raster\RasterVectorBridge.py:60:101: E501 line too long (122 > 100 characters)
+.\utils\raster\RasterVectorBridge.py:64:101: E501 line too long (111 > 100 characters)
+.\utils\raster\RasterVectorBridge.py:68:101: E501 line too long (118 > 100 characters)
+.\utils\vector\VectorLayerAttributes.py:3:1: F401 'qgis.core.QgsCoordinateReferenceSystem' imported but unused
+.\utils\vector\VectorLayerAttributes.py:3:1: F401 'qgis.core.QgsCoordinateTransform' imported but unused
+.\utils\vector\VectorLayerAttributes.py:3:1: F401 'qgis.core.QgsFeature' imported but unused
+.\utils\vector\VectorLayerAttributes.py:3:1: F401 'qgis.core.QgsGeometry' imported but unused
+.\utils\vector\VectorLayerAttributes.py:3:1: F401 'qgis.core.QgsPointXY' imported but unused
+.\utils\vector\VectorLayerAttributes.py:3:1: F401 'qgis.core.QgsWkbTypes' imported but unused
+.\utils\vector\VectorLayerAttributes.py:3:1: F401 'qgis.core.QgsFeatureRequest' imported but unused
+.\utils\vector\VectorLayerAttributes.py:10:25: W291 trailing whitespace
+.\utils\vector\VectorLayerAttributes.py:11:24: W291 trailing whitespace
+.\utils\vector\VectorLayerAttributes.py:16:1: F811 redefinition of unused 'QgsVectorLayer' from line 3
+.\utils\vector\VectorLayerAttributes.py:16:1: F811 redefinition of unused 'QgsVectorFileWriter' from line 3
+.\utils\vector\VectorLayerAttributes.py:16:1: F811 redefinition of unused 'QgsProject' from line 3
+.\utils\vector\VectorLayerAttributes.py:16:1: F401 'qgis.core.QgsVectorFileWriter' imported but unused
+.\utils\vector\VectorLayerAttributes.py:16:1: F401 'qgis.core.QgsProject' imported but unused
+.\utils\vector\VectorLayerAttributes.py:16:1: F401 'qgis.core.QgsVectorLayer' imported but unused
+.\utils\vector\VectorLayerAttributes.py:16:1: F401 'qgis.core.QgsCoordinateTransformContext' imported but unused
+.\utils\vector\VectorLayerAttributes.py:22:1: F811 redefinition of unused 'Path' from line 2
+.\utils\vector\VectorLayerAttributes.py:22:1: F401 'pathlib.Path' imported but unused
+.\utils\vector\VectorLayerAttributes.py:23:1: F401 'os' imported but unused
+.\utils\vector\VectorLayerAttributes.py:24:1: F401 'typing.Optional' imported but unused
+.\utils\vector\VectorLayerAttributes.py:25:1: F401 'processing' imported but unused
+.\utils\vector\VectorLayerAttributes.py:39:101: E501 line too long (105 > 100 characters)
+.\utils\vector\VectorLayerAttributes.py:43:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerAttributes.py:50:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerAttributes.py:55:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerAttributes.py:123:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerAttributes.py:133:5: E303 too many blank lines (3)
+.\utils\vector\VectorLayerAttributes.py:133:101: E501 line too long (108 > 100 characters)
+.\utils\vector\VectorLayerAttributes.py:153:101: E501 line too long (106 > 100 characters)
+.\utils\vector\VectorLayerAttributes.py:181:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerAttributes.py:190:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerAttributes.py:198:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerAttributes.py:201:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerAttributes.py:219:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerAttributes.py:231:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerAttributes.py:244:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerAttributes.py:256:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerAttributes.py:268:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerAttributes.py:277:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerAttributes.py:286:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerAttributes.py:291:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerAttributes.py:298:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerAttributes.py:307:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerAttributes.py:312:53: W291 trailing whitespace
+.\utils\vector\VectorLayerAttributes.py:316:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerAttributes.py:326:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerGeometry.py:2:1: F401 'os' imported but unused
+.\utils\vector\VectorLayerGeometry.py:5:1: F401 'qgis.core.QgsCoordinateReferenceSystem' imported but unused
+.\utils\vector\VectorLayerGeometry.py:5:1: F401 'qgis.core.QgsCoordinateTransform' imported but unused
+.\utils\vector\VectorLayerGeometry.py:5:1: F401 'qgis.core.QgsCoordinateTransformContext' imported but unused
+.\utils\vector\VectorLayerGeometry.py:22:1: F401 '...utils.StringUtils.StringUtils' imported but unused
+.\utils\vector\VectorLayerGeometry.py:25:1: E302 expected 2 blank lines, found 0
+.\utils\vector\VectorLayerGeometry.py:28:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerGeometry.py:35:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerGeometry.py:40:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerGeometry.py:46:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerGeometry.py:53:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerGeometry.py:57:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerGeometry.py:62:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerGeometry.py:143:32: W291 trailing whitespace
+.\utils\vector\VectorLayerGeometry.py:145:9: E131 continuation line unaligned for hanging indent
+.\utils\vector\VectorLayerGeometry.py:146:9: E131 continuation line unaligned for hanging indent
+.\utils\vector\VectorLayerGeometry.py:147:9: E131 continuation line unaligned for hanging indent
+.\utils\vector\VectorLayerGeometry.py:148:9: E131 continuation line unaligned for hanging indent
+.\utils\vector\VectorLayerGeometry.py:149:9: E131 continuation line unaligned for hanging indent
+.\utils\vector\VectorLayerGeometry.py:150:9: E131 continuation line unaligned for hanging indent
+.\utils\vector\VectorLayerGeometry.py:151:9: E131 continuation line unaligned for hanging indent
+.\utils\vector\VectorLayerGeometry.py:152:9: E131 continuation line unaligned for hanging indent
+.\utils\vector\VectorLayerGeometry.py:153:9: E131 continuation line unaligned for hanging indent
+.\utils\vector\VectorLayerGeometry.py:153:40: W291 trailing whitespace
+.\utils\vector\VectorLayerGeometry.py:157:101: E501 line too long (110 > 100 characters)
+.\utils\vector\VectorLayerGeometry.py:159:38: E231 missing whitespace after ','
+.\utils\vector\VectorLayerGeometry.py:159:63: E231 missing whitespace after ','
+.\utils\vector\VectorLayerGeometry.py:176:20: W291 trailing whitespace
+.\utils\vector\VectorLayerGeometry.py:193:17: E251 unexpected spaces around keyword / parameter equals
+.\utils\vector\VectorLayerGeometry.py:193:19: E251 unexpected spaces around keyword / parameter equals
+.\utils\vector\VectorLayerGeometry.py:201:101: E501 line too long (108 > 100 characters)
+.\utils\vector\VectorLayerGeometry.py:217:47: E231 missing whitespace after ','
+.\utils\vector\VectorLayerGeometry.py:217:56: E251 unexpected spaces around keyword / parameter equals
+.\utils\vector\VectorLayerGeometry.py:217:58: E251 unexpected spaces around keyword / parameter equals
+.\utils\vector\VectorLayerGeometry.py:224:5: E303 too many blank lines (2)
+.\utils\vector\VectorLayerGeometry.py:224:36: E201 whitespace after '('
+.\utils\vector\VectorLayerGeometry.py:224:36: E221 multiple spaces before operator
+.\utils\vector\VectorLayerGeometry.py:224:46: W291 trailing whitespace
+.\utils\vector\VectorLayerGeometry.py:225:36: E128 continuation line under-indented for visual indent
+.\utils\vector\VectorLayerGeometry.py:226:33: E128 continuation line under-indented for visual indent
+.\utils\vector\VectorLayerGeometry.py:227:5: E124 closing bracket does not match visual indentation
+.\utils\vector\VectorLayerGeometry.py:237:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerGeometry.py:241:20: E261 at least two spaces before inline comment
+.\utils\vector\VectorLayerGeometry.py:242:5: E301 expected 1 blank line, found 0
+.\utils\vector\VectorLayerGeometry.py:337:101: E501 line too long (102 > 100 characters)
+.\utils\vector\VectorLayerGeometry.py:341:5: E303 too many blank lines (2)
+.\utils\vector\VectorLayerGeometry.py:363:31: E201 whitespace after '('
+.\utils\vector\VectorLayerGeometry.py:364:13: E117 over-indented
+.\utils\vector\VectorLayerGeometry.py:435:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerGeometry.py:439:101: E501 line too long (120 > 100 characters)
+.\utils\vector\VectorLayerGeometry.py:443:5: E303 too many blank lines (2)
+.\utils\vector\VectorLayerGeometry.py:450:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerGeometry.py:451:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerGeometry.py:452:5: E303 too many blank lines (2)
+.\utils\vector\VectorLayerGeometry.py:474:13: W291 trailing whitespace
+.\utils\vector\VectorLayerGeometry.py:475:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerGeometry.py:476:101: E501 line too long (103 > 100 characters)
+.\utils\vector\VectorLayerGeometry.py:482:13: W292 no newline at end of file
+.\utils\vector\VectorLayerMetrics.py:8:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerMetrics.py:15:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerMetrics.py:20:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerMetrics.py:64:101: E501 line too long (103 > 100 characters)
+.\utils\vector\VectorLayerMetrics.py:80:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerMetrics.py:94:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerMetrics.py:97:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerMetrics.py:100:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerMetrics.py:107:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerMetrics.py:115:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerMetrics.py:119:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerMetrics.py:121:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerMetrics.py:142:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerMetrics.py:145:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerMetrics.py:157:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerMetrics.py:160:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerMetrics.py:163:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerMetrics.py:170:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerMetrics.py:178:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerMetrics.py:182:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerMetrics.py:184:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerProjection.py:4:1: F401 'math' imported but unused
+.\utils\vector\VectorLayerProjection.py:151:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerProjection.py:156:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerProjection.py:164:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerProjection.py:167:5: E301 expected 1 blank line, found 0
+.\utils\vector\VectorLayerProjection.py:174:5: E301 expected 1 blank line, found 0
+.\utils\vector\VectorLayerProjection.py:182:101: E501 line too long (105 > 100 characters)
+.\utils\vector\VectorLayerProjection.py:222:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerProjection.py:224:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerProjection.py:235:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerProjection.py:300:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerProjection.py:302:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerProjection.py:309:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerSource.py:2:1: F811 redefinition of unused 'QgsVectorLayer' from line 2
+.\utils\vector\VectorLayerSource.py:2:1: F811 redefinition of unused 'QgsVectorFileWriter' from line 2
+.\utils\vector\VectorLayerSource.py:2:1: F811 redefinition of unused 'QgsProject' from line 2
+.\utils\vector\VectorLayerSource.py:2:1: F401 'qgis.core.QgsFeatureRequest' imported but unused
+.\utils\vector\VectorLayerSource.py:9:9: E131 continuation line unaligned for hanging indent
+.\utils\vector\VectorLayerSource.py:10:9: E131 continuation line unaligned for hanging indent
+.\utils\vector\VectorLayerSource.py:12:35: W291 trailing whitespace
+.\utils\vector\VectorLayerSource.py:14:16: W291 trailing whitespace
+.\utils\vector\VectorLayerSource.py:17:1: F401 '...utils.ProjectUtils.ProjectUtils' imported but unused
+.\utils\vector\VectorLayerSource.py:19:1: E302 expected 2 blank lines, found 0
+.\utils\vector\VectorLayerSource.py:22:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerSource.py:29:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerSource.py:34:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerSource.py:43:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerSource.py:48:1: W293 blank line contains whitespace
+.\utils\vector\VectorLayerSource.py:57:5: E303 too many blank lines (2)
+.\utils\vector\VectorLayerSource.py:60:5: E301 expected 1 blank line, found 0
+.\utils\vector\VectorLayerSource.py:225:29: E201 whitespace after '('
+.\utils\vector\VectorLayerSource.py:300:5: E303 too many blank lines (2)
+.\utils\vector\VectorLayerSource.py:303:5: E301 expected 1 blank line, found 0
+.\utils\vector\VectorLayerSource.py:345:5: E303 too many blank lines (4)
+.\utils\vector\VectorLayerSource.py:364:101: E501 line too long (110 > 100 characters)
+.\utils\vector\VectorLayerSource.py:373:5: E303 too many blank lines (2)
+.\utils\vector\VectorLayerSource.py:373:101: E501 line too long (115 > 100 characters)
+.\utils\vector\VectorLayerSource.py:389:101: E501 line too long (105 > 100 characters)

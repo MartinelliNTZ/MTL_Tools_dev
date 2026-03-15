@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-from typing import List, Optional
+from typing import List
 
 from qgis.core import QgsApplication
 
 from .ExecutionContext import ExecutionContext
 from .BaseStep import BaseStep
 from ..config.LogUtils import LogUtils
-from ..task.BaseTask import BaseTask
 from qgis.core import QgsTask
 
 

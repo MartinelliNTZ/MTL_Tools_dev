@@ -559,9 +559,6 @@ class LogcatDialog(QDialog):
         except Exception as e:
             self._logger.error(f"Erro ao restaurar scroll: {str(e)}")
     
-    def _do_restore_scroll(self, target_value):
-        """[REMOVIDO] Função consolidada em _restore_scroll_position()"""
-        pass
     
     def _on_clear_filters(self):
         """Limpa todos os filtros."""

@@ -38,7 +38,6 @@ class PolygonFieldsStep(BaseStep):
     def on_success(self, context: ExecutionContext, result):
         """
         Apply attribute mappings computed by the task on the MAIN THREAD.
-        Result expected shape: { 'updates': {fid: {field_name: value}}, 'missing_fields': [field_name,...] }
         """
         logger = LogUtils(
             tool=context.get("tool_key"), class_name=self.__class__.__name__
@@ -58,11 +57,11 @@ class PolygonFieldsStep(BaseStep):
 
         # 1) Add missing fields into the layer edit buffer (do not save)
         missing = result.get("missing_fields", []) or []
-        started_editing = False
+
         if missing:
             if not layer.isEditable():
                 layer.startEditing()
-                started_editing = True
+
             for fname in missing:
                 logger.debug(f"PolygonFieldsStep: adicionando campo (edição) {fname}")
                 layer.addAttribute(
@@ -111,7 +110,7 @@ class PolygonFieldsStep(BaseStep):
                                 f"PolygonFieldsStep: falha ao aplicar fid={fid} idx={idx} err={e}"
                             )
                 logger.debug(
-                    f"PolygonFieldsStep: applied edit-buffer batch {i}-{i+len(batch_items)} items={len(batch_items)}"
+                    f"Applied edit-buffer batch {i}-{i+len(batch_items)} items={len(batch_items)}"
                 )
                 QApplication.processEvents()
         finally:

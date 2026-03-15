@@ -29,6 +29,10 @@ from qgis.PyQt.QtWidgets import (
     QLabel, QLineEdit, QPushButton, QFileDialog, QCheckBox
 )
 from qgis.PyQt.QtCore import pyqtSignal
+from ...core.config.LogUtils import LogUtils
+
+# Logger do widget
+logger = LogUtils(tool="widgets", class_name="SelectorWidget")
 
 
 class SelectorWidget(QWidget):
@@ -204,8 +208,11 @@ class SelectorWidget(QWidget):
                 self._browse_multiple_files(initial_dir)
             elif self._mode == self.MODE_SAVE:
                 self._browse_save_file(initial_dir)
-        except Exception:
-            pass
+        except Exception as e:
+            try:
+                logger.exception(e)
+            except Exception:
+                pass
     
     def _get_initial_directory(self) -> str:
         """Retorna diretório inicial para dialog."""

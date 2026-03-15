@@ -44,6 +44,7 @@ class PhotoMetadataTask(BaseTask):
             try:
                 foto_int = int(foto)
             except Exception:
+                logger.warning(f"Valor de foto não é um inteiro: {foto} na feição ID {feat.id()}. Ignorando esta feição.")
                 continue
             
             ponto = {"foto": foto_int}

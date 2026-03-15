@@ -5,12 +5,9 @@ from .BaseStep import BaseStep
 from .ExecutionContext import ExecutionContext
 from ..task.BufferLayerTask import BufferLayerTask
 from ..config.LogUtils import LogUtils
-from ...utils.vector.VectorLayerSource import VectorLayerSource
-from qgis.core import QgsTask
 
 
 class BufferStep(BaseStep):
-
 
     def name(self) -> str:
         return "buffer"

@@ -235,7 +235,7 @@ class VectorLayerSource:
             if os.path.exists(path):
                 return os.path.getsize(path)
         except Exception:
-            pass
+            return 0
         return 0
 
     @staticmethod

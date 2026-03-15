@@ -1,10 +1,10 @@
-# DronePhotosTask.py
 # -*- coding: utf-8 -*-
-import os
+
 from qgis.core import QgsTask
 from utils.mrk.PhotoMetadata import PhotoMetadata
 from core.config.LogUtils import LogUtils
 from utils.ToolKeys import ToolKey
+
 
 class DronePhotosTask(QgsTask):
     TOOL_KEY = ToolKey.DRONE_COORDINATES
@@ -21,15 +21,17 @@ class DronePhotosTask(QgsTask):
 
     # ---------- RUN SEM ARGUMENTOS ----------
     def run(self):
-        self._logger.info(f"ENTRANDO NO RUN DA TASK: cruzando fotos em {self.base_folder}")
+        self._logger.info(
+            f"ENTRANDO NO RUN DA TASK: cruzando fotos em {self.base_folder}"
+        )
         try:
             self.result_points = PhotoMetadata.enrich(
-                self.points,
-                base_folder=self.base_folder,
-                recursive=self.recursive
+                self.points, base_folder=self.base_folder, recursive=self.recursive
             )
             self.setProgress(100)  # atualiza progresso no QGIS
-            self._logger.info(f"Cruzamento concluído ({len(self.result_points)} pontos)")
+            self._logger.info(
+                f"Cruzamento concluído ({len(self.result_points)} pontos)"
+            )
             self.finished(True)
             return True
         except Exception as e:

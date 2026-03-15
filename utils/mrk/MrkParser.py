@@ -144,8 +144,10 @@ class MrkParser:
                         n = int(k[5:])
                         if n > max_n:
                             max_n = n
-                    except ValueError:
-                        pass
+                    except ValueError as e:
+                        logger = LogUtils(tool="mrk_parser", class_name="MrkParser")
+                        logger.warning(f"Unexpected folder field format: {k} in point: {p}. Error: {e}")
+                        
 
         if max_n == 0:
             return points

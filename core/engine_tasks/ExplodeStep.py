@@ -11,7 +11,6 @@ from ...utils.vector.VectorLayerSource import VectorLayerSource
 
 class ExplodeStep(BaseStep):
 
-
     def name(self) -> str:
         return "explode"
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from typing import Any, Dict, List
+from typing import Any
 import time
 
 from .BaseStep import BaseStep
@@ -38,7 +38,7 @@ class LoadFilesStep(BaseStep):
             valid = result
 
         logger.info(
-            f"LoadFilesStep.on_success: registros válidos={len(valid)} thread={threading.current_thread().name}"
+            f"Registros válidos={len(valid)} thread={threading.current_thread().name}"
         )
 
         # Agora, no thread principal, instanciar camadas e adicioná-las ao projeto
@@ -65,7 +65,7 @@ class LoadFilesStep(BaseStep):
             except Exception as e:
                 progress = None
                 logger.debug(f"ProgressDialog unavailable: {e}")
-                   
+
             for i in range(0, total, chunk):
                 time.sleep(0.1)  # pequeno delay para permitir UI responder
                 if context.is_cancelled():
@@ -153,7 +153,7 @@ class LoadFilesStep(BaseStep):
                     logger.error(f"LoadFilesStep: processEvents failed: {e}")
 
                 logger.info(
-                    f"LoadFilesStep: batch {i}-{i+len(batch)-1} adicionadas; progresso {loaded}/{total}"
+                    f"Batch {i}-{i+len(batch)-1} adicionadas; progresso {loaded}/{total}"
                 )
         finally:
             try:

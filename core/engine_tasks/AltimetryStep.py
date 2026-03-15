@@ -12,7 +12,6 @@ class AltimetryStep(BaseStep):
     def create_task(self, context: ExecutionContext):
         lat = context.get("lat")
         lon = context.get("lon")
-        tool_key = context.get("tool_key", "coord_click")
 
         if lat is None or lon is None:
             return None

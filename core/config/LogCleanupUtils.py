@@ -69,7 +69,7 @@ class LogCleanupUtils:
 
         Args:
             plugin_root: Raiz do plugin
-            session_id: (Opcional) ID da sessão a deletar. Se None, deleta a mais recente.
+            session_id: (Opcional) ID da sessão a deletar.
 
         Returns:
             True se deletado com sucesso, False caso contrário

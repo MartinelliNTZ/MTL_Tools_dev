@@ -182,7 +182,7 @@ class AttributeStatisticsModel:
                         values_by_field[fn].append(val)
                 except Exception:
                     # valores não numéricos são ignorados
-                    pass
+                    return {}
         return values_by_field
 
     def compute_all(self, values_by_field: Dict[str, List[float]], stats_enabled: Dict[str, bool]) -> Dict[str, Dict[str, float]]:

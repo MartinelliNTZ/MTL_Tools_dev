@@ -235,12 +235,11 @@ class AttributeStatisticsAlgorithm(QgsProcessingAlgorithm):
                 v = feat[fn]
                 if v is None:
                     continue
-                try:
-                    val = float(v)
-                    if math.isfinite(val):
-                        values_by_field[fn].append(val)
-                except:
-                    pass
+                
+                val = float(v)
+                if math.isfinite(val):
+                    values_by_field[fn].append(val)
+
             if total:
                 feedback.setProgress(int(100 * i / total))
 

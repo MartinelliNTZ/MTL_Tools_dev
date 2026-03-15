@@ -3,11 +3,11 @@
 from qgis.PyQt.QtWidgets import QWidget, QVBoxLayout, QLabel, QCheckBox
 from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.gui import QgsMapLayerComboBox
-from qgis.core import (
-    QgsVectorLayer,
-    QgsMapLayerProxyModel,
-    QgsProject
-)
+from qgis.core import QgsVectorLayer, QgsMapLayerProxyModel, QgsProject
+from ...core.config.LogUtils import LogUtils
+
+# Logger do widget
+logger = LogUtils(tool="widgets", class_name="LayerInputWidget")
 
 
 class LayerInputWidget(QWidget):
@@ -68,14 +68,9 @@ class LayerInputWidget(QWidget):
     def _bind_events(self):
         self._combo.layerChanged.connect(self._on_layer_changed)
         QgsProject.instance().layerWasAdded.connect(self._on_project_layers_changed)
-        QgsProject.instance().layerWillBeRemoved.connect(self._on_project_layers_changed)
-
-        # escuta mudança de camada ativa no QGIS
-        try:
-            from qgis.utils import iface
-          #  iface.currentLayerChanged.connect(self._on_active_layer_changed)
-        except Exception:
-            pass
+        QgsProject.instance().layerWillBeRemoved.connect(
+            self._on_project_layers_changed
+        )
 
         self._on_layer_changed()
 
@@ -130,8 +125,12 @@ class LayerInputWidget(QWidget):
         if isinstance(old, QgsVectorLayer):
             try:
                 old.selectionChanged.disconnect(self._update_selection_state)
-            except Exception:
-                pass
+            except Exception as e:
+                try:
+                    logger.exception(e)
+                except Exception:
+                    # Fail-safe: não elevar exceção durante desconexão
+                    pass
 
     # --------------------------------------------------
     # Auto select
@@ -139,8 +138,13 @@ class LayerInputWidget(QWidget):
     def _try_select_active_layer(self):
         try:
             from qgis.utils import iface
+
             layer = iface.activeLayer()
-        except Exception:
+        except Exception as e:
+            try:
+                logger.error(f"Erro ao obter activeLayer: {e}")
+            except Exception:
+                pass
             layer = None
 
         if layer and self._layer_matches_filter(layer):
