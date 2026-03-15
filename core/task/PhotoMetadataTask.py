@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from typing import Optional, Dict, Any
 from qgis.core import QgsProject
 
 from .BaseTask import BaseTask
@@ -31,12 +30,12 @@ class PhotoMetadataTask(BaseTask):
             raise RuntimeError("Camada não encontrada para cruzamento de metadados")
 
         logger = LogUtils(tool=self.tool_key, class_name=self.__class__.__name__)
-        
+
         # Extrair lista de fotos a serem cruzadas (campo 'foto')
         # 🔴 IMPORTANTE: Também extrair 'mrk_folder' se disponível (para múltiplos voos)
         pontos = []
         has_mrk_folder = False
-        
+
         for feat in layer.getFeatures():
             foto = feat.attribute("foto")
             if foto is None:
@@ -44,24 +43,29 @@ class PhotoMetadataTask(BaseTask):
             try:
                 foto_int = int(foto)
             except Exception:
-                logger.warning(f"Valor de foto não é um inteiro: {foto} na feição ID {feat.id()}. Ignorando esta feição.")
+                logger.warning(
+                    f"Valor de foto não é um inteiro: {foto} na feição ID {feat.id()}. Ignorando esta feição."
+                )
                 continue
-            
+
             ponto = {"foto": foto_int}
-            
+
             # Verificar se o campo mrk_folder existe (adicionado por MrkParseTask)
             if feat.fieldNameIndex("mrk_folder") != -1:
                 mrk_folder = feat.attribute("mrk_folder")
                 if mrk_folder:
                     ponto["mrk_folder"] = mrk_folder
                     has_mrk_folder = True
-            
+
             pontos.append(ponto)
 
-        logger.info(f"Pontos extraídos da camada", data={
-            "total_pontos": len(pontos),
-            "com_mrk_folder": sum(1 for p in pontos if "mrk_folder" in p)
-        })
+        logger.info(
+            f"Pontos extraídos da camada",
+            data={
+                "total_pontos": len(pontos),
+                "com_mrk_folder": sum(1 for p in pontos if "mrk_folder" in p),
+            },
+        )
 
         # Cruzar metadados
         # 🔴 O método enrich() agora processa cada grupo de pontos separadamente

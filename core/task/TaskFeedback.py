@@ -1,9 +1,11 @@
+# -*- coding: utf-8 -*-
 from qgis.core import QgsProcessingFeedback
 from ..config.LogUtils import LogUtils
 
+
 class TaskFeedback(QgsProcessingFeedback):
 
-    def __init__(self, task,tool_key="untraceable"):
+    def __init__(self, task, tool_key="untraceable"):
         super().__init__()
         self.task = task
         self.logger = LogUtils(tool=tool_key, class_name="TaskFeedback")

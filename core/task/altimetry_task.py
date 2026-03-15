@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsTask
 import json
-import urllib.request
 from urllib.parse import urlparse
 import http.client
 from ..config.LogUtils import LogUtils
@@ -50,7 +49,9 @@ class AltimetriaTask(QgsTask):
                     conn = http.client.HTTPSConnection(host, port=port, timeout=15)
                 else:
                     conn = http.client.HTTPConnection(host, port=port, timeout=15)
-                conn.request("GET", path, headers={"User-Agent": "Cadmus-Altimetry-Task"})
+                conn.request(
+                    "GET", path, headers={"User-Agent": "Cadmus-Altimetry-Task"}
+                )
                 resp = conn.getresponse()
                 if resp.status != 200:
                     self.error = f"HTTP error {resp.status}"
@@ -91,23 +92,25 @@ class AltimetriaTask(QgsTask):
         logger = LogUtils(tool="altimetry_task", class_name="AltimetriaTask")
         try:
             if success:
-                if hasattr(self, 'on_success') and callable(getattr(self, 'on_success')):
+                if hasattr(self, "on_success") and callable(
+                    getattr(self, "on_success")
+                ):
                     try:
                         self.on_success(self.result)
                     except Exception as exc:
                         logger.exception(exc, code="FINISHED_ON_SUCCESS_ERROR")
-                if hasattr(self, 'callback') and callable(self.callback):
+                if hasattr(self, "callback") and callable(self.callback):
                     try:
                         self.callback(self.result, None)
                     except Exception as exc:
                         logger.exception(exc, code="FINISHED_CALLBACK_ERROR")
             else:
-                if hasattr(self, 'on_error') and callable(getattr(self, 'on_error')):
+                if hasattr(self, "on_error") and callable(getattr(self, "on_error")):
                     try:
                         self.on_error(self.error)
                     except Exception as exc:
                         logger.exception(exc, code="FINISHED_ON_ERROR_ERROR")
-                if hasattr(self, 'callback') and callable(self.callback):
+                if hasattr(self, "callback") and callable(self.callback):
                     try:
                         self.callback(None, self.error)
                     except Exception as exc:

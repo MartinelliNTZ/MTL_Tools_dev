@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsTask
 import json
-import urllib.request
 from urllib.parse import urlparse
 import http.client
 from ..config.LogUtils import LogUtils
@@ -63,15 +62,20 @@ class ReverseGeocodeTask(QgsTask):
                         # Redirect
                         location = resp.getheader("Location")
                         conn.close()
-                        logger.info(f"Redirect {status} -> {location}", code="REDIRECT_FOLLOW")
+                        logger.info(
+                            f"Redirect {status} -> {location}", code="REDIRECT_FOLLOW"
+                        )
                         if not location:
-                            self.error = f"Redirect without Location header (status {status})"
+                            self.error = (
+                                f"Redirect without Location header (status {status})"
+                            )
                             return False
                         # Resolve relative redirects
                         new_parsed = urlparse(location)
                         if not new_parsed.scheme:
                             # relative URL
                             from urllib.parse import urljoin
+
                             current_url = urljoin(current_url, location)
                         else:
                             current_url = location
@@ -148,23 +152,25 @@ class ReverseGeocodeTask(QgsTask):
         logger = LogUtils(tool="reverse_geocode", class_name="ReverseGeocodeTask")
         try:
             if success:
-                if hasattr(self, 'on_success') and callable(getattr(self, 'on_success')):
+                if hasattr(self, "on_success") and callable(
+                    getattr(self, "on_success")
+                ):
                     try:
                         self.on_success(self.result)
                     except Exception as exc:
                         logger.exception(exc, code="FINISHED_ON_SUCCESS_ERROR")
-                if hasattr(self, 'callback') and callable(self.callback):
+                if hasattr(self, "callback") and callable(self.callback):
                     try:
                         self.callback(self.result, None)
                     except Exception as exc:
                         logger.exception(exc, code="FINISHED_CALLBACK_ERROR")
             else:
-                if hasattr(self, 'on_error') and callable(getattr(self, 'on_error')):
+                if hasattr(self, "on_error") and callable(getattr(self, "on_error")):
                     try:
                         self.on_error(self.error)
                     except Exception as exc:
                         logger.exception(exc, code="FINISHED_ON_ERROR_ERROR")
-                if hasattr(self, 'callback') and callable(self.callback):
+                if hasattr(self, "callback") and callable(self.callback):
                     try:
                         self.callback(None, self.error)
                     except Exception as exc:

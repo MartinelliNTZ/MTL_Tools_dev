@@ -3,81 +3,15 @@
 .\core\engine_tasks\LoadFilesStep.py:77:32: E203 whitespace before ':'
 .\core\engine_tasks\PointFieldsStep.py:104:43: E203 whitespace before ':'
 .\core\engine_tasks\PolygonFieldsStep.py:103:43: E203 whitespace before ':'
-.\core\task\BufferLayerTask.py:3:1: F401 '..config.LogUtils.LogUtils' imported but unused
-.\core\task\BufferLayerTask.py:5:1: F401 'time' imported but unused
-.\core\task\BufferLayerTask.py:9:1: E303 too many blank lines (3)
-.\core\task\BufferLayerTask.py:40:101: E501 line too long (109 > 100 characters)
-.\core\task\BufferLayerTask.py:67:25: E251 unexpected spaces around keyword / parameter equals
-.\core\task\BufferLayerTask.py:67:27: E251 unexpected spaces around keyword / parameter equals
-.\core\task\DronePhotosTask.py:3:1: F401 'os' imported but unused
-.\core\task\DronePhotosTask.py:9:1: E302 expected 2 blank lines, found 1
-.\core\task\ExplodeHugeLayerTask.py:1:1: F401 'processing' imported but unused
-.\core\task\ExplodeHugeLayerTask.py:2:1: F401 'qgis.core.QgsVectorLayer' imported but unused
-.\core\task\ExplodeHugeLayerTask.py:4:1: F401 '..config.LogUtils.LogUtils' imported but unused
-.\core\task\ExplodeHugeLayerTask.py:6:1: F401 'time' imported but unused
-.\core\task\ExplodeHugeLayerTask.py:8:1: E302 expected 2 blank lines, found 1
-.\core\task\ExplodeHugeLayerTask.py:24:101: E501 line too long (106 > 100 characters)
-.\core\task\LineFieldsTask.py:2:1: F401 'os' imported but unused
-.\core\task\LineFieldsTask.py:3:1: F401 'tempfile' imported but unused
-.\core\task\LineFieldsTask.py:4:1: F401 'qgis.core.QgsVectorLayer' imported but unused
-.\core\task\LineFieldsTask.py:5:1: F401 'qgis.PyQt.QtCore.QVariant' imported but unused
-.\core\task\LineFieldsTask.py:7:1: F401 '..config.LogUtils.LogUtils' imported but unused
-.\core\task\LineFieldsTask.py:35:13: F541 f-string is missing placeholders
-.\core\task\LoadFilesTask.py:3:1: F401 'typing.Optional' imported but unused
-.\core\task\MrkParseTask.py:47:47: E231 missing whitespace after ','
-.\core\task\MrkParseTask.py:51:1: W293 blank line contains whitespace
-.\core\task\MrkParseTask.py:53:13: E303 too many blank lines (3)
-.\core\task\MrkParseTask.py:54:101: E501 line too long (104 > 100 characters)
-.\core\task\MrkParseTask.py:58:101: E501 line too long (105 > 100 characters)
-.\core\task\PhotoMetadataTask.py:2:1: F401 'typing.Optional' imported but unused
-.\core\task\PhotoMetadataTask.py:2:1: F401 'typing.Dict' imported but unused
-.\core\task\PhotoMetadataTask.py:2:1: F401 'typing.Any' imported but unused
-.\core\task\PhotoMetadataTask.py:34:1: W293 blank line contains whitespace
-.\core\task\PhotoMetadataTask.py:39:1: W293 blank line contains whitespace
-.\core\task\PhotoMetadataTask.py:47:101: E501 line too long (122 > 100 characters)
-.\core\task\PhotoMetadataTask.py:49:1: W293 blank line contains whitespace
-.\core\task\PhotoMetadataTask.py:51:1: W293 blank line contains whitespace
-.\core\task\PhotoMetadataTask.py:57:21: F841 local variable 'has_mrk_folder' is assigned to but never used
-.\core\task\PhotoMetadataTask.py:58:1: W293 blank line contains whitespace
-.\core\task\PhotoMetadataTask.py:61:21: F541 f-string is missing placeholders
-.\core\task\PhotoMetadataTask.py:87:101: E501 line too long (104 > 100 characters)
-.\core\task\PointFieldsTask.py:2:1: F401 'os' imported but unused
-.\core\task\PointFieldsTask.py:3:1: F401 'tempfile' imported but unused
-.\core\task\PointFieldsTask.py:4:1: F401 'qgis.core.QgsVectorLayer' imported but unused
-.\core\task\PointFieldsTask.py:4:1: F401 'qgis.core.QgsField' imported but unused
-.\core\task\PointFieldsTask.py:4:1: F401 'qgis.core.QgsProject' imported but unused
-.\core\task\PointFieldsTask.py:5:1: F401 'qgis.PyQt.QtCore.QVariant' imported but unused
-.\core\task\PointFieldsTask.py:7:1: F401 '...utils.vector.VectorLayerAttributes.VectorLayerAttributes' imported but unused
-.\core\task\PointFieldsTask.py:8:1: F401 '...utils.vector.VectorLayerSource.VectorLayerSource' imported but unused
-.\core\task\PointFieldsTask.py:9:1: F401 '..config.LogUtils.LogUtils' imported but unused
-.\core\task\PointFieldsTask.py:15:1: W293 blank line contains whitespace
-.\core\task\PointFieldsTask.py:21:1: W293 blank line contains whitespace
-.\core\task\PointFieldsTask.py:29:1: W293 blank line contains whitespace
-.\core\task\PointFieldsTask.py:98:1: W391 blank line at end of file
-.\core\task\PolygonFieldsTask.py:2:1: F401 'os' imported but unused
-.\core\task\PolygonFieldsTask.py:3:1: F401 'tempfile' imported but unused
-.\core\task\PolygonFieldsTask.py:4:1: F401 'qgis.core.QgsVectorLayer' imported but unused
-.\core\task\PolygonFieldsTask.py:4:1: F401 'qgis.core.QgsField' imported but unused
-.\core\task\PolygonFieldsTask.py:5:1: F401 'qgis.PyQt.QtCore.QVariant' imported but unused
-.\core\task\PolygonFieldsTask.py:7:1: F401 '...utils.vector.VectorLayerSource.VectorLayerSource' imported but unused
-.\core\task\PolygonFieldsTask.py:8:1: F401 '..config.LogUtils.LogUtils' imported but unused
-.\core\task\PolygonFieldsTask.py:14:1: W293 blank line contains whitespace
-.\core\task\PolygonFieldsTask.py:20:1: W293 blank line contains whitespace
-.\core\task\PolygonFieldsTask.py:29:1: W293 blank line contains whitespace
-.\core\task\PolygonFieldsTask.py:39:13: F541 f-string is missing placeholders
-.\core\task\PolygonFieldsTask.py:44:1: W293 blank line contains whitespace
-.\core\task\PolygonFieldsTask.py:48:9: F841 local variable 'missing_fields' is assigned to but never used
-.\core\task\PolygonFieldsTask.py:105:101: E501 line too long (135 > 100 characters)
-.\core\task\PolygonFieldsTask.py:109:1: W391 blank line at end of file
-.\core\task\SaveVectorLayerTask.py:6:1: F401 'typing.Any' imported but unused
-.\core\task\SaveVectorLayerTask.py:6:1: F401 'typing.Dict' imported but unused
-.\core\task\SaveVectorLayerTask.py:6:1: F401 'typing.List' imported but unused
-.\core\task\SaveVectorLayerTask.py:58:20: W292 no newline at end of file
-.\core\task\TaskFeedback.py:4:1: E302 expected 2 blank lines, found 1
-.\core\task\TaskFeedback.py:6:28: E231 missing whitespace after ','
-.\core\task\TaskFeedback.py:39:44: W292 no newline at end of file
-.\core\task\altimetry_task.py:4:1: F401 'urllib.request' imported but unused
-.\core\task\reverse_geocoding_task.py:4:1: F401 'urllib.request' imported but unused
+.\core\task\PhotoMetadataTask.py:47:101: E501 line too long (110 > 100 characters)
+.\core\task\PhotoMetadataTask.py:58:21: F841 local variable 'has_mrk_folder' is assigned to but never used
+.\core\task\PhotoMetadataTask.py:63:13: F541 f-string is missing placeholders
+.\core\task\PhotoMetadataTask.py:91:101: E501 line too long (104 > 100 characters)
+.\core\task\PointFieldsTask.py:3:1: F401 '...utils.vector.VectorLayerAttributes.VectorLayerAttributes' imported but unused
+.\core\task\PointFieldsTask.py:4:1: F401 '...utils.vector.VectorLayerSource.VectorLayerSource' imported but unused
+.\core\task\PointFieldsTask.py:5:1: F401 '..config.LogUtils.LogUtils' imported but unused
+.\core\task\PolygonFieldsTask.py:42:13: F541 f-string is missing placeholders
+.\core\task\PolygonFieldsTask.py:51:9: F841 local variable 'missing_fields' is assigned to but never used
 .\core\ui\HudProgressBar.py:3:1: F401 'qgis.PyQt.QtGui.QFont' imported but unused
 .\core\ui\ProgressDialog.py:104:101: E501 line too long (107 > 100 characters)
 .\core\ui\ProgressDialog.py:110:68: W292 no newline at end of file

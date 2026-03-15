@@ -47,7 +47,7 @@ class InfoDialog(BaseDialog):
             self.logger.error(f"InfoDialog: failed to connect close button: {e}")
         self.layout.addLayout(btn_layout)
         self.logger.debug(
-            f"InfoDialog UI construída com sucesso usando BaseDialog layout."
+            "InfoDialog UI construída com sucesso usando BaseDialog layout."
         )
 
     def _markdown_to_html(self, text: str) -> str:

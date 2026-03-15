@@ -472,7 +472,8 @@ class WidgetFactory:
         Parameters
         ----------
         fields : dict
-            Dicionário com chaves identificadoras e valores { 'title': str, 'value': Any, 'value_type': str, 'titlebutton': str }
+            Dicionário com chaves identificadoras e valores
+              { 'title': str, 'value': Any, 'value_type': str, 'titlebutton': str }
         num_columns : int
             Número de colunas para layout
         copy_all_button_title : str|None

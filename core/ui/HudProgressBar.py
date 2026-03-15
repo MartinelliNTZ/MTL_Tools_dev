@@ -1,6 +1,5 @@
 from qgis.PyQt.QtWidgets import QWidget, QVBoxLayout, QLabel, QProgressBar
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtGui import QFont
 
 
 class HudProgressBar(QWidget):
