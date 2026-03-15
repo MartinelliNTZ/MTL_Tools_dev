@@ -133,8 +133,8 @@ class LoadFolderLayersDialog(BasePluginMTL):
         # usa mecanismo de dependência via CheckboxGridWidget/DependentCheckBox
         try:
             self.chk_preserve_structure.set_dependents([self.chk_last_folder])
-        except Exception:
-            pass
+        except Exception as e:
+            self.logger.error(f"Erro {e}")
 
         # --- Botões padrão ---
         buttons_layout, self.action_buttons = WidgetFactory.create_bottom_action_buttons(
@@ -195,13 +195,11 @@ class LoadFolderLayersDialog(BasePluginMTL):
             w = prefs.get("window_width")
             h = prefs.get("window_height")
             if w and h:
-                try:
-                    self.resize(int(w), int(h))
-                except Exception:
-                    pass
-        except Exception:
+                self.resize(int(w), int(h))
+
+        except Exception as e:
             # Mantém comportamento tolerante: não falhar ao carregar prefs
-            pass
+            self.logger.error(f"Erro {e}")
 
     # ------------------------------------------------------------------
     def _save_prefs(self):
@@ -224,9 +222,9 @@ class LoadFolderLayersDialog(BasePluginMTL):
             }
 
             save_tool_prefs(self.TOOL_KEY, data)
-        except Exception:
+        except Exception as e:
             # não falhar ao salvar preferências
-            pass
+            self.logger.error(f"Erro {e}")
 
     # -----------------------------------------------------------------
     # ------------------------------------------------------------------
@@ -248,7 +246,7 @@ class LoadFolderLayersDialog(BasePluginMTL):
         if self.chk_backup.isChecked():
             try:
                 backup_file = ProjectUtils.create_project_backup(QgsProject.instance())
-            except Exception:
+            except Exception as e:
                 backup_file = None
 
         # coletar extensões selecionadas

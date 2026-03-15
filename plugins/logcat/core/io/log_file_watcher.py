@@ -8,6 +8,7 @@ from typing import Callable, Optional, List
 from datetime import datetime, timedelta
 import threading
 import time
+import logging
 
 
 class LogFileWatcher:
@@ -41,6 +42,8 @@ class LogFileWatcher:
         self._last_size = 0
         self._last_mtime = 0.0
         self._lock = threading.Lock()
+        # Logger local (não importa LogUtils para evitar loops durante init)
+        self.logger = logging.getLogger("Cadmus.logcat.LogFileWatcher")
     
     def start(self) -> None:
         """Inicia monitoramento em thread separada."""
@@ -63,28 +66,23 @@ class LogFileWatcher:
         """Para o monitoramento com segurança máxima."""
         try:
             # PASSO 1: Sinalizar parada via lock
-            try:
-                with self._lock:
-                    self._is_watching = False
-            except Exception:
-                pass
-            
+            with self._lock:
+                self._is_watching = False
+
             # PASSO 2: Aguardar thread terminar com múltiplas tentativas
             if self._watch_thread and self._watch_thread.is_alive():
                 # Tentar join com timeout progressivo
                 for attempt in range(3):
                     timeout = 1.0 * (attempt + 1)
-                    try:
-                        self._watch_thread.join(timeout=timeout)
-                        if not self._watch_thread.is_alive():
-                            break
-                    except Exception:
-                        pass
-            
+                    self._watch_thread.join(timeout=timeout)
+                    if not self._watch_thread.is_alive():
+                        break
+
             self._watch_thread = None
-        except Exception:
-            pass  # stop() nunca falha
-    
+
+        except Exception as e:
+            self.logger.error(f"Erro ao parar monitoramento: {e}")
+        
     def _update_file_stats(self) -> None:
         """Atualiza tamanho e mtime do arquivo."""
         try:
@@ -92,8 +90,8 @@ class LogFileWatcher:
                 stat = self.log_file_path.stat()
                 self._last_size = stat.st_size
                 self._last_mtime = stat.st_mtime
-        except Exception:
-            pass
+        except Exception as e:
+            self.logger.error(f"Erro ao atualizar estatísticas do arquivo: {e}")
     
     def _has_changed(self) -> bool:
         """Verifica se o arquivo foi modificado."""
@@ -103,68 +101,49 @@ class LogFileWatcher:
             
             stat = self.log_file_path.stat()
             return stat.st_size != self._last_size or stat.st_mtime != self._last_mtime
-        except Exception:
+        except Exception as e:
+            self.logger.error(f"Erro ao checar mudanças no arquivo: {e}")
             return False
     
     def _watch_loop(self) -> None:
         """
         Loop de monitoramento (executado em thread).
-        
+
         Extremamente defensivo - qualquer erro termina a thread graciosamente.
         """
         try:
             while True:
-                # Checar se deve parar - com máxima proteção
-                should_stop = False
-                try:
+                # Checar se deve parar
+                with self._lock:
+                    if not self._is_watching:
+                        break
+
+                # Checar mudanças
+                if self._has_changed():
+                    self._update_file_stats()
+
+                    if self.on_change:
+                        self.on_change()
+
+                # Sleep curto para responder rápido ao stop()
+                for _ in range(10):
+                    time.sleep(self.check_interval / 10.0)
+
                     with self._lock:
-                        should_stop = not self._is_watching
-                except Exception:
-                    should_stop = True
-                
-                if should_stop:
-                    break
-                
-                # Checar mudanças com proteção total
-                try:
-                    if self._has_changed():
-                        try:
-                            self._update_file_stats()
-                        except Exception:
-                            pass
-                        
-                        if self.on_change:
-                            try:
-                                self.on_change()
-                            except Exception:
-                                pass
-                except Exception:
-                    pass
-                
-                # Sleep com máxima proteção - se falhar, encerrar thread
-                try:
-                    # Usar loop pequeno em vez de sleep longo para responder ao stop() rápido
-                    for _ in range(10):
-                        time.sleep(self.check_interval / 10.0)
-                        # Checar novamente se foi solicitado parar durante o sleep
-                        try:
-                            with self._lock:
-                                if not self._is_watching:
-                                    break
-                        except Exception:
+                        if not self._is_watching:
                             break
-                except Exception:
-                    break  # Sleep falhou - terminar thread
-        except Exception:
-            pass  # Última rede de segurança - thread nunca quebra QGIS
+
+        except Exception as e:
+            self.logger.error(f"Erro no loop de monitoramento: {e}")
+
         finally:
             # Garantir que _is_watching seja False
             try:
                 with self._lock:
                     self._is_watching = False
-            except Exception:
-                pass
-    
+            except Exception as e:
+                self.logger.error(f"Erro ao finalizar monitoramento: {e}")
+        
     def is_watching(self) -> bool:
         """Retorna True se está monitorando."""
         with self._lock:

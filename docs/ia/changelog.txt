@@ -43,3 +43,14 @@ FIX: TRATAMENTO DE EXCEPTS EM MainLayout.py
 - Substitui blocos `except` corrompidos por `logger.error` em widgets de borda
 - Evita exceções silenciosas durante eventos de UI (`resizeEvent`, `enterEvent`, `leaveEvent`, `mouse*Event`)
 - Melhora observabilidade: erros agora aparecem no JSONL do plugin e no log do QGIS
+1.7.1.11
+
+FIX: CORREÇÕES NO LOGCAT (IO E UI)
+
+- Adicionado logger local em `plugins/logcat/core/io/log_file_watcher.py` para evitar
+  NameError em handlers de exceção durante monitoramento de arquivos.
+- Ajustado import de `LOG_FILE_LOCK` em `plugins/logcat/core/io/log_loader.py` para
+  tentar import absoluto e usar fallback seguro (`threading.Lock`) em caso de falha.
+- Corrigida a indentação e métodos em `plugins/logcat/ui/log_table_model.py` (mover
+  `append_entries` para dentro da classe, tooltips seguros, tratamento de cores),
+  prevenindo erros/syntax issues que podiam travar o diálogo do Logcat.

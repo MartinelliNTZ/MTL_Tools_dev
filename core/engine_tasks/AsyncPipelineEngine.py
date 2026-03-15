@@ -77,8 +77,8 @@ class AsyncPipelineEngine:
         if self._current_task:
             try:
                 self._current_task.cancel()
-            except RuntimeError:
-                pass
+            except RuntimeError as e:
+                self.logger.error(f"Failed to cancel current task: {e}")
 
         if self._pipeline_task:
             self._pipeline_task.cancel()
@@ -203,6 +203,3 @@ class PipelineTask(QgsTask):
 
     def mark_done(self):
         self._done = True
-
-    def finished(self, result):
-        pass

@@ -288,11 +288,11 @@ class BasePluginMTL(BaseDialog):
         Ele é chamado quando o usuário aciona a funcionalidade do plugin (ex: clica em um botão).
         Deve conter a lógica de execução do plugin.
         """
-        pass
+        self.logger.debug("execute_tool chamado - deve ser implementado pelo plugin específico")
 
     def _on_pipeline_finished(self, context):    
         """Callback para quando a pipeline é finalizada com sucesso."""
-        pass
+        self.logger.debug("Pipeline finalizada com sucesso")
 
     def _on_pipeline_error(self, errors):
         """Exibe um modal de erro genérico para a pipeline."""

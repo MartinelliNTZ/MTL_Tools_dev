@@ -165,8 +165,8 @@ class LogUtils:
 
                         sys.stderr.write(f"Cadmus LogUtils write error: {e}\n")
                 except Exception:
-                    # nada a fazer se até o fallback falhar
-                    pass
+                    # Último fallback: evitar que falha no sistema de log quebre o plugin
+                    return
         # Registrar CRITICAL e ERROR também no QgsMessageLog oficial do QGIS
         if QGIS_AVAILABLE and level in (cls.CRITICAL, cls.ERROR):
             full_msg = f"[{tool}:{class_name}] {msg}"

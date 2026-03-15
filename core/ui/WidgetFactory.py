@@ -481,9 +481,6 @@ class WidgetFactory:
             Texto padrão para botões individuais
         """
         layout = QVBoxLayout()
-        if title:
-            # header handled by widget itself
-            pass
         if separator_top:
             layout.addWidget(WidgetFactory.create_separator())
         widget = ReadOnlyFieldWidget(

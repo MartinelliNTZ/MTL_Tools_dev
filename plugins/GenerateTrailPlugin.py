@@ -124,8 +124,8 @@ class GenerateTrailPlugin(BasePluginMTL):
         if last_tam is not None:
             try:
                 self.spin_tam.setValue(float(last_tam))
-            except Exception:
-                pass
+            except Exception as e:
+                self.logger.warning(f"Valor de tamanho do implemento inválido nas preferências: {last_tam}. Erro: {str(e)}")
 
         try:            
             self.save_selector.set_enabled(bool(save_to_folder))

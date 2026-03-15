@@ -516,13 +516,9 @@ class CadmusPlugin:
                 self.logger.critical(f"Stack trace:\n{error_trace}")
                 self.logger.info("=" * 60)
             except:
-                print(error_msg, file=sys.stderr)
-            
-            # Mensagem ao usuário
-            try:
+                print(error_msg, file=sys.stderr)          
                 QgisMessageUtil.bar_critical(self.iface, f"Erro crítico no Logcat:\n{str(outer_error)}")
-            except:
-                pass
+
 
 
 

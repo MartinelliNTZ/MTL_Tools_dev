@@ -10,7 +10,7 @@ BUGS CONHECIDOS
       - Afeta: seleção de pasta completa com múltiplos .mrk
       - Workaround: selecionar múltiplos arquivos manualmente via browse (contorna o problema)
     - Geral: Impedir múltiplas instâncias de plugins rodando simultaneamente
-
+bandit -r . -f html -o bandit-report.html
 ferramentas = name                              tipo                            plugin_class                risco
     - 01: Exportar Todos os Layouts             janela                          ExportAllLayoutsPlugin      substituir produtos antigos
     - 02: Substituir Textos nos Layouts         janela                          ReplaceInLayoutsPlugin      crítico/alteração QGZ

@@ -21,8 +21,8 @@ class CoordResultDialog(BasePluginMTL):
         # Atualiza com as informações iniciais (widgets já criados em _build_ui)
         try:
             self.update_info(info)
-        except Exception:
-            pass
+        except Exception as e:
+            self.logger.error(f"Error {e}")
 
     def _build_ui(self, **kwargs):
         """Constrói a UI do diálogo: segue o padrão de GenerateTrailPlugin.        """
@@ -120,14 +120,14 @@ class CoordResultDialog(BasePluginMTL):
             if w and h:
                 try:
                     self.resize(int(w), int(h))
-                except Exception:
-                    pass
+                except Exception as e:
+                    self.logger.error(f"Error {e}")
             self.logger.debug(f"_load_prefs: loaded prefs keys={list(self.preferences.keys())}")
         except Exception as e:
             try:
                 self.logger.warning(f"_load_prefs: erro ao carregar preferencias: {e}")
-            except Exception:
-                pass
+            except Exception as e:
+                self.logger.error(f"Error {e}")
 
     def _save_prefs(self):
         """Salva preferências do diálogo (window size e outras chaves)."""
@@ -137,13 +137,13 @@ class CoordResultDialog(BasePluginMTL):
             save_tool_prefs(self.TOOL_KEY, self.preferences)
             try:
                 self.logger.debug(f"_save_prefs: prefs salvas: {self.preferences.get('window_width')}x{self.preferences.get('window_height')}")
-            except Exception:
-                pass
+            except Exception as e:
+                self.logger.error(f"Error {e}")
         except Exception as e:
             try:
                 self.logger.warning(f"_save_prefs: erro ao salvar preferencias: {e}")
-            except Exception:
-                pass
+            except Exception as e:
+                self.logger.error(f"Error {e}")
 
 
     # ==================================================
@@ -229,8 +229,8 @@ class CoordResultDialog(BasePluginMTL):
         )
         try:
             self.logger.debug(f"set_altitude: {value}")
-        except Exception:
-            pass
+        except Exception as e:
+            self.logger.error(f"Error {e}")
 
     def set_address(self, data):
         if not data:
@@ -251,8 +251,8 @@ class CoordResultDialog(BasePluginMTL):
 
         try:
             self.logger.debug(f"set_address: {data}")
-        except Exception:
-            pass
+        except Exception as e:
+            self.logger.error(f"Error {e}")
 
 
     def copy_address(self):

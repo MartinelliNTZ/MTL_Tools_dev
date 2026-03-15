@@ -4,6 +4,7 @@ Modelo Qt para tabela de logs.
 Implementa QAbstractTableModel para suportar grandes volumes de dados.
 Nenhuma lógica de UI aqui - apenas model puro.
 """
+
 from typing import List, Optional
 from qgis.PyQt.QtCore import Qt, QAbstractTableModel, QModelIndex, QVariant
 from qgis.PyQt.QtGui import QColor
@@ -14,7 +15,7 @@ from ..core.color.class_color_provider import ClassColorProvider
 class LogTableModel(QAbstractTableModel):
     """
     Modelo Qt para exibição de logs em tabela.
-    
+
     Colunas:
     - Timestamp
     - Level
@@ -22,7 +23,7 @@ class LogTableModel(QAbstractTableModel):
     - Class
     - Message (truncada)
     """
-    
+
     COLUMNS = [
         ("Timestamp", "ts"),
         ("Level", "level"),
@@ -30,7 +31,7 @@ class LogTableModel(QAbstractTableModel):
         ("Class", "class_name"),
         ("Message", "msg"),
     ]
-    
+
     def __init__(self, parent=None):
         """Inicializa o modelo."""
         super().__init__(parent)
@@ -38,28 +39,23 @@ class LogTableModel(QAbstractTableModel):
         # Usar ClassColorProvider para AMBAS as colunas (tool + class)
         # Cores determinísticas e consistentes para cada valor único
         self._color_provider = ClassColorProvider()
-        
+
         # Setup logging
         self._logger = self._get_logger()
         self._set_entries_error_count = 0
         self._data_error_count = 0
-        self._logger.info("LogTableModel inicializado", tool="logcat", class_name="LogTableModel")
-    
+        self._logger.info(
+            "LogTableModel inicializado", tool="logcat", class_name="LogTableModel"
+        )
+
     @staticmethod
     def _get_logger():
         """Obtém logger para este módulo."""
-        try:
-            from ....core.config.LogUtils import LogUtils
-            return LogUtils(tool="logcat", class_name="LogTableModel")
-        except:
-            # Fallback - logger fake
-            class FakeLogger:
-                def debug(self, msg, **kwargs): pass
-                def info(self, msg, **kwargs): pass
-                def warning(self, msg, **kwargs): pass
-                def error(self, msg, **kwargs): pass
-            return FakeLogger()
-    
+
+        from ....core.config.LogUtils import LogUtils
+
+        return LogUtils(tool="logcat", class_name="LogTableModel")
+
     def set_entries(self, entries: List[LogEntry]) -> None:
         """
         Define as entradas a exibir.
@@ -68,33 +64,31 @@ class LogTableModel(QAbstractTableModel):
         """
         try:
             self._entries = list(entries) if entries else []
-            
+
             # IMPORTANTE: Bloquear proxy model para evitar crashes durante sincronização
             # Isso previne que QTableView tente acessar índices inválidos durante layoutChanged
-            if self.parent() and hasattr(self.parent(), 'setDynamicSortFilter'):
-                try:
-                    self.parent().setDynamicSortFilter(False)
-                except:
-                    pass
-            
+            if self.parent() and hasattr(self.parent(), "setDynamicSortFilter"):
+
+                self.parent().setDynamicSortFilter(False)
+
             # Emitir layoutChanged em vez de beginResetModel
             self.layoutChanged.emit()
-            
+
             # Re-habilitar proxy model após layoutChanged
-            if self.parent() and hasattr(self.parent(), 'setDynamicSortFilter'):
-                try:
-                    self.parent().setDynamicSortFilter(False)  # Manter como False (mais seguro)
-                except:
-                    pass
-            
+            if self.parent() and hasattr(self.parent(), "setDynamicSortFilter"):
+
+                self.parent().setDynamicSortFilter(
+                    False
+                )  # Manter como False (mais seguro)
+
         except Exception as e:
             self._set_entries_error_count += 1
             self._logger.error(
                 f"Erro em set_entries (ocorrência {self._set_entries_error_count}): {str(e)}",
                 error_type=type(e).__name__,
-                entries_type=type(entries).__name__
+                entries_type=type(entries).__name__,
             )
-    
+
     def append_entries(self, entries: List[LogEntry]) -> None:
         """
         Adiciona novas entradas ao final.
@@ -103,100 +97,109 @@ class LogTableModel(QAbstractTableModel):
         try:
             if not entries:
                 return
-            
+
             entries_count = len(entries)
             start_row = len(self._entries)
             end_row = start_row + entries_count - 1
-            
-            try:
-                self.beginInsertRows(QModelIndex(), start_row, end_row)
-            except Exception as e:
-                self._logger.error(f"Erro em beginInsertRows: {str(e)}")
-                raise
-            
+
+            self.beginInsertRows(QModelIndex(), start_row, end_row)
             try:
                 self._entries.extend(entries)
-            except Exception as e:
-                self._logger.error(f"Erro ao estender entries: {str(e)}")
-                try:
-                    self.endInsertRows()
-                except:
-                    pass
-                raise
-            
-            try:
+            finally:
                 self.endInsertRows()
-            except Exception as e:
-                self._logger.error(f"Erro em endInsertRows: {str(e)}")
-                raise
-            
+
         except Exception as e:
             self._logger.error(
-                f"Erro em append_entries: {str(e)}",
+                f"Erro em append_entries: {e}",
                 error_type=type(e).__name__,
-                entries_count=len(entries) if entries else 0
+                entries_count=len(entries) if entries else 0,
             )
-    
+
     def clear(self) -> None:
         """Limpa todas as entradas."""
         self.beginResetModel()
         self._entries.clear()
         self.endResetModel()
-    
+
+    def append_entries(self, entries: List[LogEntry]) -> None:
+        """
+        Adiciona novas entradas ao final.
+        Mais eficiente que set_entries para atualizações incrementais.
+        """
+        try:
+            if not entries:
+                return
+
+            entries_count = len(entries)
+            start_row = len(self._entries)
+            end_row = start_row + entries_count - 1
+
+            self.beginInsertRows(QModelIndex(), start_row, end_row)
+            try:
+                self._entries.extend(entries)
+            finally:
+                self.endInsertRows()
+
+        except Exception as e:
+            self._logger.error(
+                f"Erro em append_entries: {e}",
+                error_type=type(e).__name__,
+                entries_count=len(entries) if entries else 0,
+            )
+
+    def clear(self) -> None:
+        """Limpa todas as entradas."""
+        self.beginResetModel()
+        self._entries.clear()
+        self.endResetModel()
+
     def rowCount(self, parent: QModelIndex = QModelIndex()) -> int:
         """Retorna número de linhas."""
         if parent.isValid():
             return 0
         return len(self._entries)
-    
+
     def columnCount(self, parent: QModelIndex = QModelIndex()) -> int:
         """Retorna número de colunas."""
         if parent.isValid():
             return 0
         return len(self.COLUMNS)
-    
+
     def headerData(
-        self,
-        section: int,
-        orientation: Qt.Orientation,
-        role: int = Qt.DisplayRole
+        self, section: int, orientation: Qt.Orientation, role: int = Qt.DisplayRole
     ) -> QVariant:
         """Retorna cabeçalho das colunas."""
         if role != Qt.DisplayRole:
             return QVariant()
-        
+
         if orientation == Qt.Horizontal and 0 <= section < len(self.COLUMNS):
             return QVariant(self.COLUMNS[section][0])
-        
+
         if orientation == Qt.Vertical:
             return QVariant(str(section + 1))
-        
+
         return QVariant()
-    
-    def data(
-        self,
-        index: QModelIndex,
-        role: int = Qt.DisplayRole
-    ) -> QVariant:
+
+    def data(self, index: QModelIndex, role: int = Qt.DisplayRole) -> QVariant:
         """Retorna dados para uma célula."""
         try:
             if not index.isValid():
                 return QVariant()
-            
+
             row = index.row()
             col = index.column()
-            
+
             if not (0 <= row < len(self._entries)):
                 return QVariant()
-            
+
             entry = self._entries[row]
             col_name = self.COLUMNS[col][1]
-            
+
             # Dados para exibição
             if role == Qt.DisplayRole:
                 text = self._get_display_text(entry, col_name)
                 return QVariant(text)
-            
+
             # Cor de texto (level - fonte colorida, não fundo)
             if role == Qt.ForegroundRole and col_name == "level":
                 try:
@@ -205,7 +208,7 @@ class LogTableModel(QAbstractTableModel):
                 except Exception as e:
                     self._logger.warning(f"Erro ao obter cor de level: {str(e)}")
                     return QVariant()
-            
+
             # Cor de texto (tool) - usando ClassColorProvider para determinismo
             if role == Qt.ForegroundRole and col_name == "tool":
                 try:
@@ -214,7 +217,7 @@ class LogTableModel(QAbstractTableModel):
                 except Exception as e:
                     self._logger.warning(f"Erro ao obter cor de tool: {str(e)}")
                     return QVariant()
-            
+
             # Cor de texto (class) - usando ClassColorProvider para determinismo
             if role == Qt.ForegroundRole and col_name == "class_name":
                 try:
@@ -223,22 +226,22 @@ class LogTableModel(QAbstractTableModel):
                 except Exception as e:
                     self._logger.warning(f"Erro ao obter cor de class_name: {str(e)}")
                     return QVariant()
-            
-            # Tooltip com informação completa
+
+            # Tooltip com informação completa (construir string segura)
             if role == Qt.ToolTipRole:
                 try:
-                    details = entry.get_full_details()
+                    details = f"{entry.ts} | {entry.level} | {entry.tool} | {entry.class_name}\n{entry.msg}"
                     return QVariant(details)
                 except Exception as e:
-                    self._logger.warning(f"Erro ao obter full_details: {str(e)}")
+                    self._logger.warning(f"Erro ao obter tooltip: {str(e)}")
                     return QVariant()
-            
+
             # User role para acesso programático (retornar entry diretamente)
             if role == Qt.UserRole:
                 return entry  # Retornar diretamente, não em QVariant
-            
+
             return QVariant()
-        
+
         except Exception as e:
             self._data_error_count += 1
             self._logger.error(
@@ -246,10 +249,10 @@ class LogTableModel(QAbstractTableModel):
                 error_type=type(e).__name__,
                 role=role,
                 index_row=index.row() if index.isValid() else -1,
-                index_col=index.column() if index.isValid() else -1
+                index_col=index.column() if index.isValid() else -1,
             )
             return QVariant()
-    
+
     def _get_display_text(self, entry: LogEntry, col_name: str) -> str:
         """Retorna texto a exibir para uma coluna."""
         if col_name == "ts":
@@ -263,27 +266,28 @@ class LogTableModel(QAbstractTableModel):
         elif col_name == "msg":
             return entry.get_short_message(100)
         return ""
-    
+
     def _get_level_color(self, level: str) -> str:
         """
         Retorna cor para nível de log.
         Importa cores de LogUtils.
         """
         from ....core.config.LogUtils import LogUtils
+
         return LogUtils.LEVEL_COLORS.get(level, "#FFFFFF")
-    
+
     def get_entry(self, index: QModelIndex) -> Optional[LogEntry]:
         """Retorna a entrada em um índice (para detalhe)."""
         if not index.isValid() or index.row() >= len(self._entries):
             return None
         return self._entries[index.row()]
-    
+
     def get_entry_at(self, row: int) -> Optional[LogEntry]:
         """Retorna a entrada em uma linha específica (por índice inteiro)."""
         if row < 0 or row >= len(self._entries):
             return None
         return self._entries[row]
-    
+
     def get_all_entries(self) -> List[LogEntry]:
         """Retorna todas as entradas."""
         return self._entries.copy()
