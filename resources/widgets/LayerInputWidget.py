@@ -125,12 +125,9 @@ class LayerInputWidget(QWidget):
         if isinstance(old, QgsVectorLayer):
             try:
                 old.selectionChanged.disconnect(self._update_selection_state)
-            except Exception as e:
-                try:
-                    logger.exception(e)
-                except Exception:
-                    # Fail-safe: não elevar exceção durante desconexão
-                    pass
+            except Exception as e:                
+                logger.exception(e)
+
 
     # --------------------------------------------------
     # Auto select
@@ -140,11 +137,8 @@ class LayerInputWidget(QWidget):
             from qgis.utils import iface
 
             layer = iface.activeLayer()
-        except Exception as e:
-            try:
-                logger.error(f"Erro ao obter activeLayer: {e}")
-            except Exception:
-                pass
+        except Exception as e:            
+            logger.error(f"Erro ao obter activeLayer: {e}")
             layer = None
 
         if layer and self._layer_matches_filter(layer):
