@@ -1,5 +1,5 @@
-from qgis.PyQt.QtWidgets import( QVBoxLayout, 
-QFrame, QApplication)
+# -*- coding: utf-8 -*-
+from qgis.PyQt.QtWidgets import QVBoxLayout, QFrame, QApplication
 from qgis.PyQt.QtWidgets import QLayout, QWidget
 from qgis.PyQt.QtCore import Qt, QPoint
 from qgis.PyQt.QtGui import QCursor
@@ -9,7 +9,10 @@ from .ScrollWidget import ScrollWidget
 from ...core.config.LogUtils import LogUtils
 from ...utils.ToolKeys import ToolKey
 
-logger = LogUtils(tool=ToolKey.CADMUS_PLUGIN, class_name="MainLayout", level=LogUtils.DEBUG)
+logger = LogUtils(
+    tool=ToolKey.CADMUS_PLUGIN, class_name="MainLayout", level=LogUtils.DEBUG
+)
+
 
 class EdgeFrame(QFrame):
     """QFrame que notifica o MainLayout quando for redimensionado."""
@@ -145,7 +148,9 @@ class MainLayout(QVBoxLayout):
         # layout interno real (sempre criado, com ou sem scroll)
         self._inner_layout = QVBoxLayout(self._frame)
         self._inner_layout.setContentsMargins(5, 5, 5, 5)
-        self._inner_layout.setSpacing(Styles.LAYOUT_V_SPACING)  # Consistente com ou sem scroll
+        self._inner_layout.setSpacing(
+            Styles.LAYOUT_V_SPACING
+        )  # Consistente com ou sem scroll
 
         # scroll widget (criado apenas se enable_scroll=True)
         self._scroll = None
@@ -176,10 +181,11 @@ class MainLayout(QVBoxLayout):
             parent.setMouseTracking(True)
         try:
             pname = type(parent).__name__ if parent is not None else None
-            logger.debug(f"MainLayout.__init__: parent={pname}, enable_scroll={enable_scroll}")
+            logger.debug(
+                f"MainLayout.__init__: parent={pname}, enable_scroll={enable_scroll}"
+            )
         except Exception as e:
             logger.error(f"MainLayout.__init__ debug log failed: {e}")
-    
 
     def addWidget(self, widget, *args, **kwargs):
         """
@@ -499,7 +505,6 @@ class MainLayout(QVBoxLayout):
 
         edge = self._get_resize_edge(mapped_pos)
 
-
         # SEMPRE atualiza o cursor baseado na posição atual
         # Mesmo quando não está em resize, isso garante que o cursor resete corretamente
         self._update_cursor(edge)
@@ -507,8 +512,6 @@ class MainLayout(QVBoxLayout):
             geom = self._parent_dialog.geometry()
         except Exception:
             logger.debug("handle_mouse_move: unable to read parent dialog geometry")
-            
-        
 
         if (
             self._resize_active

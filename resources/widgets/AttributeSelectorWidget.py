@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from qgis.PyQt.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout,
-    QLabel, QCheckBox, QListWidget, QPushButton, QListWidgetItem
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QLabel,
+    QCheckBox,
+    QListWidget,
+    QPushButton,
+    QListWidgetItem,
 )
 from qgis.PyQt.QtCore import Qt
 
@@ -53,12 +59,8 @@ class AttributeSelectorWidget(QWidget):
         # bindings
         self.chk_all.toggled.connect(self._on_chk_all_toggled)
 
-        self.btn_select.clicked.connect(
-            lambda: self._set_check_state(Qt.Checked)
-        )
-        self.btn_unselect.clicked.connect(
-            lambda: self._set_check_state(Qt.Unchecked)
-        )
+        self.btn_select.clicked.connect(lambda: self._set_check_state(Qt.Checked))
+        self.btn_unselect.clicked.connect(lambda: self._set_check_state(Qt.Unchecked))
         self.btn_invert.clicked.connect(self._invert_selection)
 
     # ------------------------------------------------------------------
@@ -85,10 +87,9 @@ class AttributeSelectorWidget(QWidget):
 
     def use_all_fields(self) -> bool:
         return self.chk_all.isChecked()
-    def set_checked_all(self,checked):
-        self.chk_all.setChecked(checked)
 
-    
+    def set_checked_all(self, checked):
+        self.chk_all.setChecked(checked)
 
     # ------------------------------------------------------------------
     # INTERNO
@@ -107,10 +108,11 @@ class AttributeSelectorWidget(QWidget):
 
     def _set_check_state(self, state):
         selected = self.list_widget.selectedItems()
-        items = selected if selected else [
-            self.list_widget.item(i)
-            for i in range(self.list_widget.count())
-        ]
+        items = (
+            selected
+            if selected
+            else [self.list_widget.item(i) for i in range(self.list_widget.count())]
+        )
         for item in items:
             item.setCheckState(state)
 

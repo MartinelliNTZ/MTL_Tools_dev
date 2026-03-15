@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from qgis.PyQt.QtWidgets import QWidget, QVBoxLayout, QGridLayout, QCheckBox, QLabel
 from typing import List
 from ...resources.styles.Styles import Styles
@@ -38,14 +39,24 @@ class DependentCheckBox(QCheckBox):
                     d.setChecked(False)
                 d.setEnabled(enabled)
             except Exception as e:
- 
-              self.logger.error(f"Erro em local: {e}")
-   
+
+                self.logger.error(f"Erro em local: {e}")
+
+
 class CheckboxGridWidget(QWidget):
     """
     Widget exclusivo para grid de checkboxes com suporte a dicionário chave→label.
     """
-    def __init__(self, options_dict, *, items_per_row=3, checked_by_default=False, title=None, parent=None):
+
+    def __init__(
+        self,
+        options_dict,
+        *,
+        items_per_row=3,
+        checked_by_default=False,
+        title=None,
+        parent=None,
+    ):
         super().__init__(parent)
         self.options_dict = options_dict
         self.items_per_row = items_per_row
@@ -100,6 +111,8 @@ class CheckboxGridWidget(QWidget):
         if not controller:
             return
 
-        dependents = [self.checkbox_map.get(k) for k in dependent_keys if self.checkbox_map.get(k)]
+        dependents = [
+            self.checkbox_map.get(k) for k in dependent_keys if self.checkbox_map.get(k)
+        ]
         if hasattr(controller, "set_dependents"):
             controller.set_dependents(dependents)

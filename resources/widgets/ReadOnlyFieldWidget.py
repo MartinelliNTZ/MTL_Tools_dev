@@ -11,10 +11,16 @@ Suporta agrupamento em múltiplas colunas e botão opcional "Copiar tudo".
 """
 
 from qgis.PyQt.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel,
-    QLineEdit, QPushButton, QSizePolicy
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QGridLayout,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QSizePolicy,
 )
-from qgis.PyQt.QtCore import Qt
+
 from typing import Dict, Optional, Any
 from ...utils.ProjectUtils import ProjectUtils
 
@@ -74,9 +80,9 @@ class ReadOnlyFieldWidget(QWidget):
             row = idx // self._num_columns
             col = idx % self._num_columns
 
-            title_text = info.get('title', str(key))
-            value = info.get('value', "")
-            btn_title = info.get('titlebutton', None) or default_button_title
+            title_text = info.get("title", str(key))
+            value = info.get("value", "")
+            btn_title = info.get("titlebutton", None) or default_button_title
 
             h = QHBoxLayout()
             h.setContentsMargins(0, 0, 0, 0)
@@ -124,6 +130,7 @@ class ReadOnlyFieldWidget(QWidget):
             _, le, _ = self._widgets.get(key, (None, None, None))
             if le:
                 ProjectUtils.set_clipboard_text(le.text())
+
         return _cb
 
     def _copy_all(self):

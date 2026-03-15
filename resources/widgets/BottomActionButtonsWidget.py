@@ -3,7 +3,6 @@
 from qgis.PyQt.QtWidgets import QWidget, QHBoxLayout, QPushButton
 
 
-
 class BottomActionButtonsWidget(QWidget):
     """
     Widget padronizado de botões inferiores (Run / Close / Info).
@@ -26,7 +25,6 @@ class BottomActionButtonsWidget(QWidget):
 
         self._tool_key = tool_key
         self._info_callback = info_callback
-
 
         self._btn_run = QPushButton(run_text)
         self._btn_close = QPushButton(close_text)

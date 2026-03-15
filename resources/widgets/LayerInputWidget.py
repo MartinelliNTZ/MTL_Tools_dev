@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from qgis.PyQt.QtWidgets import QWidget, QVBoxLayout, QLabel, QCheckBox
-from qgis.PyQt.QtCore import Qt, pyqtSignal
+from qgis.PyQt.QtCore import pyqtSignal
 from qgis.gui import QgsMapLayerComboBox
 from qgis.core import QgsVectorLayer, QgsMapLayerProxyModel, QgsProject
 from ...core.config.LogUtils import LogUtils
@@ -30,7 +30,7 @@ class LayerInputWidget(QWidget):
         *,
         allow_empty: bool = True,
         enable_selected_checkbox: bool = True,
-        parent=None
+        parent=None,
     ):
         super().__init__(parent)
 
