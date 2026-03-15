@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # utils/log_utils_new.py
 import json
 import threading
@@ -12,12 +13,14 @@ from .log_sync import LOG_FILE_LOCK
 
 try:
     from qgis.core import QgsMessageLog, Qgis
+
     QGIS_AVAILABLE = True
 except ImportError:
     QGIS_AVAILABLE = False
 
+
 class LogUtils:
-    #C:\Users\<usuario>\AppData\Roaming\QGIS\QGIS3\Cadmus
+    # C:\Users\<usuario>\AppData\Roaming\QGIS\QGIS3\Cadmus
     DEBUG = "DEBUG"
     INFO = "INFO"
     WARNING = "WARNING"
@@ -25,11 +28,11 @@ class LogUtils:
     CRITICAL = "CRITICAL"
     # Cores para níveis de log
     LEVEL_COLORS = {
-        'DEBUG': '#9CA3AF',      # Cinza (suave)
-        'INFO': '#10B981',       # Verde (informação)
-        'WARNING': '#F59E0B',    # Âmbar (atenção)
-        'ERROR': '#DC2626',      # Vermelho forte (erro)
-        'CRITICAL': '#991B1B'    # Vermelho escuro muito forte (crítico)
+        "DEBUG": "#9CA3AF",  # Cinza (suave)
+        "INFO": "#10B981",  # Verde (informação)
+        "WARNING": "#F59E0B",  # Âmbar (atenção)
+        "ERROR": "#DC2626",  # Vermelho forte (erro)
+        "CRITICAL": "#991B1B",  # Vermelho escuro muito forte (crítico)
     }
     LEVEL_ORDER = [DEBUG, INFO, WARNING, ERROR, CRITICAL]
 
@@ -63,7 +66,7 @@ class LogUtils:
             tool=ToolKey.SYSTEM,
             class_name="LogUtilsNew",
             code="LOG_START",
-            data={}
+            data={},
         )
 
     # ---------- instância ----------
@@ -106,16 +109,11 @@ class LogUtils:
         data["exception"] = {
             "type": type(exc).__name__,
             "message": str(exc),
-            "traceback": tb
+            "traceback": tb,
         }
 
         self._write_event(
-            self.ERROR,
-            "Unhandled exception",
-            self.tool,
-            self.class_name,
-            code,
-            data
+            self.ERROR, "Unhandled exception", self.tool, self.class_name, code, data
         )
 
     # ---------- internos ----------
@@ -144,7 +142,7 @@ class LogUtils:
             "class": class_name or "UnknownClass",
             "code": code,
             "msg": msg,
-            "data": data or {}
+            "data": data or {},
         }
 
         with LOG_FILE_LOCK:
@@ -152,9 +150,23 @@ class LogUtils:
                 with open(cls._log_file, "a", encoding="utf-8") as f:
                     json.dump(event, f, ensure_ascii=False)
                     f.write("\n")
-            except Exception:
-                pass
+            except Exception as e:
+                try:
+                    if QGIS_AVAILABLE:
+                        # registrar falha de escrita no log do QGIS
+                        QgsMessageLog.logMessage(
+                            f"Falha ao gravar log do Cadmus: {e}",
+                            cls._plugin_name,
+                            Qgis.Warning,
+                        )
+                    else:
+                        # fallback simples para stderr
+                        import sys
 
+                        sys.stderr.write(f"Cadmus LogUtils write error: {e}\n")
+                except Exception:
+                    # nada a fazer se até o fallback falhar
+                    pass
         # Registrar CRITICAL e ERROR também no QgsMessageLog oficial do QGIS
         if QGIS_AVAILABLE and level in (cls.CRITICAL, cls.ERROR):
             full_msg = f"[{tool}:{class_name}] {msg}"

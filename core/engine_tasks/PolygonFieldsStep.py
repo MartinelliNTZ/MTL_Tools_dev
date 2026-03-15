@@ -12,7 +12,7 @@ import tempfile
 class PolygonFieldsStep(BaseStep):
     """
     Step para calcular área de polígonos.
-    
+
     Padrão GenerateTrail: task salva em GPKG, on_success() apenas copia PATH.
     """
 
@@ -32,7 +32,7 @@ class PolygonFieldsStep(BaseStep):
             field_map=context.get("field_map"),
             precision=context.get("precision", 4),
             tool_key=context.get("tool_key"),
-            tmp_dir=tmp_dir
+            tmp_dir=tmp_dir,
         )
 
     def on_success(self, context: ExecutionContext, result):
@@ -40,20 +40,18 @@ class PolygonFieldsStep(BaseStep):
         Apply attribute mappings computed by the task on the MAIN THREAD.
         Result expected shape: { 'updates': {fid: {field_name: value}}, 'missing_fields': [field_name,...] }
         """
-        logger = LogUtils(tool=context.get("tool_key"), class_name=self.__class__.__name__)
+        logger = LogUtils(
+            tool=context.get("tool_key"), class_name=self.__class__.__name__
+        )
         logger.info("PolygonFieldsStep.on_success: applying results")
 
         if not result or not isinstance(result, dict):
-            logger.error(
-                f"PolygonFieldsStep.on_success: resultado inválido: {result}"
-            )
+            logger.error(f"PolygonFieldsStep.on_success: resultado inválido: {result}")
             return
 
         layer = context.get("layer")
         if layer is None:
-            logger.error(
-                "PolygonFieldsStep.on_success: layer ausente no contexto"
-            )
+            logger.error("PolygonFieldsStep.on_success: layer ausente no contexto")
             return
 
         precision = context.get("precision", 4)
@@ -66,10 +64,10 @@ class PolygonFieldsStep(BaseStep):
                 layer.startEditing()
                 started_editing = True
             for fname in missing:
-                logger.debug(
-                    f"PolygonFieldsStep: adicionando campo (edição) {fname}"
+                logger.debug(f"PolygonFieldsStep: adicionando campo (edição) {fname}")
+                layer.addAttribute(
+                    QgsField(fname, QVariant.Double, len=20, prec=precision)
                 )
-                layer.addAttribute(QgsField(fname, QVariant.Double, len=20, prec=precision))
             layer.updateFields()
 
         # 2) Build provider-compatible mapping (fid -> {field_index: value})
@@ -88,26 +86,22 @@ class PolygonFieldsStep(BaseStep):
 
         # 3) Apply in batches on main thread
         if not provider_updates:
-            logger.info(
-                "PolygonFieldsStep: nada a aplicar"
-            )
+            logger.info("PolygonFieldsStep: nada a aplicar")
             return
 
         items = list(provider_updates.items())
         total = len(items)
         chunk = 2000
-        
+
         # Bloquear signals da layer durante atualização em batch para evitar overhead
         layer.blockSignals(True)
         try:
             for i in range(0, total, chunk):
                 if context.is_cancelled():
-                    logger.info(
-                        "PolygonFieldsStep: cancelado durante aplicação"
-                    )
+                    logger.info("PolygonFieldsStep: cancelado durante aplicação")
                     break
 
-                batch_items = dict(items[i:i+chunk])
+                batch_items = dict(items[i : i + chunk])
                 for fid, idx_map in batch_items.items():
                     for idx, val in idx_map.items():
                         try:

@@ -9,8 +9,11 @@ Responsável por:
 """
 
 import os
-import subprocess
+import sys
 from pathlib import Path
+from qgis.PyQt.QtCore import QProcess
+from qgis.PyQt.QtWidgets import QProgressDialog, QApplication, QMessageBox
+from .QgisMessageUtil import QgisMessageUtil
 
 
 class DependenciesManager:
@@ -115,34 +118,78 @@ class DependenciesManager:
     @staticmethod
     def install_dependency(dependency_name: str) -> bool:
         """
-        Tenta instalar uma dependência executando o script .cmd/.bat.
-        
-        Parameters
-        ----------
-        dependency_name : str
-            Nome da dependência (ex: 'PyPDF2', 'Pillow')
-        
-        Returns
-        -------
-        bool
-            True se instalação foi bem-sucedida, False caso contrário
-        
-        Example
-        -------
-        success = DependenciesManager.install_dependency('PyPDF2')
-        if success:
-            print("PyPDF2 instalada com sucesso")
+        Instala a dependência usando o Python (`-m pip install --user ...`) de forma
+        assíncrona via `QProcess` para evitar execução de scripts .bat e evitar
+        uso de `shell=True`.
+
+        Este método tenta iniciar o processo de instalação e retorna True se o
+        processo foi iniciado com sucesso. A instalação é feita de forma
+        não-bloqueante; para UI e feedback passe o parâmetro `iface` usando a
+        função `install_dependency_gui` ou chame com `iface` quando disponível.
         """
-        script_path = DependenciesManager.get_install_script_path(dependency_name)
-        
-        if not script_path:
+        dep_info = DependenciesManager.get_dependency_info(dependency_name)
+        if not dep_info:
             return False
-        
-        try:
-            subprocess.Popen([script_path], shell=True)
+
+        pip_name = dep_info.get('pip', dependency_name)
+
+        python_exe = sys.executable or 'python'
+
+        # Use QProcess.startDetached como fallback (sem UI). Retorna True se o
+        # processo foi iniciado corretamente.
+        started = QProcess.startDetached(python_exe, ["-m", "pip", "install", "--user", pip_name])
+        if started:
+            QgisMessageUtil.bar_info(None, f"Instalação iniciada: {pip_name}")
             return True
-        except Exception:
+
+        return False
+
+    @staticmethod
+    def install_dependency_gui(dependency_name: str, iface) -> bool:
+        """
+        Instala a dependência mostrando um diálogo de progresso não-bloqueante.
+
+        - `dependency_name`: nome da dependência (ex: 'PyPDF2')
+        - `iface`: QgisInterface para parent do diálogo
+
+        Retorna True se o processo de instalação foi iniciado, False caso contrário.
+        """
+        dep_info = DependenciesManager.get_dependency_info(dependency_name)
+        if not dep_info:
             return False
+
+        pip_name = dep_info.get('pip', dependency_name)
+        python_exe = sys.executable or 'python'
+
+        parent = iface.mainWindow() if iface else None
+        progress = QProgressDialog(f"Instalando dependência {pip_name}...", "Cancelar", 0, 0, parent)
+        progress.setWindowTitle("Instalando dependências")
+        progress.setAutoClose(True)
+        progress.setModal(True)
+        progress.show()
+
+        proc = QProcess(parent)
+
+        def _on_finished(exit_code, exit_status):
+            progress.close()
+            if exit_code == 0:
+                QgisMessageUtil.bar_info(iface, f"Dependência instalada: {pip_name}")
+            else:
+                QgisMessageUtil.modal_error(iface, f"Falha ao instalar {pip_name}. Código: {exit_code}")
+
+        def _on_error(err):
+            progress.close()
+            QgisMessageUtil.modal_error(iface, f"Erro ao iniciar instalação: {err}")
+
+        proc.finished.connect(_on_finished)
+        proc.errorOccurred.connect(_on_error)
+
+        started = proc.start(python_exe, ["-m", "pip", "install", "--user", pip_name])
+        if not started:
+            progress.close()
+            return False
+
+        return True
     
     @staticmethod
     def validate_dependencies(required_dependencies: list) -> dict:

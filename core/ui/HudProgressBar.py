@@ -8,13 +8,9 @@ class HudProgressBar(QWidget):
     def __init__(self, title="PROCESSING DATA"):
         super().__init__()
 
-        self.setWindowFlags(
-            Qt.FramelessWindowHint |
-            Qt.WindowStaysOnTopHint |
-            Qt.Tool
-        )
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Tool)
 
-        #self.setAttribute(Qt.WA_TranslucentBackground)
+        # self.setAttribute(Qt.WA_TranslucentBackground)
 
         layout = QVBoxLayout()
 

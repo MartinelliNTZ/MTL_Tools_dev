@@ -10,18 +10,12 @@ Responsabilidades:
 - Execução do Script: Gerenciada por _RestartExecutor
 - Logging: Estruturado via LogUtilsNew
 """
-
 import os
-import subprocess
-import tempfile
+from qgis.PyQt.QtCore import QCoreApplication, QProcess
 from typing import Optional
-
 from qgis.core import QgsProject
-from qgis.PyQt.QtCore import QCoreApplication
-
 from ..core.config.LogUtils import LogUtils
 from ..utils.QgisMessageUtil import QgisMessageUtil
-from ..utils.ProjectUtils import ProjectUtils
 
 logger = LogUtils(tool="restart_qgis", class_name="RestartQGIS")
 
@@ -52,70 +46,68 @@ class _RestartExecutor:
         return None
     
     @staticmethod
-    def create_restart_script(project_path: str) -> Optional[str]:
-        """Cria script .bat temporário para reabrir QGIS com o projeto.
-        
-        Args:
-            project_path: Caminho completo do arquivo .qgz
-            
-        Returns:
-            Caminho do script .bat ou None se falhar.
+    def create_restart_script(project_path: str) -> Optional[list]:
+        """Prepara comando (lista) para reabrir QGIS com o projeto.
+
+        Retorna uma lista de argumentos adequada para passar a
+        `subprocess.Popen(cmd, shell=False)`. Não cria .bat nem usa shell.
         """
         qgis_exec = _RestartExecutor.get_qgis_executable()
         if not qgis_exec:
             logger.error(
-                "Cannot create restart script: QGIS executable not found",
+                "Cannot prepare restart command: QGIS executable not found",
                 code="RESTART_NO_EXEC"
             )
             return None
-        
+
         try:
-            bat_path = os.path.join(tempfile.gettempdir(), "restart_qgis.bat")
-            
-            with open(bat_path, "w", encoding="utf-8") as f:
-                f.write("@echo off\n")
-                f.write("PING 127.0.0.1 -n 2 >NUL\n")
-                f.write(f'start "" "{qgis_exec}" "{project_path}"\n')
-            
+            cmd = [qgis_exec, project_path]
             logger.info(
-                "Restart script created",
-                code="RESTART_SCRIPT_OK",
-                bat_path=bat_path
+                "Restart command prepared",
+                code="RESTART_CMD_OK",
+                cmd=cmd
             )
-            return bat_path
-            
+            return cmd
         except Exception as e:
             logger.error(
-                "Failed to create restart script",
-                code="RESTART_SCRIPT_ERROR",
+                "Failed to prepare restart command",
+                code="RESTART_CMD_ERROR",
                 error=str(e)
             )
             return None
     
     @staticmethod
-    def execute_restart(bat_path: str) -> None:
-        """Executa o script .bat e fecha a aplicação QGIS.
-        
-        Args:
-            bat_path: Caminho do script .bat a executar.
+    def execute_restart(cmd: list) -> None:
+        """Registra callback para executar `cmd` quando o QGIS estiver saindo.
+
+        O comando é executado com `shell=False` para evitar injeção de shell (B602).
         """
-        def _run_script():
+        def _run_cmd():
             try:
-                subprocess.Popen(bat_path, shell=True)
-                logger.info(
-                    "Restart script executed",
-                    code="RESTART_EXECUTED",
-                    bat_path=bat_path
-                )
+                exe = cmd[0]
+                args = cmd[1:]
+                started = QProcess.startDetached(exe, args)
+                if started:
+                    logger.info(
+                        "Restart command executed (detached)",
+                        code="RESTART_EXECUTED",
+                        cmd=cmd
+                    )
+                else:
+                    logger.critical(
+                        "Failed to start detached process",
+                        code="RESTART_EXEC_ERROR",
+                        cmd=cmd
+                    )
             except Exception as e:
                 logger.critical(
-                    "Failed to execute restart script",
+                    "Failed to execute restart command",
                     code="RESTART_EXEC_ERROR",
                     error=str(e)
                 )
-        
+
         app = QCoreApplication.instance()
-        app.aboutToQuit.connect(_run_script)
+        app.aboutToQuit.connect(_run_cmd)
         logger.info("Restart queued: will execute on QGIS shutdown", code="RESTART_QUEUED")
 
 
@@ -200,12 +192,12 @@ def run_restart_qgis(iface) -> None:
         return
     
     # 3) Criar script .bat para reabrir QGIS
-    bat_path = _RestartExecutor.create_restart_script(project_path)
-    
-    if not bat_path:
+    cmd = _RestartExecutor.create_restart_script(project_path)
+
+    if not cmd:
         logger.critical(
-            "Cannot restart: failed to create restart script",
-            code="RESTART_NO_SCRIPT"
+            "Cannot restart: failed to prepare restart command",
+            code="RESTART_NO_CMD"
         )
         QgisMessageUtil.modal_error(
             iface,
@@ -214,10 +206,10 @@ def run_restart_qgis(iface) -> None:
             title="Erro"
         )
         return
-    
-    # 4) Executar restart
-    logger.info("Executing restart sequence", code="RESTART_EXECUTING", bat_path=bat_path)
-    _RestartExecutor.execute_restart(bat_path)
+
+    # 4) Executar restart (agendado para aboutToQuit)
+    logger.info("Executing restart sequence (scheduled)", code="RESTART_EXECUTING", cmd=cmd)
+    _RestartExecutor.execute_restart(cmd)
     
     # 5) Fechar QGIS
     logger.info("Closing QGIS to start restart", code="RESTART_CLOSING")

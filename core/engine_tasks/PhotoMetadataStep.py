@@ -5,7 +5,6 @@ from ..task.PhotoMetadataTask import PhotoMetadataTask
 from ..config.LogUtils import LogUtils
 from qgis.core import QgsField
 from qgis.PyQt.QtCore import QVariant
-from qgis.PyQt.QtWidgets import QApplication
 
 
 class PhotoMetadataStep(BaseStep):
@@ -50,7 +49,9 @@ class PhotoMetadataStep(BaseStep):
         LogUtils(
             tool=context.get("tool_key"),
             class_name=self.__class__.__name__,
-        ).debug(f"Aplicando metadados em {len(updates)} itens. Campos esperados: {field_names}")
+        ).debug(
+            f"Aplicando metadados em {len(updates)} itens. Campos esperados: {field_names}"
+        )
 
         # Adicionar campos faltantes
         missing_fields = [f for f in field_names if layer.fields().indexOf(f) == -1]
@@ -97,8 +98,14 @@ class PhotoMetadataStep(BaseStep):
                         continue
                     try:
                         layer.changeAttributeValue(fid, idx, value)
-                    except Exception:
-                        pass
+                    except Exception as e:
+                        LogUtils(
+                            tool=context.get("tool_key"),
+                            class_name=self.__class__.__name__,
+                        ).error(
+                            f"Erro aplicando atributo foto={foto} field={field_name}: {e}"
+                        )
+
             # Comentar commit para manter no buffer de edição caso o usuário queira revisar
         finally:
             layer.blockSignals(False)
@@ -106,14 +113,17 @@ class PhotoMetadataStep(BaseStep):
         if started_editing:
             try:
                 layer.commitChanges()
-            except Exception:
-                pass
+            except Exception as e:
+                LogUtils(
+                    tool=context.get("tool_key"), class_name=self.__class__.__name__
+                ).error(f"Erro ao commitar alterações na camada: {e}")
 
         try:
             layer.triggerRepaint()
-        except Exception:
-            pass
-
+        except Exception as e:
+            LogUtils(
+                tool=context.get("tool_key"), class_name=self.__class__.__name__
+            ).error(f"Erro ao repintar camada: {e}")
         LogUtils(
             tool=context.get("tool_key"),
             class_name=self.__class__.__name__,

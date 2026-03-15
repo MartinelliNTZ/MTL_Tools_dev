@@ -14,7 +14,6 @@ from .ToolKeys import ToolKey
 from .QgisMessageUtil import QgisMessageUtil
 from .DependenciesManager import DependenciesManager
 from .FormatUtils import FormatUtils
-from .Preferences import load_tool_prefs, save_tool_prefs, Preferences
 from .StringUtils import StringUtils
 
 __all__ = [
@@ -22,9 +21,6 @@ __all__ = [
 	"QgisMessageUtil",
 	"DependenciesManager",
 	"FormatUtils",
-	"load_tool_prefs",
-	"save_tool_prefs",
-	"Preferences",
 	"StringUtils",
 ]
 

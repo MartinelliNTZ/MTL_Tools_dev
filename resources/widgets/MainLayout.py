@@ -27,9 +27,8 @@ class EdgeFrame(QFrame):
         try:
             if self._owner_layout:
                 self._owner_layout._update_border_geometries()
-        except Exception:
-            pass
-
+        except Exception as e:
+            logger.error(f"EdgeFrame.resizeEvent error: {e}")
 
 class BorderHitWidget(QWidget):
     """Widget invisível que representa uma borda "hit-only" para captura de mouse.
@@ -48,24 +47,24 @@ class BorderHitWidget(QWidget):
         try:
          #   logger.debug(f"BorderHitWidget.enterEvent: edge={self._edge}")
             self._layout._update_cursor(self._edge)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error(f"BorderHitWidget.enterEvent error: {e}")
 
     def leaveEvent(self, event):
         try:
             #logger.debug(f"BorderHitWidget.leaveEvent: edge={self._edge}")
             self._layout._update_cursor(None)
             QApplication.restoreOverrideCursor()
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error(f"BorderHitWidget.leaveEvent error: {e}")
 
     def mousePressEvent(self, event):
         try:
             #logger.debug(f"BorderHitWidget.mousePressEvent: edge={self._edge}")
             self._layout._start_resize_from_edge(event, self._edge)
             event.accept()
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error(f"BorderHitWidget.mousePressEvent error: {e}")
 
     def mouseMoveEvent(self, event):
         try:
@@ -73,17 +72,17 @@ class BorderHitWidget(QWidget):
                 self._layout._perform_resize_move(event)
             else:
                 self._layout._update_cursor(self._edge)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error(f"BorderHitWidget.mouseMoveEvent error: {e}")
 
     def mouseReleaseEvent(self, event):
         try:
             #logger.debug(f"BorderHitWidget.mouseReleaseEvent: edge={self._edge}")
             self._layout._end_resize()
             event.accept()
-        except Exception:
-            pass
-
+        except Exception as e: 
+            self.logger.error(f"Erro em local: {e}")
+   
 class MainLayout(QVBoxLayout):
     def set_appbar_title(self, title: str):
         """Atualiza o título da AppBar se presente."""
@@ -137,8 +136,8 @@ class MainLayout(QVBoxLayout):
         self._frame.setMouseTracking(True)  # Ativa rastreamento no frame
         try:
             self._frame.set_owner_layout(self)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error(f"MainLayout.__init__ set_owner_layout error: {e}")
         # layout interno real (sempre criado, com ou sem scroll)
         self._inner_layout = QVBoxLayout(self._frame)
         self._inner_layout.setContentsMargins(5, 5, 5, 5)
@@ -165,16 +164,18 @@ class MainLayout(QVBoxLayout):
         try:
             self._create_border_widgets()
             self._update_border_geometries()
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error(f"MainLayout.__init__ border widgets init error: {e}")
+
         # Ativa rastreamento de mouse para atualizar cursor continuamente
         if parent:
             parent.setMouseTracking(True)
         try:
             pname = type(parent).__name__ if parent is not None else None
             logger.debug(f"MainLayout.__init__: parent={pname}, enable_scroll={enable_scroll}")
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error(f"MainLayout.__init__ debug log failed: {e}")
+    
 
     def addWidget(self, widget, *args, **kwargs):
         """

@@ -21,7 +21,9 @@ class AltimetryStep(BaseStep):
         return task
 
     def on_success(self, context: ExecutionContext, result):
-        logger = LogUtils(tool=context.get("tool_key"), class_name=self.__class__.__name__)
+        logger = LogUtils(
+            tool=context.get("tool_key"), class_name=self.__class__.__name__
+        )
         try:
             dialog = context.get("dialog")
             if dialog:
@@ -31,11 +33,13 @@ class AltimetryStep(BaseStep):
             logger.error(f"AltimetryStep.on_success error: {e}")
 
     def on_error(self, context: ExecutionContext, exception: Exception) -> None:
-        logger = LogUtils(tool=context.get("tool_key"), class_name=self.__class__.__name__)
+        logger = LogUtils(
+            tool=context.get("tool_key"), class_name=self.__class__.__name__
+        )
         try:
             dialog = context.get("dialog")
             if dialog:
                 dialog.set_altitude(None)
             logger.warning(f"AltimetryStep.on_error: {exception}")
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error(f"AltimetryStep.on_error error: {e}")

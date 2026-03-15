@@ -1,6 +1,10 @@
 import os
 import json
 from qgis.PyQt.QtCore import QStandardPaths
+from ..core.config.LogUtils import LogUtils
+
+# module logger for preferences utils
+logger = LogUtils(tool="preferences", class_name="Preferences")
 
 class Preferences:
     """Gerencia as preferências do plugin, armazenando em um JSON local."""
@@ -24,7 +28,8 @@ class Preferences:
         try:
             with open(Preferences.PREF_FILE, "r", encoding="utf-8") as f:
                 return json.load(f)
-        except Exception:
+        except Exception as e:
+            logger.error(f"Erro ao carregar preferences file: {e}")
             return {}
 
     def save_prefs(data):
@@ -64,7 +69,8 @@ def load_prefs():
     try:
         with open(PREF_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
-    except Exception:
+    except Exception as e:
+        logger.error(f"Erro ao carregar deprecated preferences file: {e}")
         return {}
 
 def save_prefs(data):

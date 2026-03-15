@@ -80,12 +80,20 @@ pre {
         <div class="metrics-title">
             Metrics:<br>
         </div>
-        Total lines of code: <span id="loc">17720</span><br>
+        Total lines of code: <span id="loc">17797</span><br>
         Total lines skipped (#nosec): <span id="nosec">0</span>
     </div>
 </div>
 
 
+
+<br>
+<div id="skipped">
+<div class="bordered-box">
+<b>Skipped files:</b><br><br>
+.\resources\widgets\MainLayout.py <b>reason:</b> syntax error while parsing AST from file<br>
+</div>
+</div>
 
 
 <br>
@@ -122,16 +130,17 @@ pre {
     <b>Severity: </b>LOW<br>
     <b>Confidence: </b>HIGH<br>
     <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\core\config\LogCleanupUtils.py" target="_blank">.\core\config\LogCleanupUtils.py</a><br>
-    <b>Line number: </b>27<br>
+    <b>File: </b><a href=".\core\config\LogUtils.py" target="_blank">.\core\config\LogUtils.py</a><br>
+    <b>Line number: </b>164<br>
     <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
 
 <div class="code">
 <pre>
-26	                old.unlink()
-27	            except Exception:
-28	                pass
-29	    
+163	                        sys.stderr.write(f&quot;Cadmus LogUtils write error: {e}\n&quot;)
+164	                except Exception:
+165	                    # nada a fazer se até o fallback falhar
+166	                    pass
+167	        # Registrar CRITICAL e ERROR também no QgsMessageLog oficial do QGIS
 </pre>
 </div>
 
@@ -140,101 +149,6 @@ pre {
 </div>
 
 <div id="issue-2">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\core\config\LogCleanupUtils.py" target="_blank">.\core\config\LogCleanupUtils.py</a><br>
-    <b>Line number: </b>50<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-49	                deleted_count += 1
-50	            except Exception:
-51	                pass  # Continuar mesmo se falhar em um arquivo
-52	        
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-3">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\core\config\LogUtils.py" target="_blank">.\core\config\LogUtils.py</a><br>
-    <b>Line number: </b>155<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-154	                    f.write(&quot;\n&quot;)
-155	            except Exception:
-156	                pass
-157	
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-4">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\core\engine_tasks\AltimetryStep.py" target="_blank">.\core\engine_tasks\AltimetryStep.py</a><br>
-    <b>Line number: </b>40<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-39	            logger.warning(f&quot;AltimetryStep.on_error: {exception}&quot;)
-40	        except Exception:
-41	            pass
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-5">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\core\engine_tasks\AsyncPipelineEngine.py" target="_blank">.\core\engine_tasks\AsyncPipelineEngine.py</a><br>
-    <b>Line number: </b>136<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-135	            step.on_error(self._context, exception)
-136	        except Exception:
-137	            pass
-138	
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-6">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -258,7 +172,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-7">
+<div id="issue-3">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -282,7 +196,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-8">
+<div id="issue-4">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -306,247 +220,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-9">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\core\engine_tasks\ParallelStep.py" target="_blank">.\core\engine_tasks\ParallelStep.py</a><br>
-    <b>Line number: </b>51<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-50	            context.set(&quot;parallel_result&quot;, result)
-51	        except Exception:
-52	            pass
-53	
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-10">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\core\engine_tasks\ParallelStep.py" target="_blank">.\core\engine_tasks\ParallelStep.py</a><br>
-    <b>Line number: </b>58<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-57	            context.add_error(exception)
-58	        except Exception:
-59	            pass
-60	
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-11">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\core\engine_tasks\ParallelStep.py" target="_blank">.\core\engine_tasks\ParallelStep.py</a><br>
-    <b>Line number: </b>118<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-117	                                s.on_success(self._context, result)
-118	                            except Exception:
-119	                                pass
-120	                            with self._lock:
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-12">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\core\engine_tasks\ParallelStep.py" target="_blank">.\core\engine_tasks\ParallelStep.py</a><br>
-    <b>Line number: </b>135<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-134	                                s.on_error(self._context, exc)
-135	                            except Exception:
-136	                                pass
-137	                            with self._lock:
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-13">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\core\engine_tasks\ParallelStep.py" target="_blank">.\core\engine_tasks\ParallelStep.py</a><br>
-    <b>Line number: </b>145<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-144	                                        st.cancel()
-145	                                    except Exception:
-146	                                        pass
-147	                                self._done_event.set()
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-14">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\core\engine_tasks\ParallelStep.py" target="_blank">.\core\engine_tasks\ParallelStep.py</a><br>
-    <b>Line number: </b>159<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-158	                    task.progressChanged.connect(self._on_subtask_progress)
-159	                except Exception:
-160	                    pass
-161	
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-15">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\core\engine_tasks\ParallelStep.py" target="_blank">.\core\engine_tasks\ParallelStep.py</a><br>
-    <b>Line number: </b>181<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-180	                            s.cancel()
-181	                        except Exception:
-182	                            pass
-183	                    self._done_event.set()
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-16">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\core\engine_tasks\ParallelStep.py" target="_blank">.\core\engine_tasks\ParallelStep.py</a><br>
-    <b>Line number: </b>193<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-192	                        st.cancel()
-193	                    except Exception:
-194	                        pass
-195	                self._done_event.set()
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-17">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\core\engine_tasks\ParallelStep.py" target="_blank">.\core\engine_tasks\ParallelStep.py</a><br>
-    <b>Line number: </b>214<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-213	                self.setProgress(int(group_progress))
-214	            except Exception:
-215	                pass
-216	        except Exception:
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-18">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\core\engine_tasks\ParallelStep.py" target="_blank">.\core\engine_tasks\ParallelStep.py</a><br>
-    <b>Line number: </b>216<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-215	                pass
-216	        except Exception:
-217	            pass
-218	
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-19">
+<div id="issue-5">
 <div class="issue-block issue-sev-low">
     <b>try_except_continue: </b> Try, Except, Continue detected.<br>
     <b>Test ID:</b> B112<br>
@@ -570,79 +244,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-20">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\core\engine_tasks\PhotoMetadataStep.py" target="_blank">.\core\engine_tasks\PhotoMetadataStep.py</a><br>
-    <b>Line number: </b>100<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-99	                        layer.changeAttributeValue(fid, idx, value)
-100	                    except Exception:
-101	                        pass
-102	            # Comentar commit para manter no buffer de edição caso o usuário queira revisar
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-21">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\core\engine_tasks\PhotoMetadataStep.py" target="_blank">.\core\engine_tasks\PhotoMetadataStep.py</a><br>
-    <b>Line number: </b>109<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-108	                layer.commitChanges()
-109	            except Exception:
-110	                pass
-111	
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-22">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\core\engine_tasks\PhotoMetadataStep.py" target="_blank">.\core\engine_tasks\PhotoMetadataStep.py</a><br>
-    <b>Line number: </b>114<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-113	            layer.triggerRepaint()
-114	        except Exception:
-115	            pass
-116	
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-23">
+<div id="issue-6">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -665,7 +267,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-24">
+<div id="issue-7">
 <div class="issue-block issue-sev-low">
     <b>try_except_continue: </b> Try, Except, Continue detected.<br>
     <b>Test ID:</b> B112<br>
@@ -689,7 +291,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-25">
+<div id="issue-8">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -713,7 +315,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-26">
+<div id="issue-9">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -737,7 +339,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-27">
+<div id="issue-10">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -761,7 +363,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-28">
+<div id="issue-11">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -784,7 +386,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-29">
+<div id="issue-12">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -808,7 +410,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-30">
+<div id="issue-13">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -832,7 +434,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-31">
+<div id="issue-14">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -856,7 +458,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-32">
+<div id="issue-15">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -880,7 +482,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-33">
+<div id="issue-16">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -904,7 +506,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-34">
+<div id="issue-17">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -929,7 +531,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-35">
+<div id="issue-18">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -954,53 +556,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-36">
-<div class="issue-block issue-sev-low">
-    <b>blacklist: </b> Consider possible security implications associated with the subprocess module.<br>
-    <b>Test ID:</b> B404<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/78.html" target="_blank">CWE-78</a><br>
-    <b>File: </b><a href=".\plugins\RestartQgis.py" target="_blank">.\plugins\RestartQgis.py</a><br>
-    <b>Line number: </b>15<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess" target="_blank">https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess</a><br>
-
-<div class="code">
-<pre>
-14	import os
-15	import subprocess
-16	import tempfile
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-37">
-<div class="issue-block issue-sev-high">
-    <b>subprocess_popen_with_shell_equals_true: </b> subprocess call with shell=True identified, security issue.<br>
-    <b>Test ID:</b> B602<br>
-    <b>Severity: </b>HIGH<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/78.html" target="_blank">CWE-78</a><br>
-    <b>File: </b><a href=".\plugins\RestartQgis.py" target="_blank">.\plugins\RestartQgis.py</a><br>
-    <b>Line number: </b>104<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b602_subprocess_popen_with_shell_equals_true.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b602_subprocess_popen_with_shell_equals_true.html</a><br>
-
-<div class="code">
-<pre>
-103	            try:
-104	                subprocess.Popen(bat_path, shell=True)
-105	                logger.info(
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-38">
+<div id="issue-19">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1024,7 +580,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-39">
+<div id="issue-20">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1048,7 +604,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-40">
+<div id="issue-21">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1072,7 +628,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-41">
+<div id="issue-22">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1096,7 +652,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-42">
+<div id="issue-23">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1120,7 +676,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-43">
+<div id="issue-24">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1144,7 +700,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-44">
+<div id="issue-25">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1168,7 +724,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-45">
+<div id="issue-26">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1192,7 +748,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-46">
+<div id="issue-27">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1216,7 +772,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-47">
+<div id="issue-28">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1240,7 +796,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-48">
+<div id="issue-29">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1264,7 +820,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-49">
+<div id="issue-30">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1288,7 +844,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-50">
+<div id="issue-31">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1312,7 +868,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-51">
+<div id="issue-32">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1336,7 +892,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-52">
+<div id="issue-33">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1360,7 +916,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-53">
+<div id="issue-34">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1384,7 +940,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-54">
+<div id="issue-35">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1408,7 +964,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-55">
+<div id="issue-36">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1432,7 +988,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-56">
+<div id="issue-37">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1456,7 +1012,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-57">
+<div id="issue-38">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1480,7 +1036,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-58">
+<div id="issue-39">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1504,7 +1060,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-59">
+<div id="issue-40">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1528,7 +1084,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-60">
+<div id="issue-41">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1552,7 +1108,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-61">
+<div id="issue-42">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1576,7 +1132,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-62">
+<div id="issue-43">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1600,7 +1156,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-63">
+<div id="issue-44">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1624,7 +1180,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-64">
+<div id="issue-45">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1648,7 +1204,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-65">
+<div id="issue-46">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1672,7 +1228,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-66">
+<div id="issue-47">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1696,7 +1252,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-67">
+<div id="issue-48">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1720,7 +1276,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-68">
+<div id="issue-49">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1744,7 +1300,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-69">
+<div id="issue-50">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1768,7 +1324,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-70">
+<div id="issue-51">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1792,7 +1348,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-71">
+<div id="issue-52">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1816,7 +1372,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-72">
+<div id="issue-53">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1840,7 +1396,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-73">
+<div id="issue-54">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1864,7 +1420,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-74">
+<div id="issue-55">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1888,7 +1444,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-75">
+<div id="issue-56">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1911,7 +1467,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-76">
+<div id="issue-57">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1935,7 +1491,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-77">
+<div id="issue-58">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1960,7 +1516,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-78">
+<div id="issue-59">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -1984,7 +1540,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-79">
+<div id="issue-60">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -2008,7 +1564,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-80">
+<div id="issue-61">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -2032,7 +1588,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-81">
+<div id="issue-62">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -2056,7 +1612,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-82">
+<div id="issue-63">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -2080,31 +1636,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-83">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\resources\widgets\CheckboxGridWidget.py" target="_blank">.\resources\widgets\CheckboxGridWidget.py</a><br>
-    <b>Line number: </b>40<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-39	                d.setEnabled(enabled)
-40	            except Exception:
-41	                pass
-42	
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-84">
+<div id="issue-64">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -2128,7 +1660,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-85">
+<div id="issue-65">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -2152,247 +1684,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-86">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\resources\widgets\MainLayout.py" target="_blank">.\resources\widgets\MainLayout.py</a><br>
-    <b>Line number: </b>30<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-29	                self._owner_layout._update_border_geometries()
-30	        except Exception:
-31	            pass
-32	
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-87">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\resources\widgets\MainLayout.py" target="_blank">.\resources\widgets\MainLayout.py</a><br>
-    <b>Line number: </b>51<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-50	            self._layout._update_cursor(self._edge)
-51	        except Exception:
-52	            pass
-53	
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-88">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\resources\widgets\MainLayout.py" target="_blank">.\resources\widgets\MainLayout.py</a><br>
-    <b>Line number: </b>59<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-58	            QApplication.restoreOverrideCursor()
-59	        except Exception:
-60	            pass
-61	
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-89">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\resources\widgets\MainLayout.py" target="_blank">.\resources\widgets\MainLayout.py</a><br>
-    <b>Line number: </b>67<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-66	            event.accept()
-67	        except Exception:
-68	            pass
-69	
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-90">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\resources\widgets\MainLayout.py" target="_blank">.\resources\widgets\MainLayout.py</a><br>
-    <b>Line number: </b>76<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-75	                self._layout._update_cursor(self._edge)
-76	        except Exception:
-77	            pass
-78	
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-91">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\resources\widgets\MainLayout.py" target="_blank">.\resources\widgets\MainLayout.py</a><br>
-    <b>Line number: </b>84<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-83	            event.accept()
-84	        except Exception:
-85	            pass
-86	
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-92">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\resources\widgets\MainLayout.py" target="_blank">.\resources\widgets\MainLayout.py</a><br>
-    <b>Line number: </b>140<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-139	            self._frame.set_owner_layout(self)
-140	        except Exception:
-141	            pass
-142	        # layout interno real (sempre criado, com ou sem scroll)
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-93">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\resources\widgets\MainLayout.py" target="_blank">.\resources\widgets\MainLayout.py</a><br>
-    <b>Line number: </b>168<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-167	            self._update_border_geometries()
-168	        except Exception:
-169	            pass
-170	        # Ativa rastreamento de mouse para atualizar cursor continuamente
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-94">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\resources\widgets\MainLayout.py" target="_blank">.\resources\widgets\MainLayout.py</a><br>
-    <b>Line number: </b>176<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-175	            logger.debug(f&quot;MainLayout.__init__: parent={pname}, enable_scroll={enable_scroll}&quot;)
-176	        except Exception:
-177	            pass
-178	
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-95">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\resources\widgets\PathSelectorWidget.py" target="_blank">.\resources\widgets\PathSelectorWidget.py</a><br>
-    <b>Line number: </b>207<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-206	                self._browse_save_file(initial_dir)
-207	        except Exception:
-208	            pass
-209	    
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-96">
+<div id="issue-66">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>
@@ -2416,77 +1708,7 @@ pre {
 </div>
 </div>
 
-<div id="issue-97">
-<div class="issue-block issue-sev-low">
-    <b>blacklist: </b> Consider possible security implications associated with the subprocess module.<br>
-    <b>Test ID:</b> B404<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/78.html" target="_blank">CWE-78</a><br>
-    <b>File: </b><a href=".\utils\DependenciesManager.py" target="_blank">.\utils\DependenciesManager.py</a><br>
-    <b>Line number: </b>12<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess" target="_blank">https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess</a><br>
-
-<div class="code">
-<pre>
-11	import os
-12	import subprocess
-13	from pathlib import Path
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-98">
-<div class="issue-block issue-sev-high">
-    <b>subprocess_popen_with_shell_equals_true: </b> subprocess call with shell=True identified, security issue.<br>
-    <b>Test ID:</b> B602<br>
-    <b>Severity: </b>HIGH<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/78.html" target="_blank">CWE-78</a><br>
-    <b>File: </b><a href=".\utils\DependenciesManager.py" target="_blank">.\utils\DependenciesManager.py</a><br>
-    <b>Line number: </b>142<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b602_subprocess_popen_with_shell_equals_true.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b602_subprocess_popen_with_shell_equals_true.html</a><br>
-
-<div class="code">
-<pre>
-141	        try:
-142	            subprocess.Popen([script_path], shell=True)
-143	            return True
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-99">
-<div class="issue-block issue-sev-low">
-    <b>try_except_pass: </b> Try, Except, Pass detected.<br>
-    <b>Test ID:</b> B110<br>
-    <b>Severity: </b>LOW<br>
-    <b>Confidence: </b>HIGH<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
-    <b>File: </b><a href=".\utils\ProjectUtils.py" target="_blank">.\utils\ProjectUtils.py</a><br>
-    <b>Line number: </b>141<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html</a><br>
-
-<div class="code">
-<pre>
-140	                        total += f.stat().st_size
-141	                    except Exception:
-142	                        pass
-143	            return total
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-100">
+<div id="issue-67">
 <div class="issue-block issue-sev-low">
     <b>try_except_pass: </b> Try, Except, Pass detected.<br>
     <b>Test ID:</b> B110<br>

@@ -14,7 +14,12 @@ class AsyncPipelineEngine:
     """
     Orquestrador genérico de Steps e QgsTasks.
     """
-    logger = LogUtils(tool="AsyncPipelineEngine", class_name="AsyncPipelineEngine", level=LogUtils.DEBUG)
+
+    logger = LogUtils(
+        tool="AsyncPipelineEngine",
+        class_name="AsyncPipelineEngine",
+        level=LogUtils.DEBUG,
+    )
 
     def __init__(
         self,
@@ -37,6 +42,7 @@ class AsyncPipelineEngine:
         self._current_task = None
         self._is_running = False
         self._is_cancelled = False
+
     # -------------------------------------------------
     # Public API
     # -------------------------------------------------
@@ -48,7 +54,6 @@ class AsyncPipelineEngine:
         self._is_running = True
         self._is_cancelled = False
         self._current_index = 0
-
 
         self._pipeline_task = PipelineTask("Processando trilha")
         QgsApplication.taskManager().addTask(self._pipeline_task)
@@ -82,7 +87,6 @@ class AsyncPipelineEngine:
 
     def is_running(self) -> bool:
         return self._is_running
-
 
     def _run_next_step(self) -> None:
 
@@ -128,13 +132,12 @@ class AsyncPipelineEngine:
         self._run_next_step()
 
     def _handle_task_error(self, exception: Exception):
-
-        step = self._steps[self._current_index]
-
         try:
+            step = self._steps[self._current_index]
+
             step.on_error(self._context, exception)
-        except Exception:
-            pass
+        except Exception as e:
+            self.logger.error(f"_handle_task_error handler failed: {e}")
 
         self._context.add_error(exception)
         self._finish_error()
@@ -182,6 +185,7 @@ class AsyncPipelineEngine:
                 self._on_cancelled(self._context)
             except Exception as e:
                 self.logger.error(f"Error:{e}")
+
 
 class PipelineTask(QgsTask):
 

@@ -37,10 +37,10 @@ class DependentCheckBox(QCheckBox):
                     self._previous_states[d] = d.isChecked()
                     d.setChecked(False)
                 d.setEnabled(enabled)
-            except Exception:
-                pass
-
-
+            except Exception as e:
+ 
+              self.logger.error(f"Erro em local: {e}")
+   
 class CheckboxGridWidget(QWidget):
     """
     Widget exclusivo para grid de checkboxes com suporte a dicionário chave→label.

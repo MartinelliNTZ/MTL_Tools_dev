@@ -119,7 +119,9 @@ class ProjectUtils:
                     geom_type = obj.wkbType()
                     # estimativa simples: 200 bytes por feature + geometria
                     return feat_count * 200
-                except Exception:
+                except Exception as e:
+                    logger = LogUtils(tool="project_utils", class_name="ProjectUtils")
+                    logger.error(f"Erro estimando tamanho de memória: {e}")
                     return 0
 
             # arquivo real
@@ -138,9 +140,10 @@ class ProjectUtils:
                 if f.is_file():
                     try:
                         total += f.stat().st_size
-                    except Exception:
-                        pass
-            return total
+                    except Exception as e:
+                        logger = LogUtils(tool="project_utils", class_name="ProjectUtils")
+                        logger.error(f"Erro ao ler arquivo durante compute_size: {e}")
+                        return total
 
         if p.suffix.lower() == ".shp":
             total = 0
@@ -270,7 +273,9 @@ class ProjectUtils:
             src = src.split("|", 1)[0]
         try:
             return str(Path(src).resolve())
-        except Exception:
+        except Exception as e:
+            logger = LogUtils(tool="project_utils", class_name="ProjectUtils")
+            logger.error(f"Erro normalizando source de layer: {e}")
             return os.path.normpath(src)
 
     @staticmethod
@@ -303,7 +308,9 @@ class ProjectUtils:
             else:
                 project.addMapLayer(layer, False)
             return layer
-        except Exception:
+        except Exception as e:
+            logger = LogUtils(tool="project_utils", class_name="ProjectUtils")
+            logger.error(f"Erro ao adicionar camada ao projeto: {e}")
             return None
 
     @staticmethod
@@ -315,7 +322,9 @@ class ProjectUtils:
             project.addMapLayer(layer, False)
             group.insertLayer(0, layer)
             return layer
-        except Exception:
+        except Exception as e:
+            logger = LogUtils(tool="project_utils", class_name="ProjectUtils")
+            logger.error(f"Erro ao inserir layer no grupo: {e}")
             return None
 
 

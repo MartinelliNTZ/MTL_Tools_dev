@@ -31,3 +31,15 @@
     - ReverseGeocode: follow HTTP 3xx redirects (max 5)
       - `core/task/reverse_geocoding_task.py`: follow `Location` headers, resolve relative redirects, validate redirect schemes
       - Log redirect locations and errors via `LogUtils`
+  1.7.1.9
+    - Fix restart subprocess security (avoid shell=True)
+      - `plugins/RestartQgis.py`: do not create .bat or call subprocess with `shell=True`
+      - Prepare command list and execute with `subprocess.Popen(cmd, shell=False)` on `aboutToQuit`
+      - Logs command and errors via `LogUtils`; removes shell injection risk (B602/B404)
+1.7.1.10
+
+FIX: TRATAMENTO DE EXCEPTS EM MainLayout.py
+
+- Substitui blocos `except` corrompidos por `logger.error` em widgets de borda
+- Evita exceções silenciosas durante eventos de UI (`resizeEvent`, `enterEvent`, `leaveEvent`, `mouse*Event`)
+- Melhora observabilidade: erros agora aparecem no JSONL do plugin e no log do QGIS

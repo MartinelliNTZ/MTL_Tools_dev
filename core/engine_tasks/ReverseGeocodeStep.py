@@ -19,7 +19,9 @@ class ReverseGeocodeStep(BaseStep):
         return task
 
     def on_success(self, context: ExecutionContext, result):
-        logger = LogUtils(tool=context.get("tool_key"), class_name=self.__class__.__name__)
+        logger = LogUtils(
+            tool=context.get("tool_key"), class_name=self.__class__.__name__
+        )
         try:
             dialog = context.get("dialog")
             if dialog:
@@ -29,7 +31,9 @@ class ReverseGeocodeStep(BaseStep):
             logger.error(f"ReverseGeocodeStep.on_success error: {e}")
 
     def on_error(self, context: ExecutionContext, exception: Exception) -> None:
-        logger = LogUtils(tool=context.get("tool_key"), class_name=self.__class__.__name__)
+        logger = LogUtils(
+            tool=context.get("tool_key"), class_name=self.__class__.__name__
+        )
         try:
             dialog = context.get("dialog")
             if dialog:

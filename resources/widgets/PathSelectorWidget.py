@@ -204,9 +204,14 @@ class PathSelectorWidget(QWidget):
                 self._browse_multiple_files(initial_dir)
             elif self._mode == self.MODE_SAVE:
                 self._browse_save_file(initial_dir)
-        except Exception:
-            pass
-    
+        except Exception as e:
+            try:
+                from ..core.config.LogUtils import LogUtils
+                LogUtils(tool="path_selector", class_name=self.__class__.__name__).error(f"PathSelectorWidget._browse error: {e}")
+            except Exception:
+                import sys
+                sys.stderr.write(f"PathSelectorWidget._browse error: {e}\n")
+
     def _get_initial_directory(self) -> str:
         """Retorna diretório inicial para dialog."""
         current_path = self._input.text().strip()

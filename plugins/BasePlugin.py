@@ -264,8 +264,8 @@ class BasePluginMTL(BaseDialog):
                 self.logger.info(msg)
                 if modal_info == "YES":
                     QgisMessageUtil.bar_success(self.iface, f"Estatistivas: {msg} ")
-            except Exception:
-                pass
+            except Exception as ex:
+                self.logger.error(f"Erro ao gerar resumo de estatísticas: {ex}")
 
             # atualizar agregados de features e limpar dados transitórios antes de persistir
             self.preferences["total_features"] = self.preferences.get("total_features", 0)
