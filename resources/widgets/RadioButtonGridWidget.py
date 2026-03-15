@@ -121,7 +121,7 @@ class RadioButtonGridWidget(QWidget):
         main_layout.addLayout(grid_layout)
         main_layout.addStretch()
 
-        self.logger.debug(f"RadioButtonGridWidget construído com sucesso")
+        self.logger.debug("RadioButtonGridWidget construído com sucesso")
 
     def get_selected_index(self) -> int:
         """Retorna o índice do item selecionado (-1 se nenhum)."""
@@ -136,7 +136,7 @@ class RadioButtonGridWidget(QWidget):
             text = self.radios[idx].text()
             self.logger.debug(f"get_selected_text() -> '{text}'")
             return text
-        self.logger.debug(f"get_selected_text() -> '' (nenhum selecionado)")
+        self.logger.debug("get_selected_text() -> '' (nenhum selecionado)")
         return ""
 
     def set_selected_index(self, index: int):

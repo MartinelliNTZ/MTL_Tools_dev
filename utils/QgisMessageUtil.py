@@ -71,7 +71,7 @@ class QgisMessageUtil:
 
             if parent_widget is None:
                 QgisMessageUtil.log(
-                    f"[modal_result_with_folder] AVISO: parent_widget é None, usando fallback",
+                    "[modal_result_with_folder] AVISO: parent_widget é None, usando fallback",
                     level=Qgis.Warning,
                 )
                 parent_widget = None
@@ -213,7 +213,6 @@ class QgisMessageUtil:
 
         btn_replace = msg.addButton("Substituir", QMessageBox.AcceptRole)
         btn_rename = msg.addButton("Renomear", QMessageBox.ActionRole)
-        btn_cancel = msg.addButton("Cancelar", QMessageBox.RejectRole)
 
         msg.exec()
 

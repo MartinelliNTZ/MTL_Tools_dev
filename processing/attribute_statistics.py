@@ -192,9 +192,6 @@ class AttributeStatisticsAlgorithm(QgsProcessingAlgorithm):
     # ----------------------------------------------------
     def processAlgorithm(self, parameters, context, feedback):
 
-        # recarrega prefs antes de executar (estado antes)
-        prefs_before = self._prefs_manager.load()
-
         layer = self.parameterAsLayer(parameters, self.INPUT_LAYER, context)
         if layer is None:
             raise QgsProcessingException("Camada inválida.")

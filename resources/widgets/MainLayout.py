@@ -103,32 +103,6 @@ class MainLayout(QVBoxLayout):
                 return widget
         return None
 
-    """Container layout customizado para plugins Cadmus com suporte a resize.
-    
-    ARQUITETURA:
-    ============
-    1. RESIZE (Separação de Responsabilidades):
-       - BasePlugin recebe eventos de mouse do Qt
-       - MainLayout executa lógica de resize (_get_resize_edge, _update_cursor)
-       - Limpo e reutilizável em qualquer plugin
-    
-    2. SCROLL (Encapsulamento Automático):
-       - MainLayout cria ScrollWidget INTERNAMENTE se enable_scroll=True
-       - Plugin NÃO importa ScrollWidget (encapsulado)
-       - Plugin NÃO toca em self.scroll_container (não existe)
-       - add_items() decide automaticamente para onde vai cada item:
-         * Se scroll habilitado: encaminha para scroll
-         * Se scroll desabilitado: encaminha para inner_layout
-       - Responsabilidade única: MainLayout gerencia scroll, plugin só adiciona itens
-    
-    Benefícios:
-    - Separação de responsabilidades: BasePlugin recebe, MainLayout executa
-    - Encapsulamento: scroll é detalhe interno
-    - Reutilizável: MainLayout funciona com ou sem scroll
-    - Testável: lógica concentrada em uma classe
-    - Simples: BasePlugin tem apenas 3 métodos de delegação
-    """
-
     def __init__(self, parent=None, enable_scroll=False):
         super().__init__(parent)
 
@@ -314,18 +288,15 @@ class MainLayout(QVBoxLayout):
         if pos.x() < self._resize_border and pos.y() < self._resize_border:
             return "top-left"
         elif (
-            pos.x() > rect.width() - self._resize_border
-            and pos.y() < self._resize_border
+            pos.x() > rect.width() - self._resize_border and pos.y() < self._resize_border
         ):
             return "top-right"
         elif (
-            pos.x() < self._resize_border
-            and pos.y() > rect.height() - self._resize_border
+            pos.x() < self._resize_border and pos.y() > rect.height() - self._resize_border
         ):
             return "bottom-left"
         elif (
-            pos.x() > rect.width() - self._resize_border
-            and pos.y() > rect.height() - self._resize_border
+            pos.x() > rect.width() - self._resize_border and pos.y() > rect.height() - self._resize_border
         ):
             return "bottom-right"
         elif pos.x() < self._resize_border:
@@ -401,10 +372,7 @@ class MainLayout(QVBoxLayout):
     def _perform_resize_move(self, event):
         try:
             if not (
-                self._resize_active
-                and self._resize_edge
-                and self._last_pos
-                and self._parent_dialog
+                self._resize_active and self._resize_edge and self._last_pos and self._parent_dialog
             ):
                 return
             delta = event.globalPos() - self._last_pos
@@ -418,8 +386,7 @@ class MainLayout(QVBoxLayout):
             if "right" in self._resize_edge:
                 new_rect.setRight(new_rect.right() + delta.x())
             if (
-                new_rect.width() >= self._parent_dialog.minimumWidth()
-                and new_rect.height() >= self._parent_dialog.minimumHeight()
+                new_rect.width() >= self._parent_dialog.minimumWidth() and new_rect.height() >= self._parent_dialog.minimumHeight()
             ):
                 self._parent_dialog.setGeometry(new_rect)
                 self._last_pos = event.globalPos()
@@ -456,13 +423,6 @@ class MainLayout(QVBoxLayout):
     def handle_mouse_press(self, event):
         """Inicia resize ao clicar nas bordas."""
         if event.button() == Qt.LeftButton:
-            try:
-                p = event.pos()
-                g = event.globalPos()
-                b = event.button()
-            except Exception:
-                logger.debug("handle_mouse_press: unable to read event data")
-
             # Map event global position to parent dialog coordinates to ensure
             # correct edge detection when events come from child widgets.
             mapped_pos = None
@@ -486,13 +446,7 @@ class MainLayout(QVBoxLayout):
 
     def handle_mouse_move(self, event):
         """Redimensiona a janela ao arrastar."""
-        try:
-            p = event.pos()
-            g = event.globalPos()
-        except Exception:
-            logger.debug("handle_mouse_move: unable to read event positions")
 
-        # Map event to parent dialog coordinates for edge detection
         mapped_pos = None
         if self._parent_dialog:
             try:
@@ -508,16 +462,9 @@ class MainLayout(QVBoxLayout):
         # SEMPRE atualiza o cursor baseado na posição atual
         # Mesmo quando não está em resize, isso garante que o cursor resete corretamente
         self._update_cursor(edge)
-        try:
-            geom = self._parent_dialog.geometry()
-        except Exception:
-            logger.debug("handle_mouse_move: unable to read parent dialog geometry")
 
         if (
-            self._resize_active
-            and self._resize_edge
-            and self._last_pos
-            and self._parent_dialog
+            self._resize_active and self._resize_edge and self._last_pos and self._parent_dialog
         ):
             delta = event.globalPos() - self._last_pos
             new_rect = self._parent_dialog.geometry()
@@ -533,8 +480,7 @@ class MainLayout(QVBoxLayout):
 
             # Respeita tamanho mínimo
             if (
-                new_rect.width() >= self._parent_dialog.minimumWidth()
-                and new_rect.height() >= self._parent_dialog.minimumHeight()
+                new_rect.width() >= self._parent_dialog.minimumWidth() and new_rect.height() >= self._parent_dialog.minimumHeight()
             ):
                 self._parent_dialog.setGeometry(new_rect)
                 self._last_pos = event.globalPos()

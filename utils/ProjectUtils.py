@@ -7,7 +7,6 @@ from qgis.core import QgsProject, QgsMapLayer, QgsVectorLayer
 
 from ..core.config.LogUtils import LogUtils
 from typing import Union, Optional
-from qgis.core import QgsMapLayer
 
 
 class ProjectUtils:
@@ -119,7 +118,6 @@ class ProjectUtils:
             if src.startswith("memory:"):
                 try:
                     feat_count = obj.featureCount()
-                    geom_type = obj.wkbType()
                     # estimativa simples: 200 bytes por feature + geometria
                     return feat_count * 200
                 except Exception as e:

@@ -11,18 +11,11 @@ from qgis.core import (
     QgsFeatureSink,
     QgsProcessing,
 )
-import os
 import re
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsFields, QgsField, QgsFeature, QgsCoordinateTransform
-
-
-# Preferências
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
-
-# Lógicas externas
 from ..utils.vector.VectorLayerProjection import VectorLayerProjection
-import re
 from ..utils.ToolKeys import ToolKey
 
 
@@ -68,8 +61,6 @@ class RasterMassSampler(QgsProcessingAlgorithm):
 
     # -------------------------- INIT -------------------------
     def initAlgorithm(self, config=None):
-
-        prefs = load_tool_prefs(TOOL_KEY)
 
         self.addParameter(
             QgsProcessingParameterFeatureSource(

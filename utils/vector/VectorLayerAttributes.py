@@ -21,19 +21,19 @@ class VectorLayerAttributes:
 
     """
     Responsável por campos e atributos de camadas vetoriais.
-    
+
     Escopo:
     - Gerenciar campos e estrutura de dados
     - Criar, remover, renomear campos
     - Validar dados de atributos
     - Calcular valores para campos
     - Ponte entre dados espaciais e tabulares
-    
+
     Responsabilidade Principal:
     - Orquestrar operações de dados tabulares da camada
     - Garantir integridade estrutural de atributos
     - Facilitar acesso e modificação de dados tabulares
-    
+
     NÃO é Responsabilidade:
     - Transformar geometrias (use VectorLayerGeometry)
     - Calcular métricas espaciais (use VectorLayerMetrics)

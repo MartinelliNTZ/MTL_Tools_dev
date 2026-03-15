@@ -169,11 +169,7 @@ class AttributeStatisticsModel:
             fn = f.name()
             t = f.typeName().lower()
             if (
-                "int" in t
-                or "float" in t
-                or "real" in t
-                or "double" in t
-                or "numeric" in t
+                "int" in t or "float" in t or "real" in t or "double" in t or "numeric" in t
             ):
                 numeric.append(fn)
         return numeric

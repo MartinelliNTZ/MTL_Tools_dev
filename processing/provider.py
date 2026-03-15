@@ -17,11 +17,6 @@ class MTLProvider(QgsProcessingProvider):
         self.addAlgorithm(DifferenceFieldsAlgorithm())
         self.addAlgorithm(AttributeStatisticsAlgorithm())
 
-        """     try:
-            self.addAlgorithm(ElevationAnalisys())  
-        except :            
-            print("Error: Cannot divide by zero!") """
-
     def id(self):
         return "cadmus"
 
