@@ -296,7 +296,7 @@ class BasePluginMTL(BaseDialog):
 
             # Log summary
             try:
-                msg = (                    
+                msg = (
                     f"Tamanho: {FormatUtils.bytes(current_size)}\n"
                     f"Feições: {current_features}\n"
                     f"Velocidade média(bytes/s): {FormatUtils.speed(self.preferences.get('avg_speed', 0))}\n"

@@ -25,6 +25,7 @@ _logger_global = None
 def _install_global_error_handler():
     """Instala handler global para capturar exceções não tratadas."""
     global _logger_global
+    _logger_global = None  # <-- ATRIBUIÇÃO EXPLÍCITA
 
     def handle_exception(exc_type, exc_value, exc_traceback):
         global _logger_global
