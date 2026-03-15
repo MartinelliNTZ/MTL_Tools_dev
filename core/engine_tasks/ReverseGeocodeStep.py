@@ -39,5 +39,5 @@ class ReverseGeocodeStep(BaseStep):
             if dialog:
                 dialog.set_address(None)
             logger.warning(f"ReverseGeocodeStep.on_error: {exception}")
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error(f"ReverseGeocodeStep.on_error handler failed: {e}")

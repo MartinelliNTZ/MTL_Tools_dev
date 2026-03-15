@@ -29,7 +29,7 @@ class CoordResultDialog(BasePluginMTL):
         super()._build_ui(
             title="Coordenadas do Ponto",
             icon_path="mtl_agro.ico",
-            instructions_file="standard.md",
+            instructions_file="coord_click_help.md",
             enable_scroll=True
         )
 

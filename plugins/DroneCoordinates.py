@@ -279,7 +279,7 @@ class DroneCordinates(BasePluginMTL):
                 saved_layer = VectorLayerSource.save_and_load_layer(
                     layer,
                     out_path,
-                    toolkey=self.TOOL_KEY,
+                    tool_key=self.TOOL_KEY,
                     decision="rename",
                 )
                 if saved_layer and saved_layer.isValid():
@@ -308,7 +308,7 @@ class DroneCordinates(BasePluginMTL):
                 saved_layer = VectorLayerSource.save_and_load_layer(
                     vl_line,
                     out_path,
-                    toolkey=self.TOOL_KEY,
+                    tool_key=self.TOOL_KEY,
                     decision="rename",
                 )
                 if saved_layer and saved_layer.isValid():

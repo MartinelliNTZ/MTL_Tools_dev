@@ -11,6 +11,7 @@ from qgis.core import QgsTask
 
 class BufferStep(BaseStep):
 
+
     def name(self) -> str:
         return "buffer"
 

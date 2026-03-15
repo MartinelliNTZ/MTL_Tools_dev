@@ -1,4 +1,4 @@
-# core/engine_tasks/SaveVectorStep.py
+# -*- coding: utf-8 -*-
 
 from .BaseStep import BaseStep
 from ..config.LogUtils import LogUtils

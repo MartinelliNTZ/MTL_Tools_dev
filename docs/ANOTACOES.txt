@@ -2,7 +2,7 @@
 martinelli.matheus11@gmail.com        01/01/2000  - 01/01/2000 - 04/04/2026
 mtlagriculturaetecnologia@gmail.com   01/01/2000  - 01/01/2000 - 07/04/2026
 martinelli.linesbr2@gmail.com         01/01/2000  - 01/01/2000 - 08/04/2026
-cpunova963@gmail.com                  01/01/2000  - 11/03/2026 - 08/04/2026
+cpunova963@gmail.com                  01/01/2000  - 11/03/2026 - 10/04/2026
 martinelli.linesbr@hotmail.com        12/03/2026  - 13/03/2026 - 11/04/2026
 BUGS CONHECIDOS
     - DroneCordinatesPlugin: MrkParser.parse_folder() não processa TODOS os MRKs da pasta - apenas 1 arquivo [1.6.2 TODO]
@@ -34,11 +34,16 @@ Documentação de cenarios: 1, 2, 3, 4, 5, 8, 9, 10, 11, 13
 Instrucoes: 1, 2, 3, 4,  5, 8, 9, 10, 11, 13
     metadada organizar
     license=GPL-2.0
+    multpart nao ta em task e pode bugar
 changelog=
+  2.0.3
+  - Correcoes de bug
+  2.0.2
+  - Correção de bugs críticos em MainLayout.py: tratamento de exceções aprimorado para evitar falhas silenciosas durante eventos de redimensionamento e movimento do mouse. Adicionados logs de debug para identificar falhas na leitura de dados do evento e geometria do diálogo pai, melhorando a robustez e a observabilidade do comportamento de redimensionamento.
+  2.0.1
+  -retirada dos bats de restart qgis e subprocess com shell=False
   2.0.0
-  - MUDANCA DE nome para cadmus
-
-  
+  - MUDANCA DE nome para cadmus  
   1.7.2
     -Refactor InfoDialog and BaseDialog to enhance UI construction and logging
   1.7.1

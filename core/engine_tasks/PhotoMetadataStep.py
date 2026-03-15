@@ -82,7 +82,8 @@ class PhotoMetadataStep(BaseStep):
                 continue
             try:
                 foto_to_fid[int(foto_val)] = feat.id()
-            except Exception:
+            except Exception as e:
+                self.logger.debug(f"PhotoMetadataStep: failed parsing foto value {foto_val}: {e}")
                 continue
 
         # Aplicar valores por batch

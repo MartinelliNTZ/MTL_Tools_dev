@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from ..utils import load_tool_prefs, save_tool_prefs
-from ..utils import QgisMessageUtil
-from ..utils import LayoutsUtils
-from ..utils import ProjectUtils
-from ..utils import ToolKey
+from ..utils.Preferences import load_tool_prefs, save_tool_prefs
+from ..utils.QgisMessageUtil import QgisMessageUtil
+from ..utils.LayoutsUtils import LayoutsUtils
+from ..utils.ProjectUtils import ProjectUtils
+from ..utils.ToolKeys import ToolKey
 from .BasePlugin import BasePluginMTL
 from ..core.ui.WidgetFactory import WidgetFactory
 

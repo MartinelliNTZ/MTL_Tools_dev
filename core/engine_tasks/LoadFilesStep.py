@@ -62,8 +62,10 @@ class LoadFilesStep(BaseStep):
                     "Carregando camadas...", "Cancelar", 0, total, parent
                 )
                 progress.show()
-            except Exception:
+            except Exception as e:
                 progress = None
+                logger.debug(f"ProgressDialog unavailable: {e}")
+                   
             for i in range(0, total, chunk):
                 time.sleep(0.1)  # pequeno delay para permitir UI responder
                 if context.is_cancelled():
@@ -136,8 +138,8 @@ class LoadFilesStep(BaseStep):
                                         "LoadFilesStep: cancelado pelo usuário via ProgressDialog"
                                     )
                                     break
-                        except Exception:
-                            pass
+                        except Exception as e:
+                            logger.error(f"LoadFilesStep: progress update failed: {e}")
                     except Exception as e:
                         logger.error(
                             f"LoadFilesStep: erro ao criar/adicionar camada {rec.get('path')}: {e}"
@@ -147,8 +149,8 @@ class LoadFilesStep(BaseStep):
                 # permitir UI responder entre lotes
                 try:
                     QApplication.processEvents()
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.error(f"LoadFilesStep: processEvents failed: {e}")
 
                 logger.info(
                     f"LoadFilesStep: batch {i}-{i+len(batch)-1} adicionadas; progresso {loaded}/{total}"
@@ -157,8 +159,8 @@ class LoadFilesStep(BaseStep):
             try:
                 if progress:
                     progress.close()
-            except Exception:
-                pass
+            except Exception as e:
+                logger.error(f"LoadFilesStep: closing progress dialog failed: {e}")
 
         context.set("loaded_count", loaded)
         logger.info(f"LoadFilesStep.on_success: terminada, loaded={loaded}")
