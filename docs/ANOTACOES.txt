@@ -5,6 +5,7 @@ martinelli.linesbr2@gmail.com         01/01/2000  - 01/01/2000 - 08/04/2026
 cpunova963@gmail.com                  01/01/2000  - 11/03/2026 - 10/04/2026
 martinelli.linesbr@hotmail.com        12/03/2026  - 13/03/2026 - 11/04/2026
 BUGS CONHECIDOS
+  - clear all session nao ta funcionado, quando apago essa sesao ele apaga a ultima e nao a que eu to
     - DroneCordinatesPlugin: MrkParser.parse_folder() não processa TODOS os MRKs da pasta - apenas 1 arquivo [1.6.2 TODO]
       - Encontra 98 MRKs mas retorna apenas 16160 pontos (1 arquivo) em vez de múltiplos de 16160
       - Afeta: seleção de pasta completa com múltiplos .mrk

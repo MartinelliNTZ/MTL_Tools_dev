@@ -37,9 +37,9 @@ class AboutDialog(QDialog):
 
         lbl_info = QLabel(
             """
-            <b>Versão:</b> 1.2.6<br>
-            <b>Atualizada em:</b> 12 de Janeiro de 2026<br>
-            <b>Criado em:</b> 9 de Dezembro de 2025<br>
+            <b>Versão:</b> 2.0.4<br>
+            <b>Atualizada em:</b> 15 de Março de 2026<br>
+            <b>Criado em:</b> 9 de Dezembro de 2024<br>
             <b>Criador:</b> MTL Agricultura e Tecnologia<br>
             <b>Local:</b> Palmas - Tocantins - Brasil<br>
             <b>Email:</b> <a href="mailto:martinelli.matheus11@gmail.com">martinelli.matheus11@gmail.com</a><br>
