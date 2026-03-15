@@ -40,12 +40,16 @@ Instrucoes: 1, 2, 3, 4,  5, 8, 9, 10, 11, 13
     license=GPL-2.0
     multpart nao ta em task e pode bugar
 changelog=
+<<<<<<< HEAD
   2.0.3
   - Correcoes de bug
   2.0.2
+  - readme.md
   - Correção de bugs críticos em MainLayout.py: tratamento de exceções aprimorado para evitar falhas silenciosas durante eventos de redimensionamento e movimento do mouse. Adicionados logs de debug para identificar falhas na leitura de dados do evento e geometria do diálogo pai, melhorando a robustez e a observabilidade do comportamento de redimensionamento.
   2.0.1
   -retirada dos bats de restart qgis e subprocess com shell=False
+   -padronizacao
+   
   2.0.0
   - MUDANCA DE nome para cadmus  
   1.7.2
