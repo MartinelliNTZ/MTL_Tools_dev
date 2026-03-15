@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-# FILE: Cadmus/processing/difference_fields_provider.py
-
 import os
 from PyQt5.QtGui import QIcon
 from qgis.core import (
@@ -12,25 +10,20 @@ from qgis.core import (
     QgsProcessingParameterNumber,
     QgsProcessing,
 )
-
-
-# Preferências
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
-
-# Lógica
 from .model.difference_fields_model import DifferenceFieldsModel
-
 from PyQt5.QtCore import QVariant
+
 
 class DifferenceFieldsAlgorithm(QgsProcessingAlgorithm):
     INPUT_LAYER = "INPUT_LAYER"
     BASE_FIELD = "BASE_FIELD"
-    EXCLUDE_FIELDS = "EXCLUDE_FIELDS"   # <-- AGORA É EXCLUÍR CAMPOS
+    EXCLUDE_FIELDS = "EXCLUDE_FIELDS"  # <-- AGORA É EXCLUÍR CAMPOS
     PREFIX = "PREFIX"
     PRECISION = "PRECISION"
     OUTPUT = "OUTPUT"
     TOOL_KEY = "difference_fields_tool"
-    
+
     NUMERIC = {
         QVariant.Int,
         QVariant.UInt,
@@ -54,7 +47,7 @@ class DifferenceFieldsAlgorithm(QgsProcessingAlgorithm):
 
     def icon(self):
         icon_path = os.path.join(
-            os.path.dirname(__file__), "..", "resources","icons", "field_diference.ico"
+            os.path.dirname(__file__), "..", "resources", "icons", "field_diference.ico"
         )
         return QIcon(icon_path)
 
@@ -70,58 +63,57 @@ class DifferenceFieldsAlgorithm(QgsProcessingAlgorithm):
         }
 
     def _save_prefs(self, prefix, precision):
-        save_tool_prefs(self.TOOL_KEY, {
-            "prefix": prefix,
-            "precision": precision
-        })
+        save_tool_prefs(self.TOOL_KEY, {"prefix": prefix, "precision": precision})
 
     # Definição dos parâmetros
     def initAlgorithm(self, config=None):
         prefs = self._load_prefs()
 
-        self.addParameter(QgsProcessingParameterFeatureSource(
-            self.INPUT_LAYER,
-            "Camada de Pontos",
-            [QgsProcessing.TypeVectorPoint]
-        ))
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.INPUT_LAYER, "Camada de Pontos", [QgsProcessing.TypeVectorPoint]
+            )
+        )
 
-        self.addParameter(QgsProcessingParameterField(
-            self.BASE_FIELD,
-            "Campo Base (subtraendo)",
-            parentLayerParameterName=self.INPUT_LAYER,
-            type=QgsProcessingParameterField.Numeric
-        ))
+        self.addParameter(
+            QgsProcessingParameterField(
+                self.BASE_FIELD,
+                "Campo Base (subtraendo)",
+                parentLayerParameterName=self.INPUT_LAYER,
+                type=QgsProcessingParameterField.Numeric,
+            )
+        )
 
         param_exclude = QgsProcessingParameterField(
             self.EXCLUDE_FIELDS,
             "Campos a EXCLUIR do cálculo",
             parentLayerParameterName=self.INPUT_LAYER,
             type=QgsProcessingParameterField.Numeric,
-            allowMultiple=True
+            allowMultiple=True,
         )
-        param_exclude.setFlags(param_exclude.flags() | QgsProcessingParameterField.FlagOptional)
+        param_exclude.setFlags(
+            param_exclude.flags() | QgsProcessingParameterField.FlagOptional
+        )
         self.addParameter(param_exclude)
 
+        self.addParameter(
+            QgsProcessingParameterString(
+                self.PREFIX, "Prefixo para novos campos", defaultValue=prefs["prefix"]
+            )
+        )
 
-        self.addParameter(QgsProcessingParameterString(
-            self.PREFIX,
-            "Prefixo para novos campos",
-            defaultValue=prefs["prefix"]
-        ))
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.PRECISION,
+                "Precisão (casas decimais)",
+                type=QgsProcessingParameterNumber.Integer,
+                minValue=0,
+                maxValue=10,
+                defaultValue=prefs["precision"],
+            )
+        )
 
-        self.addParameter(QgsProcessingParameterNumber(
-            self.PRECISION,
-            "Precisão (casas decimais)",
-            type=QgsProcessingParameterNumber.Integer,
-            minValue=0,
-            maxValue=10,
-            defaultValue=prefs["precision"]
-        ))
-
-        self.addParameter(QgsProcessingParameterFeatureSink(
-            self.OUTPUT,
-            "Diferenca"
-        ))
+        self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT, "Diferenca"))
 
     # PROCESSAMENTO
     def processAlgorithm(self, params, context, feedback):
@@ -139,15 +131,21 @@ class DifferenceFieldsAlgorithm(QgsProcessingAlgorithm):
         # ------------------------------------------------------------
         if not excludeds or len(excludeds) == 0:
             fields_to_compare = [
-                f.name() for f in layer.fields()
+                f.name()
+                for f in layer.fields()
                 if f.type() in self.NUMERIC and f.name() != base_field
             ]
-            feedback.pushInfo("Nenhum campo excluído → usando todos os campos numéricos.")
+            feedback.pushInfo(
+                "Nenhum campo excluído → usando todos os campos numéricos."
+            )
         else:
             # Se informou campos para excluir, usar todos MENOS esses
             fields_to_compare = [
-                f.name() for f in layer.fields()
-                if f.type() in self.NUMERIC and f.name() not in excludeds and f.name() != base_field
+                f.name()
+                for f in layer.fields()
+                if f.type() in self.NUMERIC
+                and f.name() not in excludeds
+                and f.name() != base_field
             ]
 
         feedback.pushInfo(f"Base: {base_field}")
@@ -166,12 +164,7 @@ class DifferenceFieldsAlgorithm(QgsProcessingAlgorithm):
         out_fields = model.create_output_fields(layer, fields_to_compare)
 
         sink, dest = self.parameterAsSink(
-            params,
-            self.OUTPUT,
-            context,
-            out_fields,
-            layer.wkbType(),
-            layer.sourceCrs()
+            params, self.OUTPUT, context, out_fields, layer.wkbType(), layer.sourceCrs()
         )
 
         # Processar feições

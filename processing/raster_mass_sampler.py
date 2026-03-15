@@ -9,14 +9,12 @@ from qgis.core import (
     QgsProcessingParameterFeatureSink,
     QgsProcessingParameterCrs,
     QgsFeatureSink,
-    QgsProcessing
+    QgsProcessing,
 )
 import os
 import re
 from PyQt5.QtCore import QVariant
-from qgis.core import (
-    QgsFields, QgsField, QgsFeature, QgsCoordinateTransform
-)
+from qgis.core import QgsFields, QgsField, QgsFeature, QgsCoordinateTransform
 
 
 # Preferências
@@ -32,28 +30,27 @@ TOOL_KEY = ToolKey.RASTER_MASS_SAMPLER
 
 
 class RasterMassSampler(QgsProcessingAlgorithm):
-
     """
-        QgsProcessingAlgorithm: Amostragem massiva de rasters para pontos.
+    QgsProcessingAlgorithm: Amostragem massiva de rasters para pontos.
 
-        Este algoritmo recebe uma camada de pontos e uma lista de rasters (ou camadas raster),
-        amostra o valor de cada raster no local de cada ponto e retorna uma nova camada
-        com os atributos originais dos pontos mais colunas com os valores amostrados.
+    Este algoritmo recebe uma camada de pontos e uma lista de rasters (ou camadas raster),
+    amostra o valor de cada raster no local de cada ponto e retorna uma nova camada
+    com os atributos originais dos pontos mais colunas com os valores amostrados.
 
-        Design e responsabilidade:
-        - `processAlgorithm` orquestra o fluxo (validação, construção de campos, amostragem, escrita)
-        - `build_output_fields` cria os `QgsFields` de saída e gera nomes de campo a partir
-            do `layer.name()` dos rasters (sanitizado, truncado e garantindo unicidade)
-        - `_sanitize_field_name` encapsula as regras de normalização e garantia de unicidade
-        - `build_transforms` prepara transforms CRS para amostragem (pontos -> raster CRS)
-        - `sample_features` itera sobre os pontos e realiza a amostragem usando `dataProvider().sample`
-        - `write_sink` escreve o resultado no sink de saída e persiste preferências quando aplicável
+    Design e responsabilidade:
+    - `processAlgorithm` orquestra o fluxo (validação, construção de campos, amostragem, escrita)
+    - `build_output_fields` cria os `QgsFields` de saída e gera nomes de campo a partir
+        do `layer.name()` dos rasters (sanitizado, truncado e garantindo unicidade)
+    - `_sanitize_field_name` encapsula as regras de normalização e garantia de unicidade
+    - `build_transforms` prepara transforms CRS para amostragem (pontos -> raster CRS)
+    - `sample_features` itera sobre os pontos e realiza a amostragem usando `dataProvider().sample`
+    - `write_sink` escreve o resultado no sink de saída e persiste preferências quando aplicável
 
-        Observações:
-        - Prefira reutilizar utilitários existentes em `utils.vector` e `utils.raster`; aqui
-            usamos `VectorLayerProjection.reproject_features` para reprojeção final quando solicitado.
-        - Os nomes de campos são limitados a 10 caracteres para compatibilidade com formatos legados.
-        """
+    Observações:
+    - Prefira reutilizar utilitários existentes em `utils.vector` e `utils.raster`; aqui
+        usamos `VectorLayerProjection.reproject_features` para reprojeção final quando solicitado.
+    - Os nomes de campos são limitados a 10 caracteres para compatibilidade com formatos legados.
+    """
 
     INPUT_POINTS = "INPUT_POINTS"
     INPUT_RASTERS = "INPUT_RASTERS"
@@ -76,34 +73,25 @@ class RasterMassSampler(QgsProcessingAlgorithm):
 
         self.addParameter(
             QgsProcessingParameterFeatureSource(
-                self.INPUT_POINTS,
-                "Pontos de entrada",
-                [QgsProcessing.TypeVectorPoint]
+                self.INPUT_POINTS, "Pontos de entrada", [QgsProcessing.TypeVectorPoint]
             )
         )
 
         self.addParameter(
             QgsProcessingParameterMultipleLayers(
-                self.INPUT_RASTERS,
-                "Rasters",
-                QgsProcessing.TypeRaster
+                self.INPUT_RASTERS, "Rasters", QgsProcessing.TypeRaster
             )
         )
 
         # Agora só existe CRS DE SAÍDA
         self.addParameter(
             QgsProcessingParameterCrs(
-                self.OUTPUT_CRS,
-                "Reprojetar camada de saída (opcional)",
-                optional=True
+                self.OUTPUT_CRS, "Reprojetar camada de saída (opcional)", optional=True
             )
         )
 
         self.addParameter(
-            QgsProcessingParameterFeatureSink(
-                self.OUTPUT,
-                "Valores_Amostrados"
-            )
+            QgsProcessingParameterFeatureSink(self.OUTPUT, "Valores_Amostrados")
         )
 
     # ----------------------- PROCESS -------------------------
@@ -117,7 +105,9 @@ class RasterMassSampler(QgsProcessingAlgorithm):
         if not output_crs.isValid():
             output_crs = None
 
-        feedback.pushInfo(f"CRS de saída: {output_crs.authid() if output_crs else 'None'}")
+        feedback.pushInfo(
+            f"CRS de saída: {output_crs.authid() if output_crs else 'None'}"
+        )
 
         # Construir campos de saída e nomes de campo raster
         out_fields, raster_fields = self.build_output_fields(pts, rasters)
@@ -133,22 +123,14 @@ class RasterMassSampler(QgsProcessingAlgorithm):
             source_crs = pts.sourceCrs()
 
             features = VectorLayerProjection.reproject_features(
-                features,
-                source_crs,
-                output_crs,
-                context
+                features, source_crs, output_crs, context
             )
 
         final_crs = output_crs if output_crs else pts.sourceCrs()
 
         # ----------------- SINK -----------------
         sink, dest = self.parameterAsSink(
-            params,
-            self.OUTPUT,
-            context,
-            out_fields,
-            pts.wkbType(),
-            final_crs
+            params, self.OUTPUT, context, out_fields, pts.wkbType(), final_crs
         )
 
         for f in features:
@@ -157,7 +139,7 @@ class RasterMassSampler(QgsProcessingAlgorithm):
         # ----------------- LINK E PREFERÊNCIAS DE SAÍDA -----------------
         if dest and isinstance(dest, str) and not dest.startswith("memory:"):
             out_folder = os.path.dirname(dest)
-            clickable = f"<a href=\"file:///{out_folder}\">{out_folder}</a>"
+            clickable = f'<a href="file:///{out_folder}">{out_folder}</a>'
             feedback.pushInfo(f"Arquivo salvo em: {clickable}")
 
             prefs = load_tool_prefs(TOOL_KEY)
@@ -169,7 +151,9 @@ class RasterMassSampler(QgsProcessingAlgorithm):
 
     # ------------------------ UI INFO ------------------------
     def icon(self):
-        path = os.path.join(os.path.dirname(__file__), "..", "resources","icons", "raster_mass.ico")
+        path = os.path.join(
+            os.path.dirname(__file__), "..", "resources", "icons", "raster_mass.ico"
+        )
         return QIcon(path)
 
     def group(self):
@@ -198,14 +182,18 @@ class RasterMassSampler(QgsProcessingAlgorithm):
 
         raster_fields = []
         for ras in rasters:
-            layer_name = ras.name() if hasattr(ras, 'name') else str(ras)
-            candidate = self._sanitize_field_name(layer_name, raster_fields, max_len=max_len)
+            layer_name = ras.name() if hasattr(ras, "name") else str(ras)
+            candidate = self._sanitize_field_name(
+                layer_name, raster_fields, max_len=max_len
+            )
             raster_fields.append(candidate)
             out_fields.append(QgsField(candidate, QVariant.Double))
 
         return out_fields, raster_fields
 
-    def _sanitize_field_name(self, layer_name: str, existing: list, max_len: int = 10) -> str:
+    def _sanitize_field_name(
+        self, layer_name: str, existing: list, max_len: int = 10
+    ) -> str:
         """
         Sanitiza `layer_name` para um identificador de campo válido:
         - substituir caracteres inválidos por `_`
@@ -219,7 +207,11 @@ class RasterMassSampler(QgsProcessingAlgorithm):
             while True:
                 suffix = f"_{i}"
                 avail_len = max_len - len(suffix)
-                new_candidate = (field_base[:avail_len] + suffix) if avail_len > 0 else (field_base[:max_len])
+                new_candidate = (
+                    (field_base[:avail_len] + suffix)
+                    if avail_len > 0
+                    else (field_base[:max_len])
+                )
                 if new_candidate not in existing:
                     candidate = new_candidate
                     break
@@ -238,9 +230,7 @@ class RasterMassSampler(QgsProcessingAlgorithm):
         for ras in rasters:
             transforms.append(
                 QgsCoordinateTransform(
-                    effective_pts_crs,
-                    ras.crs(),
-                    context.transformContext()
+                    effective_pts_crs, ras.crs(), context.transformContext()
                 )
             )
         return transforms
@@ -267,7 +257,9 @@ class RasterMassSampler(QgsProcessingAlgorithm):
                 except Exception:
                     val = None
 
-                feedback.pushInfo(f"[DEBUG] Ponto {feat.id()}, Raster {ras.name()} = {val}")
+                feedback.pushInfo(
+                    f"[DEBUG] Ponto {feat.id()}, Raster {ras.name()} = {val}"
+                )
                 attrs.append(float(val) if val is not None else None)
 
             out_feat.setAttributes(attrs)
@@ -278,12 +270,7 @@ class RasterMassSampler(QgsProcessingAlgorithm):
     def write_sink(self, params, context, out_fields, features, pts, feedback):
         """Escreve `features` no sink configurado pelos `params` e persiste preferências."""
         sink, dest = self.parameterAsSink(
-            params,
-            self.OUTPUT,
-            context,
-            out_fields,
-            pts.wkbType(),
-            pts.sourceCrs()
+            params, self.OUTPUT, context, out_fields, pts.wkbType(), pts.sourceCrs()
         )
 
         for f in features:
@@ -291,7 +278,7 @@ class RasterMassSampler(QgsProcessingAlgorithm):
 
         if dest and isinstance(dest, str) and not dest.startswith("memory:"):
             out_folder = os.path.dirname(dest)
-            clickable = f"<a href=\"file:///{out_folder}\">{out_folder}</a>"
+            clickable = f'<a href="file:///{out_folder}">{out_folder}</a>'
             feedback.pushInfo(f"Arquivo salvo em: {clickable}")
 
             prefs = load_tool_prefs(TOOL_KEY)

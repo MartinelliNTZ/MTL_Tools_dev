@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-# FILE: Cadmus/logic/difference_fields_model.py
-
 from qgis.core import QgsFields, QgsField, QgsFeature, QgsFeatureSink
 from PyQt5.QtCore import QVariant
 

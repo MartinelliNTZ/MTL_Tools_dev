@@ -1,18 +1,13 @@
 # -*- coding: utf-8 -*-
 import os
 import math
-from datetime import datetime
+
 from typing import Dict, Any
-
-
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtCore import QVariant
-
 from qgis.core import (
     QgsProcessingAlgorithm,
     QgsProcessingParameterFeatureSource,
     QgsProcessingParameterField,
-    QgsProcessingParameterString,
     QgsProcessingParameterFileDestination,
     QgsProcessingParameterNumber,
     QgsProcessingParameterBoolean,
@@ -20,16 +15,11 @@ from qgis.core import (
     QgsProcessingParameterDefinition,
     QgsProcessingException,
     QgsVectorLayer,
-    QgsProject
+    QgsProject,
 )
-
-# Preferências
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.ToolKeys import ToolKey
-
-
-# Import do model
-from .model.attribute_statistics_model import  AttributeStatisticsModel
+from .model.attribute_statistics_model import AttributeStatisticsModel
 
 TOOL_KEY = ToolKey.ATTRIBUTE_STATISTICS
 
@@ -40,6 +30,7 @@ class PreferencesManager:
     Mantém a dependência com utils.preferences centralizada aqui para que
     o model possa ser testado substituindo essas funções (injeção).
     """
+
     def __init__(self, load_tool_prefs_func, save_tool_prefs_func, tool_key: str):
         self._load = load_tool_prefs_func
         self._save = save_tool_prefs_func
@@ -54,11 +45,12 @@ class PreferencesManager:
             "last_layer_source": prefs.get("last_layer_source", ""),
             "force_ptbr": bool(prefs.get("force_ptbr", False)),
             "load_after": bool(prefs.get("load_after", False)),
-            "stats_enabled": prefs.get("stats_enabled", {})
+            "stats_enabled": prefs.get("stats_enabled", {}),
         }
 
     def save(self, **kwargs):
         self._save(self.tool_key, kwargs)
+
 
 class AttributeStatisticsAlgorithm(QgsProcessingAlgorithm):
 
@@ -86,7 +78,7 @@ class AttributeStatisticsAlgorithm(QgsProcessingAlgorithm):
         "SUM": "Soma",
         "CV": "Coeficiente de Variaçao",
         "SKEW": "Assimetria",
-        "KURT": "Curtose"
+        "KURT": "Curtose",
     }
 
     def name(self):
@@ -102,7 +94,9 @@ class AttributeStatisticsAlgorithm(QgsProcessingAlgorithm):
         return "estatistica"
 
     def icon(self):
-        icon_path = os.path.join(os.path.dirname(__file__), "..", "resources","icons", "attribute_stats.ico")
+        icon_path = os.path.join(
+            os.path.dirname(__file__), "..", "resources", "icons", "attribute_stats.ico"
+        )
         return QIcon(icon_path) if os.path.exists(icon_path) else QIcon()
 
     def createInstance(self):
@@ -123,7 +117,7 @@ class AttributeStatisticsAlgorithm(QgsProcessingAlgorithm):
             QgsProcessingParameterFeatureSource(
                 self.INPUT_LAYER,
                 "Camada de entrada",
-                [QgsProcessing.TypeVectorAnyGeometry]
+                [QgsProcessing.TypeVectorAnyGeometry],
             )
         )
 
@@ -135,7 +129,7 @@ class AttributeStatisticsAlgorithm(QgsProcessingAlgorithm):
                 parentLayerParameterName=self.INPUT_LAYER,
                 type=QgsProcessingParameterField.Any,
                 allowMultiple=True,
-                optional=True
+                optional=True,
             )
         )
 
@@ -147,7 +141,7 @@ class AttributeStatisticsAlgorithm(QgsProcessingAlgorithm):
                 type=QgsProcessingParameterNumber.Integer,
                 minValue=0,
                 maxValue=12,
-                defaultValue=prefs["precision"]
+                defaultValue=prefs["precision"],
             )
         )
 
@@ -155,7 +149,7 @@ class AttributeStatisticsAlgorithm(QgsProcessingAlgorithm):
         p_load = QgsProcessingParameterBoolean(
             self.LOAD_AFTER,
             "Carregar CSV automaticamente após execução",
-            defaultValue=prefs["load_after"]
+            defaultValue=prefs["load_after"],
         )
         p_load.setFlags(p_load.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
         self.addParameter(p_load)
@@ -163,18 +157,18 @@ class AttributeStatisticsAlgorithm(QgsProcessingAlgorithm):
         p_force_ptbr = QgsProcessingParameterBoolean(
             self.PTBR_FORMAT,
             "Forçar CSV no formato PT-BR (usar ; e ,)",
-            defaultValue=prefs["force_ptbr"]
+            defaultValue=prefs["force_ptbr"],
         )
-        p_force_ptbr.setFlags(p_force_ptbr.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+        p_force_ptbr.setFlags(
+            p_force_ptbr.flags() | QgsProcessingParameterDefinition.FlagAdvanced
+        )
         self.addParameter(p_force_ptbr)
 
         # Checkboxes de estatísticas (marcados conforme prefs)
         enabled_stats = prefs.get("stats_enabled", {})
         for key, label in self.STATS.items():
             p = QgsProcessingParameterBoolean(
-                key,
-                f"Calcular: {label}",
-                defaultValue=enabled_stats.get(key, True)
+                key, f"Calcular: {label}", defaultValue=enabled_stats.get(key, True)
             )
             p.setFlags(p.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
             self.addParameter(p)
@@ -189,7 +183,7 @@ class AttributeStatisticsAlgorithm(QgsProcessingAlgorithm):
                 self.OUTPUT,
                 "Arquivo CSV de saída",
                 fileFilter="CSV (*.csv)",
-                defaultValue=default_output
+                defaultValue=default_output,
             )
         )
 
@@ -205,11 +199,15 @@ class AttributeStatisticsAlgorithm(QgsProcessingAlgorithm):
         if layer is None:
             raise QgsProcessingException("Camada inválida.")
 
-        exclude_fields = self.parameterAsFields(parameters, self.EXCLUDE_FIELDS, context) or []
+        exclude_fields = (
+            self.parameterAsFields(parameters, self.EXCLUDE_FIELDS, context) or []
+        )
         precision = int(self.parameterAsInt(parameters, self.PRECISION, context))
         ptbr_format = bool(self.parameterAsBool(parameters, self.PTBR_FORMAT, context))
         load_after = bool(self.parameterAsBool(parameters, self.LOAD_AFTER, context))
-        stats_enabled = {k: self.parameterAsBool(parameters, k, context) for k in self.STATS.keys()}
+        stats_enabled = {
+            k: self.parameterAsBool(parameters, k, context) for k in self.STATS.keys()
+        }
 
         output_path = self.parameterAsFileOutput(parameters, self.OUTPUT, context)
         out_folder = os.path.dirname(output_path)
@@ -235,7 +233,7 @@ class AttributeStatisticsAlgorithm(QgsProcessingAlgorithm):
                 v = feat[fn]
                 if v is None:
                     continue
-                
+
                 val = float(v)
                 if math.isfinite(val):
                     values_by_field[fn].append(val)
@@ -300,7 +298,7 @@ class AttributeStatisticsAlgorithm(QgsProcessingAlgorithm):
             last_layer_source=layer.source(),
             force_ptbr=force_ptbr,
             load_after=load_after,
-            stats_enabled=stats_enabled
+            stats_enabled=stats_enabled,
         )
 
         # Carregar CSV automaticamente (mesmo comportamento)
@@ -318,7 +316,7 @@ class AttributeStatisticsAlgorithm(QgsProcessingAlgorithm):
         if output_path:
             feedback.pushInfo(f"Arquivo CSV gerado: file:///{output_path}")
 
-        clickable = f"<a href=\"file:///{out_folder}\">{out_folder}</a>"
+        clickable = f'<a href="file:///{out_folder}">{out_folder}</a>'
         feedback.pushInfo(f"Arquivo salvo em: {clickable}")
 
         return {self.OUTPUT: output_path}

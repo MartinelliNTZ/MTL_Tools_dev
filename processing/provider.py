@@ -5,7 +5,8 @@ from qgis.core import QgsProcessingProvider
 from .raster_mass_sampler import RasterMassSampler
 from .difference_fields_algorithm import DifferenceFieldsAlgorithm
 from .attribute_statistics import AttributeStatisticsAlgorithm
-#from .elevation_analisys import ElevationAnalisys
+
+# from .elevation_analisys import ElevationAnalisys
 
 
 class MTLProvider(QgsProcessingProvider):
@@ -13,15 +14,13 @@ class MTLProvider(QgsProcessingProvider):
     def loadAlgorithms(self):
         print("[DEBUG] Registrando algoritmos MTL…")
         self.addAlgorithm(RasterMassSampler())
-        self.addAlgorithm(DifferenceFieldsAlgorithm())  
-        self.addAlgorithm(AttributeStatisticsAlgorithm())        
-               
-            
+        self.addAlgorithm(DifferenceFieldsAlgorithm())
+        self.addAlgorithm(AttributeStatisticsAlgorithm())
+
         """     try:
             self.addAlgorithm(ElevationAnalisys())  
         except :            
             print("Error: Cannot divide by zero!") """
-        
 
     def id(self):
         return "cadmus"
@@ -31,7 +30,9 @@ class MTLProvider(QgsProcessingProvider):
 
     def longName(self):
         return "Cadmus – Processamento"
-    
+
     def icon(self):
-        path = os.path.join(os.path.dirname(__file__), "..", "resources","icons", "cadmus_icon.ico")
+        path = os.path.join(
+            os.path.dirname(__file__), "..", "resources", "icons", "cadmus_icon.ico"
+        )
         return QIcon(path)
