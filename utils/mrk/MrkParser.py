@@ -5,22 +5,20 @@ import re
 from ...core.config.LogUtils import LogUtils
 
 
-
-class MrkParser:   
+class MrkParser:
 
     LINE_RE = re.compile(
         r"(?P<foto>\d+).*?"
         r"(?P<lat>-?\d+\.\d+),Lat.*?"
         r"(?P<lon>-?\d+\.\d+),Lon.*?"
         r"(?P<alt>-?\d+(?:\.\d+)?),Ellh",
-        re.IGNORECASE
+        re.IGNORECASE,
     )
 
     DATE_RE = re.compile(r"DJI_(\d{8})", re.IGNORECASE)
 
     FILE_META_RE = re.compile(
-        r"DJI_\d+_(?P<numdovoo>\d+?)_(?P<nomedovoo>[^_]+?)_Timestamp",
-        re.IGNORECASE
+        r"DJI_\d+_(?P<numdovoo>\d+?)_(?P<nomedovoo>[^_]+?)_Timestamp", re.IGNORECASE
     )
 
     @staticmethod
@@ -36,7 +34,9 @@ class MrkParser:
         }
 
     @staticmethod
-    def _generate_folder_fields(file_dir: str, base_folder: str, tool_key: str="untraceable") -> dict:
+    def _generate_folder_fields(
+        file_dir: str, base_folder: str, tool_key: str = "untraceable"
+    ) -> dict:
 
         file_dir = os.path.abspath(file_dir)
         base_folder = os.path.abspath(base_folder)
@@ -64,10 +64,19 @@ class MrkParser:
         data = {}
         for i, name in enumerate(folders, 1):
             data[f"pasta{i}"] = name
-        logger.debug(f"Generated folder fields: {data} for file_dir: {file_dir} and base_folder: {base_folder}")
+        logger.debug(
+            f"Generated folder fields: {data} for file_dir: {file_dir} and base_folder: {base_folder}"
+        )
         return data
+
     @staticmethod
-    def parse_folder(folder, recursive=True, extra_fields=None, gerarpastas=True, tool_key="untraceable"):
+    def parse_folder(
+        folder,
+        recursive=True,
+        extra_fields=None,
+        gerarpastas=True,
+        tool_key="untraceable",
+    ):
         """
         Lê todos os MRK de uma pasta e retorna lista de pontos.
         """
@@ -92,8 +101,12 @@ class MrkParser:
 
                 folder_fields = {}
                 if gerarpastas:
-                    folder_fields = MrkParser._generate_folder_fields(root, folder, tool_key)
-                    logger.debug(f"Generated folder fields for file: {file_path} - {folder_fields}")
+                    folder_fields = MrkParser._generate_folder_fields(
+                        root, folder, tool_key
+                    )
+                    logger.debug(
+                        f"Generated folder fields for file: {file_path} - {folder_fields}"
+                    )
 
                 with open(file_path, "r", encoding="utf-8", errors="ignore") as fh:
 
@@ -115,21 +128,22 @@ class MrkParser:
                             "numdovoo": file_meta["numdovoo"],
                             "nomedovoo": file_meta["nomedovoo"],
                         }
-                        
 
                         if gerarpastas:
                             point.update(folder_fields)
 
                         points.append(point)
-                       
 
             if not recursive:
                 break
 
         if gerarpastas:
             points = MrkParser._normalize_folder_fields(points)
-        logger.debug(f"Parsed point: {point} from file: {file_path}Points parsed so far: {len(points)}")
+        logger.debug(
+            f"Parsed point: {point} from file: {file_path}Points parsed so far: {len(points)}"
+        )
         return points
+
     @staticmethod
     def _normalize_folder_fields(points: list) -> list:
         """
@@ -146,8 +160,9 @@ class MrkParser:
                             max_n = n
                     except ValueError as e:
                         logger = LogUtils(tool="mrk_parser", class_name="MrkParser")
-                        logger.warning(f"Unexpected folder field format: {k} in point: {p}. Error: {e}")
-                        
+                        logger.warning(
+                            f"Unexpected folder field format: {k} in point: {p}. Error: {e}"
+                        )
 
         if max_n == 0:
             return points
@@ -169,15 +184,16 @@ class MrkParser:
             name=name,
             extra_fields=extra_fields,
         )
+
     @staticmethod
     def _get_logger(tool_key: str = "untraceable") -> LogUtils:
         """Helper para obter logger com tool_key específico.
-        
+
         Parameters
         ----------
         tool_key : str
             Identificador da ferramenta (padrão: 'untraceable')
-            
+
         Returns
         -------
         LogUtils

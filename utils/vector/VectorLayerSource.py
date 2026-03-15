@@ -1,37 +1,38 @@
+# -*- coding: utf-8 -*-
 from pathlib import Path
 from qgis.core import (
-            QgsVectorFileWriter,
-            QgsProject,
-            QgsVectorLayer,
-            QgsWkbTypes,
-            QgsFeatureRequest,
-            QgsVectorLayer,
-        QgsVectorFileWriter,
-        QgsProject,
-        )
-from typing import Optional, Tuple 
+    QgsVectorFileWriter,
+    QgsProject,
+    QgsVectorLayer,
+    QgsWkbTypes,
+    QgsVectorLayer,
+    QgsVectorFileWriter,
+    QgsProject,
+)
+from typing import Optional, Tuple
 import os
-import tempfile 
+import tempfile
 import time
 from ...utils.StringUtils import StringUtils
-from ...utils.ProjectUtils import ProjectUtils
 from ...core.config.LogUtils import LogUtils
+
+
 class VectorLayerSource:
     """
     Responsável pela entrada, saída e origem de camadas vetoriais.
-    
+
     Escopo:
     - Carregar camadas vetoriais de diferentes fontes
     - Salvar camadas em diferentes formatos
     - Validar integridade de camadas
     - Clonar camadas existentes
     - Gerenciar origem de dados (arquivo, banco, memória)
-    
+
     Responsabilidade Principal:
     - Orquestrar operações de I/O de camadas vetoriais
     - Garantir que camadas sejam carregadas e salvas corretamente
     - Validar antes de operações críticas
-    
+
     Logging Strategy (Métodos Estáticos):
     - Helper method: _get_logger(tool_key) centraliza criação de instâncias LogUtilsNew
     - Benefícios: Thread-safe, flexível (tool_key customizável), sem estado global
@@ -40,12 +41,12 @@ class VectorLayerSource:
     @staticmethod
     def _get_logger(tool_key: str = "untraceable") -> LogUtils:
         """Helper para obter logger com tool_key específico.
-        
+
         Parameters
         ----------
         tool_key : str
             Identificador da ferramenta (padrão: 'untraceable')
-            
+
         Returns
         -------
         LogUtils
@@ -53,19 +54,18 @@ class VectorLayerSource:
         """
         return LogUtils(tool=tool_key, class_name="VectorLayerSource")
 
-
     # ------------------------------------------------------------------
     # SAVE VECTOR LAYER (UNIFICADO E BIG-DATA SAFE)
     # ------------------------------------------------------------------
     @staticmethod
     def save_vector_layer(
-            layer: QgsVectorLayer,
-            *,
-            save_to_folder: bool = False,
-            output_path: Optional[str] = None,
-            output_name: Optional[str] = None,
-            decision: str = "rename",
-            external_tool_key: str = "untraceable"
+        layer: QgsVectorLayer,
+        *,
+        save_to_folder: bool = False,
+        output_path: Optional[str] = None,
+        output_name: Optional[str] = None,
+        decision: str = "rename",
+        external_tool_key: str = "untraceable",
     ) -> Optional[QgsVectorLayer]:
 
         logger = VectorLayerSource._get_logger(external_tool_key)
@@ -85,7 +85,7 @@ class VectorLayerSource:
             memory_layer = QgsVectorLayer(
                 f"{QgsWkbTypes.displayString(layer.wkbType())}?crs={layer.crs().authid()}",
                 layer_name,
-                "memory"
+                "memory",
             )
 
             provider = memory_layer.dataProvider()
@@ -147,20 +147,19 @@ class VectorLayerSource:
         transform_context = QgsProject.instance().transformContext()
 
         result, error_message = QgsVectorFileWriter.writeAsVectorFormatV2(
-            layer,
-            final_path,
-            transform_context,
-            options
+            layer, final_path, transform_context, options
         )
 
         if result != QgsVectorFileWriter.NoError:
-            logger.critical(f"Erro ao salvar camada | Código={result} | Msg={error_message}")
+            logger.critical(
+                f"Erro ao salvar camada | Código={result} | Msg={error_message}"
+            )
             return None
 
         saved_layer = QgsVectorLayer(
             final_path,
             Path(final_path).stem,  # nome vem do arquivo escolhido pelo usuário
-            "ogr"
+            "ogr",
         )
 
         if not saved_layer.isValid():
@@ -222,7 +221,7 @@ class VectorLayerSource:
         )
 
     @staticmethod
-    def get_layer_file_size( layer: QgsVectorLayer) -> int:
+    def get_layer_file_size(layer: QgsVectorLayer) -> int:
         """Retorna tamanho em bytes do datasource se for arquivo"""
         try:
             src = layer.source()
@@ -242,7 +241,7 @@ class VectorLayerSource:
     def export_temp_layer(
         layer: QgsVectorLayer,
         prefix: str = "tmp_layer",
-        external_tool_key: str = "untraceable"
+        external_tool_key: str = "untraceable",
     ) -> Optional[str]:
 
         if not layer or not layer.isValid():
@@ -255,7 +254,7 @@ class VectorLayerSource:
             layer=layer,
             output_path=output_path,
             decision="overwrite",
-            external_tool_key=external_tool_key
+            external_tool_key=external_tool_key,
         )
 
     @staticmethod
@@ -296,7 +295,6 @@ class VectorLayerSource:
 
         return new_path
 
-
     # ------------------------------------------------------------------
     # VALIDAÇÃO CENTRALIZADA
     # ------------------------------------------------------------------
@@ -305,7 +303,7 @@ class VectorLayerSource:
         layer: QgsVectorLayer,
         *,
         expected_geometry: Optional[int] = None,
-        require_editable: bool = False
+        require_editable: bool = False,
     ) -> Tuple[bool, Optional[str]]:
         """
         Valida camada vetorial com regras padronizadas.
@@ -339,9 +337,6 @@ class VectorLayerSource:
 
         return True, None
 
-
-
-
     def load_vector_layer_from_file(self, file_path, external_tool_key="untraceable"):
         """Carrega uma camada vetorial de um arquivo no disco."""
         logger = VectorLayerSource._get_logger(external_tool_key)
@@ -361,20 +356,27 @@ class VectorLayerSource:
             logger.error(f"Erro carregando layer {file_path}: {e}")
             return None
 
-    def load_vector_layer_from_database(self, connection_string, layer_name, external_tool_key="untraceable"):
+    def load_vector_layer_from_database(
+        self, connection_string, layer_name, external_tool_key="untraceable"
+    ):
         """Carrega uma camada vetorial de um banco de dados."""
         pass
 
-    def create_memory_layer(self, layer_name, geometry_type, crs, external_tool_key="untraceable"):
+    def create_memory_layer(
+        self, layer_name, geometry_type, crs, external_tool_key="untraceable"
+    ):
         """Cria uma camada vetorial em memória com geometria e CRS especificados."""
         pass
 
-
-    def save_vector_layer_to_database(self, layer, connection_string, table_name, external_tool_key="untraceable"):
+    def save_vector_layer_to_database(
+        self, layer, connection_string, table_name, external_tool_key="untraceable"
+    ):
         """Salva uma camada vetorial em um banco de dados."""
         pass
 
-    def clone_vector_layer(self, source_layer, include_features, external_tool_key="untraceable"):
+    def clone_vector_layer(
+        self, source_layer, include_features, external_tool_key="untraceable"
+    ):
         """Cria uma cópia exata de uma camada vetorial com ou sem feições."""
         pass
 
@@ -386,7 +388,9 @@ class VectorLayerSource:
         """Obtém a URI ou caminho completo da origem da camada."""
         pass
 
-    def check_file_format_compatibility(self, file_path, target_format, external_tool_key="untraceable"):
+    def check_file_format_compatibility(
+        self, file_path, target_format, external_tool_key="untraceable"
+    ):
         """Verifica se o arquivo pode ser convertido para o formato desejado."""
         pass
 
@@ -394,7 +398,9 @@ class VectorLayerSource:
         """Recarrega a camada a partir de sua fonte original."""
         pass
 
-    def export_layer_statistics(self, layer, output_path, external_tool_key="untraceable"):
+    def export_layer_statistics(
+        self, layer, output_path, external_tool_key="untraceable"
+    ):
         """Exporta estatísticas básicas da camada para arquivo de relatório."""
         pass
 
