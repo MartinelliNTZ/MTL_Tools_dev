@@ -24,6 +24,7 @@ import os
 from typing import Optional
 import processing
 from qgis.PyQt.QtCore import QVariant
+from ...core.config.LogUtils import LogUtils
 
 
 class VectorLayerAttributes:
@@ -207,6 +208,8 @@ class VectorLayerAttributes:
             layer.updateFields()
             return True
         except Exception as e:
+            logger = LogUtils(tool="untraceable", class_name="VectorLayerAttributes")
+            logger.error(f"Erro criando campos de coordenada: {e}")
             return False
 
     @staticmethod
