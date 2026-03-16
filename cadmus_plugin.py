@@ -390,7 +390,8 @@ class CadmusPlugin:
             # ==================================================
             self._add_toolbar_dropdown(
                 title="Sistema",
-                main_action=self.action_restart_qgis,
+                #main_action=self.action_restart_qgis,#padrao
+                main_action=self.action_about_dialog,#debug editável
                 secondary_actions=[
                     self.action_restart_qgis,
                     self.action_logcat,
@@ -730,8 +731,7 @@ class CadmusPlugin:
 
             self.logger.info("Iniciando plugin: Carregar pasta de arquivos")
             self.load_folder_dlg = run_load_folder_layers(self.iface)
-            self.logger.info(
-                "Plugin Carregar pasta de arquivos executado com sucesso")
+            self.logger.info("Plugin Carregar pasta de arquivos executado com sucesso")
         except Exception as e:
             self.logger.error(
                 f"Erro ao executar Carregar pasta de arquivos: {str(e)}")
@@ -747,7 +747,7 @@ class CadmusPlugin:
             from .plugins.about_dialog import run_about_dialog
 
             self.logger.info("Abrindo diálogo: Sobre o Cadmus")
-            run_about_dialog(self.iface)
+            self.about_dlg = run_about_dialog(self.iface)
             self.logger.info("Diálogo Sobre Cadmus fechado")
         except Exception as e:
             self.logger.error(f"Erro ao executar Sobre o Cadmus: {str(e)}")

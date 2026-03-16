@@ -1,64 +1,8 @@
-1.7.1 2026 03 12
-  -1.7.1.1  
-    - #começa aqui
-    -1.7.1.2
-      - Propagate plugin `icon_path` into AppBarWidget and render icon
-      - Add `WidgetFactory.create_text_browser` helper
-      - Use `WidgetFactory.create_simple_button` in `InfoDialog`
-1.7.1.3
-  - Rename plugin mentions from `MTL_Tools`/`mtl_tools` to `Cadmus`/`cadmus`
-    - Updated: `processing/provider.py`, `core/config/LogUtils.py`, `resources/__init__.py`, docs and IDE metadata
-1.7.1.4
-  - Fix import cycle causing ImportError on startup
-    - Removed `ExplorerUtils` import from `utils/__init__.py` to avoid circular import between `core.config.LogUtils` and `utils` package
-    - This prevents `ImportError: cannot import name 'LogUtils'` during plugin load
-  1.7.1.5
-    - Security: validar esquema de URL antes de abrir conexões
-      - `core/task/altimetry_task.py`: validar `urlparse(url).scheme` aceita apenas `http/https` antes de `urlopen`
-      - `core/task/reverse_geocoding_task.py`: validar `urlparse(url).scheme` aceita apenas `http/https` antes de `Request`/`urlopen`
-      - Previne uso acidental de esquemas inseguros (ex.: `file://`, `ftp://`)
-  1.7.1.6
-    - Replace silent exception handlers with structured logging
-      - `core/task/altimetry_task.py`: log exceptions in `finished()` using `LogUtils` instead of silent `pass`
-      - `core/task/reverse_geocoding_task.py`: log exceptions in `finished()` using `LogUtils` instead of silent `pass`
-      - Ensures errors are captured in plugin JSONL logs and QGIS message log when critical
-  1.7.1.7
-    - Security: avoid Bandit B310 by replacing `urllib.request.urlopen` with `http.client` requests
-      - `core/task/altimetry_task.py`: use `http.client.HTTPSConnection`/`HTTPConnection` with validated scheme
-      - `core/task/reverse_geocoding_task.py`: same replacement and validation
-      - Adds explicit `User-Agent`, checks HTTP status and returns descriptive errors
-  1.7.1.8
-    - ReverseGeocode: follow HTTP 3xx redirects (max 5)
-      - `core/task/reverse_geocoding_task.py`: follow `Location` headers, resolve relative redirects, validate redirect schemes
-      - Log redirect locations and errors via `LogUtils`
-  1.7.1.9
-    - Fix restart subprocess security (avoid shell=True)
-      - `plugins/RestartQgis.py`: do not create .bat or call subprocess with `shell=True`
-      - Prepare command list and execute with `subprocess.Popen(cmd, shell=False)` on `aboutToQuit`
-      - Logs command and errors via `LogUtils`; removes shell injection risk (B602/B404)
-1.7.1.10
 
-FIX: TRATAMENTO DE EXCEPTS EM MainLayout.py
+2.0.7.1
 
-- Substitui blocos `except` corrompidos por `logger.error` em widgets de borda
-- Evita exceções silenciosas durante eventos de UI (`resizeEvent`, `enterEvent`, `leaveEvent`, `mouse*Event`)
-- Melhora observabilidade: erros agora aparecem no JSONL do plugin e no log do QGIS
-1.7.1.11
-
-FIX: CORREÇÕES NO LOGCAT (IO E UI)
-
-- Adicionado logger local em `plugins/logcat/core/io/log_file_watcher.py` para evitar
-  NameError em handlers de exceção durante monitoramento de arquivos.
-- Ajustado import de `LOG_FILE_LOCK` em `plugins/logcat/core/io/log_loader.py` para
-  tentar import absoluto e usar fallback seguro (`threading.Lock`) em caso de falha.
-- Corrigida a indentação e métodos em `plugins/logcat/ui/log_table_model.py` (mover
-  `append_entries` para dentro da classe, tooltips seguros, tratamento de cores),
-  prevenindo erros/syntax issues que podiam travar o diálogo do Logcat.
-1.7.1.12
-
-FIX: CORREÇÃO EM cadmus_plugin.py - _logger_global
-
-- Adiciona declaração `global _logger_global` dentro de `handle_exception` em
-  `cadmus_plugin.py` para evitar erro F823 (variável definida no escopo externo
-  referenciada antes da atribuição) e garantir logging consistente de exceções
-  não tratadas.
+- Refactor: `plugins/about_dialog.py` -> `AboutDialog` herda de `BaseDialog`
+  - Usa `WidgetFactory.create_image_widget` para logo
+  - Usa `WidgetFactory.create_label` + RichText + links externos + alinhamento
+  - Botão fechar agora via `WidgetFactory.create_simple_button`
+  - Parâmetros de info (version, updated, created, creator, location, email, site, github) via args nomeados

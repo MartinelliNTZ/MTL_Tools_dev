@@ -7,6 +7,7 @@ from qgis.PyQt.QtWidgets import (
     QDoubleSpinBox,
     QFrame,
 )
+from ...resources.widgets.ImageWidget import ImageWidget
 from ...utils.StringUtils import StringUtils
 from ...resources.widgets.LayerInputWidget import LayerInputWidget
 from ...resources.widgets.BottomActionButtonsWidget import BottomActionButtonsWidget
@@ -53,6 +54,54 @@ class WidgetFactory:
             layout.addWidget(WidgetFactory.create_separator())
 
         widget.setStyleSheet(Styles.attribute_selector())
+        return layout, widget
+    @staticmethod
+    def create_image_widget(
+        *,
+        image_path: str,
+        fixed_height: int = 60,
+        clickable: bool = False,
+        clicked_callback=None,
+        separator_top: bool = False,
+        separator_bottom: bool = False,
+        parent=None,
+    ):
+        """
+        Cria um widget de logo padronizado.
+
+        :param image_path: Caminho absoluto para a imagem.
+        :param fixed_height: Altura fixa do widget (padrão 60px).
+        :param clickable: Se True, o widget emite um sinal ao ser clicado.
+        :param clicked_callback: Função a ser chamada quando clicado (se clickable=True).
+        :param separator_top: Adiciona separador acima do widget.
+        :param separator_bottom: Adiciona separador abaixo do widget.
+        :param parent: Widget pai.
+        :return: tuple (layout contendo o widget, instância do widget)
+        """        
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(2)  # ou use Styles.LAYOUT_V_SPACING
+
+        if separator_top:
+            layout.addWidget(WidgetFactory.create_separator())
+
+        widget = ImageWidget(
+            image_path=image_path,
+            fixed_height=fixed_height,
+            parent=parent
+        )
+
+        if clickable and clicked_callback:
+            widget.clicked.connect(clicked_callback)
+
+        # Opcional: aplicar estilo específico se definido em Styles
+        # widget.setStyleSheet(Styles.logo_widget())
+
+        layout.addWidget(widget)
+
+        if separator_bottom:
+            layout.addWidget(WidgetFactory.create_separator())
+
         return layout, widget
 
     @staticmethod
@@ -686,7 +735,7 @@ class WidgetFactory:
         parent=None,
         separator_top=False,
         separator_bottom=False,
-        spacing: int = Styles.LAYOUT_V_SPACING,
+        spacing: int = Styles.LAYOUT_V_SPACING*10,
     ):
         """
         Cria botão simples que ocupa espaço disponível.
@@ -725,7 +774,15 @@ class WidgetFactory:
 
     @staticmethod
     def create_label(
-        *, text: str = "", bold: bool = False, word_wrap: bool = False, parent=None
+        *,
+        text: str = "",
+        bold: bool = False,
+        word_wrap: bool = False,
+        parent=None,
+        text_format=None,
+        text_interaction_flags=None,
+        open_external_links=None,
+        alignment=None,
     ) -> QLabel:
         """
         Cria um QLabel configurado e estilizado.
@@ -744,6 +801,18 @@ class WidgetFactory:
         parent : QWidget
             Widget pai
 
+        text_format : Qt.TextFormat | None
+            Define o formato do texto (p.ex., Qt.RichText)
+
+        text_interaction_flags : Qt.TextInteractionFlags | None
+            Flags de interação de texto para links
+
+        open_external_links : bool | None
+            Se True, permite links externos
+
+        alignment : Qt.Alignment | None
+            Alinhamento do label
+
         Returns
         -------
         QLabel
@@ -757,5 +826,17 @@ class WidgetFactory:
             font = label.font()
             font.setBold(True)
             label.setFont(font)
+
+        if text_format is not None:
+            label.setTextFormat(text_format)
+
+        if text_interaction_flags is not None:
+            label.setTextInteractionFlags(text_interaction_flags)
+
+        if open_external_links is not None:
+            label.setOpenExternalLinks(open_external_links)
+
+        if alignment is not None:
+            label.setAlignment(alignment)
 
         return label
