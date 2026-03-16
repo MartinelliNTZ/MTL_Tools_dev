@@ -80,10 +80,18 @@ class PhotoMetadataTask(BaseTask):
             foto = item.get("foto")
             if foto is None:
                 continue
+
+            mrk_folder = str(item.get("mrk_folder", "") or "").strip()
+            photo_key = (mrk_folder, int(foto))
+
             # Não incluir mrk_folder nos updates (é apenas campo de contexto)
             data = {k: v for k, v in item.items() if k not in ("foto", "mrk_folder")}
-            updates[int(foto)] = data
+            updates[photo_key] = data
             field_names.update(data.keys())
+
+            # Compatibilidade legada: se câmera não tem mrk_folder, também mantemos índice só por foto
+            if not mrk_folder:
+                updates[int(foto)] = data
 
         logger.debug(
             f"Cruzamento completo: {len(pontos)} fotos processadas, {len(updates)} atualizações geradas"

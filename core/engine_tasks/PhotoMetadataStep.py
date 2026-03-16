@@ -74,23 +74,43 @@ class PhotoMetadataStep(BaseStep):
             layer.startEditing()
             started_editing = True
 
-        # Mapear foto -> fid
+        # Mapear (mrk_folder, foto) -> fid (e compatibilidade por foto única)
         foto_to_fid = {}
+        foto_mrk_to_fid = {}
         for feat in layer.getFeatures():
             foto_val = feat.attribute("foto")
             if foto_val is None:
                 continue
+
             try:
-                foto_to_fid[int(foto_val)] = feat.id()
+                foto_int = int(foto_val)
             except Exception as e:
-                self.logger.debug(f"PhotoMetadataStep: failed parsing foto value {foto_val}: {e}")
+                self.logger.debug(
+                    f"PhotoMetadataStep: failed parsing foto value {foto_val}: {e}"
+                )
                 continue
+
+            mrk_folder_val = feat.attribute("mrk_folder")
+            mrk_folder = str(mrk_folder_val or "").strip()
+            foto_to_fid.setdefault(foto_int, feat.id())
+            foto_mrk_to_fid[(mrk_folder, foto_int)] = feat.id()
 
         # Aplicar valores por batch
         layer.blockSignals(True)
         try:
-            for foto, vals in updates.items():
-                fid = foto_to_fid.get(int(foto))
+            for key, vals in updates.items():
+                fid = None
+                if isinstance(key, tuple) and len(key) == 2:
+                    mrk_folder_key, foto_key = key
+                    fid = foto_mrk_to_fid.get((str(mrk_folder_key or "").strip(), int(foto_key)))
+                    if fid is None:
+                        fid = foto_to_fid.get(int(foto_key))
+                else:
+                    try:
+                        fid = foto_to_fid.get(int(key))
+                    except Exception:
+                        fid = None
+
                 if fid is None:
                     continue
                 for field_name, value in vals.items():

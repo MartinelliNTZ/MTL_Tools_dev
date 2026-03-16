@@ -441,10 +441,8 @@ IMPLEMENTACOES
     ja carrega algumas camdas e web services pergunta nome se nao cria 
       nome padrrao)
     - Ferramenta basica que apaga campos de KML
-    - Ferramenta Replace: colocar botao de trroccar campos de entrada e saida, 
     -acrescentar centralizar tela de todos os layouts 
     -Atribuir bandas 0 a todos raster 
-    -Recorte pela camada raster de múltiplas camadas 
     -Todos scripts de colheita 
     - matriz de linhas paralelas 
     -Classificador de declividade 
@@ -478,7 +476,6 @@ IMPLEMENTACOES
 
 Ferramenta de buffer, permitindo aplicação de buffer positivo ou negativo sobre camadas vetoriais.
 
-Ferramenta para cálculo automático de atributos geométricos, gerando comprimento (length) para linhas, coordenadas X e Y para pontos e área para polígonos.
 
 Ferramenta de processamento de declividade e altimetria. Recebe um DEM fornecido pelo usuário ou faz o download automático de um DEM. Recebe um KML definindo a área de interesse. Permite definir a resolução de saída do DEM e aplicar um buffer na área (por exemplo, 100 m). Possui seletor de intervalo para geração de curvas de nível. Permite gerar produtos individualmente, com opção de excluir ou salvar cada resultado. Possui opção de salvar os arquivos com nome padrão em uma pasta específica e carregar automaticamente os resultados em um grupo no QGIS. Aplica estilos predefinidos para declividade, altimetria e curvas de nível. Permite definir um tamanho mínimo para exclusão de curvas (por exemplo, 50 m).
 

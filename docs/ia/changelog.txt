@@ -6,3 +6,11 @@
   - Usa `WidgetFactory.create_label` + RichText + links externos + alinhamento
   - Botão fechar agora via `WidgetFactory.create_simple_button`
   - Parâmetros de info (version, updated, created, creator, location, email, site, github) via args nomeados
+
+2.0.7.2
+
+- Fix: corrigida a lógica de mapeamento de metadados de foto para suportar voos múltiplos com mesmo número de foto:
+  - `PhotoMetadataTask`: usa chave composta `(mrk_folder, foto)` em `updates`
+  - `PhotoMetadataStep`: mapeia e aplica atualizações via `(mrk_folder, foto)` e fallback por `foto`
+  - Evita sobrescrever metadados entre voos diferentes com foto-id duplicado
+
