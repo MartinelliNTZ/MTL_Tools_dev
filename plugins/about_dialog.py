@@ -51,8 +51,8 @@ class AboutDialog(BaseDialog):
             self.logger.debug("Título adicionado")
 
             info_text = (
-                "<b>Versão:</b> 2.0.4<br>"
-                "<b>Atualizada em:</b> 15 de Março de 2026<br>"
+                "<b>Versão:</b> 2.0.7<br>"
+                "<b>Atualizada em:</b> 16 de Março de 2026<br>"
                 "<b>Criado em:</b> 9 de Dezembro de 2024<br>"
                 "<b>Criador:</b> MTL Agricultura e Tecnologia<br>"
                 "<b>Local:</b> Palmas - Tocantins - Brasil<br>"

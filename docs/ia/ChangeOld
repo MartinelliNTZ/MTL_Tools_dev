@@ -1,3 +1,40 @@
+  
+2.0.7.1
+
+- Refactor: `plugins/about_dialog.py` -> `AboutDialog` herda de `BaseDialog`
+  - Usa `WidgetFactory.create_image_widget` para logo
+  - Usa `WidgetFactory.create_label` + RichText + links externos + alinhamento
+  - Botão fechar agora via `WidgetFactory.create_simple_button`
+  - Parâmetros de info (version, updated, created, creator, location, email, site, github) via args nomeados
+
+2.0.7.2
+
+- Fix: corrigida a lógica de mapeamento de metadados de foto para suportar voos múltiplos com mesmo número de foto:
+  - `PhotoMetadataTask`: usa chave composta `(mrk_folder, foto)` em `updates`
+  - `PhotoMetadataStep`: mapeia e aplica atualizações via `(mrk_folder, foto)` e fallback por `foto`
+  - Evita sobrescrever metadados entre voos diferentes com foto-id duplicado
+
+2.0.7.3
+
+- Refactor: removida opção "merge" (Unir todos os MRKs) do plugin Drone Coordinates
+  - `MrkParseTask` remove parâmetro `merge`
+  - `MrkParseStep` não exige mais `merge` no contexto
+  - UI: checkbox `merge` removido e preferências ajustadas
+- Feature: `VectorLayerGeometry.create_line_layer_from_points(..., group_by_fields=...)`
+  - gera uma linha por grupo de atributos definidos
+  - adiciona atributos genéricos via `attribute_fields`
+  - fallback único traço mantido se nenhum grupo válido
+- DroneCoordinates: _on_pipeline_finished chama create_line_layer_from_points com grupos MRK
+
+2.0.7.4
+
+- Fix: `MrkParser` `folder` agora é basename do diretório de voos (`DJI_...`) e novo campo `folder_path` guarda caminho completo
+- Fix: `MrkParseTask` define `mrk_folder` como `folder_path` absoluto para PhotoMetadata
+- Fix: `PhotoMetadata.enrich` resolve paths relativos para absolute usando `base_folder` e fallback 
+- Fix: chama `VectorLayerGeometry.create_line_layer_from_points` genérico com `group_by_fields` e `attribute_fields` para garantir responsabilidade de camada genérica
+
+  
+  
   1.7.1 2026 03 12
   -1.7.1.1  
     - #começa aqui
