@@ -24,7 +24,6 @@ class DroneCordinates(BasePluginMTL):
 
     CHECKBOX_OPTIONS = {
         "recursive": "Vasculhar subpastas",
-        "merge": "Unir todos os MRKs",
         "photos": "Cruzar com metadados das fotos",
     }
 
@@ -171,7 +170,6 @@ class DroneCordinates(BasePluginMTL):
 
         # Checkboxes
         self.checkbox_map["recursive"].setChecked(prefs.get("recursive", True))
-        self.checkbox_map["merge"].setChecked(prefs.get("merge", True))
         self.checkbox_map["photos"].setChecked(prefs.get("photos", True))
 
         # Salvamento
@@ -202,7 +200,6 @@ class DroneCordinates(BasePluginMTL):
         prefs_data = {
             "folder": folder_path,
             "recursive": self.checkbox_map["recursive"].isChecked(),
-            "merge": self.checkbox_map["merge"].isChecked(),
             "photos": self.checkbox_map["photos"].isChecked(),
             "save_file": self.save_track_selector.is_enabled(),
             "save_file_pts": self.save_points_selector.is_enabled(),
@@ -235,7 +232,6 @@ class DroneCordinates(BasePluginMTL):
             return
 
         recursive = self.checkbox_map["recursive"].isChecked()
-        merge = self.checkbox_map["merge"].isChecked()
         apply_photos = self.checkbox_map["photos"].isChecked()
 
         extra_fields = PhotoMetadata.FIELDS_PHOTO if apply_photos else None
@@ -243,7 +239,6 @@ class DroneCordinates(BasePluginMTL):
         context = ExecutionContext()
         context.set("paths", paths)
         context.set("recursive", recursive)
-        context.set("merge", merge)
         context.set("extra_fields", extra_fields)
         context.set("tool_key", self.TOOL_KEY)
         context.set("points_layer_name", "MRK_Pontos")
@@ -304,7 +299,18 @@ class DroneCordinates(BasePluginMTL):
 
         # ===== TRAÇO =====
         points = context.get("points", []) or []
-        vl_line = VectorLayerGeometry.create_line_layer_from_points(points)
+        vl_line = VectorLayerGeometry.create_line_layer_from_points(
+            points,
+            group_by_fields=["mrk_path", "mrk_file"],
+            attribute_fields=[
+                "data_name",
+                "folder",
+                "mrk_file",
+                "mrk_path",
+                "numdovoo",
+                "nomedovoo",
+            ],
+        )
         if vl_line:
             out_layer = None
             save_to_file = self.save_track_selector.is_enabled()

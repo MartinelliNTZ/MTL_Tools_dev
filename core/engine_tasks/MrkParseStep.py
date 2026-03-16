@@ -19,7 +19,6 @@ class MrkParseStep(BaseStep):
         return MrkParseTask(
             paths=context.get("paths"),
             recursive=context.get("recursive", True),
-            merge=context.get("merge", True),
             extra_fields=context.get("extra_fields"),
             tool_key=context.get("tool_key"),
         )

@@ -14,14 +14,12 @@ class MrkParseTask(BaseTask):
         self,
         paths: List[str],
         recursive: bool,
-        merge: bool,
         extra_fields: Optional[Dict[str, Any]],
         tool_key: str,
     ):
         super().__init__("Lendo MRKs", tool_key)
         self.paths = paths
         self.recursive = recursive
-        self.merge = merge
         self.extra_fields = extra_fields or {}
 
     def _run(self) -> bool:
@@ -50,12 +48,12 @@ class MrkParseTask(BaseTask):
             logger.info(f"Encontrados {len(points)} pontos em {base}")
 
             # 🔴 CRÍTICO: Rastrear pasta específica de cada ponto
-            # MrkParser.parse_folder() já retorna p['folder']
-            # Usamos p['folder'] como mrk_folder para evitar conflito
+            # MrkParser.parse_folder() retorna folder_name e folder_path
+            # Usamos folder_path para fornecer path absoluto ao PhotoMetadata
             if points:
                 for p in points:
-                    # Usa pasta específica (já vem do MrkParser)
-                    p["mrk_folder"] = p.get("folder", base)
+                    # Usa path absoluto para cruzamento de metadados
+                    p["mrk_folder"] = p.get("folder_path", base)
                 all_points.extend(points)
 
         self.result = {

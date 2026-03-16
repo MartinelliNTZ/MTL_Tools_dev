@@ -127,19 +127,80 @@ class VectorLayerGeometry:
     def create_line_layer_from_points(
         points: list,
         name: str = "Trilha",
+        group_by_fields: list = None,
+        attribute_fields: list = None,
     ) -> Optional[QgsVectorLayer]:
-        """Cria uma camada de linha em memória a partir de uma lista de pontos."""
-        if not points or len(points) < 2:
+        """Cria linha(s) em memória a partir de pontos.
+
+        group_by_fields: lista de campos para agrupar em várias linhas.
+        attribute_fields: lista de campos a serem incluidos no layer de saída.
+        """
+        if not points:
             return None
 
+        # Agrupa o conjunto de pontos por chave específica
+        groups = {None: points}
+        if group_by_fields:
+            groups = {}
+            for p in points:
+                key = tuple(str(p.get(f, "") or "").strip() for f in group_by_fields)
+                groups.setdefault(key, []).append(p)
+
+        # Preparar campos do layer
+        fields = QgsFields()
+        if attribute_fields:
+            for field_name in attribute_fields:
+                fields.append(QgsField(field_name, QVariant.String))
+
         line = QgsVectorLayer("LineString?crs=EPSG:4326", name, "memory")
-        geom = QgsGeometry.fromPolylineXY(
-            [QgsPointXY(p.get("lon"), p.get("lat")) for p in points]
-        )
-        f = QgsFeature()
-        f.setGeometry(geom)
-        line.dataProvider().addFeature(f)
+        line.dataProvider().addAttributes(fields)
+        line.updateFields()
+
+        for group_key, group in groups.items():
+            if len(group) < 2:
+                continue
+
+            # Ordenar por foto se existir
+            try:
+                group = sorted(group, key=lambda x: int(x.get("foto", 0)))
+            except Exception:
+                pass
+
+            geometry = QgsGeometry.fromPolylineXY(
+                [QgsPointXY(p.get("lon"), p.get("lat")) for p in group]
+            )
+
+            f = QgsFeature(line.fields())
+            f.setGeometry(geometry)
+
+            if attribute_fields:
+                source = group[0]
+                for attr in attribute_fields:
+                    if attr in source:
+                        f.setAttribute(attr, source.get(attr))
+
+            line.dataProvider().addFeature(f)
+
         line.updateExtents()
+
+        # Se não houve grupos válidos, tenta criar uma linha única com todos
+        if line.featureCount() == 0 and points:
+            if len(points) >= 2:
+                geometry = QgsGeometry.fromPolylineXY(
+                    [QgsPointXY(p.get("lon"), p.get("lat")) for p in points]
+                )
+                f = QgsFeature(line.fields())
+                f.setGeometry(geometry)
+                if attribute_fields:
+                    source = points[0]
+                    for attr in attribute_fields:
+                        if attr in source:
+                            f.setAttribute(attr, source.get(attr))
+                line.dataProvider().addFeature(f)
+                line.updateExtents()
+            else:
+                return None
+
         return line
 
     def create_buffer_geometry(

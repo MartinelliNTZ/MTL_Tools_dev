@@ -68,6 +68,15 @@ class PhotoMetadata:
         for p in points:
             # Se o ponto tem mrk_folder, usar; senão usar base_folder
             folder = p.get("mrk_folder") or base_folder
+            if folder and not os.path.isabs(folder) and base_folder:
+                candidate = os.path.join(base_folder, folder)
+                if os.path.isdir(candidate):
+                    folder = candidate
+
+            if folder and not os.path.isdir(folder) and base_folder:
+                # fallback robusto
+                folder = base_folder
+
             if folder not in points_by_folder:
                 points_by_folder[folder] = []
             points_by_folder[folder].append(p)
