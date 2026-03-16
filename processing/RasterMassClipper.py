@@ -317,20 +317,11 @@ class RasterMassClipper(BaseProcessingAlgorithm):
 
     # ---------------- UI ----------------
 
-    def icon(self,icon_path = "cadmus_icon.ico"):
-
-        path = os.path.join(
-            os.path.dirname(__file__),
-            "..",
-            "resources",
-            "icons",
-            icon_path,
-        )
-
-        return QIcon(path)
+    def icon(self):
+        return super().icon("raster_mass_clipper.ico")
 
     def group(self):
-        return "Estatistica"
+        return self.GROUP_RASTER.name
 
     def groupId(self):
-        return "estatistica"
+        return self.GROUP_RASTER.id

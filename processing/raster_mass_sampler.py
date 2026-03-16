@@ -2,8 +2,8 @@
 import os
 from PyQt5.QtGui import QIcon
 
-from qgis.core import (
-    QgsProcessingAlgorithm,
+from .BaseProcessingAlgorithm import BaseProcessingAlgorithm
+from qgis.core import (    
     QgsProcessingParameterFeatureSource,
     QgsProcessingParameterMultipleLayers,
     QgsProcessingParameterFeatureSink,
@@ -22,7 +22,7 @@ from ..utils.ToolKeys import ToolKey
 TOOL_KEY = ToolKey.RASTER_MASS_SAMPLER
 
 
-class RasterMassSampler(QgsProcessingAlgorithm):
+class RasterMassSampler(BaseProcessingAlgorithm):
     """
     QgsProcessingAlgorithm: Amostragem massiva de rasters para pontos.
     """
@@ -124,16 +124,13 @@ class RasterMassSampler(QgsProcessingAlgorithm):
 
     # ------------------------ UI INFO ------------------------
     def icon(self):
-        path = os.path.join(
-            os.path.dirname(__file__), "..", "resources", "icons", "raster_mass.ico"
-        )
-        return QIcon(path)
+        return super().icon("raster_mass.ico")
 
     def group(self):
-        return "Estatistica"
+        return self.GROUP_RASTER.name
 
     def groupId(self):
-        return "estatistica"
+        return self.GROUP_RASTER.id
 
     # ---------------------- Helpers ----------------------
     def build_output_fields(self, pts, rasters, max_len: int = 10):

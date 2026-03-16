@@ -29,17 +29,18 @@ ferramentas = name                              tipo                            
     - 14: AmostradorMassivo de Raster           Processing
     - 15: Gerador de diferença entre campos     Processing
     - 16: Estatisticas de atributos             Processing
+    - 17: Recortador Massivo de Raster          Processing                      RasterMassClipper              manipulação de raster
 
 PADRONIZADOS = 1, 2, 3, 4, 5, 6, 7 8, 9, 10 , 11, 13
 Documentação de cenarios: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13
 Instrucoes: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13
-    metadada organizar
-    license=GPL-2.0
     multpart nao ta em task e pode bugar
 changelog=
   
   2.0.7 2026/03/16
     - About dialog padronizada
+    - Nova Ferramenta: Recortador Massivo de Raster (RasterMassClipper) - recorte em lote de rasters por polígonos
+    - BaseAlgoritmo
   
   2.0.6 2026/03/15
     - PEP8 fix issues 
