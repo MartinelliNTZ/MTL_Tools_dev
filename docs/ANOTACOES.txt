@@ -3,12 +3,9 @@ martinelli.matheus11@gmail.com        01/01/2000  - 01/01/2000 - 04/04/2026
 mtlagriculturaetecnologia@gmail.com   01/01/2000  - 01/01/2000 - 07/04/2026
 martinelli.linesbr2@gmail.com         01/01/2000  - 01/01/2000 - 08/04/2026
 cpunova963@gmail.com                  01/01/2000  - 11/03/2026 - 10/04/2026
-martinelli.linesbr@hotmail.com        12/03/2026  - 13/03/2026 - 11/04/2026
+martinelli.linesbr@hotmail.com        12/03/2026  - 13/03/2026 - 12/04/2026
 BUGS CONHECIDOS
-  - clear all session nao ta funcionado, quando apago essa sesao ele apaga a ultima e nao a que eu to
     - DroneCordinatesPlugin: MrkParser.parse_folder() não processa TODOS os MRKs da pasta - apenas 1 arquivo [1.6.2 TODO]
-      - Encontra 98 MRKs mas retorna apenas 16160 pontos (1 arquivo) em vez de múltiplos de 16160
-      - Afeta: seleção de pasta completa com múltiplos .mrk
       - Workaround: selecionar múltiplos arquivos manualmente via browse (contorna o problema)
     - Geral: Impedir múltiplas instâncias de plugins rodando simultaneamente
 bandit -r . -f html -o bandit-report.html
@@ -33,15 +30,16 @@ ferramentas = name                              tipo                            
     - 15: Gerador de diferença entre campos     Processing
     - 16: Estatisticas de atributos             Processing
 
-PADRONIZADOS = 1, 2, 3, 4, 5, 8, 9, 10 , 11, 13
-Documentação de cenarios: 1, 2, 3, 4, 5, 8, 9, 10, 11, 13
-Instrucoes: 1, 2, 3, 4,  5, 8, 9, 10, 11, 13
+PADRONIZADOS = 1, 2, 3, 4, 5, 6, 7 8, 9, 10 , 11, 13
+Documentação de cenarios: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13
+Instrucoes: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13
     metadada organizar
     license=GPL-2.0
     multpart nao ta em task e pode bugar
 changelog=
   
   2.0.7 2026/03/16
+    - About dialog padronizada
   
   2.0.6 2026/03/15
     - PEP8 fix issues 

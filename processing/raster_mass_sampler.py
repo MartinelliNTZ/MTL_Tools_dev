@@ -25,24 +25,6 @@ TOOL_KEY = ToolKey.RASTER_MASS_SAMPLER
 class RasterMassSampler(QgsProcessingAlgorithm):
     """
     QgsProcessingAlgorithm: Amostragem massiva de rasters para pontos.
-
-    Este algoritmo recebe uma camada de pontos e uma lista de rasters (ou camadas raster),
-    amostra o valor de cada raster no local de cada ponto e retorna uma nova camada
-    com os atributos originais dos pontos mais colunas com os valores amostrados.
-
-    Design e responsabilidade:
-    - `processAlgorithm` orquestra o fluxo (validação, construção de campos, amostragem, escrita)
-    - `build_output_fields` cria os `QgsFields` de saída e gera nomes de campo a partir
-        do `layer.name()` dos rasters (sanitizado, truncado e garantindo unicidade)
-    - `_sanitize_field_name` encapsula as regras de normalização e garantia de unicidade
-    - `build_transforms` prepara transforms CRS para amostragem (pontos -> raster CRS)
-    - `sample_features` itera sobre os pontos e realiza a amostragem usando `dataProvider().sample`
-    - `write_sink` escreve o resultado no sink de saída e persiste preferências quando aplicável
-
-    Observações:
-    - Prefira reutilizar utilitários existentes em `utils.vector` e `utils.raster`; aqui
-        usamos `VectorLayerProjection.reproject_features` para reprojeção final quando solicitado.
-    - Os nomes de campos são limitados a 10 caracteres para compatibilidade com formatos legados.
     """
 
     INPUT_POINTS = "INPUT_POINTS"

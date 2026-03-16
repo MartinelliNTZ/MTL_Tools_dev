@@ -25,6 +25,7 @@ class ToolKey:
     PROVIDER = "provider"
     RASTER_MASS_SAMPLER = "raster_mass_sampler"
     ELEVATION_ANALISYS = "elevation_analisys"
+    RASTER_MASS_CLIPPER = "raster_mass_clipper"
 
     # Cores por tool_key (toolbar-first, semântica)
     TOOL_KEY_COLORS = {
