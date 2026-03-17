@@ -28,7 +28,9 @@ class GeometryLineFromPoints(BaseProcessingAlgorithm):
     ALGORITHM_DISPLAY_NAME = "Linha de Diferença entre Pontos"
     ALGORITHM_GROUP = BaseProcessingAlgorithm.GROUP_VETORIAL
     ICON = "line_difference.ico"
-
+    INSTRUCTIONS_FILE = "geometry_difference_line.html"
+    
+    # especificas do algoritmo
     INPUT_LAYER_A = "INPUT_LAYER_A"
     INPUT_LAYER_B = "INPUT_LAYER_B"
     USE_SECOND_LAYER = "USE_SECOND_LAYER"

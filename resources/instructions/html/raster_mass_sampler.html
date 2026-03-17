@@ -1,0 +1,80 @@
+<h2 style="color:#ffffff;">
+Ferramenta do pacote Cadmus para amostragem massiva de pontos de múltiplos rasters em pontos,
+gerando uma nova camada com os valores extraídos como atributos.
+</h2>
+
+<h2 style="color:#ffffff;">🎯 Objetivo</h2>
+<h2 style="color:#ffffff;">
+Extrair valores de vários rasters em pontos de forma automatizada<br>
+Gerar uma tabela com valores amostrados por ponto<br>
+Permitir análise cruzada entre diferentes superfícies raster<br>
+Preparar dados para estatística, modelagem e validação
+<h3 style="color:#ff0505;">⚠️ É imprecindivel que o nome do raster seja claro e unico, pois será usado para nomear os campos de saída.</h3>
+</h2>
+
+<h2 style="color:#ffffff;">🛠️ Como usar</h2>
+<h2 style="color:#ffffff;">
+1. Abra a ferramenta<br>
+Menu → Cadmus → Raster → Amostragem Massiva de Rasters<br><br>
+
+2. Selecione os pontos<br>
+Escolha uma camada de pontos de entrada<br><br>
+
+3. Selecione os rasters<br>
+Adicione um ou mais rasters para amostragem<br><br>
+
+4. Defina CRS de saída (opcional)<br>
+Caso informado, a camada resultante será reprojetada<br><br>
+
+5. Execute<br>
+Acompanhe o processamento até finalizar
+</h2>
+
+<h2 style="color:#ffffff;">⚙️ Comportamento</h2>
+<h2 style="color:#ffffff;">
+Amostra valores usando dataProvider.sample()<br>
+Reprojeta automaticamente pontos para o CRS de cada raster<br>
+Mantém atributos originais dos pontos<br>
+Cria novos campos com valores de cada raster<br>
+Garante nomes de campos válidos e únicos
+</h2>
+
+<h2 style="color:#ffffff;">🧾 Saídas</h2>
+<h2 style="color:#ffffff;">
+Nova camada de pontos com atributos adicionais<br>
+Cada raster gera um novo campo<br><br>
+
+Exemplo:<br>
+elevacao<br>
+ndvi<br>
+temperatura
+</h2>
+
+<h2 style="color:#ffffff;">🧾 Logs</h2>
+<h2 style="color:#ffffff;">
+Exibe CRS de saída utilizado<br>
+Mostra valores amostrados por ponto (debug)<br>
+Informa caminho do arquivo gerado<br>
+Resumo ao final da execução
+</h2>
+
+<h2 style="color:#ffffff;">⚠️ Atenções</h2>
+<h2 style="color:#ffffff;">
+Rasters devem possuir dados válidos na área dos pontos<br>
+Diferenças de CRS são tratadas, mas podem impactar precisão<br>
+Grande volume de pontos e rasters aumenta tempo de processamento<br>
+Valores fora da extensão retornam nulo
+</h2>
+
+<h2 style="color:#ffffff;">✅ Boas práticas</h2>
+<h2 style="color:#ffffff;">
+Verificar CRS dos dados antes de executar<br>
+Evitar rasters desnecessários<br>
+Usar nomes claros para rasters<br>
+Testar com subconjunto de pontos
+</h2>
+
+<h2 style="color:#ffffff;">Autor</h2>
+<h2 style="color:#ffffff;">
+Matheus A.S. Martinelli
+</h2>

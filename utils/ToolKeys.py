@@ -2,6 +2,8 @@
 
 
 class ToolKey:
+    # all
+    UNTRACEABLE = "untraceable"  # para logs genéricos sem tool específica
     # plugins/
     CADMUS_PLUGIN = "cadmus_plugin"
     EXPORT_ALL_LAYOUTS = "export_all_layouts"

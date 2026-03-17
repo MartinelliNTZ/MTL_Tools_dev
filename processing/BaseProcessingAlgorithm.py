@@ -14,6 +14,7 @@ from qgis.core import (
 )
 from ..core.config.LogUtils import LogUtils
 from ..utils.Preferences import Preferences
+from ..utils.ToolKeys import ToolKey
 
 
 class GroupProcessing:
@@ -52,7 +53,7 @@ class BaseProcessingAlgorithm(QgsProcessingAlgorithm):
             try:
                 with open(path, encoding="utf-8") as f:
                     return f.read()
-            except Exception as e:
+            except Exception as e:                
                 return f
         else:
             return
@@ -101,8 +102,9 @@ class BaseProcessingAlgorithm(QgsProcessingAlgorithm):
             self.prefs = Preferences.load_tool_prefs(self.TOOL_KEY)
         except Exception as e:
             LogUtils(
-                tool="untraceable",
+                tool=ToolKey.UNTRACEABLE,
                 class_name=self.__class__.__name__,
                 level=LogUtils.WARNING,
             ).warning(f"Falha ao carregar preferências de {self.TOOL_KEY}: {e}")
             return {}
+    

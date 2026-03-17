@@ -4,7 +4,7 @@ from PyQt5.QtGui import QIcon
 from qgis.core import QgsProcessingProvider
 from .RasterMassSampler import RasterMassSampler
 from .RasterMassClipper import RasterMassClipper
-from .difference_fields_algorithm import DifferenceFieldsAlgorithm
+from .DifferenceFields import DifferenceFieldsAlgorithm
 from .attribute_statistics import AttributeStatisticsAlgorithm
 from .GeometryLineFromPoints import GeometryLineFromPoints
 

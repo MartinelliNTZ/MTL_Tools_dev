@@ -1,0 +1,89 @@
+<h2 style="color:#ffffff;">
+Ferramenta do pacote Cadmus para criação de linhas entre pontos,
+calculando a distância entre pares com base em agrupamento por atributos.
+</h2>
+
+<h2 style="color:#ffffff;">🎯 Objetivo</h2>
+<h2 style="color:#ffffff;">
+Gerar linhas conectando 2 ou mais pontos relacionados<br>
+Calcular distância entre pares de pontos<br>
+Permitir análise espacial entre conjuntos de pontos<br>
+Suportar comparação entre uma ou duas camadas
+</h2>
+
+<h2 style="color:#ffffff;">🛠️ Como usar</h2>
+<h2 style="color:#ffffff;">
+1. Abra a ferramenta<br>
+Menu → Cadmus → Vetorial → Linha de Diferença entre Pontos<br><br>
+
+2. Selecione a camada A<br>
+Camada principal de pontos<br><br>
+
+3. (Opcional) Selecione camada B<br>
+Usada apenas no modo com duas camadas<br><br>
+
+4. Escolha o modo<br>
+Ativar "Usar segunda camada" para modo 2<br><br>
+
+5. Defina campos de agrupamento<br>
+Campo A: obrigatório<br>
+Campo B: obrigatório no modo 2<br><br>
+
+6. Execute<br>
+Acompanhe o processamento até finalizar
+</h2>
+
+<h2 style="color:#ffffff;">⚙️ Comportamento</h2>
+<h2 style="color:#ffffff;">
+Modo 1 (uma camada)<br>
+Agrupa por atributo<br>
+Cria linhas entre pontos sequenciais<br><br>
+
+Modo 2 (duas camadas)<br>
+Relaciona pontos entre A e B pelo mesmo valor de campo<br>
+Gera linha para cada correspondência<br><br>
+
+Geometrias não pontuais usam centróide automaticamente<br>
+Ignora feições inválidas<br>
+Garante ordem consistente por ID
+</h2>
+
+<h2 style="color:#ffffff;">🧾 Saídas</h2>
+<h2 style="color:#ffffff;">
+Camada de linhas com atributos<br><br>
+
+Campos gerados:<br>
+group_key<br>
+feature_a<br>
+feature_b<br>
+distance
+</h2>
+
+<h2 style="color:#ffffff;">🧾 Logs</h2>
+<h2 style="color:#ffffff;">
+Logs por par processado<br>
+Avisos para geometrias inválidas<br>
+Informações de agrupamento<br>
+Resumo ao final da execução
+</h2>
+
+<h2 style="color:#ffffff;">⚠️ Atenções</h2>
+<h2 style="color:#ffffff;">
+Modo 2 exige camada B e campo correspondente<br>
+Campos devem possuir valores compatíveis<br>
+Geometrias vazias são ignoradas<br>
+Grande volume pode impactar desempenho
+</h2>
+
+<h2 style="color:#ffffff;">✅ Boas práticas</h2>
+<h2 style="color:#ffffff;">
+Garantir consistência nos campos de agrupamento<br>
+Evitar valores nulos<br>
+Testar com subconjunto antes<br>
+Verificar CRS das camadas
+</h2>
+
+<h2 style="color:#ffffff;">Autor</h2>
+<h2 style="color:#ffffff;">
+Matheus A.S. Martinelli
+</h2>

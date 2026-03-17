@@ -30,14 +30,16 @@ class RasterMassClipper(BaseProcessingAlgorithm):
     ALGORITHM_NAME = "raster_mass_clipper"
     ALGORITHM_DISPLAY_NAME = "Recorte Massivo de Rasters"
     ALGORITHM_GROUP = BaseProcessingAlgorithm.GROUP_RASTER
+    INSTRUCTIONS_FILE = "raster_mass_clipper.html"
+    logger = LogUtils(tool=TOOL_KEY, class_name="RasterMassClipper", level="DEBUG")
     ICON = "raster_mass_clipper.ico"
+    #Especificas do algoritmo
     INPUT_MASK = "INPUT_MASK"
     INPUT_RASTERS = "INPUT_RASTERS"
     OUTPUT_FOLDER = "OUTPUT_FOLDER"
     PER_FEATURE = "PER_FEATURE"
     BUFFER_FIX = "BUFFER_FIX"
-    INSTRUCTIONS_FILE = "raster_mass_clipper.html"
-    logger = LogUtils(tool=TOOL_KEY, class_name="RasterMassClipper", level="DEBUG")
+
 
  
 

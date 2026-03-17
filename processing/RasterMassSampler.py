@@ -32,6 +32,9 @@ class RasterMassSampler(BaseProcessingAlgorithm):
     ALGORITHM_DISPLAY_NAME = "Amostragem Massiva de Rasters"
     ALGORITHM_GROUP = BaseProcessingAlgorithm.GROUP_RASTER
     ICON = "raster_mass.ico"
+    INSTRUCTIONS_FILE = "raster_mass_sampler.html"
+    
+    # Especificas do algoritmo
     INPUT_POINTS = "INPUT_POINTS"
     INPUT_RASTERS = "INPUT_RASTERS"
     OUTPUT_CRS = "OUTPUT_CRS"

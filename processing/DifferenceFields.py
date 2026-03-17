@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
 from PyQt5.QtGui import QIcon
-from qgis.core import (
-    QgsProcessingAlgorithm,
+from ..core.config.LogUtils import LogUtils
+from qgis.core import (    
     QgsProcessingParameterFeatureSource,
     QgsProcessingParameterField,
     QgsProcessingParameterString,
@@ -10,19 +10,33 @@ from qgis.core import (
     QgsProcessingParameterNumber,
     QgsProcessing,
 )
-from ..utils.Preferences import load_tool_prefs, save_tool_prefs
-from .model.difference_fields_model import DifferenceFieldsModel
+from ..utils.ToolKeys import ToolKey
+from ..utils.Preferences import Preferences
+#from .model.difference_fields_model import DifferenceFieldsModel
+from PyQt5.QtCore import QVariant
+from .BaseProcessingAlgorithm import BaseProcessingAlgorithm
+from qgis.core import QgsFields, QgsField, QgsFeature, QgsFeatureSink
 from PyQt5.QtCore import QVariant
 
 
-class DifferenceFieldsAlgorithm(QgsProcessingAlgorithm):
+
+class DifferenceFieldsAlgorithm(BaseProcessingAlgorithm):
+    
+    TOOL_KEY = ToolKey.DIFFERENCE_FIELDS
+    ALGORITHM_NAME = "difference_fields"
+    ALGORITHM_DISPLAY_NAME = "Gerador de Diferenças entre Campos"
+    ALGORITHM_GROUP = BaseProcessingAlgorithm.GROUP_ESTATISTICA
+    ICON = "field_diference.ico"
+    INSTRUCTIONS_FILE = "difference_fields.html"
+    logger = LogUtils(tool=TOOL_KEY, class_name="DifferenceFieldsAlgorithm", level="DEBUG")
+    
+    #especificas do algoritmo
     INPUT_LAYER = "INPUT_LAYER"
     BASE_FIELD = "BASE_FIELD"
     EXCLUDE_FIELDS = "EXCLUDE_FIELDS"  # <-- AGORA É EXCLUÍR CAMPOS
     PREFIX = "PREFIX"
     PRECISION = "PRECISION"
     OUTPUT = "OUTPUT"
-    TOOL_KEY = "difference_fields_tool"
 
     NUMERIC = {
         QVariant.Int,
@@ -30,44 +44,15 @@ class DifferenceFieldsAlgorithm(QgsProcessingAlgorithm):
         QVariant.LongLong,
         QVariant.ULongLong,
         QVariant.Double,
-    }
+    } 
 
-    # Identificação
-    def name(self):
-        return "difference_fields"
-
-    def displayName(self):
-        return "Gerador de Diferenças entre Campos"
-
-    def group(self):
-        return "Estatística"
-
-    def groupId(self):
-        return "estatistica"
-
-    def icon(self):
-        icon_path = os.path.join(
-            os.path.dirname(__file__), "..", "resources", "icons", "field_diference.ico"
-        )
-        return QIcon(icon_path)
-
-    def createInstance(self):
-        return DifferenceFieldsAlgorithm()
-
-    # Carregar preferências
-    def _load_prefs(self):
-        prefs = load_tool_prefs(self.TOOL_KEY)
-        return {
-            "prefix": prefs.get("prefix", "D_"),
-            "precision": prefs.get("precision", 4),
-        }
-
-    def _save_prefs(self, prefix, precision):
-        save_tool_prefs(self.TOOL_KEY, {"prefix": prefix, "precision": precision})
+    def save_prefs(self, prefix, precision):
+        Preferences.save_tool_prefs(self.TOOL_KEY, {"prefix": prefix, "precision": precision})
 
     # Definição dos parâmetros
     def initAlgorithm(self, config=None):
-        prefs = self._load_prefs()
+        self.logger.debug("Inicializando parâmetros do algoritmo DifferenceFieldsAlgorithm…")
+        self.load_preferences()
 
         self.addParameter(
             QgsProcessingParameterFeatureSource(
@@ -98,7 +83,7 @@ class DifferenceFieldsAlgorithm(QgsProcessingAlgorithm):
 
         self.addParameter(
             QgsProcessingParameterString(
-                self.PREFIX, "Prefixo para novos campos", defaultValue=prefs["prefix"]
+                self.PREFIX, "Prefixo para novos campos", defaultValue=self.prefs.get("prefix", "diff_")
             )
         )
 
@@ -109,7 +94,7 @@ class DifferenceFieldsAlgorithm(QgsProcessingAlgorithm):
                 type=QgsProcessingParameterNumber.Integer,
                 minValue=0,
                 maxValue=10,
-                defaultValue=prefs["precision"],
+                defaultValue=self.prefs.get("precision", 2),
             )
         )
 
@@ -153,21 +138,49 @@ class DifferenceFieldsAlgorithm(QgsProcessingAlgorithm):
         feedback.pushInfo(f"Precisão: {precision}")
 
         # Salvar preferências
-        self._save_prefs(prefix, precision)
-
-        # Lógica (Model)
-        model = DifferenceFieldsModel(prefix=prefix, precision=precision)
+        self.save_prefs(prefix, precision)
 
         # Campos de saída
-        out_fields = model.create_output_fields(layer, fields_to_compare)
+        out_fields = self.create_output_fields(layer, fields_to_compare, prefix=prefix)
 
         sink, dest = self.parameterAsSink(
             params, self.OUTPUT, context, out_fields, layer.wkbType(), layer.sourceCrs()
         )
 
         # Processar feições
-        model.process_features(layer, base_field, fields_to_compare, out_fields, sink)
+        self.process_features(layer, base_field, fields_to_compare, out_fields, sink, precision=precision)
 
         feedback.pushInfo("✔ Processo finalizado com sucesso.")
 
         return {self.OUTPUT: dest}
+    
+    def create_output_fields(self, source_layer, fields_to_compare, prefix="diff_"):
+        out_fields = QgsFields()
+        for f in source_layer.fields():
+            out_fields.append(f)
+
+        for col in fields_to_compare:
+            new_name = f"{prefix}{col}"
+            out_fields.append(QgsField(new_name, QVariant.Double))
+
+        return out_fields
+
+    def process_features(self, layer, base_field, fields_to_compare, out_fields, sink, precision=2):
+        for feat in layer.getFeatures():
+            geom = feat.geometry()
+            attrs = feat.attributes()
+            base_value = feat[base_field]
+
+            out_feat = QgsFeature(out_fields)
+            out_feat.setGeometry(geom)
+
+            for col in fields_to_compare:
+                value = feat[col]
+                if value is None or base_value is None:
+                    attrs.append(None)
+                else:
+                    diff = float(value) - float(base_value)
+                    attrs.append(round(diff, precision))
+
+            out_feat.setAttributes(attrs)
+            sink.addFeature(out_feat, QgsFeatureSink.FastInsert)
