@@ -6,6 +6,7 @@ from .raster_mass_sampler import RasterMassSampler
 from .RasterMassClipper import RasterMassClipper
 from .difference_fields_algorithm import DifferenceFieldsAlgorithm
 from .attribute_statistics import AttributeStatisticsAlgorithm
+from .GeometryLineFromPoints import GeometryLineFromPoints
 
 # from .elevation_analisys import ElevationAnalisys
 
@@ -18,6 +19,7 @@ class MTLProvider(QgsProcessingProvider):
         self.addAlgorithm(RasterMassClipper())
         self.addAlgorithm(DifferenceFieldsAlgorithm())
         self.addAlgorithm(AttributeStatisticsAlgorithm())
+        self.addAlgorithm(GeometryLineFromPoints())
 
     def id(self):
         return "cadmus"

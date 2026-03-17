@@ -153,8 +153,8 @@ class RasterMassClipper(BaseProcessingAlgorithm):
 
         prefs = load_tool_prefs(self.TOOL_KEY)
         prefs["last_output_folder"] = out_folder
-        prefs['per_feature'] = per_feature
-        prefs['buffer_fix'] = buffer_fix
+        prefs['per_feature'] = bool(per_feature)
+        prefs['buffer_fix'] = bool(buffer_fix)
         save_tool_prefs(self.TOOL_KEY, prefs)
 
         clickable = f'<a href="file:///{out_folder}">{out_folder}</a>'

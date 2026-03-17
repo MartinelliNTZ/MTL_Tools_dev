@@ -1,2 +1,10 @@
-2.0.8 #aq
+2.0.8.1 #aq
+- Adicionada nova ferramenta de processamento: "Linha de Diferença entre Pontos por Atributo".
+  - Modo 1: camada de pontos única, agrupa por campo e cria linhas sequenciais entre features com mesmo valor.
+  - Modo 2: duas camadas de pontos, mapa de campo A/B com pares e criação de linha por cada par de correspondência.
+
+2.0.8.2 #aq
+- Ajustado `GeometryLineFromPointsAlgorithm` para herdar `BaseProcessingAlgorithm`.
+- Adicionado `LogUtils` (`self.logger`) em pontos-chave (inicialização, processAlgorithm, append_line_features).
+- Adicionado persistência de checkbox `use_second_layer` usando `Preferences` (`load_tool_prefs`/`save_tool_prefs`).
 
