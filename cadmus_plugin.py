@@ -276,7 +276,7 @@ class CadmusPlugin:
 
             # 13-Settings
             settings_icon = os.path.join(
-                os.path.dirname(__file__), "resources", "icons", "system.ico"
+                os.path.dirname(__file__), "resources", "icons", "settings.ico"
             )
             self.action_settings = QAction(
                 QIcon(settings_icon), "Configurações", self.iface.mainWindow()
@@ -390,8 +390,8 @@ class CadmusPlugin:
             # ==================================================
             self._add_toolbar_dropdown(
                 title="Sistema",
-                #main_action=self.action_restart_qgis,#padrao
-                main_action=self.action_about_dialog,#debug editável
+                main_action=self.action_restart_qgis,#padrao
+                #main_action=self.action_about_dialog,#debug editável
                 secondary_actions=[
                     self.action_restart_qgis,
                     self.action_logcat,
@@ -744,7 +744,7 @@ class CadmusPlugin:
     # =====================================================
     def run_about_dialog(self):
         try:
-            from .plugins.about_dialog import run_about_dialog
+            from .plugins.AboutDialog import run_about_dialog
 
             self.logger.info("Abrindo diálogo: Sobre o Cadmus")
             self.about_dlg = run_about_dialog(self.iface)

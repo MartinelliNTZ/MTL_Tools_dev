@@ -31,7 +31,7 @@ class SettingsPlugin(BasePluginMTL):
 
         super()._build_ui(
             title="Configurações Cadmus",
-            icon_path="system.ico",
+            icon_path="settings.ico",
             instructions_file="settings_help.md",
         )
 

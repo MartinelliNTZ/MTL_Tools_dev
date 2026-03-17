@@ -2,7 +2,7 @@
 import os
 from qgis.PyQt.QtCore import Qt
 from ..core.config.LogUtils import LogUtils
-from ..plugins.BaseDialog import BaseDialog
+from .BaseDialog import BaseDialog
 from ..core.ui.WidgetFactory import WidgetFactory
 
 

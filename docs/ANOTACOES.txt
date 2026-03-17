@@ -5,8 +5,6 @@ martinelli.linesbr2@gmail.com         01/01/2000  - 01/01/2000 - 08/04/2026
 cpunova963@gmail.com                  01/01/2000  - 11/03/2026 - 10/04/2026
 martinelli.linesbr@hotmail.com        12/03/2026  - 13/03/2026 - 12/04/2026
 BUGS CONHECIDOS
-    - DroneCordinatesPlugin: MrkParser.parse_folder() não processa TODOS os MRKs da pasta - apenas 1 arquivo [1.6.2 TODO]
-      - Workaround: selecionar múltiplos arquivos manualmente via browse (contorna o problema)
     - Geral: Impedir múltiplas instâncias de plugins rodando simultaneamente
 bandit -r . -f html -o bandit-report.html
 flake8 . --exclude=.git,__pycache__,build,dist,docs,.vscode,.idea > erros_plugin.txt
@@ -30,13 +28,20 @@ ferramentas = name                              tipo                            
     - 15: Gerador de diferença entre campos     Processing
     - 16: Estatisticas de atributos             Processing
     - 17: Recortador Massivo de Raster          Processing                      RasterMassClipper              manipulação de raster
+    - 18: Gerador de Linhas entre Pontos        Processing                      GeometryLineFromPoints         manipulação de vetores
 
-PADRONIZADOS = 1, 2, 3, 4, 5, 6, 7 8, 9, 10 , 11, 13
 Documentação de cenarios: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13
-Instrucoes: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13
+Instrucoes: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18
     multpart nao ta em task e pode bugar
 changelog=
   2.0.8
+    - Nova Ferramenta: "Linha de Diferença entre Pontos por Atributo"
+      - Modo 1: camada de pontos única, agrupa por campo e cria linhas sequenciais entre features com mesmo valor.
+      - Modo 2: duas camadas de pontos, mapa de campo A/B com pares e criação de linha por cada par de correspondência.
+    - Refatoração: BaseProcessingAlgorithm para padronizar integração com QGIS Processing
+    - Refatoração: persistência de preferências usando Preferences e API padrão em BaseProcessingAlgorithm
+    - Refatoração: GeometryLineFromPoints, RasterMassSampler e RasterMassClipper para usar nova arquitetura de processamento e persistência
+    - Novo sistema de helper HTML para cada algoritmo, referenciado por INSTRUCTIONS_FILE em cada classe de algoritmo, renderizado no diálogo de processamento
   
   2.0.7 2026/03/16
     - Nova ferramenta: RasterMassClipper (recorte massivo de rasters por polígono)
@@ -465,19 +470,6 @@ IMPLEMENTACOES
     - melhoria no drone cordinates gerar a area concave hull 0,025000
     aplicar buffer e so entao reprojetar novamente para evitar erros
     - nova ferramenta que aplica buffer negativo e positivo
-    - nova ferramenta que faz geometria por expressao e gera a diferenca entre dois pontos 
-    make_line(
-    $geometry,
-    geometry(
-        get_feature(
-            'Geometrias_corrigidas_58ac3c9a_7748_4042_b4a9_8ca309b0aca8',
-             'field_1' ,
-              "name" 
-        )
-    )
-)
-
-
 
     NOVASS FUNCOES
     Ferramenta para processamento de arquivos MRK e fotos associadas. Recebe a pasta dos arquivos, com opção de processar somente a pasta selecionada ou vasculhar 
