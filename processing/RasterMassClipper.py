@@ -18,23 +18,21 @@ from qgis.core import (
 )
 
 import processing
-
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.ToolKeys import ToolKey
 from ..core.config.LogUtils import LogUtils
 
 
-TOOL_KEY = ToolKey.RASTER_MASS_CLIPPER
-
-
 class RasterMassClipper(BaseProcessingAlgorithm):
 
+    TOOL_KEY = ToolKey.RASTER_MASS_CLIPPER
     INPUT_MASK = "INPUT_MASK"
     INPUT_RASTERS = "INPUT_RASTERS"
     OUTPUT_FOLDER = "OUTPUT_FOLDER"
     PER_FEATURE = "PER_FEATURE"
     BUFFER_FIX = "BUFFER_FIX"
     logger = LogUtils(tool=TOOL_KEY, class_name="RasterMassClipper", level="DEBUG")
+    prefs = load_tool_prefs(TOOL_KEY)
 
     def name(self):
         return "raster_mass_clipper"
@@ -70,7 +68,7 @@ class RasterMassClipper(BaseProcessingAlgorithm):
             QgsProcessingParameterBoolean(
                 self.PER_FEATURE,
                 "Recortar por cada polígono",
-                defaultValue=False,
+                defaultValue=self.prefs.get("per_feature", False)
             )
         )
 
@@ -78,7 +76,7 @@ class RasterMassClipper(BaseProcessingAlgorithm):
             QgsProcessingParameterBoolean(
                 self.BUFFER_FIX,
                 "Aplicar buffer de correção (pixel * 1.1)",
-                defaultValue=True,
+                defaultValue=self.prefs.get("buffer_fix", True)
             )
         )
 
@@ -86,6 +84,7 @@ class RasterMassClipper(BaseProcessingAlgorithm):
             QgsProcessingParameterFolderDestination(
                 self.OUTPUT_FOLDER,
                 "Pasta de saída",
+                defaultValue=self.prefs.get("last_output_folder", ""),
             )
         )
 
@@ -152,14 +151,18 @@ class RasterMassClipper(BaseProcessingAlgorithm):
                     feedback.pushInfo(str(e))
                     self.logger.error(f"Erro ao processar tarefa: {e}")
 
-        prefs = load_tool_prefs(TOOL_KEY)
+        prefs = load_tool_prefs(self.TOOL_KEY)
         prefs["last_output_folder"] = out_folder
-        save_tool_prefs(TOOL_KEY, prefs)
+        prefs['per_feature'] = per_feature
+        prefs['buffer_fix'] = buffer_fix
+        save_tool_prefs(self.TOOL_KEY, prefs)
 
         clickable = f'<a href="file:///{out_folder}">{out_folder}</a>'
-        feedback.pushInfo(f"Arquivos salvos em: {clickable}")
+        feedback.pushInfo(f"Arquivos salvos em: {clickable}")    
 
         return {self.OUTPUT_FOLDER: out_folder}
+    
+
 
     # ---------------- CLIP LAYER ----------------
 
