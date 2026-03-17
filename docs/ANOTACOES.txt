@@ -36,6 +36,7 @@ Documentação de cenarios: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13
 Instrucoes: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13
     multpart nao ta em task e pode bugar
 changelog=
+  2.0.8
   
   2.0.7 2026/03/16
     - Nova ferramenta: RasterMassClipper (recorte massivo de rasters por polígono)
