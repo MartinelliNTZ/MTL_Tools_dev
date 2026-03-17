@@ -14,9 +14,9 @@ from qgis.core import (
 import re
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsFields, QgsField, QgsFeature, QgsCoordinateTransform
-from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.vector.VectorLayerProjection import VectorLayerProjection
 from ..utils.ToolKeys import ToolKey
+from ..utils.Preferences import Preferences
 
 
 TOOL_KEY = ToolKey.RASTER_MASS_SAMPLER
@@ -27,22 +27,33 @@ class RasterMassSampler(BaseProcessingAlgorithm):
     QgsProcessingAlgorithm: Amostragem massiva de rasters para pontos.
     """
 
+    TOOL_KEY = ToolKey.RASTER_MASS_SAMPLER
+    ALGORITHM_NAME = "raster_mass_sampler"
+    ALGORITHM_DISPLAY_NAME = "Amostragem Massiva de Rasters"
+    ALGORITHM_GROUP = BaseProcessingAlgorithm.GROUP_RASTER
+    ICON = "raster_mass.ico"
     INPUT_POINTS = "INPUT_POINTS"
     INPUT_RASTERS = "INPUT_RASTERS"
     OUTPUT_CRS = "OUTPUT_CRS"
     OUTPUT = "OUTPUT"
 
-    def name(self):
-        return "raster_mass_sampler"
+    def _load_prefs(self):
+        try:
+            self.prefs = Preferences.load_tool_prefs(self.TOOL_KEY)
+        except Exception:
+            self.prefs = {}
+        return self.prefs
 
-    def displayName(self):
-        return "Amostragem Massiva de Rasters"
-
-    def createInstance(self):
-        return RasterMassSampler()
+    def save_prefs(self, out_folder, dest):
+        prefs = getattr(self, "prefs", {}) or {}
+        prefs["last_output_folder"] = out_folder
+        prefs["last_output_file"] = dest
+        Preferences.save_tool_prefs(self.TOOL_KEY, prefs)
+        self.prefs = prefs
 
     # -------------------------- INIT -------------------------
     def initAlgorithm(self, config=None):
+        self._load_prefs()
 
         self.addParameter(
             QgsProcessingParameterFeatureSource(
@@ -115,22 +126,11 @@ class RasterMassSampler(BaseProcessingAlgorithm):
             clickable = f'<a href="file:///{out_folder}">{out_folder}</a>'
             feedback.pushInfo(f"Arquivo salvo em: {clickable}")
 
-            prefs = load_tool_prefs(TOOL_KEY)
-            prefs["last_output_folder"] = out_folder
-            prefs["last_output_file"] = dest
-            save_tool_prefs(TOOL_KEY, prefs)
+            self.save_prefs(out_folder, dest)
 
         return {self.OUTPUT: dest}
 
     # ------------------------ UI INFO ------------------------
-    def icon(self):
-        return super().icon("raster_mass.ico")
-
-    def group(self):
-        return self.GROUP_RASTER.name
-
-    def groupId(self):
-        return self.GROUP_RASTER.id
 
     # ---------------------- Helpers ----------------------
     def build_output_fields(self, pts, rasters, max_len: int = 10):
@@ -251,9 +251,6 @@ class RasterMassSampler(BaseProcessingAlgorithm):
             clickable = f'<a href="file:///{out_folder}">{out_folder}</a>'
             feedback.pushInfo(f"Arquivo salvo em: {clickable}")
 
-            prefs = load_tool_prefs(TOOL_KEY)
-            prefs["last_output_folder"] = out_folder
-            prefs["last_output_file"] = dest
-            save_tool_prefs(TOOL_KEY, prefs)
+            self.save_prefs(out_folder, dest)
 
         return {self.OUTPUT: dest}

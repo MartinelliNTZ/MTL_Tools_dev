@@ -23,47 +23,28 @@ from ..utils.Preferences import Preferences
 
 
 class GeometryLineFromPoints(BaseProcessingAlgorithm):
+    TOOL_KEY = ToolKey.GEOMETRY_LINE_FROM_POINTS
+    ALGORITHM_NAME = "geometry_difference_line"
+    ALGORITHM_DISPLAY_NAME = "Linha de Diferença entre Pontos"
+    ALGORITHM_GROUP = BaseProcessingAlgorithm.GROUP_VETORIAL
+    ICON = "line_difference.ico"
+
     INPUT_LAYER_A = "INPUT_LAYER_A"
     INPUT_LAYER_B = "INPUT_LAYER_B"
     USE_SECOND_LAYER = "USE_SECOND_LAYER"
     FIELD_A = "FIELD_A"
     FIELD_B = "FIELD_B"
     OUTPUT = "OUTPUT"
-    TOOL_KEY = ToolKey.GEOMETRY_LINE_FROM_POINTS
 
     logger = LogUtils(tool=TOOL_KEY, class_name="GeometryLineFromPointsAlgorithm", level="DEBUG")
 
-    def name(self):
-        return "geometry_difference_line"
 
-    def displayName(self):
-        return "Linha de Diferença entre Pontos"
 
-    def group(self):
-        return self.GROUP_VETORIAL.name
-
-    def groupId(self):
-        return self.GROUP_VETORIAL.id
-
-    def icon(self):
-        icon_path = os.path.join(
-            os.path.dirname(__file__), "..", "resources", "icons", "line_difference.ico"
-        )
-        if os.path.exists(icon_path):
-            return QIcon(icon_path)
-        return QIcon()
-
-    def createInstance(self):
-        return GeometryLineFromPoints()
-
-    def _load_prefs(self):
-        prefs = Preferences.load_tool_prefs(self.TOOL_KEY)
-        return {
-            "use_second_layer": prefs.get("use_second_layer", False),
-        }
 
     def _save_prefs(self, use_second_layer):
-        Preferences.save_tool_prefs(self.TOOL_KEY, {"use_second_layer": bool(use_second_layer)})
+
+        self.prefs["use_second_layer"] = bool(use_second_layer)
+        Preferences.save_tool_prefs(self.TOOL_KEY, self.prefs)
 
     def initAlgorithm(self, config=None):
         self.logger.debug("Inicializando parâmetros do algoritmo GeometryLineFromPointsAlgorithm…")
@@ -84,14 +65,14 @@ class GeometryLineFromPoints(BaseProcessingAlgorithm):
         layer_b_param.setFlags(layer_b_param.flags() | QgsProcessingParameterFeatureSource.FlagOptional)
         self.addParameter(layer_b_param)
 
-        prefs = self._load_prefs()
-        self.logger.debug(f"Preferências carregadas: {prefs}")
+        self.load_preferences()# use load prefs direto sem sobrescrever
+        self.logger.debug(f"Preferências carregadas: {self.prefs}")
 
         self.addParameter(
             QgsProcessingParameterBoolean(
                 self.USE_SECOND_LAYER,
                 "Usar segunda camada (modo 2)",
-                defaultValue=prefs.get("use_second_layer", False),
+                defaultValue=self.prefs.get("use_second_layer", False),
             )
         )
 

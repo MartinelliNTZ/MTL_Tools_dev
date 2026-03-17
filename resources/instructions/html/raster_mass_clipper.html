@@ -1,0 +1,93 @@
+<h1 style="color:#ffffff;">🧾 Recorte Massivo de Rasters — Guia de Uso</h1>
+
+<h2 style="color:#ffffff;">
+Ferramenta do pacote Cadmus para recorte em lote de rasters usando uma camada poligonal como máscara,<br>
+com suporte a processamento por feição e correção automática de bordas.
+</h2>
+
+<h2 style="color:#ffffff;">🎯 Objetivo</h2>
+<h2 style="color:#ffffff;">
+Recortar múltiplos rasters em uma única execução<br>
+Permitir recorte por camada inteira ou por feição<br>
+Aplicar correção de borda baseada no tamanho do pixel<br>
+Manter resolução original dos rasters<br>
+Executar processamento em paralelo
+</h2>
+
+<h2 style="color:#ffffff;">🛠️ Como usar</h2>
+<h2 style="color:#ffffff;">
+1. Abra a ferramenta<br>
+Menu → Cadmus → Raster → Recorte Massivo de Rasters<br><br>
+
+2. Defina a máscara<br>
+Selecione uma camada poligonal para recorte<br><br>
+
+3. Selecione os rasters<br>
+Adicione um ou mais rasters<br><br>
+
+4. Configure o modo<br>
+Recortar por cada polígono<br>
+Ativado: gera um raster por feição<br>
+Desativado: usa a camada inteira<br><br>
+
+5. Ajuste correção<br>
+Aplica pixel * 1.1 para evitar cortes serrilhados<br><br>
+
+6. Pasta de saída<br>
+A pasta será criada automaticamente se não existir<br><br>
+
+7. Execute<br>
+Acompanhe o progresso e aguarde a finalização
+</h2>
+
+<h2 style="color:#ffffff;">⚙️ Comportamento</h2>
+<h2 style="color:#ffffff;">
+Usa GDAL (cliprasterbymasklayer)<br>
+Reprojeta máscara automaticamente<br>
+Mantém resolução original<br>
+Processamento multi-core
+</h2>
+
+<h2 style="color:#ffffff;">🧾 Saídas</h2>
+<h2 style="color:#ffffff;">
+Modo normal<br>
+raster1_clip.tif<br>
+raster2_clip.tif<br><br>
+
+Modo por feição<br>
+raster1_feat_1.tif<br>
+raster1_feat_2.tif<br>
+raster2_feat_1.tif
+</h2>
+
+<h2 style="color:#ffffff;">🧾 Logs</h2>
+<h2 style="color:#ffffff;">
+Logs por raster e feição<br>
+Erros não interrompem o processo<br>
+Pasta final exibida ao concluir
+</h2>
+
+<h2 style="color:#ffffff;">⚠️ Atenções</h2>
+<h2 style="color:#ffffff;">
+Modo por feição pode gerar muitos arquivos<br>
+Buffer aumenta levemente a área recortada<br>
+Alto uso de CPU e disco em grandes volumes
+</h2>
+
+<h2 style="color:#ffffff;">✅ Boas práticas</h2>
+<h2 style="color:#ffffff;">
+Testar com poucos dados antes<br>
+Usar modo por feição apenas quando necessário<br>
+Garantir CRS correto<br>
+Usar pasta de saída limpa
+</h2>
+
+<h2 style="color:#ffffff;">🧩 Preferências</h2>
+<h2 style="color:#ffffff;">
+raster_mass_clipper
+</h2>
+
+<h2 style="color:#ffffff;">❤️ Autor</h2>
+<h2 style="color:#ffffff;">
+Matheus A.S. Martinelli
+</h2>

@@ -15,38 +15,44 @@ from qgis.core import (
     QgsVectorLayer,
     QgsCoordinateTransform,
     QgsProject,
+    QgsGeometry,
 )
 
 import processing
-from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.ToolKeys import ToolKey
+from ..utils.Preferences import Preferences
 from ..core.config.LogUtils import LogUtils
 
 
 class RasterMassClipper(BaseProcessingAlgorithm):
 
     TOOL_KEY = ToolKey.RASTER_MASS_CLIPPER
+    ALGORITHM_NAME = "raster_mass_clipper"
+    ALGORITHM_DISPLAY_NAME = "Recorte Massivo de Rasters"
+    ALGORITHM_GROUP = BaseProcessingAlgorithm.GROUP_RASTER
+    ICON = "raster_mass_clipper.ico"
     INPUT_MASK = "INPUT_MASK"
     INPUT_RASTERS = "INPUT_RASTERS"
     OUTPUT_FOLDER = "OUTPUT_FOLDER"
     PER_FEATURE = "PER_FEATURE"
     BUFFER_FIX = "BUFFER_FIX"
+    INSTRUCTIONS_FILE = "raster_mass_clipper.html"
     logger = LogUtils(tool=TOOL_KEY, class_name="RasterMassClipper", level="DEBUG")
-    prefs = load_tool_prefs(TOOL_KEY)
 
-    def name(self):
-        return "raster_mass_clipper"
+ 
 
-    def displayName(self):
-        return "Recorte Massivo de Rasters"
-
-    def createInstance(self):
-        return RasterMassClipper()
+    def save_prefs(self, out_folder, per_feature, buffer_fix):
+        self.prefs["last_output_folder"] = out_folder
+        self.prefs["per_feature"] = bool(per_feature)
+        self.prefs["buffer_fix"] = bool(buffer_fix)
+        Preferences.save_tool_prefs(self.TOOL_KEY, self.prefs)
 
     # ---------------- INIT ----------------
 
     def initAlgorithm(self, config=None):
         self.logger.debug("Inicializando algoritmo RasterMassClipper…")
+
+        self.load_preferences()
 
         self.addParameter(
             QgsProcessingParameterFeatureSource(
@@ -151,11 +157,7 @@ class RasterMassClipper(BaseProcessingAlgorithm):
                     feedback.pushInfo(str(e))
                     self.logger.error(f"Erro ao processar tarefa: {e}")
 
-        prefs = load_tool_prefs(self.TOOL_KEY)
-        prefs["last_output_folder"] = out_folder
-        prefs['per_feature'] = bool(per_feature)
-        prefs['buffer_fix'] = bool(buffer_fix)
-        save_tool_prefs(self.TOOL_KEY, prefs)
+        self.save_prefs(out_folder, per_feature, buffer_fix)
 
         clickable = f'<a href="file:///{out_folder}">{out_folder}</a>'
         feedback.pushInfo(f"Arquivos salvos em: {clickable}")    
@@ -272,6 +274,9 @@ class RasterMassClipper(BaseProcessingAlgorithm):
 
     def reproject_geom(self, geom, src_crs, dst_crs):
 
+        if geom is None:
+            return None
+
         if src_crs == dst_crs:
             return geom
 
@@ -281,8 +286,17 @@ class RasterMassClipper(BaseProcessingAlgorithm):
             QgsProject.instance(),
         )
 
-        g = geom.clone()
-        g.transform(transform)
+        if hasattr(geom, "clone"):
+            g = geom.clone()
+        else:
+            # compatibilidade QGIS 3.16+ onde clone pode não existir
+            g = QgsGeometry.fromWkt(geom.asWkt())
+
+        try:
+            g.transform(transform)
+        except Exception as e:            
+            self.logger.error(f"Falha ao reprojetar geometria: {e}")
+            return geom
 
         return g
 
@@ -320,11 +334,3 @@ class RasterMassClipper(BaseProcessingAlgorithm):
 
     # ---------------- UI ----------------
 
-    def icon(self):
-        return super().icon("raster_mass_clipper.ico")
-
-    def group(self):
-        return self.GROUP_RASTER.name
-
-    def groupId(self):
-        return self.GROUP_RASTER.id

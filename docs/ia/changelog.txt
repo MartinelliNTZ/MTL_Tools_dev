@@ -8,3 +8,24 @@
 - Adicionado `LogUtils` (`self.logger`) em pontos-chave (inicialização, processAlgorithm, append_line_features).
 - Adicionado persistência de checkbox `use_second_layer` usando `Preferences` (`load_tool_prefs`/`save_tool_prefs`).
 
+2.0.8.3 #aq
+- Refatorado `BaseProcessingAlgorithm` para oferecer API padrão: `load_preferences`, `save_preferences`, `ALGORITHM_NAME`, `ALGORITHM_DISPLAY_NAME`, `ALGORITHM_GROUP`, e icon padrão.
+- Atualizado `RasterMassSampler`, `RasterMassClipper` e `GeometryLineFromPoints` para usar `save_preferences` / `load_preferences` e evitar repetição de `load_tool_prefs` / `save_tool_prefs`.
+- Simplificado definição de name/displayName/group/groupId nas subclasses via atributos de classe padrão.
+
+2.0.8.4 #aq
+- Ajustado `RasterMassSampler` para remover overrides redundantes de `group()` e `groupId()`.
+- Ajustado `RasterMassClipper` para remover overrides redundantes de `name()` e `displayName()` (já definidos em base por ALGORITHM_*).
+
+2.0.8.5 #aq
+- `RasterMassSampler` e `RasterMassClipper` agora implementam método específico `save_prefs(...)` (filho), e `load_prefs()` em `initAlgorithm`.
+- O `save_prefs` salva com `Preferences.save_tool_prefs(...)` usando parâmetros explícitos.
+- Removida dependência de `load_preferences()/save_preferences()` do base nestas classes.
+
+2.0.8.6 #aq
+- Atualizado `DifferenceFieldsAlgorithm` para mesmo padrão:
+  - `_load_prefs` em `initAlgorithm`
+  - `save_prefs(prefix, precision)` ao final de `processAlgorithm`
+  - persistência específica por ferramenta usando `Preferences`
+  - `self.prefs` mantido na instância
+
