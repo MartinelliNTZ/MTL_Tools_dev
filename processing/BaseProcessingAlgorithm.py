@@ -43,23 +43,12 @@ class BaseProcessingAlgorithm(QgsProcessingAlgorithm):
 
 
     def shortHelpString(self):
-        if False:#self.INSTRUCTIONS_FILE:
-            path = os.path.join(
-                os.path.dirname(__file__),
-                "..",
-                "resources",
-                "instructions",
-                "html",
-                self.INSTRUCTIONS_FILE,
-            )
-            try:
-                with open(path, encoding="utf-8") as f:
-                    return f.read()
-            except Exception as e:                
-                return f
+        if self.prefs.get("display_help",True):#self.INSTRUCTIONS_FILE:
+                html = HtmlInstructionsProvider(self.TOOL_KEY)  
+                return html.get_instructions(self.ALGORITHM_NAME)  # valor padrão genérico
         else:
-            html = HtmlInstructionsProvider(self.TOOL_KEY)  
-            return html.get_instructions(self.ALGORITHM_NAME)  # valor padrão genérico
+            return
+
 
     def icon(self):
         icon_path = os.path.join(

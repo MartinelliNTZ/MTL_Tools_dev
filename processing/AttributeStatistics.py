@@ -24,7 +24,6 @@ from .model.attribute_statistics_model import AttributeStatisticsModel
 TOOL_KEY = ToolKey.ATTRIBUTE_STATISTICS
 
 
-
 class AttributeStatistics(BaseProcessingAlgorithm):
     TOOL_KEY = ToolKey.ATTRIBUTE_STATISTICS
     ALGORITHM_NAME = "attribute_statistics"
@@ -38,6 +37,7 @@ class AttributeStatistics(BaseProcessingAlgorithm):
     PTBR_FORMAT = "PTBR_FORMAT"
     LOAD_AFTER = "LOAD_AFTER"
     OUTPUT = "OUTPUT"
+    DISPLAY_HELP = "DISPLAY_HELP"
 
     # Rótulos (usados na UI e para decidir colunas)
     STATS = {
@@ -59,7 +59,6 @@ class AttributeStatistics(BaseProcessingAlgorithm):
         "KURT": "Curtose",
     }
 
-
     # ----------------------------------------------------
     # INIT: parâmetros -> aqui apenas constrói UI usando prefs via BaseProcessingAlgorithm
     # ----------------------------------------------------
@@ -68,12 +67,6 @@ class AttributeStatistics(BaseProcessingAlgorithm):
         self.load_preferences()
         prefs = self.prefs or {}
         self._model = AttributeStatisticsModel()
-
-        precision_default = prefs.get("precision", 2)
-        force_ptbr_default = prefs.get("force_ptbr", False)
-        load_after_default = prefs.get("load_after", False)
-        enabled_stats = prefs.get("stats_enabled", {})
-
         # Camada de entrada
         self.addParameter(
             QgsProcessingParameterFeatureSource(
@@ -103,23 +96,32 @@ class AttributeStatistics(BaseProcessingAlgorithm):
                 type=QgsProcessingParameterNumber.Integer,
                 minValue=0,
                 maxValue=12,
-                defaultValue=precision_default,
+                defaultValue=prefs.get("precision", 2),
+            )
+        )
+        # Mostrar ajuda
+        self.addParameter(
+            QgsProcessingParameterBoolean(
+                self.DISPLAY_HELP,
+                "Exibir campo de ajuda (Necessario executar e reiniciar)",
+                defaultValue=prefs.get("display_help", True),
             )
         )
 
-        # Avançados: carregar após, forçar PT-BR
+        # Avançados: carregar após
         p_load = QgsProcessingParameterBoolean(
             self.LOAD_AFTER,
             "Carregar CSV automaticamente após execução",
-            defaultValue=load_after_default,
+            defaultValue=prefs.get("load_after", False),
         )
         p_load.setFlags(p_load.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
         self.addParameter(p_load)
 
+        # , forçar PT-BR
         p_force_ptbr = QgsProcessingParameterBoolean(
             self.PTBR_FORMAT,
             "Forçar CSV no formato PT-BR (usar ; e ,)",
-            defaultValue=force_ptbr_default,
+            defaultValue=prefs.get("force_ptbr", False),
         )
         p_force_ptbr.setFlags(
             p_force_ptbr.flags() | QgsProcessingParameterDefinition.FlagAdvanced
@@ -163,7 +165,7 @@ class AttributeStatistics(BaseProcessingAlgorithm):
         )
         precision = int(self.parameterAsInt(parameters, self.PRECISION, context))
         ptbr_format = bool(self.parameterAsBool(parameters, self.PTBR_FORMAT, context))
-        load_after = bool(self.parameterAsBool(parameters, self.LOAD_AFTER, context))
+        load_after = bool(self.parameterAsBool(parameters, self.LOAD_AFTER, context))        
         stats_enabled = {
             k: self.parameterAsBool(parameters, k, context) for k in self.STATS.keys()
         }
@@ -248,7 +250,7 @@ class AttributeStatistics(BaseProcessingAlgorithm):
 
         except Exception as e:
             raise QgsProcessingException(f"Erro ao salvar CSV: {e}")
-
+        display_help = bool(self.parameterAsBool(parameters, self.DISPLAY_HELP, context)) if self.DISPLAY_HELP in parameters else False
         self.prefs.update(
             {
                 "precision": precision,
@@ -257,6 +259,7 @@ class AttributeStatistics(BaseProcessingAlgorithm):
                 "force_ptbr": force_ptbr,
                 "load_after": load_after,
                 "stats_enabled": stats_enabled,
+                "display_help": display_help,
             }
         )
         self.save_preferences()

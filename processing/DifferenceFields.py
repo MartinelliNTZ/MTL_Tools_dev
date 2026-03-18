@@ -8,6 +8,7 @@ from qgis.core import (
     QgsProcessingParameterString,
     QgsProcessingParameterFeatureSink,
     QgsProcessingParameterNumber,
+    QgsProcessingParameterBoolean,
     QgsProcessing,
 )
 from ..utils.ToolKeys import ToolKey
@@ -37,6 +38,7 @@ class DifferenceFieldsAlgorithm(BaseProcessingAlgorithm):
     PREFIX = "PREFIX"
     PRECISION = "PRECISION"
     OUTPUT = "OUTPUT"
+    DISPLAY_HELP = "DISPLAY_HELP"
 
     NUMERIC = {
         QVariant.Int,
@@ -96,6 +98,14 @@ class DifferenceFieldsAlgorithm(BaseProcessingAlgorithm):
             )
         )
 
+        self.addParameter(
+            QgsProcessingParameterBoolean(
+                self.DISPLAY_HELP,
+                "Exibir campo de ajuda (Necessario executar e reiniciar)",
+                defaultValue=self.prefs.get("display_help", True),
+            )
+        )
+
         self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT, "Diferenca"))
 
     # PROCESSAMENTO
@@ -135,8 +145,16 @@ class DifferenceFieldsAlgorithm(BaseProcessingAlgorithm):
         feedback.pushInfo(f"Prefixo: {prefix}")
         feedback.pushInfo(f"Precisão: {precision}")
 
+        display_help = bool(self.parameterAsBool(params, self.DISPLAY_HELP, context)) if self.DISPLAY_HELP in params else False
+
         # Salvar preferências
-        self.prefs.update({"prefix": prefix, "precision": precision})
+        self.prefs.update(
+            {
+                "prefix": prefix,
+                "precision": precision,
+                "display_help": display_help,
+            }
+        )
         self.save_preferences()
 
         # Campos de saída

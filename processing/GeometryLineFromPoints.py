@@ -36,6 +36,7 @@ class GeometryLineFromPoints(BaseProcessingAlgorithm):
     FIELD_A = "FIELD_A"
     FIELD_B = "FIELD_B"
     OUTPUT = "OUTPUT"
+    DISPLAY_HELP = "DISPLAY_HELP"
 
     logger = LogUtils(tool=TOOL_KEY, class_name="GeometryLineFromPointsAlgorithm", level="DEBUG")
 
@@ -69,6 +70,14 @@ class GeometryLineFromPoints(BaseProcessingAlgorithm):
                 self.USE_SECOND_LAYER,
                 "Usar segunda camada (modo 2)",
                 defaultValue=self.prefs.get("use_second_layer", False),
+            )
+        )
+
+        self.addParameter(
+            QgsProcessingParameterBoolean(
+                self.DISPLAY_HELP,
+                "Exibir campo de ajuda (Necessario executar e reiniciar)",
+                defaultValue=self.prefs.get("display_help", True),
             )
         )
 
@@ -221,7 +230,10 @@ class GeometryLineFromPoints(BaseProcessingAlgorithm):
                 pair_list = [(feats[i], feats[i + 1]) for i in range(len(feats) - 1)]
                 self._append_line_features(pair_list, sink, fields, str(key_name))
 
-        self.prefs.update({"use_second_layer": bool(use_second)})
+        display_help = bool(self.parameterAsBool(params, self.DISPLAY_HELP, context)) if self.DISPLAY_HELP in params else False
+        self.prefs.update(
+            {"use_second_layer": bool(use_second), "display_help": display_help}
+        )
         self.save_preferences()
         self.logger.info(f"Preferência use_second_layer salva: {use_second}")
 

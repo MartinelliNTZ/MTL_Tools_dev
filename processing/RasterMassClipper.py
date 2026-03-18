@@ -34,6 +34,7 @@ class RasterMassClipper(BaseProcessingAlgorithm):
     OUTPUT_FOLDER = "OUTPUT_FOLDER"
     PER_FEATURE = "PER_FEATURE"
     BUFFER_FIX = "BUFFER_FIX"
+    DISPLAY_HELP = "DISPLAY_HELP"
 
 
  
@@ -78,6 +79,14 @@ class RasterMassClipper(BaseProcessingAlgorithm):
         )
 
         self.addParameter(
+            QgsProcessingParameterBoolean(
+                self.DISPLAY_HELP,
+                "Exibir campo de ajuda (Necessario executar e reiniciar)",
+                defaultValue=self.prefs.get("display_help", True),
+            )
+        )
+
+        self.addParameter(
             QgsProcessingParameterFolderDestination(
                 self.OUTPUT_FOLDER,
                 "Pasta de saída",
@@ -95,6 +104,7 @@ class RasterMassClipper(BaseProcessingAlgorithm):
 
         per_feature = self.parameterAsBool(params, self.PER_FEATURE, context)
         buffer_fix = self.parameterAsBool(params, self.BUFFER_FIX, context)
+        display_help = bool(self.parameterAsBool(params, self.DISPLAY_HELP, context)) if self.DISPLAY_HELP in params else False
         self.logger.debug(f"Parâmetros: {per_feature}, Buffer fix: {buffer_fix}, Output folder: {out_folder}, Rasters: {[r.name() for r in rasters]}")
 
         os.makedirs(out_folder, exist_ok=True)
@@ -153,6 +163,7 @@ class RasterMassClipper(BaseProcessingAlgorithm):
                 "last_output_folder": out_folder,
                 "per_feature": bool(per_feature),
                 "buffer_fix": bool(buffer_fix),
+                "display_help": display_help,
             }
         )
         self.save_preferences()

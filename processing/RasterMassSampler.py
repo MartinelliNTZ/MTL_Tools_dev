@@ -5,6 +5,7 @@ from qgis.core import (
     QgsProcessingParameterFeatureSource,
     QgsProcessingParameterMultipleLayers,
     QgsProcessingParameterFeatureSink,
+    QgsProcessingParameterBoolean,
     QgsProcessingParameterCrs,
     QgsFeatureSink,
     QgsProcessing,
@@ -14,10 +15,6 @@ from qgis.PyQt.QtCore import QVariant
 from qgis.core import QgsFields, QgsField, QgsFeature, QgsCoordinateTransform
 from ..utils.vector.VectorLayerProjection import VectorLayerProjection
 from ..utils.ToolKeys import ToolKey
-from ..utils.Preferences import Preferences
-
-
-TOOL_KEY = ToolKey.RASTER_MASS_SAMPLER
 
 
 class RasterMassSampler(BaseProcessingAlgorithm):
@@ -37,6 +34,7 @@ class RasterMassSampler(BaseProcessingAlgorithm):
     INPUT_RASTERS = "INPUT_RASTERS"
     OUTPUT_CRS = "OUTPUT_CRS"
     OUTPUT = "OUTPUT"
+    DISPLAY_HELP = "DISPLAY_HELP"
 
     # -------------------------- INIT -------------------------
 
@@ -65,6 +63,14 @@ class RasterMassSampler(BaseProcessingAlgorithm):
 
         self.addParameter(
             QgsProcessingParameterFeatureSink(self.OUTPUT, "Valores_Amostrados")
+        )
+
+        self.addParameter(
+            QgsProcessingParameterBoolean(
+                self.DISPLAY_HELP,
+                "Exibir campo de ajuda (Necessario executar e reiniciar)",
+                defaultValue=self.prefs.get("display_help", True),
+            )
         )
 
     # ----------------------- PROCESS -------------------------
@@ -241,7 +247,14 @@ class RasterMassSampler(BaseProcessingAlgorithm):
             clickable = f'<a href="file:///{out_folder}">{out_folder}</a>'
             feedback.pushInfo(f"Arquivo salvo em: {clickable}")
 
-            self.prefs.update({"last_output_folder": out_folder, "last_output_file": dest})
+            display_help = bool(self.parameterAsBool(params, self.DISPLAY_HELP, context)) if self.DISPLAY_HELP in params else False
+            self.prefs.update(
+                {
+                    "last_output_folder": out_folder,
+                    "last_output_file": dest,
+                    "display_help": display_help,
+                }
+            )
             self.save_preferences()
 
         return {self.OUTPUT: dest}
