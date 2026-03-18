@@ -33,8 +33,13 @@ ferramentas = name                              tipo                            
 Documentação de cenarios: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13
 Instrucoes: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18
     multpart nao ta em task e pode bugar
+    - tentar usar o visualizador de resultados do processing para mostrar o resultado do processing
 changelog=
   2.0.9
+    - Nova ferramenta: "Estatísticas de Diferença entre Rasters"
+      - Processamento de rasters em pasta e/ou camadas selecionadas, gerando arquivos HTML de estatísticas para cada raster de diferença e um resumo consolidado.
+      - Verificação de sobreposição e grade entre rasters para evitar erros de cálculo.
+      - Tratamento robusto de exceções durante operações de raster, com logs detalhados.
     - Implementacao de Checkbox "Exibir campo de ajuda" no provider, com persistencia via Preferences e exibicao condicional de mensagens de ajuda no processamento.
     - Substituição dos arquivos HTML de ajuda por sistema dinâmico via HtmlInstructionsProvider, permitindo manutenção centralizada e formatação consistente com logos e alertas estilizados.
 

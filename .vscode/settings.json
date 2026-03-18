@@ -7,6 +7,14 @@
         "/^python -m py_compile processing/attribute_statistics\\.py$/": {
             "approve": true,
             "matchCommandLine": true
+        },
+        "/^python -m py_compile processing/FolderLayerProcessor\\.py processing/provider\\.py$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^python -m py_compile processing/RasterDifferenceStatiscs\\.py$/": {
+            "approve": true,
+            "matchCommandLine": true
         }
     },
     "chat.agent.maxRequests": 150,

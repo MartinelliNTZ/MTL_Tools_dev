@@ -45,6 +45,71 @@ class HtmlInstructionsProvider:
     def transform_alert(self,text = ""):
         return f'<h3 style="background-color:#ffcccc;color:#990000;padding:10px;border-radius:5px;margin:10px 0;">⚠️{text}</h3>'
     
+    def get_raster_difference_statistics_help(self):
+        return f"""
+            {self.logo}
+            Ferramenta do pacote Cadmus para cálculo de diferença entre múltiplos rasters,
+            com geração automática de estatísticas e relatório consolidado em HTML.
+
+            {self.transform_h('🎯 Objetivo')}
+            Calcular diferenças entre todos os pares possíveis de rasters
+            Identificar variações entre superfícies (ex: DSM, DTM, modelos temporais)
+            Gerar estatísticas automáticas para cada comparação
+            Consolidar resultados em relatório único
+
+            {self.transform_h('🛠️ Como usar')}
+            1. Abra a ferramenta
+            Menu → Cadmus → Raster → Diferença de Rasters (Pasta/Camadas)
+            2. Defina a entrada
+            Opção A: Informe uma pasta com rasters (busca recursiva)
+            Opção B: Selecione rasters já carregados no QGIS
+            3. Defina saída (opcional)
+            Caso não informado, será criada pasta temporária
+            4. Execute
+            O sistema irá gerar todas as combinações possíveis entre rasters
+
+            {self.transform_h('⚙️ Comportamento')}
+            Gera combinações 2 a 2 (nC2)
+            Calcula: Raster A - Raster B
+            Mantém NoData consistente
+            Processa apenas rasters com sobreposição espacial
+            Usa resolução e extent do primeiro raster do par
+            Ignora automaticamente pares sem interseção
+
+            {self.transform_h('🧾 Saídas')}
+            Para cada par:
+            DIF_rasterA_rasterB.tif
+
+            Estatísticas individuais:
+            DIF_rasterA_rasterB_stats.html
+
+            Relatório consolidado:
+            raster_difference_stats_summary.html
+
+            Estatísticas incluem:
+            MIN
+            MAX
+            INTERVALO (MAX - MIN)
+            MEAN
+            STD_DEV
+
+            {self.transform_h('⚠️ Atenções')}
+            Número de combinações cresce rapidamente (n²)
+            Pode gerar muitos arquivos em grandes volumes
+            Rasters devem ter alinhamento razoável (resolução/CRS)
+            Diferenças usam apenas banda 1
+            Extents diferentes podem gerar recorte implícito
+
+            {self.transform_h('✅ Boas práticas')}
+            Trabalhar com rasters já alinhados
+            Evitar grandes volumes sem necessidade
+            Testar com poucos arquivos primeiro
+            Validar NoData antes do processamento
+            Usar nomes curtos para evitar caminhos longos
+
+            {self.author_info}
+        """
+        
     def get_difference_fields_help(self):
         return f"""
             {self.logo}
