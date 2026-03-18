@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-from PyQt5.QtGui import QIcon
-
 from .BaseProcessingAlgorithm import BaseProcessingAlgorithm
 from qgis.core import (    
     QgsProcessingParameterFeatureSource,
@@ -12,7 +10,7 @@ from qgis.core import (
     QgsProcessing,
 )
 import re
-from PyQt5.QtCore import QVariant
+from qgis.PyQt.QtCore import QVariant
 from qgis.core import QgsFields, QgsField, QgsFeature, QgsCoordinateTransform
 from ..utils.vector.VectorLayerProjection import VectorLayerProjection
 from ..utils.ToolKeys import ToolKey

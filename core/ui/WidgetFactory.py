@@ -548,8 +548,24 @@ class WidgetFactory:
 
     @staticmethod
     def create_separator(
-        shape=QFrame.HLine, shadow=QFrame.Sunken, height=1, color="palette(mid)"
+        shape=None, shadow=None, height=1, color="palette(mid)"
     ):
+        if shape is None:
+            if hasattr(QFrame, "HLine"):
+                shape = QFrame.HLine
+            elif hasattr(QFrame, "Shape") and hasattr(QFrame.Shape, "HLine"):
+                shape = QFrame.Shape.HLine
+            else:
+                shape = QFrame.NoFrame
+
+        if shadow is None:
+            if hasattr(QFrame, "Sunken"):
+                shadow = QFrame.Sunken
+            elif hasattr(QFrame, "Shadow") and hasattr(QFrame.Shadow, "Sunken"):
+                shadow = QFrame.Shadow.Sunken
+            else:
+                shadow = QFrame.Plain
+
         qframe = QFrame()
         qframe.setFrameShape(shape)
         qframe.setFrameShadow(shadow)

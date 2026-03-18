@@ -805,7 +805,17 @@ class CadmusPlugin:
         # 3️⃣ Configurar o botão
         button.setMenu(menu)
         button.setDefaultAction(main_action)
-        button.setPopupMode(QToolButton.MenuButtonPopup)
+
+        if hasattr(QToolButton, "MenuButtonPopup"):
+            popup_mode = QToolButton.MenuButtonPopup
+        elif hasattr(QToolButton, "ToolButtonPopupMode") and hasattr(
+            QToolButton.ToolButtonPopupMode, "MenuButtonPopup"
+        ):
+            popup_mode = QToolButton.ToolButtonPopupMode.MenuButtonPopup
+        else:
+            popup_mode = QToolButton.InstantPopup
+
+        button.setPopupMode(popup_mode)
         # button.clicked.connect(main_action.trigger)
 
         # 4️⃣ Transformar em widgets e adicionar à toolbar

@@ -8,13 +8,26 @@ from ..core.config.LogUtils import LogUtils
 logger = LogUtils(tool="preferences", class_name="Preferences")
 
 
+def _resolve_app_data_path():
+    """Retorna o caminho adequado para armazenar configurações entre Qt5/Qt6."""
+    for candidate in (
+        "AppDataLocation",
+        "AppLocalDataLocation",
+        "AppConfigLocation",
+        "DataLocation",
+        "GenericDataLocation",
+    ):
+        if hasattr(QStandardPaths, candidate):
+            return QStandardPaths.writableLocation(getattr(QStandardPaths, candidate))
+
+    # fallback mais básico se nenhum atributo estiver disponível.
+    return os.path.expanduser("~")
+
+
 class Preferences:
     """Gerencia as preferências do plugin, armazenando em um JSON local."""
 
-    PREF_FOLDER = os.path.join(
-        QStandardPaths.writableLocation(QStandardPaths.AppDataLocation), "MTLTools"
-    )
-
+    PREF_FOLDER = os.path.join(_resolve_app_data_path(), "MTLTools")
     PREF_FILE = os.path.join(PREF_FOLDER, "mtl_prefs.json")
 
     def _ensure_pref_folder():
@@ -53,10 +66,7 @@ class Preferences:
         Preferences.save_prefs(prefs)
 
 
-PREF_FOLDER = os.path.join(
-    QStandardPaths.writableLocation(QStandardPaths.AppDataLocation), "MTLTools"
-)
-
+PREF_FOLDER = os.path.join(_resolve_app_data_path(), "MTLTools")
 PREF_FILE = os.path.join(PREF_FOLDER, "mtl_prefs.json")
 
 

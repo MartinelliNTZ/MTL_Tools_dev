@@ -42,6 +42,13 @@ class QgisMessageUtil:
             QMessageBox.information(iface.mainWindow(), title, message)
 
     @staticmethod
+    def _exec_dialog(dialog):
+        """Compatibilidade Qt5/Qt6: executa dialog de forma unificada."""
+        if hasattr(dialog, "exec_"):
+            return dialog.exec_()
+        return dialog.exec()
+
+    @staticmethod
     def modal_result_with_folder(
         iface, title: str, message: str, folder_path: str, parent=None
     ):
@@ -87,7 +94,7 @@ class QgisMessageUtil:
             )
 
             msg.setText(text)
-            result = msg.exec()
+            result = QgisMessageUtil._exec_dialog(msg)
 
             QgisMessageUtil.log(
                 f"[modal_result_with_folder] Diálogo exibido com sucesso: {title}",
@@ -214,7 +221,7 @@ class QgisMessageUtil:
         btn_replace = msg.addButton("Substituir", QMessageBox.AcceptRole)
         btn_rename = msg.addButton("Renomear", QMessageBox.ActionRole)
 
-        msg.exec()
+        QgisMessageUtil._exec_dialog(msg)
 
         clicked = msg.clickedButton()
         if clicked == btn_replace:
@@ -233,7 +240,7 @@ class QgisMessageUtil:
         btn_rename = msg.addButton("Renomear", QMessageBox.ActionRole)
         msg.addButton("Cancelar", QMessageBox.RejectRole)
 
-        msg.exec_()
+        QgisMessageUtil._exec_dialog(msg)
 
         if msg.clickedButton() == btn_over:
             return "overwrite"
@@ -254,7 +261,7 @@ class QgisMessageUtil:
         msg.setTextFormat(Qt.RichText)
         msg.setText(html_text)
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        return msg.exec() == QMessageBox.Yes
+        return QgisMessageUtil._exec_dialog(msg) == QMessageBox.Yes
 
 
 # EOF

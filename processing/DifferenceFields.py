@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-from PyQt5.QtGui import QIcon
+
 from ..core.config.LogUtils import LogUtils
 from qgis.core import (    
     QgsProcessingParameterFeatureSource,
@@ -13,10 +13,9 @@ from qgis.core import (
 from ..utils.ToolKeys import ToolKey
 from ..utils.Preferences import Preferences
 #from .model.difference_fields_model import DifferenceFieldsModel
-from PyQt5.QtCore import QVariant
+from qgis.PyQt.QtCore import QVariant
 from .BaseProcessingAlgorithm import BaseProcessingAlgorithm
 from qgis.core import QgsFields, QgsField, QgsFeature, QgsFeatureSink
-from PyQt5.QtCore import QVariant
 
 
 

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QVariant
+from qgis.PyQt.QtCore import QVariant
 from ..core.config.LogUtils import LogUtils
 from qgis.core import (
     QgsProcessingParameterFeatureSource,

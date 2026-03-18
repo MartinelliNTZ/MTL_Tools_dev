@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
-
-from PyQt5.QtGui import QIcon
-
 from .BaseProcessingAlgorithm import BaseProcessingAlgorithm
 from qgis.core import (
     QgsProcessingAlgorithm,

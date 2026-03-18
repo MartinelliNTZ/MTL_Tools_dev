@@ -29,3 +29,9 @@
   - persistência específica por ferramenta usando `Preferences`
   - `self.prefs` mantido na instância
 
+2.0.8.7 #aq
+- Ajustada `QgisMessageUtil` para compatibilidade Qt5/Qt6:
+  - adicionado helper `_exec_dialog` que chama `exec_()` quando disponível e `exec()` caso contrário
+  - todos os usos de `QMessageBox.exec`/`exec_` migrados para `_exec_dialog` (`modal_result_with_folder`, `ask_field_conflict`, `ask_overwrite`, `confirm_destructive`)
+  - mantém caminho mínimo e sem quebra de API
+
