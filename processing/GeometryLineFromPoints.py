@@ -42,11 +42,6 @@ class GeometryLineFromPoints(BaseProcessingAlgorithm):
 
 
 
-    def _save_prefs(self, use_second_layer):
-
-        self.prefs["use_second_layer"] = bool(use_second_layer)
-        Preferences.save_tool_prefs(self.TOOL_KEY, self.prefs)
-
     def initAlgorithm(self, config=None):
         self.logger.debug("Inicializando parâmetros do algoritmo GeometryLineFromPointsAlgorithm…")
         self.addParameter(
@@ -226,7 +221,8 @@ class GeometryLineFromPoints(BaseProcessingAlgorithm):
                 pair_list = [(feats[i], feats[i + 1]) for i in range(len(feats) - 1)]
                 self._append_line_features(pair_list, sink, fields, str(key_name))
 
-        self._save_prefs(use_second)
+        self.prefs.update({"use_second_layer": bool(use_second)})
+        self.save_preferences()
         self.logger.info(f"Preferência use_second_layer salva: {use_second}")
 
         feedback.pushInfo("✔ Processo concluído: linhas geradas com sucesso.")

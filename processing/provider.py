@@ -5,7 +5,7 @@ from qgis.core import QgsProcessingProvider
 from .RasterMassSampler import RasterMassSampler
 from .RasterMassClipper import RasterMassClipper
 from .DifferenceFields import DifferenceFieldsAlgorithm
-from .attribute_statistics import AttributeStatisticsAlgorithm
+from .AttributeStatistics import AttributeStatistics
 from .GeometryLineFromPoints import GeometryLineFromPoints
 
 # from .elevation_analisys import ElevationAnalisys
@@ -18,7 +18,7 @@ class MTLProvider(QgsProcessingProvider):
         self.addAlgorithm(RasterMassSampler())
         self.addAlgorithm(RasterMassClipper())
         self.addAlgorithm(DifferenceFieldsAlgorithm())
-        self.addAlgorithm(AttributeStatisticsAlgorithm())
+        self.addAlgorithm(AttributeStatistics())
         self.addAlgorithm(GeometryLineFromPoints())
 
     def id(self):

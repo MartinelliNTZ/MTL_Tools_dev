@@ -3,7 +3,11 @@
         "Test-Path": true,
         "Get-Item": true,
         "ForEach-Object": true,
-        "Move-Item": true
+        "Move-Item": true,
+        "/^python -m py_compile processing/attribute_statistics\\.py$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
     },
     "chat.agent.maxRequests": 150,
     "chat.agent.enabled": true,

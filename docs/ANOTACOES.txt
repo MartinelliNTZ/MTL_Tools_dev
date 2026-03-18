@@ -34,6 +34,11 @@ Documentação de cenarios: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13
 Instrucoes: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18
     multpart nao ta em task e pode bugar
 changelog=
+  2.0.9
+
+  2.0.8.1
+    - QgisMessageUtil ajustado para compatibilidade Qt5/Qt6: adicionado helper _exec_dialog que resolve diferenças entre exec() e exec_(), e migradas todas as chamadas de QMessageBox.
+  
   2.0.8
     - Nova Ferramenta: "Linha de Diferença entre Pontos por Atributo"
       - Modo 1: camada de pontos única, agrupa por campo e cria linhas sequenciais entre features com mesmo valor.
@@ -42,6 +47,15 @@ changelog=
     - Refatoração: persistência de preferências usando Preferences e API padrão em BaseProcessingAlgorithm
     - Refatoração: GeometryLineFromPoints, RasterMassSampler e RasterMassClipper para usar nova arquitetura de processamento e persistência
     - Novo sistema de helper HTML para cada algoritmo, referenciado por INSTRUCTIONS_FILE em cada classe de algoritmo, renderizado no diálogo de processamento
+    - GeometryLineFromPointsAlgorithm refatorado para herdar de BaseProcessingAlgorithm.
+    - Adicionado LogUtils (self.logger) em pontos-chave (inicialização, processAlgorithm, append_line_features).
+    - Persistência do checkbox `use_second_layer` implementada via Preferences.
+    - BaseProcessingAlgorithm estendido com API padrão: load_preferences, save_preferences, atributos de classe para nome, nome de exibição, grupo e ícone.
+    - RasterMassSampler, RasterMassClipper e GeometryLineFromPoints atualizados para usar save_preferences/load_preferences, eliminando repetição de load_tool_prefs/save_tool_prefs.
+    - Definição simplificada de name/displayName/group/groupId nas subclasses através de atributos de classe.
+    - RasterMassSampler e RasterMassClipper: removidos overrides redundantes de group()/groupId() e name()/displayName().
+    - RasterMassSampler e RasterMassClipper agora implementam métodos específicos save_prefs (com parâmetros explícitos) e load_prefs em initAlgorithm.
+    - DifferenceFieldsAlgorithm adaptado para o mesmo padrão: _load_prefs em initAlgorithm e save_prefs ao final de processAlgorithm.
   
   2.0.7 2026/03/16
     - Nova ferramenta: RasterMassClipper (recorte massivo de rasters por polígono)

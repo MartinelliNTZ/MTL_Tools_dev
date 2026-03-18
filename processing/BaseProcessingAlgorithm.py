@@ -15,6 +15,7 @@ from qgis.core import (
 from ..core.config.LogUtils import LogUtils
 from ..utils.Preferences import Preferences
 from ..utils.ToolKeys import ToolKey
+from ..resources.instructions.HtmlInstructionsProvider import HtmlInstructionsProvider
 
 
 class GroupProcessing:
@@ -40,8 +41,9 @@ class BaseProcessingAlgorithm(QgsProcessingAlgorithm):
     ALGORITHM_GROUP = GROUP_VETORIAL
     ICON = "cadmus_icon.ico"
 
+
     def shortHelpString(self):
-        if self.INSTRUCTIONS_FILE:
+        if False:#self.INSTRUCTIONS_FILE:
             path = os.path.join(
                 os.path.dirname(__file__),
                 "..",
@@ -56,7 +58,8 @@ class BaseProcessingAlgorithm(QgsProcessingAlgorithm):
             except Exception as e:                
                 return f
         else:
-            return
+            html = HtmlInstructionsProvider(self.TOOL_KEY)  
+            return html.get_instructions(self.ALGORITHM_NAME)  # valor padrão genérico
 
     def icon(self):
         icon_path = os.path.join(
@@ -96,6 +99,7 @@ class BaseProcessingAlgorithm(QgsProcessingAlgorithm):
         )
 
     def load_preferences(self):
+        """Carrega preferências usando Preferences.load_tool_prefs e armazena em self.prefs. Retorna dict de preferências ou vazio se falhar."""
         if not self.TOOL_KEY:
             return {}
         try:
@@ -108,3 +112,11 @@ class BaseProcessingAlgorithm(QgsProcessingAlgorithm):
             ).warning(f"Falha ao carregar preferências de {self.TOOL_KEY}: {e}")
             return {}
     
+    
+    def save_preferences(self):
+        """Salva self.prefs usando Preferences.save_tool_prefs. Espera que self.prefs já esteja atualizada."""
+        if not self.TOOL_KEY:
+            return
+        if self.prefs is None:
+            self.prefs = {}
+        Preferences.save_tool_prefs(self.TOOL_KEY, self.prefs)

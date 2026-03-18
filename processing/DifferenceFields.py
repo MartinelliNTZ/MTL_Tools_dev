@@ -16,6 +16,7 @@ from ..utils.Preferences import Preferences
 from qgis.PyQt.QtCore import QVariant
 from .BaseProcessingAlgorithm import BaseProcessingAlgorithm
 from qgis.core import QgsFields, QgsField, QgsFeature, QgsFeatureSink
+from ..resources.instructions.HtmlInstructionsProvider import HtmlInstructionsProvider as Help
 
 
 
@@ -45,11 +46,9 @@ class DifferenceFieldsAlgorithm(BaseProcessingAlgorithm):
         QVariant.Double,
     } 
 
-    def save_prefs(self, prefix, precision):
-        Preferences.save_tool_prefs(self.TOOL_KEY, {"prefix": prefix, "precision": precision})
-
     # Definição dos parâmetros
     def initAlgorithm(self, config=None):
+        
         self.logger.debug("Inicializando parâmetros do algoritmo DifferenceFieldsAlgorithm…")
         self.load_preferences()
 
@@ -137,7 +136,8 @@ class DifferenceFieldsAlgorithm(BaseProcessingAlgorithm):
         feedback.pushInfo(f"Precisão: {precision}")
 
         # Salvar preferências
-        self.save_prefs(prefix, precision)
+        self.prefs.update({"prefix": prefix, "precision": precision})
+        self.save_preferences()
 
         # Campos de saída
         out_fields = self.create_output_fields(layer, fields_to_compare, prefix=prefix)

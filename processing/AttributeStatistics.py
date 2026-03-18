@@ -5,7 +5,6 @@ import math
 from typing import Dict, Any
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import (
-    QgsProcessingAlgorithm,
     QgsProcessingParameterFeatureSource,
     QgsProcessingParameterField,
     QgsProcessingParameterFileDestination,
@@ -17,42 +16,21 @@ from qgis.core import (
     QgsVectorLayer,
     QgsProject,
 )
-from ..utils.Preferences import load_tool_prefs, save_tool_prefs
+from .BaseProcessingAlgorithm import BaseProcessingAlgorithm
+from ..utils.Preferences import Preferences
 from ..utils.ToolKeys import ToolKey
 from .model.attribute_statistics_model import AttributeStatisticsModel
 
 TOOL_KEY = ToolKey.ATTRIBUTE_STATISTICS
 
 
-class PreferencesManager:
-    """
-    Wrapper simples para carregar/salvar preferências de ferramenta.
-    Mantém a dependência com utils.preferences centralizada aqui para que
-    o model possa ser testado substituindo essas funções (injeção).
-    """
 
-    def __init__(self, load_tool_prefs_func, save_tool_prefs_func, tool_key: str):
-        self._load = load_tool_prefs_func
-        self._save = save_tool_prefs_func
-        self.tool_key = tool_key
-
-    def load(self) -> Dict[str, Any]:
-        prefs = self._load(self.tool_key) or {}
-        return {
-            "precision": int(prefs.get("precision", 4)),
-            "exclude_fields": prefs.get("exclude_fields", []),
-            "last_output_folder": prefs.get("last_output_folder", ""),
-            "last_layer_source": prefs.get("last_layer_source", ""),
-            "force_ptbr": bool(prefs.get("force_ptbr", False)),
-            "load_after": bool(prefs.get("load_after", False)),
-            "stats_enabled": prefs.get("stats_enabled", {}),
-        }
-
-    def save(self, **kwargs):
-        self._save(self.tool_key, kwargs)
-
-
-class AttributeStatisticsAlgorithm(QgsProcessingAlgorithm):
+class AttributeStatistics(BaseProcessingAlgorithm):
+    TOOL_KEY = ToolKey.ATTRIBUTE_STATISTICS
+    ALGORITHM_NAME = "attribute_statistics"
+    ALGORITHM_DISPLAY_NAME = "Estatísticas de Atributos"
+    ALGORITHM_GROUP = BaseProcessingAlgorithm.GROUP_ESTATISTICA
+    ICON = "attribute_stats.ico"
 
     INPUT_LAYER = "INPUT_LAYER"
     EXCLUDE_FIELDS = "EXCLUDE_FIELDS"
@@ -81,36 +59,20 @@ class AttributeStatisticsAlgorithm(QgsProcessingAlgorithm):
         "KURT": "Curtose",
     }
 
-    def name(self):
-        return "attribute_statistics_mtl"
-
-    def displayName(self):
-        return "Estatísticas de Atributos (Cadmus)"
-
-    def group(self):
-        return "Estatística"
-
-    def groupId(self):
-        return "estatistica"
-
-    def icon(self):
-        icon_path = os.path.join(
-            os.path.dirname(__file__), "..", "resources", "icons", "attribute_stats.ico"
-        )
-        return QIcon(icon_path) if os.path.exists(icon_path) else QIcon()
-
-    def createInstance(self):
-        return AttributeStatisticsAlgorithm()
 
     # ----------------------------------------------------
-    # INIT: parâmetros -> aqui apenas constrói UI usando prefs do PreferencesManager
+    # INIT: parâmetros -> aqui apenas constrói UI usando prefs via BaseProcessingAlgorithm
     # ----------------------------------------------------
     def initAlgorithm(self, config=None):
 
-        prefs_manager = PreferencesManager(load_tool_prefs, save_tool_prefs, TOOL_KEY)
-        prefs = prefs_manager.load()
-        self._prefs_manager = prefs_manager
+        self.load_preferences()
+        prefs = self.prefs or {}
         self._model = AttributeStatisticsModel()
+
+        precision_default = prefs.get("precision", 2)
+        force_ptbr_default = prefs.get("force_ptbr", False)
+        load_after_default = prefs.get("load_after", False)
+        enabled_stats = prefs.get("stats_enabled", {})
 
         # Camada de entrada
         self.addParameter(
@@ -141,7 +103,7 @@ class AttributeStatisticsAlgorithm(QgsProcessingAlgorithm):
                 type=QgsProcessingParameterNumber.Integer,
                 minValue=0,
                 maxValue=12,
-                defaultValue=prefs["precision"],
+                defaultValue=precision_default,
             )
         )
 
@@ -149,7 +111,7 @@ class AttributeStatisticsAlgorithm(QgsProcessingAlgorithm):
         p_load = QgsProcessingParameterBoolean(
             self.LOAD_AFTER,
             "Carregar CSV automaticamente após execução",
-            defaultValue=prefs["load_after"],
+            defaultValue=load_after_default,
         )
         p_load.setFlags(p_load.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
         self.addParameter(p_load)
@@ -157,7 +119,7 @@ class AttributeStatisticsAlgorithm(QgsProcessingAlgorithm):
         p_force_ptbr = QgsProcessingParameterBoolean(
             self.PTBR_FORMAT,
             "Forçar CSV no formato PT-BR (usar ; e ,)",
-            defaultValue=prefs["force_ptbr"],
+            defaultValue=force_ptbr_default,
         )
         p_force_ptbr.setFlags(
             p_force_ptbr.flags() | QgsProcessingParameterDefinition.FlagAdvanced
@@ -287,16 +249,17 @@ class AttributeStatisticsAlgorithm(QgsProcessingAlgorithm):
         except Exception as e:
             raise QgsProcessingException(f"Erro ao salvar CSV: {e}")
 
-        # salvar preferências via PreferencesManager
-        self._prefs_manager.save(
-            precision=precision,
-            exclude_fields=exclude_fields,
-            last_output_folder=out_folder,
-            last_layer_source=layer.source(),
-            force_ptbr=force_ptbr,
-            load_after=load_after,
-            stats_enabled=stats_enabled,
+        self.prefs.update(
+            {
+                "precision": precision,
+                "exclude_fields": exclude_fields,
+                "last_output_folder": out_folder,
+                "force_ptbr": force_ptbr,
+                "load_after": load_after,
+                "stats_enabled": stats_enabled,
+            }
         )
+        self.save_preferences()
 
         # Carregar CSV automaticamente (mesmo comportamento)
         if load_after and output_path:

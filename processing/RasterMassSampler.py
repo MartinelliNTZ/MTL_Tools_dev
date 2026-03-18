@@ -38,23 +38,11 @@ class RasterMassSampler(BaseProcessingAlgorithm):
     OUTPUT_CRS = "OUTPUT_CRS"
     OUTPUT = "OUTPUT"
 
-    def _load_prefs(self):
-        try:
-            self.prefs = Preferences.load_tool_prefs(self.TOOL_KEY)
-        except Exception:
-            self.prefs = {}
-        return self.prefs
-
-    def save_prefs(self, out_folder, dest):
-        prefs = getattr(self, "prefs", {}) or {}
-        prefs["last_output_folder"] = out_folder
-        prefs["last_output_file"] = dest
-        Preferences.save_tool_prefs(self.TOOL_KEY, prefs)
-        self.prefs = prefs
+    # -------------------------- INIT -------------------------
 
     # -------------------------- INIT -------------------------
     def initAlgorithm(self, config=None):
-        self._load_prefs()
+        self.load_preferences()
 
         self.addParameter(
             QgsProcessingParameterFeatureSource(
@@ -127,7 +115,8 @@ class RasterMassSampler(BaseProcessingAlgorithm):
             clickable = f'<a href="file:///{out_folder}">{out_folder}</a>'
             feedback.pushInfo(f"Arquivo salvo em: {clickable}")
 
-            self.save_prefs(out_folder, dest)
+            self.prefs.update({"last_output_folder": out_folder, "last_output_file": dest})
+            self.save_preferences()
 
         return {self.OUTPUT: dest}
 
@@ -252,6 +241,7 @@ class RasterMassSampler(BaseProcessingAlgorithm):
             clickable = f'<a href="file:///{out_folder}">{out_folder}</a>'
             feedback.pushInfo(f"Arquivo salvo em: {clickable}")
 
-            self.save_prefs(out_folder, dest)
+            self.prefs.update({"last_output_folder": out_folder, "last_output_file": dest})
+            self.save_preferences()
 
         return {self.OUTPUT: dest}

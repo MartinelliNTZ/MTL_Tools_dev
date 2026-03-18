@@ -3,7 +3,6 @@ import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from .BaseProcessingAlgorithm import BaseProcessingAlgorithm
 from qgis.core import (
-    QgsProcessingAlgorithm,
     QgsProcessingParameterFeatureSource,
     QgsProcessingParameterMultipleLayers,
     QgsProcessingParameterFolderDestination,
@@ -17,7 +16,6 @@ from qgis.core import (
 
 import processing
 from ..utils.ToolKeys import ToolKey
-from ..utils.Preferences import Preferences
 from ..core.config.LogUtils import LogUtils
 
 
@@ -39,12 +37,6 @@ class RasterMassClipper(BaseProcessingAlgorithm):
 
 
  
-
-    def save_prefs(self, out_folder, per_feature, buffer_fix):
-        self.prefs["last_output_folder"] = out_folder
-        self.prefs["per_feature"] = bool(per_feature)
-        self.prefs["buffer_fix"] = bool(buffer_fix)
-        Preferences.save_tool_prefs(self.TOOL_KEY, self.prefs)
 
     # ---------------- INIT ----------------
 
@@ -156,7 +148,14 @@ class RasterMassClipper(BaseProcessingAlgorithm):
                     feedback.pushInfo(str(e))
                     self.logger.error(f"Erro ao processar tarefa: {e}")
 
-        self.save_prefs(out_folder, per_feature, buffer_fix)
+        self.prefs.update(
+            {
+                "last_output_folder": out_folder,
+                "per_feature": bool(per_feature),
+                "buffer_fix": bool(buffer_fix),
+            }
+        )
+        self.save_preferences()
 
         clickable = f'<a href="file:///{out_folder}">{out_folder}</a>'
         feedback.pushInfo(f"Arquivos salvos em: {clickable}")    
