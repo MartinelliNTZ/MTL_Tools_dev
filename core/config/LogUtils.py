@@ -64,7 +64,7 @@ class LogUtils:
             level="INFO",
             msg="Log session started",
             tool=ToolKey.SYSTEM,
-            class_name="LogUtilsNew",
+            class_name="LogUtils",
             code="LOG_START",
             data={},
         )

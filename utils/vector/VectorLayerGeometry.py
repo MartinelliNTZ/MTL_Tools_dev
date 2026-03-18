@@ -45,7 +45,7 @@ class VectorLayerGeometry:
     - Carregar ou salvar (use VectorLayerSource)
 
     Logging Strategy (Métodos Estáticos):
-    - Cada método estático instancia LogUtilsNew com tool_key fornecido
+    - Cada método estático instancia LogUtils com tool_key fornecido
     - Padrão: external_tool_key='untraceable' como valor padrão
     - Helper method: _get_logger(tool_key) centraliza criação de instâncias
     - Benefícios: Thread-safe, flexível (tool_key customizável), sem estado global

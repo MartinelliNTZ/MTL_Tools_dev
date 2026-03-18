@@ -49,7 +49,6 @@ class ProgressDialog:
         parent : QWidget, optional
             Widget pai (típico: self em dialogs)
         """
-        # Instanciar LogUtilsNew como logger (sem ToolKey, usar nome genérico)
 
         self.logger = LogUtils(
             tool="ui_progress", class_name="ProgressDialog", level=LogUtils.DEBUG

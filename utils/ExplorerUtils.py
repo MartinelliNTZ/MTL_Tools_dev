@@ -27,7 +27,7 @@ RASTER_EXTS = {".tif", ".tiff", ".ecw", ".jp2", ".asc"}
 class ExplorerUtils:
     """Utilitário para varredura de diretórios e carregamento de layers.
 
-    Métodos estáticos, log com LogUtilsNew.
+    Métodos estáticos, log com LogUtils.
     """
 
     @staticmethod

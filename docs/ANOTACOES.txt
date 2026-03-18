@@ -35,6 +35,7 @@ Instrucoes: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18
     multpart nao ta em task e pode bugar
 changelog=
   2.0.9
+    - Implementacao de Checkbox "Exibir campo de ajuda" no provider, com persistencia via Preferences e exibicao condicional de mensagens de ajuda no processamento.
     - Substituição dos arquivos HTML de ajuda por sistema dinâmico via HtmlInstructionsProvider, permitindo manutenção centralizada e formatação consistente com logos e alertas estilizados.
 
   2.0.8.1

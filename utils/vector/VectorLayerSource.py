@@ -31,7 +31,7 @@ class VectorLayerSource:
     - Validar antes de operações críticas
 
     Logging Strategy (Métodos Estáticos):
-    - Helper method: _get_logger(tool_key) centraliza criação de instâncias LogUtilsNew
+    - Helper method: _get_logger(tool_key) centraliza criação de instâncias LogUtils
     - Benefícios: Thread-safe, flexível (tool_key customizável), sem estado global
     """
 
