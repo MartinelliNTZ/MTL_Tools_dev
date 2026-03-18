@@ -1,17 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 from qgis.PyQt.QtGui import QIcon
-from qgis.core import (
-    QgsProcessingAlgorithm,
-    QgsProcessingParameterFeatureSource,
-    QgsProcessingParameterMultipleLayers,
-    QgsProcessingParameterFolderDestination,
-    QgsProcessingParameterBoolean,
-    QgsProcessing,
-    QgsVectorLayer,
-    QgsCoordinateTransform,
-    QgsProject,
-)
+from qgis.core import QgsProcessingAlgorithm
 from ..core.config.LogUtils import LogUtils
 from ..utils.Preferences import Preferences
 from ..utils.ToolKeys import ToolKey
@@ -41,14 +31,12 @@ class BaseProcessingAlgorithm(QgsProcessingAlgorithm):
     ALGORITHM_GROUP = GROUP_VETORIAL
     ICON = "cadmus_icon.ico"
 
-
     def shortHelpString(self):
-        if self.prefs.get("display_help",True):#self.INSTRUCTIONS_FILE:
-                html = HtmlInstructionsProvider(self.TOOL_KEY)  
-                return html.get_instructions(self.ALGORITHM_NAME)  # valor padrão genérico
+        if self.prefs.get("display_help", True):  # self.INSTRUCTIONS_FILE:
+            html = HtmlInstructionsProvider(self.TOOL_KEY)
+            return html.get_instructions(self.ALGORITHM_NAME)  # valor padrão genérico
         else:
             return
-
 
     def icon(self):
         icon_path = os.path.join(
@@ -100,8 +88,7 @@ class BaseProcessingAlgorithm(QgsProcessingAlgorithm):
                 level=LogUtils.WARNING,
             ).warning(f"Falha ao carregar preferências de {self.TOOL_KEY}: {e}")
             return {}
-    
-    
+
     def save_preferences(self):
         """Salva self.prefs usando Preferences.save_tool_prefs. Espera que self.prefs já esteja atualizada."""
         if not self.TOOL_KEY:

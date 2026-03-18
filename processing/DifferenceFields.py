@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-import os
-
 from ..core.config.LogUtils import LogUtils
-from qgis.core import (    
+from qgis.core import (
     QgsProcessingParameterFeatureSource,
     QgsProcessingParameterField,
     QgsProcessingParameterString,
@@ -10,28 +8,28 @@ from qgis.core import (
     QgsProcessingParameterNumber,
     QgsProcessingParameterBoolean,
     QgsProcessing,
+    QgsFields,
+    QgsFeature,
+    QgsFeatureSink,
 )
 from ..utils.ToolKeys import ToolKey
-from ..utils.Preferences import Preferences
-#from .model.difference_fields_model import DifferenceFieldsModel
 from qgis.PyQt.QtCore import QVariant
 from .BaseProcessingAlgorithm import BaseProcessingAlgorithm
-from qgis.core import QgsFields, QgsField, QgsFeature, QgsFeatureSink
-from ..resources.instructions.HtmlInstructionsProvider import HtmlInstructionsProvider as Help
-
 
 
 class DifferenceFieldsAlgorithm(BaseProcessingAlgorithm):
-    
+
     TOOL_KEY = ToolKey.DIFFERENCE_FIELDS
     ALGORITHM_NAME = "difference_fields"
     ALGORITHM_DISPLAY_NAME = "Gerador de Diferenças entre Campos"
     ALGORITHM_GROUP = BaseProcessingAlgorithm.GROUP_ESTATISTICA
     ICON = "field_diference.ico"
     INSTRUCTIONS_FILE = "difference_fields.html"
-    logger = LogUtils(tool=TOOL_KEY, class_name="DifferenceFieldsAlgorithm", level="DEBUG")
-    
-    #especificas do algoritmo
+    logger = LogUtils(
+        tool=TOOL_KEY, class_name="DifferenceFieldsAlgorithm", level="DEBUG"
+    )
+
+    # especificas do algoritmo
     INPUT_LAYER = "INPUT_LAYER"
     BASE_FIELD = "BASE_FIELD"
     EXCLUDE_FIELDS = "EXCLUDE_FIELDS"  # <-- AGORA É EXCLUÍR CAMPOS
@@ -46,12 +44,14 @@ class DifferenceFieldsAlgorithm(BaseProcessingAlgorithm):
         QVariant.LongLong,
         QVariant.ULongLong,
         QVariant.Double,
-    } 
+    }
 
     # Definição dos parâmetros
     def initAlgorithm(self, config=None):
-        
-        self.logger.debug("Inicializando parâmetros do algoritmo DifferenceFieldsAlgorithm…")
+
+        self.logger.debug(
+            "Inicializando parâmetros do algoritmo DifferenceFieldsAlgorithm…"
+        )
         self.load_preferences()
 
         self.addParameter(
@@ -83,7 +83,9 @@ class DifferenceFieldsAlgorithm(BaseProcessingAlgorithm):
 
         self.addParameter(
             QgsProcessingParameterString(
-                self.PREFIX, "Prefixo para novos campos", defaultValue=self.prefs.get("prefix", "diff_")
+                self.PREFIX,
+                "Prefixo para novos campos",
+                defaultValue=self.prefs.get("prefix", "diff_"),
             )
         )
 
@@ -136,7 +138,9 @@ class DifferenceFieldsAlgorithm(BaseProcessingAlgorithm):
             fields_to_compare = [
                 f.name()
                 for f in layer.fields()
-                if f.type() in self.NUMERIC and f.name() not in excludeds and f.name() != base_field
+                if f.type() in self.NUMERIC
+                and f.name() not in excludeds
+                and f.name() != base_field
             ]
 
         feedback.pushInfo(f"Base: {base_field}")
@@ -145,7 +149,11 @@ class DifferenceFieldsAlgorithm(BaseProcessingAlgorithm):
         feedback.pushInfo(f"Prefixo: {prefix}")
         feedback.pushInfo(f"Precisão: {precision}")
 
-        display_help = bool(self.parameterAsBool(params, self.DISPLAY_HELP, context)) if self.DISPLAY_HELP in params else False
+        display_help = (
+            bool(self.parameterAsBool(params, self.DISPLAY_HELP, context))
+            if self.DISPLAY_HELP in params
+            else False
+        )
 
         # Salvar preferências
         self.prefs.update(
@@ -165,12 +173,14 @@ class DifferenceFieldsAlgorithm(BaseProcessingAlgorithm):
         )
 
         # Processar feições
-        self.process_features(layer, base_field, fields_to_compare, out_fields, sink, precision=precision)
+        self.process_features(
+            layer, base_field, fields_to_compare, out_fields, sink, precision=precision
+        )
 
         feedback.pushInfo("✔ Processo finalizado com sucesso.")
 
         return {self.OUTPUT: dest}
-    
+
     def create_output_fields(self, source_layer, fields_to_compare, prefix="diff_"):
         out_fields = QgsFields()
         for f in source_layer.fields():
@@ -182,7 +192,9 @@ class DifferenceFieldsAlgorithm(BaseProcessingAlgorithm):
 
         return out_fields
 
-    def process_features(self, layer, base_field, fields_to_compare, out_fields, sink, precision=2):
+    def process_features(
+        self, layer, base_field, fields_to_compare, out_fields, sink, precision=2
+    ):
         for feat in layer.getFeatures():
             geom = feat.geometry()
             attrs = feat.attributes()

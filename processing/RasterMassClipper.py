@@ -13,7 +13,6 @@ from qgis.core import (
     QgsProject,
     QgsGeometry,
 )
-
 import processing
 from ..utils.ToolKeys import ToolKey
 from ..core.config.LogUtils import LogUtils

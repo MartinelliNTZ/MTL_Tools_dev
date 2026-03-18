@@ -8,8 +8,6 @@ from .DifferenceFields import DifferenceFieldsAlgorithm
 from .AttributeStatistics import AttributeStatistics
 from .GeometryLineFromPoints import GeometryLineFromPoints
 
-# from .elevation_analisys import ElevationAnalisys
-
 
 class MTLProvider(QgsProcessingProvider):
 

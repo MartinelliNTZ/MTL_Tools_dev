@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 import math
-
-from typing import Dict, Any
-from qgis.PyQt.QtGui import QIcon
 from qgis.core import (
     QgsProcessingParameterFeatureSource,
     QgsProcessingParameterField,
@@ -17,11 +14,8 @@ from qgis.core import (
     QgsProject,
 )
 from .BaseProcessingAlgorithm import BaseProcessingAlgorithm
-from ..utils.Preferences import Preferences
 from ..utils.ToolKeys import ToolKey
 from .model.attribute_statistics_model import AttributeStatisticsModel
-
-TOOL_KEY = ToolKey.ATTRIBUTE_STATISTICS
 
 
 class AttributeStatistics(BaseProcessingAlgorithm):

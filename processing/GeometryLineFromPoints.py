@@ -18,7 +18,6 @@ from qgis.core import (
 )
 from .BaseProcessingAlgorithm import BaseProcessingAlgorithm
 from ..utils.ToolKeys import ToolKey
-from ..utils.Preferences import Preferences
 
 
 class GeometryLineFromPoints(BaseProcessingAlgorithm):
