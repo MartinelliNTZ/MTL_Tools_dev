@@ -2,7 +2,7 @@
 
 import os
 
-from ...core.config.LogUtils import LogUtils
+from ..core.config.LogUtils import LogUtils
 
 class HtmlInstructionsProvider:
     logger = None

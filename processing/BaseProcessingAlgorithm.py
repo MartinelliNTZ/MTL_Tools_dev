@@ -5,7 +5,7 @@ from qgis.core import QgsProcessingAlgorithm
 from ..core.config.LogUtils import LogUtils
 from ..utils.Preferences import Preferences
 from ..utils.ToolKeys import ToolKey
-from ..resources.instructions.HtmlInstructionsProvider import HtmlInstructionsProvider
+from ..resources.HtmlInstructionsProvider import HtmlInstructionsProvider
 
 
 class GroupProcessing:
