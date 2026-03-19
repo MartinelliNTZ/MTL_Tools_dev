@@ -55,6 +55,7 @@ class WidgetFactory:
 
         widget.setStyleSheet(Styles.attribute_selector())
         return layout, widget
+
     @staticmethod
     def create_image_widget(
         *,
@@ -77,7 +78,7 @@ class WidgetFactory:
         :param separator_bottom: Adiciona separador abaixo do widget.
         :param parent: Widget pai.
         :return: tuple (layout contendo o widget, instância do widget)
-        """        
+        """
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(2)  # ou use Styles.LAYOUT_V_SPACING
@@ -86,9 +87,7 @@ class WidgetFactory:
             layout.addWidget(WidgetFactory.create_separator())
 
         widget = ImageWidget(
-            image_path=image_path,
-            fixed_height=fixed_height,
-            parent=parent
+            image_path=image_path, fixed_height=fixed_height, parent=parent
         )
 
         if clickable and clicked_callback:
@@ -547,9 +546,7 @@ class WidgetFactory:
         return layout, widget
 
     @staticmethod
-    def create_separator(
-        shape=None, shadow=None, height=1, color="palette(mid)"
-    ):
+    def create_separator(shape=None, shadow=None, height=1, color="palette(mid)"):
         if shape is None:
             if hasattr(QFrame, "HLine"):
                 shape = QFrame.HLine
@@ -751,7 +748,7 @@ class WidgetFactory:
         parent=None,
         separator_top=False,
         separator_bottom=False,
-        spacing: int = Styles.LAYOUT_V_SPACING*10,
+        spacing: int = Styles.LAYOUT_V_SPACING * 10,
     ):
         """
         Cria botão simples que ocupa espaço disponível.

@@ -20,7 +20,9 @@ class AboutDialog(BaseDialog):
             self.logger.debug("Inicializando AboutDialog")
 
             self.setWindowTitle("Sobre o Cadmus")
-            self._build_ui(title="Sobre o Cadmus", enable_scroll=False, minimum_size=(420, 520))
+            self._build_ui(
+                title="Sobre o Cadmus", enable_scroll=False, minimum_size=(420, 520)
+            )
             self.logger.debug("AboutDialog _build_ui concluído")
 
             logo_path = os.path.join(
@@ -56,9 +58,9 @@ class AboutDialog(BaseDialog):
                 "<b>Criado em:</b> 9 de Dezembro de 2024<br>"
                 "<b>Criador:</b> MTL Agricultura e Tecnologia<br>"
                 "<b>Local:</b> Palmas - Tocantins - Brasil<br>"
-                "<b>Email:</b> <a href=\"mailto:martinelli.matheus11@gmail.com\">martinelli.matheus11@gmail.com</a><br>"
-                "<b>Site:</b> <a href=\"https://github.com/MartinelliNTZ/Cadmus\">https://github.com/MartinelliNTZ/Cadmus</a><br>"
-                "<b>GitHub:</b> <a href=\"https://github.com/MartinelliNTZ/Cadmus\">https://github.com/MartinelliNTZ/Cadmus</a>"
+                '<b>Email:</b> <a href="mailto:martinelli.matheus11@gmail.com">martinelli.matheus11@gmail.com</a><br>'
+                '<b>Site:</b> <a href="https://github.com/MartinelliNTZ/Cadmus">https://github.com/MartinelliNTZ/Cadmus</a><br>'
+                '<b>GitHub:</b> <a href="https://github.com/MartinelliNTZ/Cadmus">https://github.com/MartinelliNTZ/Cadmus</a>'
             )
 
             lbl_info = WidgetFactory.create_label(
@@ -86,12 +88,11 @@ class AboutDialog(BaseDialog):
 
             self.logger.debug("AboutDialog UI construída com sucesso")
         except Exception as ex:
-            if hasattr(self, 'logger') and self.logger:
+            if hasattr(self, "logger") and self.logger:
                 self.logger.error(f"AboutDialog falhou na inicialização: {ex}")
             else:
                 print(f"AboutDialog falhou na inicialização: {ex}")
             raise
-
 
 
 def run_about_dialog(iface):

@@ -39,6 +39,7 @@ Instrucoes: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18
   - Usar InstructionsManager para carregar instruções de forma centralizada e eficiente, com suporte a formatação e imagens
 changelog=
   2.0.10 2026/03/18
+    - Tooltips na toolbar
     - Implementado icon Manager  para centralizar carregamento de ícones do plugin, evitando múltiplas instâncias e melhorando performance
     - Implementado Instructions Manager para centralizar carregamento de instruções, com suporte a formatação e imagens, e integração com checkbox de exibição de ajuda
   2.0.9 2026/03/18

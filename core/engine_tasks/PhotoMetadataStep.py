@@ -124,7 +124,7 @@ class PhotoMetadataStep(BaseStep):
                             tool=context.get("tool_key"),
                             class_name=self.__class__.__name__,
                         ).error(
-                            f"Erro aplicando atributo foto={foto} field={field_name}: {e}"
+                            f"Erro aplicando atributo foto={fid} field={field_name}: {e}"
                         )
 
             # Comentar commit para manter no buffer de edição caso o usuário queira revisar

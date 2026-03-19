@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 from .BaseProcessingAlgorithm import BaseProcessingAlgorithm
-from qgis.core import (    
+from qgis.core import (
     QgsProcessingParameterFeatureSource,
     QgsProcessingParameterMultipleLayers,
     QgsProcessingParameterFeatureSink,
@@ -28,7 +28,7 @@ class RasterMassSampler(BaseProcessingAlgorithm):
     ALGORITHM_GROUP = BaseProcessingAlgorithm.GROUP_RASTER
     ICON = "raster_mass.ico"
     INSTRUCTIONS_FILE = "raster_mass_sampler.html"
-    
+
     # Especificas do algoritmo
     INPUT_POINTS = "INPUT_POINTS"
     INPUT_RASTERS = "INPUT_RASTERS"
@@ -121,7 +121,9 @@ class RasterMassSampler(BaseProcessingAlgorithm):
             clickable = f'<a href="file:///{out_folder}">{out_folder}</a>'
             feedback.pushInfo(f"Arquivo salvo em: {clickable}")
 
-            self.prefs.update({"last_output_folder": out_folder, "last_output_file": dest})
+            self.prefs.update(
+                {"last_output_folder": out_folder, "last_output_file": dest}
+            )
             self.save_preferences()
 
         return {self.OUTPUT: dest}
@@ -247,7 +249,11 @@ class RasterMassSampler(BaseProcessingAlgorithm):
             clickable = f'<a href="file:///{out_folder}">{out_folder}</a>'
             feedback.pushInfo(f"Arquivo salvo em: {clickable}")
 
-            display_help = bool(self.parameterAsBool(params, self.DISPLAY_HELP, context)) if self.DISPLAY_HELP in params else False
+            display_help = (
+                bool(self.parameterAsBool(params, self.DISPLAY_HELP, context))
+                if self.DISPLAY_HELP in params
+                else False
+            )
             self.prefs.update(
                 {
                     "last_output_folder": out_folder,

@@ -9,6 +9,7 @@ from qgis.core import (
     QgsProcessingParameterBoolean,
     QgsProcessing,
     QgsFields,
+    QgsField,
     QgsFeature,
     QgsFeatureSink,
 )
@@ -138,9 +139,7 @@ class DifferenceFieldsAlgorithm(BaseProcessingAlgorithm):
             fields_to_compare = [
                 f.name()
                 for f in layer.fields()
-                if f.type() in self.NUMERIC
-                and f.name() not in excludeds
-                and f.name() != base_field
+                if f.type() in self.NUMERIC and f.name() not in excludeds and f.name() != base_field
             ]
 
         feedback.pushInfo(f"Base: {base_field}")

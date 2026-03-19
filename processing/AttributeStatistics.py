@@ -16,6 +16,7 @@ from qgis.core import (
 from .BaseProcessingAlgorithm import BaseProcessingAlgorithm
 from ..utils.ToolKeys import ToolKey
 from .model.attribute_statistics_model import AttributeStatisticsModel
+from ..resources.IconManager import IconManager as im
 
 
 class AttributeStatistics(BaseProcessingAlgorithm):
@@ -23,7 +24,7 @@ class AttributeStatistics(BaseProcessingAlgorithm):
     ALGORITHM_NAME = "attribute_statistics"
     ALGORITHM_DISPLAY_NAME = "Estatísticas de Atributos"
     ALGORITHM_GROUP = BaseProcessingAlgorithm.GROUP_ESTATISTICA
-    ICON = "attribute_stats.ico"
+    ICON = im.ATTRIBUTE_STATS
 
     INPUT_LAYER = "INPUT_LAYER"
     EXCLUDE_FIELDS = "EXCLUDE_FIELDS"
@@ -159,7 +160,7 @@ class AttributeStatistics(BaseProcessingAlgorithm):
         )
         precision = int(self.parameterAsInt(parameters, self.PRECISION, context))
         ptbr_format = bool(self.parameterAsBool(parameters, self.PTBR_FORMAT, context))
-        load_after = bool(self.parameterAsBool(parameters, self.LOAD_AFTER, context))        
+        load_after = bool(self.parameterAsBool(parameters, self.LOAD_AFTER, context))
         stats_enabled = {
             k: self.parameterAsBool(parameters, k, context) for k in self.STATS.keys()
         }
@@ -244,7 +245,11 @@ class AttributeStatistics(BaseProcessingAlgorithm):
 
         except Exception as e:
             raise QgsProcessingException(f"Erro ao salvar CSV: {e}")
-        display_help = bool(self.parameterAsBool(parameters, self.DISPLAY_HELP, context)) if self.DISPLAY_HELP in parameters else False
+        display_help = (
+            bool(self.parameterAsBool(parameters, self.DISPLAY_HELP, context))
+            if self.DISPLAY_HELP in parameters
+            else False
+        )
         self.prefs.update(
             {
                 "precision": precision,

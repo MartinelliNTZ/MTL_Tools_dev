@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-import os
 import sys
 import traceback
-from qgis.PyQt.QtGui import QIcon
 from qgis.core import QgsApplication
 from qgis.PyQt.QtWidgets import QAction, QMenu, QToolButton, QWidgetAction
 from pathlib import Path
@@ -83,8 +81,7 @@ class CadmusPlugin:
         # Inicializar logger UMA VEZ como atributo da classe
         self.logger = LogUtils(tool=self.TOOL_KEY, class_name="Cadmus")
         self.logger.info("Plugin inicializado")
-        self.logger.info(
-            "SYSTEM: Global error handler instalado para capturar crashes")
+        self.logger.info("SYSTEM: Global error handler instalado para capturar crashes")
         # -------------------------
         # 1) ATIVAR PROCESSING PROVIDER
         # -------------------------
@@ -93,8 +90,7 @@ class CadmusPlugin:
             QgsApplication.processingRegistry().addProvider(self.provider)
             self.logger.info("Processing Provider carregado com sucesso")
         except Exception as e:
-            self.logger.error(
-                f"Erro ao carregar Processing Provider: {str(e)}")
+            self.logger.error(f"Erro ao carregar Processing Provider: {str(e)}")
             QgisMessageUtil.bar_critical(
                 self.iface, f"Erro ao carregar provider. Erro: {e}"
             )
@@ -125,38 +121,25 @@ class CadmusPlugin:
             self.logger.error(f"Erro ao criar menu principal: {str(e)}")
             return
 
-        
         # Submenus
         try:
             self.agriculture_menu = QMenu("Agricultura de Precisão", self.menu)
-            self.agriculture_menu.setIcon(
-                im.icon(im.AGRICULTURE)
-            )
+            self.agriculture_menu.setIcon(im.icon(im.AGRICULTURE))
 
             self.layers_menu = QMenu("Camadas", self.menu)
-            self.layers_menu.setIcon(
-                im.icon(im.LAYER)
-            )
+            self.layers_menu.setIcon(im.icon(im.LAYER))
 
             self.layouts_menu = QMenu("Layouts", self.menu)
-            self.layouts_menu.setIcon(
-                im.icon(im.LAYOUT)
-            )
+            self.layouts_menu.setIcon(im.icon(im.LAYOUT))
 
             self.raster_menu = QMenu("Raster", self.menu)
-            self.raster_menu.setIcon(
-                im.icon(im.RASTER)
-            )
+            self.raster_menu.setIcon(im.icon(im.RASTER))
 
             self.system_menu = QMenu("Sistema", self.menu)
-            self.system_menu.setIcon(
-                im.icon(im.SYSTEM)
-            )
+            self.system_menu.setIcon(im.icon(im.SYSTEM))
 
             self.vectors_menu = QMenu("Vetores", self.menu)
-            self.vectors_menu.setIcon(
-                im.icon(im.VECTOR)
-            )
+            self.vectors_menu.setIcon(im.icon(im.VECTOR))
 
             # Adiciona submenus ao menu principal
             self.menu.addMenu(self.agriculture_menu)
@@ -178,10 +161,11 @@ class CadmusPlugin:
             self.action_export_all = QAction(
                 im.icon(im.EXPORT_ALL_LAYOUTS),
                 "Exportar todos os Layouts",
-                self.iface.mainWindow())
+                self.iface.mainWindow(),
+            )
             self.action_export_all.triggered.connect(self.run_export_layouts)
             self.action_export_all.setToolTip(
-                "Exporta todos os Layouts do projeto para arquivos PDF ou imagens.\n"                
+                "Exporta todos os Layouts do projeto para arquivos PDF ou imagens.\n"
             )
 
             # 2-Replace in Layouts
@@ -190,8 +174,7 @@ class CadmusPlugin:
                 "Substituir textos nos Layouts",
                 self.iface.mainWindow(),
             )
-            self.action_replace_layouts.triggered.connect(
-                self.run_replace_layouts)
+            self.action_replace_layouts.triggered.connect(self.run_replace_layouts)
             self.action_replace_layouts.setToolTip(
                 "Substitui textos em massa nos Layouts do projeto.\n"
                 "Permite criar um mapa de substituição a partir de uma camada vetorial ou tabela, onde um campo é usado para identificar os Layouts e outro campo é usado para o novo valor a ser inserido.\n"
@@ -214,7 +197,8 @@ class CadmusPlugin:
             self.action_load_folder = QAction(
                 im.icon(im.LOAD_FOLDER_LAYER),
                 "Carregar pasta de arquivos",
-                self.iface.mainWindow())
+                self.iface.mainWindow(),
+            )
             self.action_load_folder.triggered.connect(self.run_load_folder)
             self.action_load_folder.setToolTip(
                 "Carrega em massa uma pasta de arquivos como camadas no QGIS.\n"
@@ -224,7 +208,8 @@ class CadmusPlugin:
             self.action_gerar_rastro = QAction(
                 im.icon(im.GENERATE_TRAIL),
                 "Gerar Rastro Implemento",
-                self.iface.mainWindow())
+                self.iface.mainWindow(),
+            )
             self.action_gerar_rastro.triggered.connect(self.run_gerar_rastro)
             self.action_gerar_rastro.setToolTip(
                 "Gera um rastro do movimento de um implemento agrícola com base em uma linha.\n"
@@ -232,26 +217,23 @@ class CadmusPlugin:
 
             # 6-About Dialog
             self.action_about_dialog = QAction(
-                im.icon(im.ABOUT),
-                "Sobre o Cadmus",
-                self.iface.mainWindow()
+                im.icon(im.ABOUT), "Sobre o Cadmus", self.iface.mainWindow()
             )
             self.action_about_dialog.triggered.connect(self.run_about_dialog)
             self.action_about_dialog.setToolTip("Informações sobre o plugin Cadmus.")
 
             # 12-Logcat Tool
             self.action_logcat = QAction(
-                im.icon(im.LOGCAT),
-                "Logcat - Viewer de Logs",
-                self.iface.mainWindow())
+                im.icon(im.LOGCAT), "Logcat - Viewer de Logs", self.iface.mainWindow()
+            )
             self.action_logcat.triggered.connect(self.run_logcat)
-            self.action_logcat.setToolTip("Abre o Logcat, uma ferramenta de visualização dos logs do plugin Cadmus")
+            self.action_logcat.setToolTip(
+                "Abre o Logcat, uma ferramenta de visualização dos logs do plugin Cadmus"
+            )
 
             # 13-Settings
             self.action_settings = QAction(
-                im.icon(im.SETTINGS),
-                "Configurações",
-                self.iface.mainWindow()
+                im.icon(im.SETTINGS), "Configurações", self.iface.mainWindow()
             )
             self.action_settings.triggered.connect(self.run_settings)
             self.action_settings.setToolTip("Configurações do plugin Cadmus.")
@@ -260,7 +242,8 @@ class CadmusPlugin:
             self.action_coord_click = QAction(
                 im.icon(im.COORD_CLICK_TOOL),
                 "Capturar Coordenadas",
-                self.iface.mainWindow())
+                self.iface.mainWindow(),
+            )
             self.action_coord_click.triggered.connect(self.run_coord_click)
             self.action_coord_click.setToolTip(
                 "Clique no mapa para obter coordenadas geográficas\n"
@@ -273,7 +256,7 @@ class CadmusPlugin:
             self.action_vector_fields = QAction(
                 im.icon(im.VECTOR_FIELD),
                 "Calcular Campos Vetoriais",
-                self.iface.mainWindow()
+                self.iface.mainWindow(),
             )
             self.action_vector_fields.triggered.connect(self.run_vector_fields)
             self.action_vector_fields.setToolTip(
@@ -289,16 +272,19 @@ class CadmusPlugin:
                 self.iface.mainWindow(),
             )
             self.action_drone_coords.triggered.connect(self.run_drone_coords)
-            self.action_drone_coords.setToolTip("Gera uma camada de pontos com as coordenadas de cada foto.\n"
-                                                "Gera um linha da trajetória do drone, conectando os pontos na ordem de captura.\n"
-                                                "Pode cruzar os pontos das fotos com os metadados das fotos para adicionar atributos/n"
-                                                "como altitude, data/hora, etc.")
+            self.action_drone_coords.setToolTip(
+                "Gera uma camada de pontos com as coordenadas de cada foto.\n"
+                "Gera um linha da trajetória do drone, conectando os pontos na ordem de captura.\n"
+                "Pode cruzar os pontos das fotos com os metadados das fotos para adicionar atributos/n"
+                "como altitude, data/hora, etc."
+            )
 
             # 10-Realizar multipart de todas as feições
             self.action_multpart = QAction(
                 im.icon(im.VECTOR_MULTPART),
                 "Promover a multiparte",
-                self.iface.mainWindow())
+                self.iface.mainWindow(),
+            )
             self.action_multpart.triggered.connect(self.run_multpart)
             self.action_multpart.setToolTip(
                 "Promove feições para o tipo multiparte\n"
@@ -306,14 +292,11 @@ class CadmusPlugin:
                 "para promover as feições."
             )
 
-
             # 11-Copiar atributos entre camadas
             self.action_copy_atributes = QAction(
-                im.icon(im.COPY_ATTRIBUTES),
-                "Copiar Atributos",
-                self.iface.mainWindow())
-            self.action_copy_atributes.triggered.connect(
-                self.run_copy_atributes)
+                im.icon(im.COPY_ATTRIBUTES), "Copiar Atributos", self.iface.mainWindow()
+            )
+            self.action_copy_atributes.triggered.connect(self.run_copy_atributes)
             self.logger.debug("Todas as ações criadas com sucesso")
         except Exception as e:
             self.logger.error(f"Erro ao criar ações: {str(e)}")
@@ -360,8 +343,8 @@ class CadmusPlugin:
             # ==================================================
             self._add_toolbar_dropdown(
                 title="Sistema",
-                main_action=self.action_restart_qgis,#padrao
-                #main_action=self.action_about_dialog,#debug editável
+                main_action=self.action_restart_qgis,  # padrao
+                # main_action=self.action_about_dialog,#debug editável
                 secondary_actions=[
                     self.action_restart_qgis,
                     self.action_logcat,
@@ -412,9 +395,7 @@ class CadmusPlugin:
                 title="Agricultura de Precisão",
                 main_action=self.action_drone_coords,
                 # main_action=self.action_gerar_rastro,
-                secondary_actions=[
-                    self.action_drone_coords,
-                    self.action_gerar_rastro],
+                secondary_actions=[self.action_drone_coords, self.action_gerar_rastro],
             )
             # ==================================================
             # BOTÃO "RASTER" NA TOOLBAR (com dropdown)
@@ -509,17 +490,14 @@ class CadmusPlugin:
 
             self.logger.info("Iniciando plugin: Calcular Campos Vetoriais")
             # manter referência viva
-            self.vector_field_plugin = VectorFieldsCalculationPlugin(
-                self.iface)
+            self.vector_field_plugin = VectorFieldsCalculationPlugin(self.iface)
             self.vector_field_plugin.run_vector_field()
-            self.logger.info(
-                "Plugin Calcular Campos Vetoriais executado com sucesso")
+            self.logger.info("Plugin Calcular Campos Vetoriais executado com sucesso")
         except Exception as e:
-            self.logger.error(
-                f"Erro ao executar Calcular Campos Vetoriais: {str(e)}")
+            self.logger.error(f"Erro ao executar Calcular Campos Vetoriais: {str(e)}")
             QgisMessageUtil.bar_critical(
-                self.iface,
-                f"Erro no plugin Calcular Campos Vetoriais:{str(e)}")
+                self.iface, f"Erro no plugin Calcular Campos Vetoriais:{str(e)}"
+            )
 
     # =====================================================
     # EXECUTAR: Converter para Multipart
@@ -532,14 +510,12 @@ class CadmusPlugin:
             # manter referência viva
             self.vector_multpart_plugin = VectorMultipartPlugin(self.iface)
             self.vector_multpart_plugin.run_multpart()
-            self.logger.info(
-                "Plugin Converter para Multipart executado com sucesso")
+            self.logger.info("Plugin Converter para Multipart executado com sucesso")
         except Exception as e:
-            self.logger.error(
-                f"Erro ao executar Converter para Multipart: {str(e)}")
+            self.logger.error(f"Erro ao executar Converter para Multipart: {str(e)}")
             QgisMessageUtil.bar_critical(
-                self.iface,
-                f"Erro no plugin Converter para Multipart: {str(e)}")
+                self.iface, f"Erro no plugin Converter para Multipart: {str(e)}"
+            )
 
     # =====FERRAMENTAS INSTANTANEA COM JANELA DE RESULTADOS=
 
@@ -553,13 +529,12 @@ class CadmusPlugin:
             self.logger.info("Ativando ferramenta: Capturar Coordenadas")
             self.coord_click_tool = CoordClickTool(self.iface)
             self.iface.mapCanvas().setMapTool(self.coord_click_tool)
-            self.logger.info(
-                "Ferramenta Capturar Coordenadas ativada com sucesso")
+            self.logger.info("Ferramenta Capturar Coordenadas ativada com sucesso")
         except Exception as e:
             self.logger.error(f"Erro ao ativar Capturar Coordenadas: {str(e)}")
             QgisMessageUtil.bar_critical(
-                self.iface,
-                f"Erro na ferramenta Capturar Coordenadas:{str(e)}")
+                self.iface, f"Erro na ferramenta Capturar Coordenadas:{str(e)}"
+            )
 
     # ===FERRAMENTAS DE JANELA COM SAIDA QGIS===============
     # =====================================================
@@ -587,14 +562,12 @@ class CadmusPlugin:
 
             self.logger.info("Abrindo diálogo: Gerar Rastro Implemento")
             self.gerar_rastro_dlg = run_gerar_rastro(self.iface)
-            self.logger.info(
-                "Diálogo Gerar Rastro Implemento aberto com sucesso")
+            self.logger.info("Diálogo Gerar Rastro Implemento aberto com sucesso")
         except Exception as e:
-            self.logger.error(
-                f"Erro ao executar Gerar Rastro Implemento: {str(e)}")
+            self.logger.error(f"Erro ao executar Gerar Rastro Implemento: {str(e)}")
             QgisMessageUtil.bar_critical(
-                self.iface,
-                f"Erro no plugin Gerar Rastro Implemento: {str(e)}")
+                self.iface, f"Erro no plugin Gerar Rastro Implemento: {str(e)}"
+            )
 
     # =====================================================
     # EXECUTAR: Logcat Tool
@@ -633,7 +606,8 @@ class CadmusPlugin:
             except Exception as run_error:
                 # Erro na execução do Logcat
                 error_msg = (
-                    f"LOGCAT: Erro ao executar logcat_plugin.run(): {str(run_error)}")
+                    f"LOGCAT: Erro ao executar logcat_plugin.run(): {str(run_error)}"
+                )
                 self.logger.critical(error_msg)
                 error_trace = traceback.format_exc()
                 self.logger.critical(f"Stack trace:\n{error_trace}")
@@ -666,14 +640,12 @@ class CadmusPlugin:
 
             self.logger.info("Abrindo diálogo: Obter Coordenadas de Drone")
             self.drone_cordinates_dlg = run_drone_cordinates(self.iface)
-            self.logger.info(
-                "Diálogo Obter Coordenadas de Drone aberto com sucesso")
+            self.logger.info("Diálogo Obter Coordenadas de Drone aberto com sucesso")
         except Exception as e:
-            self.logger.error(
-                f"Erro ao executar Obter Coordenadas de Drone: {str(e)}")
+            self.logger.error(f"Erro ao executar Obter Coordenadas de Drone: {str(e)}")
             QgisMessageUtil.bar_critical(
-                self.iface,
-                f"Erro no plugin Obter Coordenadas de Drone:\n{str(e)}")
+                self.iface, f"Erro no plugin Obter Coordenadas de Drone:\n{str(e)}"
+            )
 
     # ====FERRAMENTAS DE JANELA SEM SAIDAS=================
     # =====================================================
@@ -703,8 +675,7 @@ class CadmusPlugin:
             self.load_folder_dlg = run_load_folder_layers(self.iface)
             self.logger.info("Plugin Carregar pasta de arquivos executado com sucesso")
         except Exception as e:
-            self.logger.error(
-                f"Erro ao executar Carregar pasta de arquivos: {str(e)}")
+            self.logger.error(f"Erro ao executar Carregar pasta de arquivos: {str(e)}")
             QgisMessageUtil.bar_critical(
                 self.iface, f"Erro no plugin Carregar pasta:\n{str(e)}"
             )
@@ -742,12 +713,8 @@ class CadmusPlugin:
             )
 
     def _add_toolbar_dropdown(
-            self,
-            title,
-            main_action,
-            secondary_actions=None,
-            icon=None,
-            separator=True):
+        self, title, main_action, secondary_actions=None, icon=None, separator=True
+    ):
         """
         Cria um botão dropdown na toolbar com ações principais e secundárias.
 

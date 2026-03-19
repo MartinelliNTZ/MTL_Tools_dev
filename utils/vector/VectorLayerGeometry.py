@@ -164,7 +164,7 @@ class VectorLayerGeometry:
             try:
                 group = sorted(group, key=lambda x: int(x.get("foto", 0)))
             except Exception:
-                pass
+                return None
 
             geometry = QgsGeometry.fromPolylineXY(
                 [QgsPointXY(p.get("lon"), p.get("lat")) for p in group]

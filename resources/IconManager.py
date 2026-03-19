@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import os
 from qgis.PyQt.QtGui import QIcon
 
@@ -9,13 +8,11 @@ class IconManager:
     Gerenciador central de ícones do plugin.
     """
 
-    BASE_PATH = os.path.join(
-        os.path.dirname(__file__),
-        "icons"
-    )
-    #SYSTEM
+    BASE_PATH = os.path.join(os.path.dirname(__file__), "icons")
+    # SYSTEM
     MTL_AGRO = "mtl_agro.ico"
     CADMUS_ICON = "cadmus_icon.ico"
+    CADMUS_PNG = "cadmus_icon.png"
 
     # Menus
     AGRICULTURE = "agriculture.ico"
@@ -40,7 +37,7 @@ class IconManager:
     VECTOR_MULTPART = "vector_multpart.ico"
     COPY_ATTRIBUTES = "copy_attributes.ico"
 
-    #processing
+    # processing
     ATTRIBUTE_STATS = "attribute_stats.ico"
     FIELD_DIFFERENCE = "field_diference.ico"
     GEOMETRY_LINE_DIFFERENCE = "line_difference.ico"
@@ -54,7 +51,7 @@ class IconManager:
         """
         path = os.path.join(cls.BASE_PATH, name)
         return QIcon(path)
-    
+
     @classmethod
     def icon_path(cls, name: str) -> str:
         """

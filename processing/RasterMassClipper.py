@@ -27,16 +27,13 @@ class RasterMassClipper(BaseProcessingAlgorithm):
     INSTRUCTIONS_FILE = "raster_mass_clipper.html"
     logger = LogUtils(tool=TOOL_KEY, class_name="RasterMassClipper", level="DEBUG")
     ICON = "raster_mass_clipper.ico"
-    #Especificas do algoritmo
+    # Especificas do algoritmo
     INPUT_MASK = "INPUT_MASK"
     INPUT_RASTERS = "INPUT_RASTERS"
     OUTPUT_FOLDER = "OUTPUT_FOLDER"
     PER_FEATURE = "PER_FEATURE"
     BUFFER_FIX = "BUFFER_FIX"
     DISPLAY_HELP = "DISPLAY_HELP"
-
-
- 
 
     # ---------------- INIT ----------------
 
@@ -65,7 +62,7 @@ class RasterMassClipper(BaseProcessingAlgorithm):
             QgsProcessingParameterBoolean(
                 self.PER_FEATURE,
                 "Recortar por cada polígono",
-                defaultValue=self.prefs.get("per_feature", False)
+                defaultValue=self.prefs.get("per_feature", False),
             )
         )
 
@@ -73,7 +70,7 @@ class RasterMassClipper(BaseProcessingAlgorithm):
             QgsProcessingParameterBoolean(
                 self.BUFFER_FIX,
                 "Aplicar buffer de correção (pixel * 1.1)",
-                defaultValue=self.prefs.get("buffer_fix", True)
+                defaultValue=self.prefs.get("buffer_fix", True),
             )
         )
 
@@ -95,7 +92,7 @@ class RasterMassClipper(BaseProcessingAlgorithm):
 
     # ---------------- PROCESS ----------------
 
-    def processAlgorithm(self, params, context, feedback):        
+    def processAlgorithm(self, params, context, feedback):
 
         mask_layer = self.parameterAsVectorLayer(params, self.INPUT_MASK, context)
         rasters = self.parameterAsLayerList(params, self.INPUT_RASTERS, context)
@@ -103,8 +100,14 @@ class RasterMassClipper(BaseProcessingAlgorithm):
 
         per_feature = self.parameterAsBool(params, self.PER_FEATURE, context)
         buffer_fix = self.parameterAsBool(params, self.BUFFER_FIX, context)
-        display_help = bool(self.parameterAsBool(params, self.DISPLAY_HELP, context)) if self.DISPLAY_HELP in params else False
-        self.logger.debug(f"Parâmetros: {per_feature}, Buffer fix: {buffer_fix}, Output folder: {out_folder}, Rasters: {[r.name() for r in rasters]}")
+        display_help = (
+            bool(self.parameterAsBool(params, self.DISPLAY_HELP, context))
+            if self.DISPLAY_HELP in params
+            else False
+        )
+        self.logger.debug(
+            f"Parâmetros: {per_feature}, Buffer fix: {buffer_fix}, Output folder: {out_folder}, Rasters: {[r.name() for r in rasters]}"
+        )
 
         os.makedirs(out_folder, exist_ok=True)
 
@@ -168,11 +171,9 @@ class RasterMassClipper(BaseProcessingAlgorithm):
         self.save_preferences()
 
         clickable = f'<a href="file:///{out_folder}">{out_folder}</a>'
-        feedback.pushInfo(f"Arquivos salvos em: {clickable}")    
+        feedback.pushInfo(f"Arquivos salvos em: {clickable}")
 
         return {self.OUTPUT_FOLDER: out_folder}
-    
-
 
     # ---------------- CLIP LAYER ----------------
 
@@ -188,9 +189,7 @@ class RasterMassClipper(BaseProcessingAlgorithm):
             pixel = abs(raster.rasterUnitsPerPixelX())
             buffer_dist = pixel * 1.1
 
-            self.logger.debug(
-                f"Aplicando buffer {buffer_dist} na layer inteira"
-            )
+            self.logger.debug(f"Aplicando buffer {buffer_dist} na layer inteira")
 
             buffered = QgsVectorLayer(
                 f"Polygon?crs={raster.crs().authid()}",
@@ -229,6 +228,7 @@ class RasterMassClipper(BaseProcessingAlgorithm):
             },
             context=context,
         )
+
     # ---------------- CLIP FEATURE ----------------
 
     def clip_raster_feature(
@@ -247,9 +247,7 @@ class RasterMassClipper(BaseProcessingAlgorithm):
 
             geom = geom.buffer(buffer_dist, 5)
 
-            self.logger.debug(
-                f"Buffer feature {feat_id}: {buffer_dist}"
-            )
+            self.logger.debug(f"Buffer feature {feat_id}: {buffer_dist}")
 
         mem_layer = QgsVectorLayer(
             f"Polygon?crs={raster.crs().authid()}",
@@ -302,7 +300,7 @@ class RasterMassClipper(BaseProcessingAlgorithm):
 
         try:
             g.transform(transform)
-        except Exception as e:            
+        except Exception as e:
             self.logger.error(f"Falha ao reprojetar geometria: {e}")
             return geom
 
@@ -333,12 +331,8 @@ class RasterMassClipper(BaseProcessingAlgorithm):
             "OUTPUT": "memory:",
         }
 
-        result = processing.run(
-            "native:reprojectlayer",
-            params
-        )
+        result = processing.run("native:reprojectlayer", params)
 
         return result["OUTPUT"]
 
     # ---------------- UI ----------------
-

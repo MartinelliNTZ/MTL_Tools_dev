@@ -6,6 +6,7 @@ from ..core.config.LogUtils import LogUtils
 from ..utils.Preferences import Preferences
 from ..utils.ToolKeys import ToolKey
 from ..resources.HtmlInstructionsProvider import HtmlInstructionsProvider
+from ..resources.IconManager import IconManager as im
 
 
 class GroupProcessing:
@@ -39,9 +40,7 @@ class BaseProcessingAlgorithm(QgsProcessingAlgorithm):
             return
 
     def icon(self):
-        icon_path = os.path.join(
-            os.path.dirname(__file__), "..", "resources", "icons", self.ICON
-        )
+        icon_path = im.icon_path(self.ICON) if self.ICON else None
         if os.path.exists(icon_path):
             return QIcon(icon_path)
         return QIcon()

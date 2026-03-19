@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import os
 from qgis.PyQt.QtCore import QVariant
 from ..core.config.LogUtils import LogUtils
 from qgis.core import (
@@ -27,7 +26,7 @@ class GeometryLineFromPoints(BaseProcessingAlgorithm):
     ALGORITHM_GROUP = BaseProcessingAlgorithm.GROUP_VETORIAL
     ICON = "line_difference.ico"
     INSTRUCTIONS_FILE = "geometry_difference_line.html"
-    
+
     # especificas do algoritmo
     INPUT_LAYER_A = "INPUT_LAYER_A"
     INPUT_LAYER_B = "INPUT_LAYER_B"
@@ -37,13 +36,17 @@ class GeometryLineFromPoints(BaseProcessingAlgorithm):
     OUTPUT = "OUTPUT"
     DISPLAY_HELP = "DISPLAY_HELP"
 
-    logger = LogUtils(tool=TOOL_KEY, class_name="GeometryLineFromPointsAlgorithm", level="DEBUG")
-
-
-
+    logger = LogUtils(
+        tool=TOOL_KEY, class_name="GeometryLineFromPointsAlgorithm", level="DEBUG"
+    )
 
     def initAlgorithm(self, config=None):
-        self.logger.debug("Inicializando parâmetros do algoritmo GeometryLineFromPointsAlgorithm…")
+        self.load_preferences()  # use load prefs direto sem sobrescrever
+        self.logger.debug(f"Preferências carregadas: {self.prefs}")
+
+        self.logger.debug(
+            "Inicializando parâmetros do algoritmo GeometryLineFromPointsAlgorithm…"
+        )
         self.addParameter(
             QgsProcessingParameterFeatureSource(
                 self.INPUT_LAYER_A,
@@ -52,17 +55,14 @@ class GeometryLineFromPoints(BaseProcessingAlgorithm):
             )
         )
 
-        layer_b_param = QgsProcessingParameterFeatureSource(
-            self.INPUT_LAYER_B,
-            "Segunda Camada de Pontos (Modo 2 - opcional)",
-            [QgsProcessing.TypeVectorPoint],
-            optional=True,
+        self.addParameter(
+            QgsProcessingParameterField(
+                self.FIELD_A,
+                "Atributo base - camada A",
+                parentLayerParameterName=self.INPUT_LAYER_A,
+                type=QgsProcessingParameterField.Any,
+            )
         )
-        layer_b_param.setFlags(layer_b_param.flags() | QgsProcessingParameterFeatureSource.FlagOptional)
-        self.addParameter(layer_b_param)
-
-        self.load_preferences()# use load prefs direto sem sobrescrever
-        self.logger.debug(f"Preferências carregadas: {self.prefs}")
 
         self.addParameter(
             QgsProcessingParameterBoolean(
@@ -72,6 +72,32 @@ class GeometryLineFromPoints(BaseProcessingAlgorithm):
             )
         )
 
+        layer_b_param = QgsProcessingParameterFeatureSource(
+            self.INPUT_LAYER_B,
+            "Segunda Camada de Pontos (Modo 2 - opcional)",
+            [QgsProcessing.TypeVectorPoint],
+            optional=True,
+        )
+        layer_b_param.setFlags(
+            layer_b_param.flags() | QgsProcessingParameterFeatureSource.FlagOptional
+        )
+        self.addParameter(layer_b_param)
+
+        field_b_param = QgsProcessingParameterField(
+            self.FIELD_B,
+            "Atributo base - camada B (modo 2)",
+            parentLayerParameterName=self.INPUT_LAYER_B,
+            type=QgsProcessingParameterField.Any,
+            optional=True,
+        )
+        field_b_param.setFlags(
+            field_b_param.flags() | QgsProcessingParameterField.FlagOptional
+        )
+        self.addParameter(field_b_param)
+
+        self.addParameter(
+            QgsProcessingParameterFeatureSink(self.OUTPUT, "Linhas de diferenças")
+        )
         self.addParameter(
             QgsProcessingParameterBoolean(
                 self.DISPLAY_HELP,
@@ -79,27 +105,6 @@ class GeometryLineFromPoints(BaseProcessingAlgorithm):
                 defaultValue=self.prefs.get("display_help", True),
             )
         )
-
-        self.addParameter(
-            QgsProcessingParameterField(
-                self.FIELD_A,
-                "Campo de agrupamento - camada A",
-                parentLayerParameterName=self.INPUT_LAYER_A,
-                type=QgsProcessingParameterField.Any,
-            )
-        )
-
-        field_b_param = QgsProcessingParameterField(
-            self.FIELD_B,
-            "Campo de agrupamento - camada B (modo 2)",
-            parentLayerParameterName=self.INPUT_LAYER_B,
-            type=QgsProcessingParameterField.Any,
-            optional=True,
-        )
-        field_b_param.setFlags(field_b_param.flags() | QgsProcessingParameterField.FlagOptional)
-        self.addParameter(field_b_param)
-
-        self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT, "Linhas de diferenças"))
 
     @staticmethod
     def _feature_point(feat):
@@ -114,7 +119,9 @@ class GeometryLineFromPoints(BaseProcessingAlgorithm):
                     return None
                 return point
             except Exception:
-                pass
+                LogUtils(
+                    tool=GeometryLineFromPoints.TOOL_KEY, class_name="GeometryLine"
+                ).warning(f"Erro ao extrair ponto da geometria do recurso {feat.id()}")
 
         # Para MultiPoint ou outro, usa centroide
         try:
@@ -146,7 +153,9 @@ class GeometryLineFromPoints(BaseProcessingAlgorithm):
             distance = geom1.distance(geom2)
             out_feat = QgsFeature(out_fields)
             out_feat.setGeometry(line)
-            out_feat.setAttributes([key_name, int(f1.id()), int(f2.id()), float(distance)])
+            out_feat.setAttributes(
+                [key_name, int(f1.id()), int(f2.id()), float(distance)]
+            )
             sink.addFeature(out_feat, QgsFeatureSink.FastInsert)
             GeometryLineFromPoints.logger.debug(
                 f"Adicionada linha: group={key_name}, a={f1.id()}, b={f2.id()}, d={distance:.3f}"
@@ -163,15 +172,25 @@ class GeometryLineFromPoints(BaseProcessingAlgorithm):
         layer_b = self.parameterAsSource(params, self.INPUT_LAYER_B, context)
 
         field_a = self.parameterAsString(params, self.FIELD_A, context)
-        field_b = self.parameterAsString(params, self.FIELD_B, context) if layer_b is not None else None
+        field_b = (
+            self.parameterAsString(params, self.FIELD_B, context)
+            if layer_b is not None
+            else None
+        )
 
-        self.logger.debug(f"Parâmetros: use_second={use_second}, field_a={field_a}, field_b={field_b}")
+        self.logger.debug(
+            f"Parâmetros: use_second={use_second}, field_a={field_a}, field_b={field_b}"
+        )
 
         if use_second and layer_b is None:
-            raise QgsProcessingException("Modo 2 requisita uma segunda camada de pontos.")
+            raise QgsProcessingException(
+                "Modo 2 requisita uma segunda camada de pontos."
+            )
 
         if use_second and not field_b:
-            raise QgsProcessingException("No modo 2 informe o campo de agrupamento da camada B.")
+            raise QgsProcessingException(
+                "No modo 2 informe o campo de agrupamento da camada B."
+            )
 
         fields = QgsFields()
         fields.append(QgsField("group_key", QVariant.String))
@@ -229,7 +248,11 @@ class GeometryLineFromPoints(BaseProcessingAlgorithm):
                 pair_list = [(feats[i], feats[i + 1]) for i in range(len(feats) - 1)]
                 self._append_line_features(pair_list, sink, fields, str(key_name))
 
-        display_help = bool(self.parameterAsBool(params, self.DISPLAY_HELP, context)) if self.DISPLAY_HELP in params else False
+        display_help = (
+            bool(self.parameterAsBool(params, self.DISPLAY_HELP, context))
+            if self.DISPLAY_HELP in params
+            else False
+        )
         self.prefs.update(
             {"use_second_layer": bool(use_second), "display_help": display_help}
         )
