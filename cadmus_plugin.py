@@ -180,6 +180,9 @@ class CadmusPlugin:
                 "Exportar todos os Layouts",
                 self.iface.mainWindow())
             self.action_export_all.triggered.connect(self.run_export_layouts)
+            self.action_export_all.setToolTip(
+                "Exporta todos os Layouts do projeto para arquivos PDF ou imagens.\n"                
+            )
 
             # 2-Replace in Layouts
             self.action_replace_layouts = QAction(
@@ -189,6 +192,11 @@ class CadmusPlugin:
             )
             self.action_replace_layouts.triggered.connect(
                 self.run_replace_layouts)
+            self.action_replace_layouts.setToolTip(
+                "Substitui textos em massa nos Layouts do projeto.\n"
+                "Permite criar um mapa de substituição a partir de uma camada vetorial ou tabela, onde um campo é usado para identificar os Layouts e outro campo é usado para o novo valor a ser inserido.\n"
+                "Útil para atualizar informações como títulos, legendas ou rótulos em múltiplos Layouts de forma rápida e consistente."
+            )
 
             # 3-Restart QGIS
             self.action_restart_qgis = QAction(
@@ -197,6 +205,10 @@ class CadmusPlugin:
                 self.iface.mainWindow(),
             )
             self.action_restart_qgis.triggered.connect(self.run_restart_qgis)
+            self.action_restart_qgis.setToolTip(
+                "Salva o projeto atual, fecha o QGIS e reabre o mesmo projeto automaticamente.\n"
+                "Útil para resolver travamentos, bugs visuais ou de renderização sem perder o trabalho."
+            )
 
             # 4-Carregar pasta de arquivos
             self.action_load_folder = QAction(
@@ -204,6 +216,9 @@ class CadmusPlugin:
                 "Carregar pasta de arquivos",
                 self.iface.mainWindow())
             self.action_load_folder.triggered.connect(self.run_load_folder)
+            self.action_load_folder.setToolTip(
+                "Carrega em massa uma pasta de arquivos como camadas no QGIS.\n"
+            )
 
             # 5-Gerar Rastro Implemento
             self.action_gerar_rastro = QAction(
@@ -211,6 +226,9 @@ class CadmusPlugin:
                 "Gerar Rastro Implemento",
                 self.iface.mainWindow())
             self.action_gerar_rastro.triggered.connect(self.run_gerar_rastro)
+            self.action_gerar_rastro.setToolTip(
+                "Gera um rastro do movimento de um implemento agrícola com base em uma linha.\n"
+            )
 
             # 6-About Dialog
             self.action_about_dialog = QAction(
@@ -219,6 +237,7 @@ class CadmusPlugin:
                 self.iface.mainWindow()
             )
             self.action_about_dialog.triggered.connect(self.run_about_dialog)
+            self.action_about_dialog.setToolTip("Informações sobre o plugin Cadmus.")
 
             # 12-Logcat Tool
             self.action_logcat = QAction(
@@ -226,6 +245,7 @@ class CadmusPlugin:
                 "Logcat - Viewer de Logs",
                 self.iface.mainWindow())
             self.action_logcat.triggered.connect(self.run_logcat)
+            self.action_logcat.setToolTip("Abre o Logcat, uma ferramenta de visualização dos logs do plugin Cadmus")
 
             # 13-Settings
             self.action_settings = QAction(
@@ -234,6 +254,7 @@ class CadmusPlugin:
                 self.iface.mainWindow()
             )
             self.action_settings.triggered.connect(self.run_settings)
+            self.action_settings.setToolTip("Configurações do plugin Cadmus.")
 
             # 7-Capturar Coordenadas
             self.action_coord_click = QAction(
@@ -241,14 +262,25 @@ class CadmusPlugin:
                 "Capturar Coordenadas",
                 self.iface.mainWindow())
             self.action_coord_click.triggered.connect(self.run_coord_click)
+            self.action_coord_click.setToolTip(
+                "Clique no mapa para obter coordenadas geográficas\n"
+                "Ative a ferramenta e clique em qualquer ponto do mapa para\n"
+                "visualizar diversas informações a respeito daquele ponto"
+                "Incluindo, UTM Zone, Municipio, Altitude em SRTM 90m."
+            )
 
             # 8-Calcular campos vetoriais
             self.action_vector_fields = QAction(
                 im.icon(im.VECTOR_FIELD),
                 "Calcular Campos Vetoriais",
-                self.iface.mainWindow(),
+                self.iface.mainWindow()
             )
             self.action_vector_fields.triggered.connect(self.run_vector_fields)
+            self.action_vector_fields.setToolTip(
+                "Calcula automaticamente campos: Área, Comprimento ou X/Y\n"
+                "Selecione uma camada vetorial ativa e execute a ferramenta\n"
+                "para adicionar os campos calculados."
+            )
 
             # 09-Obter coordenadas de drone
             self.action_drone_coords = QAction(
@@ -257,6 +289,10 @@ class CadmusPlugin:
                 self.iface.mainWindow(),
             )
             self.action_drone_coords.triggered.connect(self.run_drone_coords)
+            self.action_drone_coords.setToolTip("Gera uma camada de pontos com as coordenadas de cada foto.\n"
+                                                "Gera um linha da trajetória do drone, conectando os pontos na ordem de captura.\n"
+                                                "Pode cruzar os pontos das fotos com os metadados das fotos para adicionar atributos/n"
+                                                "como altitude, data/hora, etc.")
 
             # 10-Realizar multipart de todas as feições
             self.action_multpart = QAction(
@@ -264,6 +300,12 @@ class CadmusPlugin:
                 "Promover a multiparte",
                 self.iface.mainWindow())
             self.action_multpart.triggered.connect(self.run_multpart)
+            self.action_multpart.setToolTip(
+                "Promove feições para o tipo multiparte\n"
+                "Selecione uma camada vetorial ativa e execute a ferramenta\n"
+                "para promover as feições."
+            )
+
 
             # 11-Copiar atributos entre camadas
             self.action_copy_atributes = QAction(
@@ -723,9 +765,11 @@ class CadmusPlugin:
         button = QToolButton()
         button.setText(title)
         button.setIcon(icon or main_action.icon())
+        button.setToolTip(main_action.toolTip())
 
         # 2️⃣ Criar menu dropdown
         menu = QMenu(self.iface.mainWindow())
+        menu.setToolTipsVisible(True)
         menu.addAction(main_action)  # ação principal no topo
         for act in secondary_actions:
             menu.addAction(act)
