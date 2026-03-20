@@ -1,23 +1,21 @@
 from qgis.PyQt.QtCore import QCoreApplication
 
-def get(string):
-    return QCoreApplication.translate("StringsBR", string)
 
 class Strings_pt_BR:
-    """"Strings for Brazilian Portuguese (pt-BR)
-    """
+    """ "Strings for Brazilian Portuguese (pt-BR)"""
+
     # General
     APP_NAME = "Cadmus"
-    
-    #plugins/AboutDialog.py
+
+    # plugins/AboutDialog.py
     ABOUT_CADMUS = "Sobre o Cadmus"
     VERSION = "Versão"
     UPDATED_ON = "Atualizada em"
     CREATED_ON = "Criado em"
     CREATOR = "Criador"
     LOCATION = "Local"
-    
-    #plugins/DroneCoordinates.py
+
+    # plugins/DroneCoordinates.py
     DRONE_COORDINATES_TITLE = "Coordenadas de Drone"
     RECURSIVE_SEARCH = "Vasculhar subpastas"
     PHOTOS_METADATA = "Cruzar com metadados das fotos"
@@ -32,16 +30,12 @@ class Strings_pt_BR:
     QML_POINTS = "QML pontos:"
     APPLY_STYLE_TRACK = "Aplicar estilo (QML) no rastro?"
     QML_TRACK = "QML:"
-    
-   
-    
-    
-    
-    #Buttons
+
+    # Buttons
     CLOSE = "Fechar"
-    
+
     # Errors
     ERROR_LAYER_NOT_FOUND = "Erro: Camada não encontrada."
-    
-    #success
+
+    # success
     SUCCESS_MESSAGE = "Processamento executado com sucesso."
