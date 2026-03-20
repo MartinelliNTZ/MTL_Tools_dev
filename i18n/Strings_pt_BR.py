@@ -39,3 +39,20 @@ class Strings_pt_BR:
 
     # success
     SUCCESS_MESSAGE = "Processamento executado com sucesso."
+
+    # plugins/SettingsPlugin.py
+    SETTINGS_TITLE = "Configurações Cadmus"
+    SETTINGS_APP_PREFERENCES = "Preferências do Aplicativo"
+    SETTINGS_OPEN_PREFERENCES_LINK = "Abrir Pasta de Preferências"
+    SETTINGS_CALCULATION_METHOD_ELLIPSOIDAL = "Elipsoidal"
+    SETTINGS_CALCULATION_METHOD_CARTESIAN = "Cartesiana"
+    SETTINGS_CALCULATION_METHOD_BOTH = "Ambos"
+    SETTINGS_VECTOR_CALCULATION_METHOD = "Método de Cálculo Vetorial"
+    SETTINGS_VECTOR_FIELDS_PRECISION = "Precisão de campos vetoriais (casas decimais):"
+    SETTINGS_ASYNC_THRESHOLD = "Limiar assíncrono (nº de feições):"
+    SAVE = "Salvar"
+    SETTINGS_SAVED_TITLE = "Configurações Salvas"
+    SETTINGS_VECTOR_CALCULATION_METHOD_LABEL = "Método de cálculo vetorial:"
+    SETTINGS_SAVED_MESSAGE = "As configurações foram salvas com sucesso."
+    WARNING = "Aviso"
+    SETTINGS_PREFERENCES_FOLDER_NOT_FOUND = "Pasta de preferências não encontrada:"

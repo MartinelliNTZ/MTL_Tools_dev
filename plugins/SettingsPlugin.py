@@ -18,7 +18,11 @@ class SettingsPlugin(BasePluginMTL):
     - Configurar método de cálculo vetorial (Elipsoidal, Cartesiana, Ambos)
     """
 
-    CALCULATION_METHODS = ["Elipsoidal", "Cartesiana", "Ambos"]
+    CALCULATION_METHODS = [
+        STR.SETTINGS_CALCULATION_METHOD_ELLIPSOIDAL,
+        STR.SETTINGS_CALCULATION_METHOD_CARTESIAN,
+        STR.SETTINGS_CALCULATION_METHOD_BOTH,
+    ]
 
     def __init__(self, iface):
         super().__init__(iface.mainWindow())
@@ -31,19 +35,19 @@ class SettingsPlugin(BasePluginMTL):
         self.logger.debug("Construindo interface de configurações")
 
         super()._build_ui(
-            title="Configurações Cadmus",
+            title=STR.SETTINGS_TITLE,
             icon_path="settings.ico",
         )
 
         self.logger.info("Construindo componentes de interface")
 
         # ========== SEÇÃO 1: Preferências do App ==========
-        prefs_label = QLabel("📋 Preferências do Aplicativo")
+        prefs_label = QLabel(f"📋 {STR.SETTINGS_APP_PREFERENCES}")
         prefs_label.setStyleSheet("font-weight: bold; font-size: 11pt;")
 
         # Link clicável para preferências
         pref_link = QLabel(
-            '<a href="open_prefs" style="color: #0066cc; text-decoration: underline;">Abrir Pasta de Preferências</a>'
+            f'<a href="open_prefs" style="color: #0066cc; text-decoration: underline;">{STR.SETTINGS_OPEN_PREFERENCES_LINK}</a>'
         )
         pref_link.setOpenExternalLinks(False)
         pref_link.setCursor(Qt.PointingHandCursor)
@@ -55,7 +59,7 @@ class SettingsPlugin(BasePluginMTL):
         calc_layout, self.radio_calc = WidgetFactory.create_radio_button_grid(
             items=self.CALCULATION_METHODS,
             columns=3,
-            title="⚙️ Método de Cálculo Vetorial",
+            title=f"⚙️ {STR.SETTINGS_VECTOR_CALCULATION_METHOD}",
             checked_index=0,
             tool_key=ToolKey.SETTINGS,
             separator_top=True,
@@ -66,7 +70,7 @@ class SettingsPlugin(BasePluginMTL):
 
         # ========== SEÇÃO 3: Precisão para campos vetoriais ==========
         prec_layout, self.spin_precision = WidgetFactory.create_double_spin_input(
-            "🎯 Precisão de campos vetoriais (casas decimais):",
+            f"🎯 {STR.SETTINGS_VECTOR_FIELDS_PRECISION}",
             decimals=0,
             step=1,
             minimum=0,
@@ -81,7 +85,7 @@ class SettingsPlugin(BasePluginMTL):
         # Agora o valor é o número máximo de feições que podem ser processadas
         # de forma síncrona; tudo acima irá disparar execução em segundo plano.
         thresh_layout, self.spin_threshold = WidgetFactory.create_double_spin_input(
-            "📦 Limiar assíncrono (nº de feições):",
+            f"📦 {STR.SETTINGS_ASYNC_THRESHOLD}",
             decimals=0,
             step=1,
             minimum=1,
@@ -100,7 +104,7 @@ class SettingsPlugin(BasePluginMTL):
                 close_callback=self.close,
                 info_callback=self.show_info_dialog,
                 tool_key=ToolKey.SETTINGS,
-                run_text="Salvar",
+                run_text=STR.SAVE,
             )
         )
 
@@ -125,7 +129,9 @@ class SettingsPlugin(BasePluginMTL):
         self.preferences = load_tool_prefs(ToolKey.SETTINGS)
 
         # Carregar método de cálculo selecionado
-        calc_method = self.preferences.get("calculation_method", "Elipsoidal")
+        calc_method = self.preferences.get(
+            "calculation_method", STR.SETTINGS_CALCULATION_METHOD_ELLIPSOIDAL
+        )
         try:
             idx = self.CALCULATION_METHODS.index(calc_method)
             self.radio_calc.set_selected_index(idx)
@@ -192,9 +198,9 @@ class SettingsPlugin(BasePluginMTL):
         selected_method = self.radio_calc.get_selected_text()
         QMessageBox.information(
             self,
-            "Configurações Salvas",
-            f"Método de cálculo vetorial: {selected_method}\n\n"
-            f"As configurações foram salvas com sucesso.",
+            STR.SETTINGS_SAVED_TITLE,
+            f"{STR.SETTINGS_VECTOR_CALCULATION_METHOD_LABEL} {selected_method}\n\n"
+            f"{STR.SETTINGS_SAVED_MESSAGE}",
         )
 
         self.logger.info("Configurações aplicadas e salvas")
@@ -213,7 +219,9 @@ class SettingsPlugin(BasePluginMTL):
         else:
             self.logger.warning(f"Pasta de preferências não encontrada: {PREF_FOLDER}")
             QMessageBox.warning(
-                self, "Aviso", f"Pasta de preferências não encontrada:\n{PREF_FOLDER}"
+                self,
+                STR.WARNING,
+                f"{STR.SETTINGS_PREFERENCES_FOLDER_NOT_FOUND}\n{PREF_FOLDER}",
             )
 
 
