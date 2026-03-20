@@ -94,18 +94,23 @@ class BasePluginMTL(BaseDialog):
         icon_path: Optional[str] = "cadmus_icon.ico",
         instructions_file: Optional[str] = "standard.md",
         enable_scroll: bool = True,
+        instructions_manager = False,
         **kwargs,
     ):
         super()._build_ui(title=title, icon_path=icon_path, enable_scroll=enable_scroll)
 
         # instruções
-        self.instructions_file = os.path.join(
-            os.path.dirname(__file__),
-            "..",
-            "resources",
-            "instructions",
-            instructions_file,
-        )
+        if instructions_manager:
+            self.instructions_file = instructions_file
+            self.logger.debug(f"Instruções gerenciadas por InstructionsManager. File: {self.instructions_file}")
+        else:
+            self.instructions_file = os.path.join(
+                os.path.dirname(__file__),
+                "..",
+                "resources",
+                "instructions",
+                instructions_file,
+            )
         # Restaurar tamanho da janela se foi persistido
         self._restore_window_size()
 

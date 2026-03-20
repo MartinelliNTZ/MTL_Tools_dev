@@ -169,9 +169,3 @@ Apenas o **primeiro caminho** (pasta ou arquivo) é lembrado. Se múltiplos arqu
 - **Fotos não encontradas:** Se ativar "Cruzar com fotos" mas alguma JPG estiver faltando, a ferramenta criará o ponto MRK sem metadados de foto (não falha)
 
 ---
-
-## 🔑 Chave interna da ferramenta
-
-Esta ferramenta utiliza a seguinte chave para salvar preferências:
-
-`drone_coordinates`

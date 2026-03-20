@@ -17,7 +17,7 @@ from ..utils.ToolKeys import ToolKey
 from ..core.ui.WidgetFactory import WidgetFactory
 from pathlib import Path
 from ..i18n.TranslationManager import STR
-from ..i18n.Strings_pt_BR import Strings_pt_BR
+from ..resources.InstructionsManager import InstructionsManager
 
 
 class DroneCordinates(BasePluginMTL):
@@ -49,8 +49,9 @@ class DroneCordinates(BasePluginMTL):
         super()._build_ui(
             title=STR.DRONE_COORDINATES_TITLE,
             icon_path="coord.ico",
-            instructions_file="drone_coordinates_help.md",
+            instructions_file=InstructionsManager.DRONE_COORDINATES,
             enable_scroll=True,
+            instructions_manager=True,
         )
 
         # ====== PASTA MRK ======

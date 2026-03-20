@@ -1,27 +1,38 @@
-# -*- coding: utf-8 -*-
 import os
+from pathlib import Path
+from ..i18n.TranslationManager import TM
 
 
 class InstructionsManager:
-    """
-    Gerenciador central de arquivos de instruções (.md)
-    """
+    BASE_DIR = Path(__file__).parent
+    _cache = {}
 
-    BASE_PATH = os.path.dirname(__file__)
+    @classmethod
+    def _build_filename(cls, tool_key: str) -> str:
+        return f"{tool_key.lower()}_help.md"
 
-    # padrão
-    STANDARD = os.path.join(BASE_PATH, "standard.md")
+    @classmethod
+    def get(cls, tool_key: str) -> str:
+        if tool_key in cls._cache:
+            return cls._cache[tool_key]
 
-    # ferramentas
-    COORD_CLICK = os.path.join(BASE_PATH, "coord_click_help.md")
-    COPY_ATTRIBUTES = os.path.join(BASE_PATH, "copy_attributes_help.md")
-    DRONE_COORDINATES = os.path.join(BASE_PATH, "drone_coordinates_help.md")
-    EXPORT_ALL_LAYOUTS = os.path.join(BASE_PATH, "export_all_layouts_help.MD")
-    GENERATE_TRAIL = os.path.join(BASE_PATH, "generate_trail_help.MD")
-    LOAD_FOLDER = os.path.join(BASE_PATH, "load_folder_layers.MD")
-    REPLACE_LAYOUTS = os.path.join(BASE_PATH, "replace_in_layouts_help.MD")
-    RESTART_QGIS = os.path.join(BASE_PATH, "restart_qgis_help.md")
-    SETTINGS = os.path.join(BASE_PATH, "settings_help.md")
-    SETTINGS_OLD = os.path.join(BASE_PATH, "settings_help_old.md")
-    VECTOR_FIELDS = os.path.join(BASE_PATH, "vector_fields_help.md")
-    VECTOR_MULTIPART = os.path.join(BASE_PATH, "vector_multipart_help.md")
+        filename = cls._build_filename(tool_key)
+
+        locale = TM.locale   # ex: pt_BR
+        lang = TM.lang       # ex: pt
+
+        candidates = [
+            cls.BASE_DIR / f"instructions_{locale}" / filename,
+            cls.BASE_DIR / f"instructions_{lang}" / filename,
+            cls.BASE_DIR / "instructions_pt_BR" / filename,
+        ]
+
+        for path in candidates:
+            if path.exists():
+                cls._cache[tool_key] = str(path)
+                return cls._cache[tool_key]
+
+        # fallback final
+        fallback = cls.BASE_DIR / "instructions_pt_BR" / "standard.md"
+        cls._cache[tool_key] = str(fallback)
+        return cls._cache[tool_key]

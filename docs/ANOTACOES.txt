@@ -29,9 +29,11 @@ ferramentas = name                              tipo                            
     - 16: Estatisticas de atributos             Processing
     - 17: Recortador Massivo de Raster          Processing                      RasterMassClipper              manipulação de raster
     - 18: Gerador de Linhas entre Pontos        Processing                      GeometryLineFromPoints         manipulação de vetores
+    - 19: Gerador de diferença entre rasters       Processing                      RasterDifferenceStats          manipulação de raster
 
 Documentação de cenarios: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13
 Instrucoes: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18
+Traducao: 9
   - Geral: Impedir múltiplas instâncias de plugins rodando simultaneamente
   - multpart nao ta em task e pode bugar
   - tentar usar o visualizador de resultados do processing para mostrar o resultado do processing
