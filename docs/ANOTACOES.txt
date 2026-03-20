@@ -3,7 +3,8 @@ martinelli.matheus11@gmail.com        01/01/2000  - 01/01/2000 - 04/04/2026
 mtlagriculturaetecnologia@gmail.com   01/01/2000  - 01/01/2000 - 07/04/2026
 martinelli.linesbr2@gmail.com         01/01/2000  - 01/01/2000 - 08/04/2026
 cpunova963@gmail.com                  01/01/2000  - 11/03/2026 - 10/04/2026
-martinelli.linesbr@hotmail.com        12/03/2026  - 13/03/2026 - 12/04/2026
+martinelli.linesbr@hotmail.com        12/03/2026  - 20/03/2026 - 12/04/2026
+martinelli.lines2@hotmail.com         20/03/2026  - 
 BUGS CONHECIDOS
 bandit -r . -f html -o bandit-report.html
 flake8 . --exclude=.git,__pycache__,build,dist,docs,.vscode,.idea > erros_plugin.txt
@@ -38,7 +39,11 @@ Instrucoes: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18
   - Usar iconManager para carregar ícones de forma centralizada e eficiente
   - Usar InstructionsManager para carregar instruções de forma centralizada e eficiente, com suporte a formatação e imagens
 changelog=
-  2.0.10 2026/03/18
+  2.1.2 2026/03/20
+    - 
+  2.1.1 2026/03/19
+    - Tentando traduzir
+  2.1.0 2026/03/18
     - Tooltips na toolbar
     - Implementado icon Manager  para centralizar carregamento de ícones do plugin, evitando múltiplas instâncias e melhorando performance
     - Implementado Instructions Manager para centralizar carregamento de instruções, com suporte a formatação e imagens, e integração com checkbox de exibição de ajuda

@@ -16,6 +16,8 @@ from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.ToolKeys import ToolKey
 from ..core.ui.WidgetFactory import WidgetFactory
 from pathlib import Path
+from ..i18n.TranslationManager import STR
+from ..i18n.Strings_pt_BR import Strings_pt_BR
 
 
 class DroneCordinates(BasePluginMTL):
@@ -23,8 +25,8 @@ class DroneCordinates(BasePluginMTL):
     TOOL_KEY = ToolKey.DRONE_COORDINATES
 
     CHECKBOX_OPTIONS = {
-        "recursive": "Vasculhar subpastas",
-        "photos": "Cruzar com metadados das fotos",
+        "recursive": STR.RECURSIVE_SEARCH,
+        "photos": STR.PHOTOS_METADATA,
     }
 
     def __init__(self, iface):
@@ -45,7 +47,7 @@ class DroneCordinates(BasePluginMTL):
 
     def _build_ui(self, **kwargs):
         super()._build_ui(
-            title="Coordenadas de Drone",
+            title=STR.DRONE_COORDINATES_TITLE,
             icon_path="coord.ico",
             instructions_file="drone_coordinates_help.md",
             enable_scroll=True,
@@ -54,7 +56,7 @@ class DroneCordinates(BasePluginMTL):
         # ====== PASTA MRK ======
         folder_layout, self.folder_selector = WidgetFactory.create_path_selector(
             parent=self,
-            title="Pasta MRK:",
+            title=STR.MRK_FOLDER,
             mode="folder",
             separator_bottom=True,
         )
@@ -63,7 +65,7 @@ class DroneCordinates(BasePluginMTL):
         opts_layout, self.opts_collapsible = (
             WidgetFactory.create_collapsible_parameters(
                 parent=self,
-                title="Opções",
+                title=STR.OPTIONS,
                 expanded_by_default=False,
             )
         )
@@ -81,7 +83,7 @@ class DroneCordinates(BasePluginMTL):
         save_layout, self.save_collapsible = (
             WidgetFactory.create_collapsible_parameters(
                 parent=self,
-                title="Salvamento",
+                title=STR.SAVING,
                 expanded_by_default=False,
             )
         )
@@ -90,8 +92,8 @@ class DroneCordinates(BasePluginMTL):
             WidgetFactory.create_save_file_selector(
                 parent=self,
                 file_filter=StringUtils.FILTER_VECTOR,
-                checkbox_text="Salvar pontos MRK em arquivo?",
-                label_text="Salvar em:",
+                checkbox_text=STR.SAVE_POINTS_CHECKBOX,
+                label_text=STR.SAVE_IN,
                 separator_top=False,
                 separator_bottom=False,
             )
@@ -101,8 +103,8 @@ class DroneCordinates(BasePluginMTL):
             WidgetFactory.create_save_file_selector(
                 parent=self,
                 file_filter=StringUtils.FILTER_VECTOR,
-                checkbox_text="Salvar rastro em arquivo?",
-                label_text="Salvar em:",
+                checkbox_text=STR.SAVE_TRACK_CHECKBOX,
+                label_text=STR.SAVE_IN,
                 separator_top=False,
                 separator_bottom=False,
             )
@@ -115,23 +117,23 @@ class DroneCordinates(BasePluginMTL):
         styles_layout, self.styles_collapsible = (
             WidgetFactory.create_collapsible_parameters(
                 parent=self,
-                title="Estilos",
+                title=STR.STYLES,
                 expanded_by_default=False,
             )
         )
 
         qml_points_layout, self.qml_points_selector = WidgetFactory.create_qml_selector(
             parent=self,
-            checkbox_text="Aplicar estilo (QML) nos pontos?",
-            label_text="QML pontos:",
+            checkbox_text=STR.APPLY_STYLE_POINTS,
+            label_text=STR.QML_POINTS,
             separator_top=False,
             separator_bottom=False,
         )
 
         qml_track_layout, self.qml_track_selector = WidgetFactory.create_qml_selector(
             parent=self,
-            checkbox_text="Aplicar estilo (QML) no rastro?",
-            label_text="QML:",
+            checkbox_text=STR.APPLY_STYLE_TRACK,
+            label_text=STR.QML_TRACK,
             separator_top=False,
             separator_bottom=False,
         )
@@ -267,7 +269,7 @@ class DroneCordinates(BasePluginMTL):
             from ..utils.QgisMessageUtil import QgisMessageUtil
 
             QgisMessageUtil.modal_error(
-                self.iface, "Erro: camada final não encontrada no contexto."
+                self.iface, STR.ERROR_LAYER_NOT_FOUND
             )
             return
 
@@ -344,7 +346,7 @@ class DroneCordinates(BasePluginMTL):
 
         from ..utils.QgisMessageUtil import QgisMessageUtil
 
-        QgisMessageUtil.bar_success(self.iface, "Processamento executado com sucesso.")
+        QgisMessageUtil.bar_success(self.iface, STR.SUCCESS_MESSAGE)
 
 
 def run_drone_cordinates(iface):

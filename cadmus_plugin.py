@@ -4,13 +4,13 @@ import traceback
 from qgis.core import QgsApplication
 from qgis.PyQt.QtWidgets import QAction, QMenu, QToolButton, QWidgetAction
 from pathlib import Path
-
 from .utils.ToolKeys import ToolKey
 from .utils.QgisMessageUtil import QgisMessageUtil
 from .processing.provider import MTLProvider
 from .core.config.LogCleanupUtils import LogCleanupUtils
 from .core.config.LogUtils import LogUtils
 from .resources.IconManager import IconManager as im
+from .i18n.TranslationManager import TM, STR
 
 
 # ========================================================================
@@ -70,6 +70,8 @@ class CadmusPlugin:
     # INICIAR GUI E PROCESSING
     # =====================================================
     def initGui(self):
+
+        locale = QgsApplication.locale()  # ex: 'pt_BR'
         # Instalar proteção global contra crashes
         # QgisMessageUtil.bar_info(self.iface, "Iniciando Cadmus...")
         _install_global_error_handler()
@@ -82,6 +84,7 @@ class CadmusPlugin:
         self.logger = LogUtils(tool=self.TOOL_KEY, class_name="Cadmus")
         self.logger.info("Plugin inicializado")
         self.logger.info("SYSTEM: Global error handler instalado para capturar crashes")
+        self.logger.info(f"Locale: {locale}. TM.STR: {STR.APP_NAME}")
         # -------------------------
         # 1) ATIVAR PROCESSING PROVIDER
         # -------------------------

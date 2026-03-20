@@ -5,6 +5,7 @@ from ..core.config.LogUtils import LogUtils
 from .BaseDialog import BaseDialog
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..utils.ToolKeys import ToolKey
+from ..i18n.TranslationManager import STR
 
 
 class AboutDialog(BaseDialog):
@@ -20,9 +21,9 @@ class AboutDialog(BaseDialog):
             )
             self.logger.debug("Inicializando AboutDialog")
 
-            self.setWindowTitle(self.tr("Sobre o Cadmus"))
+            self.setWindowTitle(STR.ABOUT_CADMUS)
             self._build_ui(
-                title=self.tr("Sobre o Cadmus"), enable_scroll=False, minimum_size=(420, 520)
+                title=STR.ABOUT_CADMUS, enable_scroll=False, minimum_size=(420, 520)
             )
             self.logger.debug("AboutDialog _build_ui concluído")
 
@@ -43,7 +44,7 @@ class AboutDialog(BaseDialog):
                 self.logger.warning(f"Logo não encontrado: {logo_path}")
 
             lbl_title = WidgetFactory.create_label(
-                text=self.tr("<h2>Cadmus</h2>"),
+                text=f"<h2>{STR.APP_NAME}</h2>",
                 bold=False,
                 word_wrap=True,
                 parent=self,
@@ -54,11 +55,11 @@ class AboutDialog(BaseDialog):
             self.logger.debug("Título adicionado")
 
             info_text = self.tr(
-                "<b>Versão:</b> 2.0.7<br>"
-                "<b>Atualizada em:</b> 16 de Março de 2026<br>"
-                "<b>Criado em:</b> 9 de Dezembro de 2024<br>"
-                "<b>Criador:</b> MTL Agricultura e Tecnologia<br>"
-                "<b>Local:</b> Palmas - Tocantins - Brasil<br>"
+                f"<b>{STR.VERSION}:</b> 2.0.7<br>"
+                f"<b>{STR.UPDATED_ON}:</b> 16 / 03 / 2026<br>"
+                f"<b>{STR.CREATED_ON}:</b> 9 / 12 / 2024<br>"
+                f"<b>{STR.CREATOR}:</b> MTL Agricultura e Tecnologia<br>"
+                f"<b>{STR.LOCATION}:</b> Palmas - Tocantins - Brasil<br>"
                 '<b>Email:</b> <a href="mailto:martinelli.matheus11@gmail.com">martinelli.matheus11@gmail.com</a><br>'
                 '<b>Site:</b> <a href="https://github.com/MartinelliNTZ/Cadmus">https://github.com/MartinelliNTZ/Cadmus</a><br>'
                 '<b>GitHub:</b> <a href="https://github.com/MartinelliNTZ/Cadmus">https://github.com/MartinelliNTZ/Cadmus</a>'
@@ -78,7 +79,7 @@ class AboutDialog(BaseDialog):
             self.logger.debug("Informações adicionadas")
 
             close_layout, close_button = WidgetFactory.create_simple_button(
-                text=self.tr("Fechar"),
+                text=STR.CLOSE,
                 parent=self,
                 separator_top=True,
                 separator_bottom=False,
