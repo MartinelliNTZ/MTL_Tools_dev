@@ -18,6 +18,7 @@ class TranslationManager:
 
         if self.locale == self.INGLES:
             self.STR = Strings_en()
+            
         elif self.locale == self.ESPANHOL:
             self.STR = Strings_es()  # fallback
         else:

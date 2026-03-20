@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from ..utils.ToolKeys import ToolKey
+
 from .BasePlugin import BasePluginMTL
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..utils.ProjectUtils import ProjectUtils
@@ -7,7 +9,7 @@ from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 
 
 class CoordResultDialog(BasePluginMTL):
-
+    TOOL_KEY = ToolKey.COORD_CLICK_TOOL
     # ==================================================
     # INIT
     # ==================================================
@@ -17,7 +19,7 @@ class CoordResultDialog(BasePluginMTL):
         self.info = info
         # Inicializa logger e preferences do BasePlugin e constrói UI via _build_ui
         self.init(
-            tool_key="coord_result", class_name="CoordResultDialog", build_ui=True
+            tool_key=self.TOOL_KEY, class_name="CoordResultDialog", build_ui=True
         )
 
         # Atualiza com as informações iniciais (widgets já criados em _build_ui)
@@ -96,7 +98,7 @@ class CoordResultDialog(BasePluginMTL):
             info_callback=lambda: self.show_info_dialog(),
             separator_top=False,
             separator_bottom=False,
-            tool_key="coord_result",
+            tool_key=self.TOOL_KEY,
             run_text="Executar",
             close_text="Fechar",
         )

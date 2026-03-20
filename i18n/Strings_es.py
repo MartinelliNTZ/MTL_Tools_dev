@@ -20,22 +20,20 @@ class Strings_es(Strings_pt_BR):
     DRONE_COORDINATES_TITLE = "Coordenadas del Dron"
     RECURSIVE_SEARCH = "Buscar subcarpetas"
     PHOTOS_METADATA = "Cruzar con metadatos de fotos"
-    MRK_FOLDER = "MRK Folder:"
-    OPTIONS = "Options"
-    SAVING = "Saving"
-    STYLES = "Styles"
-    SAVE_POINTS_CHECKBOX = "Save MRK points to file?"
-    SAVE_IN = "Save in:"
-    SAVE_TRACK_CHECKBOX = "Save track to file?"
-    APPLY_STYLE_POINTS = "Apply style (QML) to points?"
-    QML_POINTS = "QML points:"
-    APPLY_STYLE_TRACK = "Apply style (QML) to track?"
+    MRK_FOLDER = "MRK:"
+    OPTIONS = "Opciones"
+    SAVING = "Guardado"
+    STYLES = "Estilos"
+    SAVE_POINTS_CHECKBOX = "¿Guardar puntos MRK en archivo?"
+    SAVE_IN = "Guardar en:"
+    SAVE_TRACK_CHECKBOX = "¿Guardar la trayectoria en archivo?"
+    APPLY_STYLE_POINTS = "¿Aplicar estilo (QML) a los puntos?"
+    QML_POINTS = "QML de puntos:"
+    APPLY_STYLE_TRACK = "¿Aplicar estilo (QML) a la trayectoria?"
     QML_TRACK = "QML:"
-    
-   
-    
-    # Errors
-    ERROR_LAYER_NOT_FOUND = "Error: Layer not found."
-    
-    #success
-    SUCCESS_MESSAGE = "Processing completed successfully."
+
+    # Errores
+    ERROR_LAYER_NOT_FOUND = "Error: Capa no encontrada."
+
+    # Éxito
+    SUCCESS_MESSAGE = "Procesamiento completado con éxito."
