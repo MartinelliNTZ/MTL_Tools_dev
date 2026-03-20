@@ -57,6 +57,14 @@
   - mantém skip apenas se não houver sobreposição, conforme script original `ferramenta.py`.
   - passo de cálculo continua protegido com try/catch para evitar crash em operação de raster mismatch.
 
+2.0.9.10 #aq
+- Adicionada internacionalização (i18n) ao plugin Cadmus.
+  - Strings hard-coded no AboutDialog substituídas por self.tr() para suporte a traduções.
+  - Criado arquivo de tradução cadmus_pt_BR.ts e compilado para .qm.
+  - Carregamento automático de traduções no __init__.py baseado no locale do sistema usando QLocale.system().name().
+  - Suporte inicial para português brasileiro (pt_BR).
+  - Corrigido erro de AttributeError ao carregar traduções, substituindo QCoreApplication.instance().locale() por QLocale.system().name().
+
 2.0.9.9 #aq
 - `RasterDifferenceStatiscs`: tabela final de resumo agora remove colunas `Par`, `HTML` e `Erro`, e adiciona `INTERVALO`.
   - intervalo calculado como `MAX - MIN` (quando disponível).

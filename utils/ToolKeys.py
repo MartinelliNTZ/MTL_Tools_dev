@@ -18,6 +18,7 @@ class ToolKey:
     SETTINGS = "settings"
     SYSTEM = "SYSTEM"  # para logs genéricos do sistema, sem tool específica
     VECTOR_FIELDS = "vector_fields"
+    ABOUT_DIALOG = "about_dialog"
 
     # model3 / panel tool
     # processing/

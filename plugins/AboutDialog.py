@@ -4,6 +4,7 @@ from qgis.PyQt.QtCore import Qt
 from ..core.config.LogUtils import LogUtils
 from .BaseDialog import BaseDialog
 from ..core.ui.WidgetFactory import WidgetFactory
+from ..utils.ToolKeys import ToolKey
 
 
 class AboutDialog(BaseDialog):
@@ -13,15 +14,15 @@ class AboutDialog(BaseDialog):
             super().__init__(iface.mainWindow())
 
             self.logger = LogUtils(
-                tool="untraceable",
+                tool=ToolKey.ABOUT_DIALOG,
                 class_name=self.__class__.__name__,
                 level=LogUtils.DEBUG,
             )
             self.logger.debug("Inicializando AboutDialog")
 
-            self.setWindowTitle("Sobre o Cadmus")
+            self.setWindowTitle(self.tr("Sobre o Cadmus"))
             self._build_ui(
-                title="Sobre o Cadmus", enable_scroll=False, minimum_size=(420, 520)
+                title=self.tr("Sobre o Cadmus"), enable_scroll=False, minimum_size=(420, 520)
             )
             self.logger.debug("AboutDialog _build_ui concluído")
 
@@ -42,7 +43,7 @@ class AboutDialog(BaseDialog):
                 self.logger.warning(f"Logo não encontrado: {logo_path}")
 
             lbl_title = WidgetFactory.create_label(
-                text="<h2>Cadmus</h2>",
+                text=self.tr("<h2>Cadmus</h2>"),
                 bold=False,
                 word_wrap=True,
                 parent=self,
@@ -52,7 +53,7 @@ class AboutDialog(BaseDialog):
             self.layout.addWidget(lbl_title)
             self.logger.debug("Título adicionado")
 
-            info_text = (
+            info_text = self.tr(
                 "<b>Versão:</b> 2.0.7<br>"
                 "<b>Atualizada em:</b> 16 de Março de 2026<br>"
                 "<b>Criado em:</b> 9 de Dezembro de 2024<br>"
@@ -77,7 +78,7 @@ class AboutDialog(BaseDialog):
             self.logger.debug("Informações adicionadas")
 
             close_layout, close_button = WidgetFactory.create_simple_button(
-                text="Fechar",
+                text=self.tr("Fechar"),
                 parent=self,
                 separator_top=True,
                 separator_bottom=False,
