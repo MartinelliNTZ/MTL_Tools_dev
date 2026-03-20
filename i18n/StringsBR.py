@@ -7,5 +7,11 @@ class StringsBR:
     """"Strings for Brazilian Portuguese (pt-BR)
     """
     # General
-    APP_NAME = get("Gerenciador de Senhas")
+    APP_NAME = "Gerenciador de Senhas"
+class StringsEN:
+    """"Strings for English (en)
+    """
+    # General
+    APP_NAME = "Password Manager"
+
 
