@@ -14,6 +14,7 @@ from ..utils.ToolKeys import ToolKey
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.ProjectUtils import ProjectUtils
 from ..utils.StringUtils import StringUtils
+from ..resources.InstructionsManager import InstructionsManager
 
 
 # -------------------------------------------------------------
@@ -92,25 +93,14 @@ class BasePluginMTL(BaseDialog):
         self,
         title: Optional[str] = None,
         icon_path: Optional[str] = "cadmus_icon.ico",
-        instructions_file: Optional[str] = "standard.md",
-        enable_scroll: bool = True,
-        instructions_manager = False,
+        enable_scroll: bool = True,        
         **kwargs,
     ):
         super()._build_ui(title=title, icon_path=icon_path, enable_scroll=enable_scroll)
 
-        # instruções
-        if instructions_manager:
-            self.instructions_file = instructions_file
-            self.logger.debug(f"Instruções gerenciadas por InstructionsManager. File: {self.instructions_file}")
-        else:
-            self.instructions_file = os.path.join(
-                os.path.dirname(__file__),
-                "..",
-                "resources",
-                "instructions",
-                instructions_file,
-            )
+        # instruções - resolvidas automaticamente via InstructionsManager.get(TOOL_KEY)
+        self.instructions_file = InstructionsManager.get(self.TOOL_KEY)
+        self.logger.debug(f"Instruções carregadas via InstructionsManager: {self.instructions_file}")
         # Restaurar tamanho da janela se foi persistido
         self._restore_window_size()
 

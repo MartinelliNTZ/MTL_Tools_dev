@@ -55,7 +55,6 @@ class LoadFolderLayersDialog(BasePluginMTL):
         super()._build_ui(
             title="Carregar Pasta de Arquivos",
             icon_path="load_folder.ico",
-            instructions_file="load_folder_layers.md",
             enable_scroll=False,
         )
 

@@ -38,7 +38,6 @@ class GenerateTrailPlugin(BasePluginMTL):
         super()._build_ui(
             title="Gerar Rastro de Máquinas",
             icon_path="gerar_rastro.ico",
-            instructions_file="generate_trail_help.md",
             enable_scroll=True,
         )
         self.logger.info("Construindo interface da ferramenta")

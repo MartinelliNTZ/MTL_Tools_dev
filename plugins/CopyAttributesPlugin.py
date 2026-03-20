@@ -24,7 +24,6 @@ class CopyAttributes(BasePluginMTL):
         super()._build_ui(
             title="Copiar Atributos de Vetor",
             icon_path="copy_attributes.ico",
-            instructions_file="copy_attributes_help.md",
             enable_scroll=True,
         )
         self.logger.info("Construindo interface da ferramenta")

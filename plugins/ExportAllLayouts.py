@@ -54,7 +54,6 @@ class ExportAllLayoutsDialog(BasePluginMTL):
         super()._build_ui(
             title="Exportar Todos os Layouts",
             icon_path="export_icon.ico",
-            instructions_file="export_all_layouts_help.md",
             enable_scroll=False,  # Simples, cabe na tela
         )
 

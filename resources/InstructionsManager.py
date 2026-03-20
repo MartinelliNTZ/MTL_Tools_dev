@@ -22,9 +22,9 @@ class InstructionsManager:
         lang = TM.lang       # ex: pt
 
         candidates = [
-            cls.BASE_DIR / f"instructions_{locale}" / filename,
-            cls.BASE_DIR / f"instructions_{lang}" / filename,
-            cls.BASE_DIR / "instructions_pt_BR" / filename,
+            cls.BASE_DIR / "instructions" / locale / filename,
+            cls.BASE_DIR / "instructions" / lang / filename,
+            cls.BASE_DIR / "instructions" / "pt_BR" / filename,
         ]
 
         for path in candidates:
@@ -33,6 +33,6 @@ class InstructionsManager:
                 return cls._cache[tool_key]
 
         # fallback final
-        fallback = cls.BASE_DIR / "instructions_pt_BR" / "standard.md"
+        fallback = cls.BASE_DIR / "instructions" / "pt_BR" / "standard.md"
         cls._cache[tool_key] = str(fallback)
         return cls._cache[tool_key]
