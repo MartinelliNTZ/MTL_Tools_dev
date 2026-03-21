@@ -41,6 +41,8 @@ Traducao: 9
   - Usar iconManager para carregar ícones de forma centralizada e eficiente
   - Usar InstructionsManager para carregar instruções de forma centralizada e eficiente, com suporte a formatação e imagens
 changelog=
+  2.1.3 2026/03/20
+    - TRaducao de plugins
   2.1.2 2026/03/20
     - Criacao do sistema de traducao
   2.1.1 2026/03/19
