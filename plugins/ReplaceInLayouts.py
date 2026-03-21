@@ -6,12 +6,13 @@ from ..utils.ProjectUtils import ProjectUtils
 from ..utils.ToolKeys import ToolKey
 from .BasePlugin import BasePluginMTL
 from ..core.ui.WidgetFactory import WidgetFactory
+from ..i18n.TranslationManager import STR
 
 
 class ReplaceInLayoutsDialog(BasePluginMTL):
     CHECKBOX_OPTIONS = {
-        "case_sensitive": "Diferenciar maiúsculas/minúsculas",
-        "full_replace": "Substituir o label inteiro quando encontrar o texto",
+        "case_sensitive": STR.CASE_SENSITIVE,
+        "full_replace": STR.FULL_LABEL_REPLACE,
     }
 
     TOOL_KEY = ToolKey.REPLACE_IN_LAYOUTS
@@ -29,7 +30,7 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
 
     def _build_ui(self, **kwargs):
         super()._build_ui(
-            title="Substituir Texto em Layouts",
+            title=STR.REPLACE_IN_LAYOUTS_TITLE,
             icon_path="Cadmus_icon.png",
             enable_scroll=False,
         )
@@ -39,12 +40,12 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
             WidgetFactory.create_input_fields_widget(
                 fields_dict={
                     "old_text": {
-                        "title": "Texto a buscar:",
+                        "title": STR.SEARCH_TEXT,
                         "type": "text",
                         "default": "",
                     },
                     "new_text": {
-                        "title": "Texto a substituir (novo):",
+                        "title": STR.REPLACE_WITH_NEW_TEXT,
                         "type": "text",
                         "default": "",
                     },
@@ -55,7 +56,7 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
 
         # ====== BOTÃO DE TROCA ======
         swap_layout, self.swap_button = WidgetFactory.create_simple_button(
-            text="⇅ Inverter",
+            text=f"⇄ {STR.REPLACE_IN_LAYOUTS_SWAP}",
             parent=self,
             separator_top=False,
             separator_bottom=True,
@@ -73,7 +74,7 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
 
         # ====== INFO ======
         info_label = WidgetFactory.create_label(
-            text="Backup: será criada uma cópia do projeto (.qgz) na pasta backup ao lado do arquivo do projeto.",
+            text=STR.PROJECT_BACKUP_INFO,
             word_wrap=True,
             bold=False,
         )
@@ -86,8 +87,8 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
                 close_callback=self.close,
                 info_callback=self.show_info_dialog,
                 tool_key=self.TOOL_KEY,
-                run_text="Executar substituição",
-                close_text="Fechar",
+                run_text=STR.REPLACE_IN_LAYOUTS_RUN,
+                close_text=STR.CLOSE,
             )
         )
 
@@ -142,19 +143,19 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
         full_replace = self.checkbox_map["full_replace"].isChecked()
 
         if not old_text:
-            QgisMessageUtil.bar_warning(self.iface, "Informe o texto a buscar.")
+            QgisMessageUtil.bar_warning(self.iface, STR.ENTER_TEXT_TO_SEARCH)
             return
 
         self._save_prefs()
 
         if not QgisMessageUtil.confirm_destructive(
             self,
-            "Confirme substituições",
+            STR.CONFIRM_REPLACEMENTS,
             (
-                f"<b>Buscar:</b> <i>{old_text}</i><br>"
-                f"<b>Substituir por:</b> <i>{new_text}</i>"
+                f"<b>{STR.SEARCH_LABEL}</b> <i>{old_text}</i><br>"
+                f"<b>{STR.REPLACE_WITH_LABEL}</b> <i>{new_text}</i>"
             ),
-            red_text="Atenção — operação destrutiva",
+            red_text=STR.DESTRUCTIVE_OPERATION_WARNING,
         ):
             return
 
@@ -177,12 +178,14 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
             total = result.get("total_changes", 0)
             layouts = result.get("total_layouts", 0)
             message = (
-                f"<b>Layouts analisados:</b> {layouts}<br>"
-                f"<b>Substituições aplicadas:</b> {total}"
+                f"<b>{STR.LAYOUTS_ANALYZED}</b> {layouts}<br>"
+                f"<b>{STR.CHANGES_APPLIED}</b> {total}"
             )
-            QgisMessageUtil.modal_success(self.iface, message, "Substituição concluída")
+            QgisMessageUtil.modal_success(
+                self.iface, message, STR.REPLACEMENT_COMPLETED_TITLE
+            )
         except Exception as e:
-            QgisMessageUtil.bar_critical(self, str(e), "Erro")
+            QgisMessageUtil.bar_critical(self, str(e), STR.ERROR)
 
 
 def run_replace_in_layouts(iface):

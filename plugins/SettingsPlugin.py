@@ -42,12 +42,12 @@ class SettingsPlugin(BasePluginMTL):
         self.logger.info("Construindo componentes de interface")
 
         # ========== SEÇÃO 1: Preferências do App ==========
-        prefs_label = QLabel(f"📋 {STR.SETTINGS_APP_PREFERENCES}")
+        prefs_label = QLabel(f"📋 {STR.APP_PREFERENCES}")
         prefs_label.setStyleSheet("font-weight: bold; font-size: 11pt;")
 
         # Link clicável para preferências
         pref_link = QLabel(
-            f'<a href="open_prefs" style="color: #0066cc; text-decoration: underline;">{STR.SETTINGS_OPEN_PREFERENCES_LINK}</a>'
+            f'<a href="open_prefs" style="color: #0066cc; text-decoration: underline;">{STR.OPEN_PREFERENCES_FOLDER}</a>'
         )
         pref_link.setOpenExternalLinks(False)
         pref_link.setCursor(Qt.PointingHandCursor)
@@ -59,7 +59,7 @@ class SettingsPlugin(BasePluginMTL):
         calc_layout, self.radio_calc = WidgetFactory.create_radio_button_grid(
             items=self.CALCULATION_METHODS,
             columns=3,
-            title=f"⚙️ {STR.SETTINGS_VECTOR_CALCULATION_METHOD}",
+            title=f"⚙️ {STR.VECTOR_CALCULATION_METHOD}",
             checked_index=0,
             tool_key=ToolKey.SETTINGS,
             separator_top=True,
@@ -70,7 +70,7 @@ class SettingsPlugin(BasePluginMTL):
 
         # ========== SEÇÃO 3: Precisão para campos vetoriais ==========
         prec_layout, self.spin_precision = WidgetFactory.create_double_spin_input(
-            f"🎯 {STR.SETTINGS_VECTOR_FIELDS_PRECISION}",
+            f"🎯 {STR.VECTOR_FIELDS_PRECISION}",
             decimals=0,
             step=1,
             minimum=0,
@@ -85,7 +85,7 @@ class SettingsPlugin(BasePluginMTL):
         # Agora o valor é o número máximo de feições que podem ser processadas
         # de forma síncrona; tudo acima irá disparar execução em segundo plano.
         thresh_layout, self.spin_threshold = WidgetFactory.create_double_spin_input(
-            f"📦 {STR.SETTINGS_ASYNC_THRESHOLD}",
+            f"📦 {STR.ASYNC_THRESHOLD}",
             decimals=0,
             step=1,
             minimum=1,
@@ -199,7 +199,7 @@ class SettingsPlugin(BasePluginMTL):
         QMessageBox.information(
             self,
             STR.SETTINGS_SAVED_TITLE,
-            f"{STR.SETTINGS_VECTOR_CALCULATION_METHOD_LABEL} {selected_method}\n\n"
+            f"{STR.CALCULATION_METHOD_LABEL} {selected_method}\n\n"
             f"{STR.SETTINGS_SAVED_MESSAGE}",
         )
 
@@ -221,7 +221,7 @@ class SettingsPlugin(BasePluginMTL):
             QMessageBox.warning(
                 self,
                 STR.WARNING,
-                f"{STR.SETTINGS_PREFERENCES_FOLDER_NOT_FOUND}\n{PREF_FOLDER}",
+                f"{STR.PREFERENCES_FOLDER_NOT_FOUND}\n{PREF_FOLDER}",
             )
 
 

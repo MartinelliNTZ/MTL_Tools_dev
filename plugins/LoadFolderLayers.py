@@ -10,6 +10,7 @@ from ..utils.ProjectUtils import ProjectUtils
 from ..core.engine_tasks.AsyncPipelineEngine import AsyncPipelineEngine
 from ..core.engine_tasks.LoadFilesStep import LoadFilesStep
 from ..core.engine_tasks.ExecutionContext import ExecutionContext
+from ..i18n.TranslationManager import STR
 
 
 # ============================================================
@@ -53,7 +54,7 @@ class LoadFolderLayersDialog(BasePluginMTL):
     def _build_ui(self, **kwargs):
         # Constrói a UI padronizada usando WidgetFactory e BasePluginMTL
         super()._build_ui(
-            title="Carregar Pasta de Arquivos",
+            title=STR.LOAD_FOLDER_LAYERS_TITLE,
             icon_path="load_folder.ico",
             enable_scroll=False,
         )
@@ -61,7 +62,7 @@ class LoadFolderLayersDialog(BasePluginMTL):
         # --- Tipos de arquivo dentro de seção colapsável ---
         coll_layout, self.coll_widget = WidgetFactory.create_collapsible_parameters(
             parent=self,
-            title="Tipos de Arquivo",
+            title=STR.FILE_TYPES,
             expanded_by_default=False,
             separator_top=False,
             separator_bottom=True,
@@ -82,7 +83,7 @@ class LoadFolderLayersDialog(BasePluginMTL):
         # --- Seletor de pasta ---
         folder_layout, self.folder_selector = WidgetFactory.create_path_selector(
             parent=self,
-            title="Pasta raiz:",
+            title=STR.ROOT_FOLDER,
             mode="folder",
             separator_top=False,
             separator_bottom=True,
@@ -90,10 +91,10 @@ class LoadFolderLayersDialog(BasePluginMTL):
 
         # --- Opções adicionais (1 coluna) ---
         opts = {
-            "missing_only": "Carregar apenas arquivos ainda NÃO carregados no projeto",
-            "preserve": "Criar grupos conforme estrutura de pastas/subpastas",
-            "lastfolder": "Não agrupar a última pasta",
-            "backup": "Criar backup do projeto antes de carregar (somente se salvo)",
+            "missing_only": STR.LOAD_ONLY_MISSING_FILES,
+            "preserve": STR.PRESERVE_FOLDER_STRUCTURE,
+            "lastfolder": STR.DO_NOT_GROUP_LAST_FOLDER,
+            "backup": STR.CREATE_PROJECT_BACKUP_IF_SAVED,
         }
         # cmo funciona F:\TTG\FEV_2026\FAZ_UNIAO\OLD\file.shp)
         # crie os grupo TTG  - FEV_2026 - FAZ_UNIAO - MAS NAO CARREGUE O OLD, POIS É A ULTIMA PASTA
@@ -132,7 +133,7 @@ class LoadFolderLayersDialog(BasePluginMTL):
                 close_callback=self.close,
                 info_callback=self.show_info_dialog,
                 tool_key=self.TOOL_KEY,
-                run_text="Carregar Arquivos",
+                run_text=STR.LOAD_FOLDER_LAYERS_RUN,
             )
         )
 
@@ -232,7 +233,9 @@ class LoadFolderLayersDialog(BasePluginMTL):
         self.logger.info(f"Iniciando execução: pasta={folder}", code="EXEC_START")
 
         if not folder or not os.path.isdir(folder):
-            QgisMessageUtil.bar_warning(self.iface, "Selecione uma pasta válida.")
+            QgisMessageUtil.bar_warning(
+                self.iface, STR.SELECT_VALID_FOLDER
+            )
             return
 
         backup_file = None
@@ -241,7 +244,9 @@ class LoadFolderLayersDialog(BasePluginMTL):
                 backup_file = ProjectUtils.create_project_backup(QgsProject.instance())
             except Exception as e:
                 backup_file = None
-                self.logger.error(f"Erro criando backup do projeto: {e}", code="BACKUP_ERROR")
+                self.logger.error(
+                    f"Erro criando backup do projeto: {e}", code="BACKUP_ERROR"
+                )
 
         # coletar extensões selecionadas
         extensions = []
@@ -251,7 +256,7 @@ class LoadFolderLayersDialog(BasePluginMTL):
 
         if not extensions:
             QgisMessageUtil.bar_warning(
-                self.iface, "Selecione pelo menos um tipo de arquivo."
+                self.iface, STR.SELECT_AT_LEAST_ONE_FILE_TYPE
             )
             return
 
@@ -327,7 +332,7 @@ class LoadFolderLayersDialog(BasePluginMTL):
         self.finish_stats()
         QgisMessageUtil.modal_info(
             self.iface,
-            f"Foram carregados {loaded_count} arquivos."
+            f"{STR.FILES_LOADED_PREFIX} {loaded_count} {STR.FILES_SUFFIX}",
         )
 
     def _run_async_pipeline(self, folder: str, records: list, backup_file: str = None):
@@ -366,14 +371,14 @@ class LoadFolderLayersDialog(BasePluginMTL):
             engine.start()
             QgisMessageUtil.bar_info(
                 self.iface,
-                "Execução em background iniciada. Verifique o log para progresso.",
+                STR.ASYNC_STARTED,
             )
         except Exception as e:
             self.logger.error(
                 f"Falha iniciando pipeline assíncrona: {e}", code="ASYNC_ERROR"
             )
             QgisMessageUtil.bar_critical(
-                self.iface, f"Erro iniciando execução assíncrona: {e}"
+                self.iface, f"{STR.ASYNC_START_ERROR} {e}"
             )
         return None
 
@@ -383,13 +388,13 @@ class LoadFolderLayersDialog(BasePluginMTL):
         self.logger.info(f"_on_async_finished: loaded={loaded}", code="ASYNC_FINISH")
         QgisMessageUtil.bar_info(
             self.iface,
-            f"Execução assíncrona concluída. Foram carregados {loaded} arquivos."
+            f"{STR.ASYNC_FINISHED} {STR.FILES_LOADED_PREFIX} {loaded} {STR.FILES_SUFFIX}",
         )
 
     def _on_async_error(self, errors):
         self.logger.error(f"_on_async_error: {errors}", code="ASYNC_ERROR")
         QgisMessageUtil.modal_error(
-            self.iface, f"Erro na execução assíncrona: {errors}"
+            self.iface, f"{STR.ASYNC_EXECUTION_ERROR} {errors}"
         )
 
 
