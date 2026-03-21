@@ -1,4 +1,10 @@
+#2.1.3 2026/03/20
+- Internacionalização expandida para os plugins `SettingsPlugin`, `ReplaceInLayouts`, `LoadFolderLayers`, `GenerateTrailPlugin`, `CopyAttributesPlugin`, `ExportAllLayouts` e `coord_result_dialog`, com centralização das strings exibidas ao usuário em `Strings_pt_BR`.
+- Reorganização do catálogo `Strings_pt_BR` em grupos mais intuitivos, separando botões, labels comuns, mensagens comuns e títulos específicos de plugins para incentivar reaproveitamento de strings genéricas.
+- Traduções completas adicionadas em `Strings_en` e `Strings_es` para todas as novas chaves introduzidas no catálogo em português.
+- Atualização do histórico para consolidar as mudanças recentes de internacionalização e padronização dos plugins.
+
 #2.1.2.1 2026/03/20
 - Refatorado DroneCoordinates para usar strings internacionalizadas via STR e Strings_pt_BR, substituindo todas as strings hardcoded exibidas ao usuário.
 
-#2.1.2 2026/03 /20
+#2.1.2 2026/03/20
