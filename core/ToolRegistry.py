@@ -6,6 +6,7 @@ from ..resources.IconManager import IconManager as im
 from .config.LogUtils import LogUtils
 from ..utils.ToolKeys import ToolKey
 from ..utils.QgisMessageUtil import QgisMessageUtil
+from ..i18n.TranslationManager import STR
 
 
 class ToolRegistry:
@@ -47,7 +48,9 @@ class ToolRegistry:
             show_in_toolbar=True,
         )
         tools.append(export_layouts)
-        print(f"ToolRegistry: added {export_layouts.name} category {export_layouts.category} main {export_layouts.main_action}")
+        print(
+            f"ToolRegistry: added {export_layouts.name} category {export_layouts.category} main {export_layouts.main_action}"
+        )
 
         replace_layouts = Tool(
             name="Substituir textos nos Layouts",
@@ -56,8 +59,8 @@ class ToolRegistry:
             tool_type=self.DIALOG,
             executor=self.run_replace_layouts,
             tooltip="Substitui textos em massa nos Layouts do projeto.\n"
-                    "Permite criar um mapa de substituição a partir de uma camada vetorial ou tabela, onde um campo é usado para identificar os Layouts e outro campo é usado para o novo valor a ser inserido.\n"
-                    "Útil para atualizar informações como títulos, legendas ou rótulos em múltiplos Layouts de forma rápida e consistente.",
+            "Permite criar um mapa de substituição a partir de uma camada vetorial ou tabela, onde um campo é usado para identificar os Layouts e outro campo é usado para o novo valor a ser inserido.\n"
+            "Útil para atualizar informações como títulos, legendas ou rótulos em múltiplos Layouts de forma rápida e consistente.",
             order=20,
             show_in_toolbar=True,
         )
@@ -75,7 +78,7 @@ class ToolRegistry:
             main_action=True,
             executor=self.run_restart_qgis,
             tooltip="Salva o projeto atual, fecha o QGIS e reabre o mesmo projeto automaticamente.\n"
-                    "Útil para resolver travamentos, bugs visuais ou de renderização sem perder o trabalho.",
+            "Útil para resolver travamentos, bugs visuais ou de renderização sem perder o trabalho.",
             order=10,
             show_in_toolbar=True,
         )
@@ -117,7 +120,8 @@ class ToolRegistry:
         )
         tools.append(about)
 
-        # =====================================================        # FOLDER (Ordem: Load=10)
+        # =====================================================
+        # FOLDER (Ordem: Load=10)
         # =====================================================
 
         load_folder = Tool(
@@ -132,22 +136,9 @@ class ToolRegistry:
             show_in_toolbar=True,
         )
         tools.append(load_folder)
-        print(f"ToolRegistry: added {load_folder.name} category {load_folder.category} main {load_folder.main_action}")
-
-        # =====================================================        # FOLDER (Ordem: Load Folder=10)
-        # =====================================================
-
-        load_folder = Tool(
-            name="Carregar pasta de arquivos",
-            icon=im.icon(im.LOAD_FOLDER_LAYER),
-            category=self.FOLDER,
-            tool_type=self.DIALOG,
-            executor=self.run_load_folder,
-            tooltip="Carrega em massa uma pasta de arquivos como camadas no QGIS.",
-            order=10,
-            show_in_toolbar=True,
+        print(
+            f"ToolRegistry: added {load_folder.name} category {load_folder.category} main {load_folder.main_action}"
         )
-        tools.append(load_folder)
 
         # =====================================================
         # VECTOR (Ordem: Fields=10, Coords=20, Pasta=30, Multipart=40, Copy=50)
@@ -161,8 +152,8 @@ class ToolRegistry:
             main_action=True,
             executor=self.run_vector_fields,
             tooltip="Calcula automaticamente campos: Área, Comprimento ou X/Y\n"
-                    "Selecione uma camada vetorial ativa e execute a ferramenta\n"
-                    "para adicionar os campos calculados.",
+            "Selecione uma camada vetorial ativa e execute a ferramenta\n"
+            "para adicionar os campos calculados.",
             order=10,
             show_in_toolbar=True,
         )
@@ -175,14 +166,13 @@ class ToolRegistry:
             tool_type=self.MAP_TOOL,
             executor=self.run_coord_click,
             tooltip="Clique no mapa para consultar coordenadas do ponto.\n"
-                    "A ferramenta abre um dialogo com WGS84, UTM,\n"
-                    "altitude aproximada e endereco estimado,\n"
-                    "alem de opcoes para copiar as informacoes.",
+            "A ferramenta abre um dialogo com WGS84, UTM,\n"
+            "altitude aproximada e endereco estimado,\n"
+            "alem de opcoes para copiar as informacoes.",
             order=20,
             show_in_toolbar=True,
         )
         tools.append(coord_click)
-
 
         multipart = Tool(
             name="Converter Multipart",
@@ -191,8 +181,8 @@ class ToolRegistry:
             tool_type=self.INSTANT,
             executor=self.run_multpart,
             tooltip="Promove feições para o tipo multiparte.\n"
-                    "Selecione uma camada vetorial ativa e execute a ferramenta\n"
-                    "para promover as feições.",
+            "Selecione uma camada vetorial ativa e execute a ferramenta\n"
+            "para promover as feições.",
             order=40,
             show_in_toolbar=True,
         )
@@ -222,9 +212,9 @@ class ToolRegistry:
             main_action=True,
             executor=self.run_drone_coords,
             tooltip="Le arquivos MRK de drone para gerar pontos das fotos\n"
-                    "e uma linha com o rastro do voo.\n"
-                    "Pode cruzar os pontos com metadados das imagens,\n"
-                    "salvar os resultados e aplicar estilos QML.",
+            "e uma linha com o rastro do voo.\n"
+            "Pode cruzar os pontos com metadados das imagens,\n"
+            "salvar os resultados e aplicar estilos QML.",
             order=10,
             show_in_toolbar=True,
         )
@@ -513,4 +503,3 @@ class ToolRegistry:
             QgisMessageUtil.bar_critical(
                 self.iface, f"Erro no diálogo de Configurações:\n{str(e)}"
             )
-
