@@ -1,171 +1,57 @@
-# 📘 Obter Coordenadas de Drone (MRK) – Manual de Utilização  
-Ferramenta do pacote **Cadmus** para geração de **pontos e trajetos de voo de drone** a partir de arquivos **MRK** (DJI).
+# Coordenadas de Drone — Guia Rapido
 
----
+Esta ferramenta le arquivos MRK de drone e gera uma camada de pontos com as posicoes registradas no voo.
 
-## 📌 O que esta ferramenta faz?
+Ela tambem pode criar uma linha de trajeto a partir desses pontos, cruzar os registros com metadados das fotos e salvar os resultados em arquivo.
 
-Esta ferramenta lê arquivos **MRK gerados por drones DJI** e permite:
+## Como usar
 
-- Gerar **pontos das fotos** do voo
-- Gerar o **trajeto (linha)** do drone
-- Opcionalmente **cruzar os pontos com metadados das fotos JPG**
-- Salvar resultados em arquivo ou criar **camadas temporárias**
-- Aplicar **estilos QML** automaticamente
-- Processar grandes volumes sem travar o QGIS
+1. Abra `Cadmus > Coordenadas de Drone`.
+2. Escolha a pasta que contem os arquivos MRK.
+3. Ajuste as opcoes, se necessario:
+- `Vasculhar subpastas`: procura MRKs dentro das subpastas.
+- `Cruzar com metadados das fotos`: tenta enriquecer os pontos com informacoes das imagens JPG.
+4. Se quiser, configure o salvamento dos pontos e do rastro em arquivo.
+5. Se quiser, selecione arquivos QML para aplicar estilo aos pontos e ao rastro.
+6. Execute a ferramenta.
 
----
+## O que o plugin faz de verdade
 
-## 🧩 Componentes principais
+- Inicia uma pipeline assincrona com `MrkParseStep`.
+- Cria uma camada de pontos chamada `MRK_Pontos` a partir dos registros lidos.
+- Se a opcao de fotos estiver ativa, executa tambem `PhotoMetadataStep`.
+- Pode adicionar campos extras com nome do arquivo, datas, dimensoes da imagem, camera, ISO, abertura e outros metadados.
+- Gera uma camada de linha conectando os pontos por grupos de `mrk_path` e `mrk_file`.
+- Adiciona as camadas geradas ao projeto.
+- Pode salvar pontos e rastro em arquivo com renomeacao automatica se o destino ja existir.
+- Pode aplicar estilos QML aos pontos e ao rastro quando essa opcao estiver habilitada.
 
-### ✔ Pasta dos MRK
-Define a pasta onde estão os arquivos `.mrk`.
+## Comportamento importante
 
-- Pode conter **subpastas**
-- Pode haver **vários MRKs**
+- A ferramenta trabalha a partir de uma pasta, nao de uma camada ja carregada.
+- O cruzamento com fotos depende de haver imagens compativeis nas pastas relacionadas ao MRK.
+- Se os metadados das fotos nao forem encontrados, os pontos ainda podem ser gerados sem esse enriquecimento.
+- O processamento principal roda em background.
+- Os pontos sao sempre gerados primeiro; o rastro e derivado desses pontos.
 
----
+## Saidas geradas
 
-### ✔ Vasculhar subpastas
-Quando marcado, a ferramenta procura arquivos `.mrk` em **todas as subpastas recursivamente** da pasta selecionada.
+- Pontos MRK em camada de memoria ou arquivo.
+- Rastro do voo em camada de memoria ou arquivo.
+- Estilo opcional aplicado separadamente para pontos e linha.
 
-⚠ **Atenção:**  
-- Se desmarcado, apenas MRKs na **pasta raiz** serão processados
-- Esta opção é ignorada se arquivos individuais forem selecionados diretamente
+## Quando usar
 
----
+Use esta ferramenta quando quiser transformar arquivos MRK em produtos espaciais que possam ser visualizados e analisados no QGIS.
 
-### ✔ Unir todos os MRK
-Quando ativado, todos os arquivos MRK encontrados são **agregados em um único voo**, gerando:
+Ela e especialmente util para:
 
-- **Um único conjunto de pontos** (com todos os waypoints combinados)
-- **Um único trajeto** (com a rota completa do voo unificada)
+- mapear posicoes das fotos do voo;
+- reconstruir o trajeto do drone;
+- enriquecer os pontos com dados tecnicos das imagens.
 
-Se desmarcado, cada MRK é processado **independentemente**, criando múltiplas camadas de pontos e trajetos.
+## Cuidados
 
----
-
-### ✔ Cruzar com metadados das fotos
-Permite enriquecer os pontos MRK com informações extraídas das **fotos JPG** do voo, como:
-
-- **Nome do arquivo** da foto
-- **Tamanho** do arquivo (bytes)
-- **Data de modificação** do arquivo
-- **Dimensões** da imagem (largura × altura)
-- **Metadados EXIF**: ISO, abertura (f-stop), distância focal, marca da câmera, etc.
-
-Requer que as fotos estejam disponíveis **na mesma pasta** do MRK ou em subpastas.
-
-⚠ **Atenção:**  
-- Não recomendado para **grandes volumes de fotos** (>5000 imagens), pois o processamento é assíncrono e pode levar minutos
-- Se a foto não for encontrada, o ponto MRK será criado **sem os metadados de foto** (processamento continua)
-
----
-
-## 📍 Pontos MRK
-
-### ✔ Salvar pontos em arquivo
-Permite salvar os pontos em:
-
-- Shapefile (`.shp`)
-- GeoPackage (`.gpkg`)
-- GeoJSON (`.geojson`)
-- KML (`.kml`)
-
-Se desmarcado, os pontos serão criados como **camada temporária**.
-
----
-
-### ✔ Aplicar estilo (QML) nos pontos
-Permite selecionar um arquivo `.qml` para estilizar automaticamente a camada de pontos.
-
----
-
-## 🧭 Trajeto do Drone (Linha)
-
-### ✔ Salvar trajeto em arquivo
-Permite salvar o trajeto do drone em:
-
-- Shapefile
-- GeoPackage
-- GeoJSON
-- KML
-- CSV
-
-Se desmarcado, o trajeto será criado como **camada temporária**.
-
----
-
-### ✔ Aplicar estilo (QML) no trajeto
-Permite aplicar um estilo `.qml` ao rastro do drone.
-
-Se nenhum QML for informado, a ferramenta pode aplicar um **estilo padrão do plugin**.
-
----
-
-## ▶ Como usar
-
-### 1. Abrir a ferramenta  
-Menu → **Cadmus** → **Agricultura de Precisão** → *Obter Coordenadas de Drone*
-
----
-
-### 2. Selecionar a pasta dos MRK
-Clique em **…** e escolha a pasta onde estão os arquivos `.mrk`.
-
----
-
-### 3. Definir opções desejadas
-Marque conforme sua necessidade:
-
-- Vasculhar subpastas
-- Unir MRKs
-- Cruzar com fotos
-- Salvar pontos
-- Salvar trajeto
-- Aplicar estilos
-
----
-
-### 4. Definir caminhos de saída (opcional)
-Caso opte por salvar em arquivo:
-
-- Escolha o local e formato
-- Selecione QMLs, se desejar
-
----
-
-### 5. Clique em **Executar**
-A ferramenta irá:
-
-1. Ler todos os MRKs encontrados  
-2. Criar os pontos  
-3. Criar o trajeto  
-4. Cruzar com fotos (se ativado)  
-5. Adicionar as camadas ao projeto  
-
-O progresso e mensagens são registrados automaticamente.
-
----
-
-## 🔄 Persistência de Configurações
-
-Todas as opções escolhidas são salvas automaticamente nas **preferências do QGIS** para a próxima abertura:
-- Última pasta/arquivos selecionados
-- Estado dos checkboxes (vasculhar subpastas, unir MRKs, etc.)
-- Caminhos de saída e estilos QML
-
-⚠ **Nota:**  
-Apenas o **primeiro caminho** (pasta ou arquivo) é lembrado. Se múltiplos arquivos foram selecionados, apenas o primeiro será restaurado.
-
----
-
-## ℹ️ Observações Importantes
-
-- **Processamento assíncrono:** Especialmente quando cruzando com metadados de fotos, a ferramenta executa em **background thread** para não travar o QGIS
-- **Reprojeção automática:** Arquivos KML são automaticamente reprojetados para **EPSG:4326** (WGS84)
-- **Camadas temporárias:** Se nenhum caminho de saída for fornecido, pontos e trajetos são criados como **camadas de memória** (temporárias)
-- **MRK não encontrados:** Se a pasta contém " .mrk arquivos inválidos ou corrompidos, a ferramenta reportará warnings mas continuará processando os válidos
-- **Fotos não encontradas:** Se ativar "Cruzar com fotos" mas alguma JPG estiver faltando, a ferramenta criará o ponto MRK sem metadados de foto (não falha)
-
----
+- Confirme que a pasta selecionada realmente contem arquivos MRK validos.
+- Se for usar cruzamento com fotos, mantenha a organizacao das pastas consistente com o voo.
+- Se quiser persistir os resultados, prefira salvar em `gpkg`.

@@ -1,116 +1,62 @@
-# 🧾 Coord Click — User Guide
+# Capture Coordinates — Quick Guide
 
-Coord Click is a tool from the **Cadmus** suite that allows you to click on the map and instantly retrieve detailed information about a location, including coordinates, projection data, address, and altitude.
+This tool lets you click on the map and open a panel with detailed information about the selected point.
 
----
+In the same user flow, `CoordClickTool` captures the point and `CoorResultDialog` displays and updates the results.
 
-## 🎯 Purpose
+## How to use
 
-Provide fast inspection of any point on the map with:
+1. Activate `Cadmus > Capture Coordinates`.
+2. Click anywhere on the map.
+3. View the dialog with:
+- WGS84 coordinates in decimal and DMS;
+- UTM coordinates;
+- zone, hemisphere, and EPSG;
+- approximate altitude;
+- approximate address.
+4. Use the buttons to copy the information blocks you want.
+5. Click another point on the map to update the same dialog.
 
-* WGS84 coordinates (decimal and DMS)
-* UTM coordinates (SIRGAS 2000)
-* Zone and EPSG information
-* Approximate altitude (OpenTopoData)
-* Reverse geocoded address (OpenStreetMap)
+## What the plugin actually does
 
----
+- Captures the clicked coordinate using snapping when a valid snap exists on the canvas.
+- Converts the point into geographic and UTM information.
+- Opens the result dialog on the first click and then reuses the same window.
+- Starts an asynchronous pipeline with two parallel tasks:
+- reverse geocoding;
+- altimetry lookup.
+- If the pipeline fails, it falls back to separate tasks.
+- Cancels previous tasks when the user clicks another point.
 
-## 🛠️ How to Use
+## What appears in the dialog
 
-### 1️⃣ Activate the tool
+- Latitude and longitude in decimal.
+- Latitude and longitude in DMS.
+- UTM Easting and Northing.
+- Zone, hemisphere, and EPSG.
+- Approximate altitude.
+- Municipality, intermediate region, state, region, and country.
+- Buttons to copy WGS84, UTM, or the full location.
 
-Menu → Cadmus → Coord Click
+## Important behavior
 
-### 2️⃣ Click on the map
+- Basic coordinates appear first; address and altitude may take a few seconds.
+- Without internet, the dialog still shows coordinates, but address and altitude may not load.
+- The dialog uses the same `ToolKey` as the click tool, so the correct help file is `coord_click_tool_help.md`.
+- The full-location copy button sends a text summary to the clipboard.
 
-Click anywhere on the map canvas.
+## When to use it
 
-### 3️⃣ View the results
+Use this tool when you need to inspect a map point quickly without creating a layer, feature, or annotation.
 
-A dialog will open (or update) displaying:
+It is especially useful for:
 
-* **WGS84**
+- checking coordinates in more than one system;
+- getting approximate point altitude;
+- copying location data into reports, messages, or documents.
 
-  * Latitude/Longitude (decimal)
-  * Latitude/Longitude (DMS)
+## Notes
 
-* **UTM**
-
-  * Easting (X)
-  * Northing (Y)
-  * Zone, hemisphere, and EPSG
-
-* **Altimetry**
-
-  * Automatically loaded approximate value
-
-* **Address**
-
-  * Municipality
-  * Intermediate region
-  * State
-  * Region
-  * Country
-
----
-
-## ⚙️ Internal Workflow
-
-The tool uses an asynchronous pipeline:
-
-* Parallel execution of:
-
-  * Reverse geocoding
-  * Altimetry query
-* Engine: `AsyncPipelineEngine`
-* Steps:
-
-  * `ReverseGeocodeStep`
-  * `AltimetryStep`
-
-If the pipeline fails:
-
-* Automatic fallback to `QgsTask`
-
----
-
-## 🔎 Dependencies
-
-* OpenStreetMap (reverse geocoding)
-* OpenTopoData (altitude)
-
-An internet connection is required.
-
----
-
-## 🧾 Available Actions
-
-* **Copy full WGS data**
-* **Copy full UTM data**
-* **Copy full location (dedicated button)**
-* Automatic updates when clicking new points
-
----
-
-## 🧠 Important Behaviors
-
-* If the dialog is already open → it will be reused
-* Previous tasks are automatically canceled
-* Snapping is respected when enabled
-* Asynchronous data (address/altitude) may take a few seconds
-
----
-
-## ⚠️ Limitations
-
-* Altitude is approximate (external model)
-* Address depends on OSM coverage
-* Without internet → only coordinates are shown
-
-
----
-
-## Created by
-
-Matheus A.S. Martinelli
+- Altitude is approximate and depends on an external service.
+- Address information depends on reverse geocoding coverage.
+- Consecutive clicks cancel previous queries and prioritize the most recent point.

@@ -152,6 +152,12 @@ class Strings_pt_BR:
 
     # plugins/DroneCoordinates.py
     DRONE_COORDINATES_TITLE = "Coordenadas de Drone"
+    DRONE_COORDINATES_TOOLTIP = (
+        "Le arquivos MRK de drone para gerar pontos das fotos e o rastro do voo.\n"
+        "Pode cruzar os pontos com metadados das imagens,\n"
+        "salvar os resultados em arquivo e aplicar estilos QML\n"
+        "aos pontos e ao trajeto gerados."
+    )
     RECURSIVE_SEARCH = "Vasculhar subpastas"
     PHOTOS_METADATA = "Cruzar com metadados das fotos"
     MRK_FOLDER = "Pasta MRK:"
@@ -165,24 +171,76 @@ class Strings_pt_BR:
 
     # plugins/SettingsPlugin.py
     SETTINGS_TITLE = "Configurações Cadmus"
+    SETTINGS_TOOLTIP = (
+        "Abre as configurações globais do Cadmus.\n"
+        "Permite definir o método padrão de cálculo vetorial,\n"
+        "a precisão dos campos vetoriais e o limiar de feições\n"
+        "usado para processamento assíncrono."
+    )
     SETTINGS_CALCULATION_METHOD_ELLIPSOIDAL = "Elipsoidal"
     SETTINGS_CALCULATION_METHOD_CARTESIAN = "Cartesiana"
     SETTINGS_CALCULATION_METHOD_BOTH = "Ambos"
 
     # plugins/ReplaceInLayouts.py
     REPLACE_IN_LAYOUTS_TITLE = "Substituir Texto em Layouts"
+    REPLACE_IN_LAYOUTS_TOOLTIP = (
+        "Procura textos nos labels dos layouts do projeto\n"
+        "e substitui pelo novo valor informado.\n"
+        "Pode fazer substituição parcial ou trocar o conteúdo\n"
+        "inteiro do label quando houver correspondência."
+    )
     REPLACE_IN_LAYOUTS_SWAP = "Inverter"
     REPLACE_IN_LAYOUTS_RUN = "Executar substituição"
 
     # plugins/LoadFolderLayers.py
     LOAD_FOLDER_LAYERS_TITLE = "Carregar Pasta de Arquivos"
+    LOAD_FOLDER_LAYERS_TOOLTIP = (
+        "Carrega em lote arquivos vetoriais e raster de uma pasta\n"
+        "e de suas subpastas para o projeto QGIS.\n"
+        "Pode filtrar por tipo de arquivo, evitar duplicados\n"
+        "e organizar as camadas conforme a estrutura de pastas."
+    )
     LOAD_FOLDER_LAYERS_RUN = "Carregar Arquivos"
 
     # plugins/GenerateTrailPlugin.py
     GENERATE_TRAIL_TITLE = "Gerar Rastro de Máquinas"
+    GENERATE_TRAIL_TOOLTIP = (
+        "Gera a faixa ocupada por um implemento a partir de uma camada de linhas.\n"
+        "Converte a largura informada para a unidade da camada,\n"
+        "aplica buffer usando metade desse valor e cria\n"
+        "uma nova camada com o rastro resultante."
+    )
 
     # plugins/CopyAttributesPlugin.py
     COPY_ATTRIBUTES_TITLE = "Copiar Atributos de Vetor"
+    COPY_ATTRIBUTES_TOOLTIP = (
+        "Copia a estrutura de campos de uma camada vetorial de origem\n"
+        "para uma camada vetorial de destino.\n"
+        "Permite selecionar quais atributos criar e tratar conflitos\n"
+        "de nome quando um campo já existe na camada destino."
+    )
 
     # plugins/ExportAllLayouts.py
     EXPORT_ALL_LAYOUTS_TITLE = "Exportar Todos os Layouts"
+    EXPORT_ALL_LAYOUTS_TOOLTIP = (
+        "Exporta todos os layouts do projeto em PDF, PNG ou ambos.\n"
+        "Pode unir os PDFs gerados em um arquivo final,\n"
+        "converter os PNGs em PDF e controlar sobrescrita\n"
+        "dos arquivos na pasta de saída."
+    )
+
+    # plugins/VectorMultipartPlugin.py
+    CONVERTER_MULTIPART_TOOLTIP = (
+        "Processa feições multipart da camada vetorial ativa\n"
+        "e separa cada parte em feições simples.\n"
+        "Pode atuar apenas nas feições selecionadas\n"
+        "ou em toda a camada, preservando os atributos."
+    )
+
+    # plugins/CoordClickTool.py
+    COORD_CLICK_TOOL_TOOLTIP = (
+        "Permite clicar no mapa para consultar coordenadas do ponto.\n"
+        "Abre um dialogo com WGS84, UTM, altitude aproximada\n"
+        "e endereco estimado, alem de opcoes de copia\n"
+        "para a area de transferencia."
+    )

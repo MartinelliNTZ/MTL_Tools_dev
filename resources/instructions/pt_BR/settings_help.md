@@ -1,63 +1,58 @@
-# 📘 Configurações Cadmus — Guia Rápido e Intuitivo
+# Configuracoes Cadmus — Guia Rapido
 
-Breve: gerencia preferências globais do Cadmus, incluindo método de cálculo vetorial, precisão de campos e limiar de processamento assíncrono. ⚙️
+Esta ferramenta centraliza preferencias globais usadas por partes do plugin Cadmus.
 
----
+No estado atual do codigo, ela permite:
 
-## ▶ Passo a passo (rápido) ✅
+- escolher o metodo padrao de calculo vetorial;
+- definir a precisao numerica de campos vetoriais;
+- definir o limiar de feicoes para processamento assincrono;
+- abrir a pasta local de preferencias do Cadmus.
 
-1. Abra: Menu → **Cadmus** → **Configurações Cadmus**
-2. Na seção **Método de Cálculo Vetorial**, escolha:
-   - **Elipsoidal**: Calcula considerando a forma da Terra (mais preciso para grandes distâncias). 🌍
-   - **Cartesiana**: Calcula em linha reta (rápido, útil para áreas pequenas). 📐
-   - **Ambos**: Calcula os dois métodos e cria dois campos (comparativo). 🔄
-3. (Opcional) Ajuste:
-   - **Precisão de campos vetoriais**: Número de casas decimais (padrão: 2). 🎯
-   - **Limiar assíncrono**: Tamanho acima do qual o processamento fica assíncrono em MB (padrão: 20 MB). 📦
-4. Clique em **Salvar** 💾 — as configurações são aplicadas imediatamente.
+## Como usar
 
----
+1. Abra `Cadmus > Configuracoes Cadmus`.
+2. Escolha o metodo de calculo vetorial:
+- `Elipsoidal`
+- `Cartesiano`
+- `Ambos`
+3. Ajuste a precisao de campos vetoriais.
+4. Ajuste o limiar assincrono.
+5. Clique em `Salvar`.
 
-## ℹ️ O que acontece por trás (resumido)
+## O que o plugin faz de verdade
 
-- **Método de Cálculo**: Preferência padrão usada em **Calcular Campos Vetoriais**. Se a camada for geográfica (graus) e você selecionar "Cartesiana", o plugin automaticamente muda para "Ambos". ⚠️
-- **Precisão**: Define quantas casas decimais os valores calculados terão (ex.: 2 = 10.45 metros, 4 = 10.4532 metros).
-- **Limiar Assíncrono**: Acima desse tamanho, camadas rodam em processamento assíncrono (não trava a interface). Abaixo, rodam em processamento rápido (síncrono).
-- **Pasta de Preferências**: Clique em "Abrir Pasta de Preferências" para acessar os arquivos `.json` de configuração localmente. 📁
+- Carrega preferencias salvas com `load_tool_prefs()`.
+- Salva as configuracoes no conjunto de preferencias da chave `settings`.
+- Mostra uma mensagem de confirmacao apos salvar.
+- Fecha a janela logo depois de aplicar as preferencias.
+- Permite abrir a pasta local onde os arquivos de preferencias ficam armazenados.
 
----
+## Significado de cada opcao
 
-## 💡 Dicas rápidas
+- `Metodo de calculo vetorial`: define o texto da preferencia `calculation_method`.
+- `Precisao de campos vetoriais`: salva um valor inteiro em `vector_field_precision`.
+- `Limiar assincrono`: salva um valor inteiro em `async_threshold_features`.
 
-- **Não tem certeza?** Deixe no padrão (Elipsoidal, Precisão 2, Limiar 20 MB). 🎯
-- **Camadas grandes em memória?** Reduza o "Limiar assíncrono" para forçar processamento assíncrono mais cedo. 🚀
-- **Quer máxima precisão?** Aumente a "Precisão de campos vetoriais" para 4 ou 6 casas decimais. 🔬
-- As preferências são **globais** — aplicadas a todos os plugins do Cadmus. 🌐
+## Comportamento importante
 
----
+- O limiar assincrono atual e medido em numero de feicoes, nao em MB.
+- O codigo aceita valores de precisao entre 0 e 10.
+- O limiar assincrono aceita valores de 1 ate 100000000.
+- Ha retrocompatibilidade de leitura com a antiga chave `async_threshold_bytes`, mas ao carregar o plugin passa a usar o limite por feicoes.
+- Este plugin apenas salva preferencias; ele nao executa calculos vetoriais por conta propria.
 
-## ⚠️ Problemas comuns e solução
+## Pasta de preferencias
 
-- **"Configurações não estão sendo salvas"** → Verifique permissões de escrita na pasta de preferências. 🔐
-- **Processamento ainda está lento/rápido demais** → Ajuste o "Limiar assíncrono" (reduz o valor para forçar async mais cedo). ⏳
-- **Valores com muitas casas decimais** → Reduza a "Precisão de campos vetoriais" (padrão é 2). ✂️
-- **Erro ao abrir Pasta de Preferências** → Pasta pode estar em local protegido; verifique permissões do Windows. 🔓
+- O link da interface tenta abrir a pasta `PREF_FOLDER` no sistema operacional.
+- Se a pasta nao existir, o plugin exibe um aviso em vez de abrir o explorador.
 
----
+## Quando usar
 
-## ✅ Checklist rápido pós-execução
+Use esta ferramenta quando quiser ajustar o comportamento padrao de outras ferramentas do Cadmus que dependem dessas preferencias globais.
 
-- Método de cálculo selecionado está correto? ✔️
-- Precisão está conforme desejado? ✔️
-- Limiar assíncrono faz sentido para suas camadas? ✔️
-- Mensagem "Configurações Salvas" foi exibida? ✔️
+## Cuidados
 
----
-
-## 🔧 Preferências e suporte
-
-- **Arquivo de configuração**: Localizado em `C:\Users\[seu_user]\AppData\Roaming\QGIS\QGIS3\profiles\[seu_perfil]\python\plugins\Cadmus\prefs\`
-- **Formato**: Arquivos `.json` para cada ferramenta (ex.: `settings.json`).
-- **Backup**: Faça backup da pasta de preferências antes de atualizações do plugin. 💾
-- Em caso de problema, delete o arquivo `settings.json` e as configurações voltarão ao padrão. 🔄
-- Reporte problemas com: versão do QGIS, sistema operacional e print de erro do painel de logs. 🐞
+- Altere o metodo de calculo apenas se ele fizer sentido para o seu fluxo.
+- Se voce reduzir demais o limiar assincrono, mais operacoes podem passar a rodar em segundo plano.
+- Se houver comportamento estranho apos mudar preferencias, vale revisar os arquivos salvos na pasta de preferencias.

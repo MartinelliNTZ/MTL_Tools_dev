@@ -1,115 +1,62 @@
-# 🧾 Coord Click — Guía de Uso
+# Capturar Coordenadas — Guia Rapida
 
-Coord Click es una herramienta del paquete **Cadmus** que permite hacer clic en el mapa y obtener información detallada del punto, incluyendo coordenadas, proyección, dirección y altitud.
+Esta herramienta permite hacer clic en el mapa y abrir un panel con informacion detallada del punto seleccionado.
 
----
+En el mismo flujo de uso, `CoordClickTool` captura el punto y `CoorResultDialog` muestra y actualiza los resultados.
 
-## 🎯 Objetivo
+## Como usar
 
-Permitir una inspección rápida de cualquier punto en el mapa con:
+1. Active `Cadmus > Capturar Coordenadas`.
+2. Haga clic en cualquier punto del mapa.
+3. Vea el dialogo con:
+- coordenadas WGS84 en decimal y DMS;
+- coordenadas UTM;
+- zona, hemisferio y EPSG;
+- altitud aproximada;
+- direccion aproximada.
+4. Use los botones para copiar los bloques de informacion deseados.
+5. Haga clic nuevamente en el mapa para actualizar el mismo dialogo con otro punto.
 
-* Coordenadas WGS84 (decimal y DMS)
-* Coordenadas UTM (SIRGAS 2000)
-* Información de zona y EPSG
-* Altitud aproximada (OpenTopoData)
-* Dirección mediante geocodificación inversa (OpenStreetMap)
+## Lo que el plugin hace realmente
 
----
+- Captura la coordenada clicada usando snapping cuando existe un snap valido en el canvas.
+- Convierte el punto en informacion geografica y UTM.
+- Abre el dialogo de resultado en el primer clic y luego reutiliza la misma ventana.
+- Inicia una pipeline asincrona con dos tareas en paralelo:
+- geocodificacion inversa;
+- consulta de altimetria.
+- Si la pipeline falla, intenta un fallback con tareas separadas.
+- Cancela tareas anteriores cuando el usuario hace clic en otro punto.
 
-## 🛠️ Cómo usar
+## Lo que aparece en el dialogo
 
-### 1️⃣ Activar la herramienta
+- Latitud y longitud en decimal.
+- Latitud y longitud en DMS.
+- Easting y Northing en UTM.
+- Zona, hemisferio y EPSG.
+- Altitud aproximada.
+- Municipio, region intermedia, estado, region y pais.
+- Botones para copiar WGS84, UTM o la ubicacion completa.
 
-Menú → Cadmus → Coord Click
+## Comportamiento importante
 
-### 2️⃣ Hacer clic en el mapa
+- Las coordenadas basicas aparecen primero; la direccion y la altitud pueden tardar algunos segundos.
+- Sin internet, el dialogo sigue mostrando coordenadas, pero puede no completar direccion y altitud.
+- El dialogo usa el mismo `ToolKey` que la herramienta de clic, por eso el archivo correcto es `coord_click_tool_help.md`.
+- El boton de copiar ubicacion completa envia un resumen de texto al portapapeles.
 
-Haz clic en cualquier punto del canvas.
+## Cuando usarla
 
-### 3️⃣ Ver los resultados
+Use esta herramienta cuando necesite inspeccionar rapidamente un punto del mapa sin crear capa, entidad o anotacion.
 
-Se abrirá (o actualizará) un diálogo con:
+Es especialmente util para:
 
-* **WGS84**
+- verificar coordenadas en mas de un sistema;
+- obtener altitud aproximada del punto;
+- copiar ubicacion en informes, mensajes o documentos.
 
-  * Latitud/Longitud en decimal
-  * Latitud/Longitud en DMS
+## Cuidados
 
-* **UTM**
-
-  * Easting (X)
-  * Northing (Y)
-  * Zona, hemisferio y EPSG
-
-* **Altimetría**
-
-  * Valor aproximado cargado automáticamente
-
-* **Dirección**
-
-  * Municipio
-  * Región intermedia
-  * Estado
-  * Región
-  * País
-
----
-
-## ⚙️ Funcionamiento interno
-
-La herramienta utiliza un pipeline asíncrono:
-
-* Ejecución en paralelo de:
-
-  * Geocodificación inversa
-  * Consulta de altitud
-* Motor: `AsyncPipelineEngine`
-* Pasos:
-
-  * `ReverseGeocodeStep`
-  * `AltimetryStep`
-
-Si el pipeline falla:
-
-* Se utiliza fallback automático con `QgsTask`
-
----
-
-## 🔎 Dependencias
-
-* OpenStreetMap (geocodificación inversa)
-* OpenTopoData (altitud)
-
-Se requiere conexión a internet.
-
----
-
-## 🧾 Acciones disponibles
-
-* **Copiar datos completos WGS**
-* **Copiar datos completos UTM**
-* **Copiar ubicación completa (botón dedicado)**
-* Actualización automática al hacer clic en nuevos puntos
-
----
-
-## 🧠 Comportamientos importantes
-
-* Si el diálogo ya está abierto → se reutiliza
-* Las tareas anteriores se cancelan automáticamente
-* El snapping es respetado si está activo
-* Los datos asíncronos (dirección/altitud) pueden tardar algunos segundos
-
----
-
-## ⚠️ Limitaciones
-
-* La altitud es aproximada (modelo externo)
-* La dirección depende de la cobertura de OSM
-* Sin internet → solo se muestran coordenadas
-
----
-
-## ❤️ Creado por
-
-Matheus A.S. Martinelli
+- La altitud es aproximada y depende de un servicio externo.
+- La direccion depende de la cobertura del servicio de geocodificacion inversa.
+- Los clics consecutivos cancelan consultas anteriores y priorizan el punto mas reciente.

@@ -174,10 +174,10 @@ class ToolRegistry:
             category=self.VECTOR,
             tool_type=self.MAP_TOOL,
             executor=self.run_coord_click,
-            tooltip="Clique no mapa para obter coordenadas geográficas\n"
-                    "Ative a ferramenta e clique em qualquer ponto do mapa para\n"
-                    "visualizar diversas informações a respeito daquele ponto.\n"
-                    "Incluindo: UTM Zone, Município, Altitude em SRTM 90m.",
+            tooltip="Clique no mapa para consultar coordenadas do ponto.\n"
+                    "A ferramenta abre um dialogo com WGS84, UTM,\n"
+                    "altitude aproximada e endereco estimado,\n"
+                    "alem de opcoes para copiar as informacoes.",
             order=20,
             show_in_toolbar=True,
         )
@@ -221,10 +221,10 @@ class ToolRegistry:
             tool_type=self.DIALOG,
             main_action=True,
             executor=self.run_drone_coords,
-            tooltip="Gera uma camada de pontos com as coordenadas de cada foto.\n"
-                    "Gera uma linha da trajetória do drone, conectando os pontos na ordem de captura.\n"
-                    "Pode cruzar os pontos das fotos com os metadados das fotos para adicionar atributos\n"
-                    "como altitude, data/hora, etc.",
+            tooltip="Le arquivos MRK de drone para gerar pontos das fotos\n"
+                    "e uma linha com o rastro do voo.\n"
+                    "Pode cruzar os pontos com metadados das imagens,\n"
+                    "salvar os resultados e aplicar estilos QML.",
             order=10,
             show_in_toolbar=True,
         )
@@ -513,3 +513,4 @@ class ToolRegistry:
             QgisMessageUtil.bar_critical(
                 self.iface, f"Erro no diálogo de Configurações:\n{str(e)}"
             )
+

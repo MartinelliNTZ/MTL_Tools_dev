@@ -11,7 +11,7 @@ class ToolKey:
     LOAD_FOLDER_LAYERS = "load_folder_layers"
     REPLACE_IN_LAYOUTS = "replace_in_layouts"
     RESTART_QGIS = "restart_qgis"
-    GERAR_RASTRO_IMPLEMENTO = "gerar_rastro_implemento"
+    GERAR_RASTRO_IMPLEMENTO = "generate_trail"
     COORD_CLICK_TOOL = "coord_click_tool"
     COPY_ATTRIBUTES = "copy_attributes"
     CONVERTER_MULTIPART = "converter_multipart"

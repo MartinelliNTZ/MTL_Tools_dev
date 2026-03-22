@@ -25,7 +25,7 @@ class ToolKeyColorProvider:
         "load_folder_layers": "#96CEB4",
         "replace_in_layouts": "#F8C471",
         "restart_qgis": "#FF6B6B",
-        "gerar_rastro_implemento": "#82E0AA",
+        "generate_trail": "#82E0AA",
         "coord_click_tool": "#85C1E9",
         "copy_attributes": "#DDA0DD",
         # === Processing / análises ===

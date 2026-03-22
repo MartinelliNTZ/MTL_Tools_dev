@@ -1,72 +1,52 @@
-# 📘 Copiar Atributos — Guia de Uso
+# Copiar Atributos — Guia Rapido
 
-Ferramenta para copiar campos (atributos) de uma camada origem para uma camada destino, com seleção de campos e resolução interativa de conflitos.
+Esta ferramenta seleciona campos de uma camada de origem e os adiciona na estrutura da camada de destino.
 
----
+Importante: no estado atual do codigo, ela nao copia valores das feicoes. Ela copia apenas a estrutura dos campos, com tratamento de conflitos de nome.
 
-## 🎯 Objetivo
+## Como usar
 
-Permitir transferir atributos entre camadas vetoriais de forma controlada, preservando tipos de dados e oferecendo opções para tratar conflitos de nomes/colunas.
+1. Abra `Cadmus > Copiar Atributos`.
+2. Escolha a camada destino.
+3. Escolha a camada origem.
+4. Marque os campos desejados da camada origem, ou use a opcao para todos os campos.
+5. Clique em executar.
 
----
+## O que o plugin faz de verdade
 
-## 🛠️ Como usar
+- Valida se origem e destino sao camadas vetoriais.
+- Exige que a camada destino ja esteja em modo de edicao.
+- Lista os campos com base na camada de origem selecionada.
+- Permite copiar todos os campos ou apenas os selecionados.
+- Para cada campo escolhido:
+- se o campo nao existir no destino, ele e criado;
+- se o campo ja existir, o plugin pede uma acao de conflito.
 
-### 1️⃣ Abrir a ferramenta
-Menu → Cadmus → Copiar Atributos
+## Tratamento de conflitos
 
-### 2️⃣ Selecionar camadas
-- `Camada destino`: a camada que receberá os campos
-- `Camada origem`: a camada que fornece os campos
+- `skip`: ignora o campo que ja existe.
+- `rename`: cria um novo campo com sufixo como `_1`, `_2` e assim por diante.
+- `cancel`: interrompe a operacao.
 
-### 3️⃣ Escolher atributos
-- Marque `Usar todos os atributos` para copiar todos os campos
-- Ou selecione manualmente os campos desejados na lista
+## Comportamento importante
 
-### 4️⃣ Executar
-Clique em `Executar`. Se houver conflito de nomes, a ferramenta solicitará ação: sobrescrever, renomear ou pular o campo conflitante.
+- A ferramenta nao transfere valores entre feicoes.
+- Ela tambem nao faz correspondencia espacial nem por chave entre registros.
+- O resultado principal e a alteracao do esquema de atributos da camada destino.
+- Se nenhum campo estiver selecionado e a opcao de todos os campos nao estiver ativa, a operacao nao continua.
 
----
+## Quando usar
 
-## ℹ️ O que acontece por trás
+Use esta ferramenta quando quiser preparar a camada destino com novos campos baseados na estrutura de outra camada.
 
-- Os campos selecionados são adicionados à `camada destino` com mapeamento por feição.
-- A operação modifica a camada destino em memória (alterações ficam pendentes para salvar ou descartar).
-- Conflitos de nomes são tratados via diálogo interativo (`QgisMessageUtil.ask_field_conflict`).
+Ela e especialmente util para:
 
----
+- padronizar esquemas de atributos;
+- criar campos faltantes antes de outra etapa de processamento;
+- replicar nomes e tipos de campos de uma camada modelo.
 
-## ⚠️ Problemas comuns e soluções
+## Cuidados
 
-- Conflito de nomes: responda ao diálogo para sobrescrever, renomear ou pular.
-- Tipos incompatíveis: alguns valores podem ficar vazios ou truncados — prefira campos com tipos compatíveis.
-- Camada destino não editável: verifique permissões e se a camada está desbloqueada.
-
----
-
-## ✅ Checklist pós-execução
-
-- Campos esperados presentes na camada destino
-- Valores amostrados visualmente corretos
-- Salvou as alterações se necessário
-
----
-
-## 🔧 Preferências e logs
-
-- Chave de preferências/logs: `copy_attributes`
-- Em caso de erro, veja o log do plugin e reporte: tipo de camada, número de feições, campos selecionados
-
----
-
-## 💡 Boas práticas
-
-- Faça backup da camada destino antes de operações em massa
-- Prefira copiar apenas os campos necessários para evitar inflar o esquema
-- Teste em um subconjunto de feições quando possível
-
----
-
-## ❤️ Criado por
-
-Matheus A.S. Martinelli
+- Coloque a camada destino em edicao antes de executar.
+- Se voce precisava copiar valores, esta ferramenta ainda nao faz isso no codigo atual.
+- Revise conflitos de nome com cuidado para nao criar campos duplicados desnecessarios.
