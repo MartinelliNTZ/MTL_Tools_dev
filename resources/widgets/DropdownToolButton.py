@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import QAction, QMenu
+from qgis.PyQt.QtWidgets import QToolButton, QAction, QMenu
 
 
-class DropdownToolButton:
+class DropdownToolButton(QToolButton):
     """
     Widget para botão dropdown na toolbar do QGIS.
 
-    Encapsula um QAction com menu dropdown para múltiplas ações,
-    compatível com diferentes versões do Qt/PyQt.
+    Herda de QToolButton para ser adicionado como widget à toolbar.
     """
 
     def __init__(self, iface=None, title=None, main_action=None, secondary_actions=None, icon=None):
@@ -20,9 +19,10 @@ class DropdownToolButton:
         :param secondary_actions: Lista de QActions adicionais no menu
         :param icon: QIcon opcional (usa ícone da main_action se None)
         """
-        self.action = QAction()
+        super().__init__()
         self.menu = QMenu(iface.mainWindow() if iface else None)
-        self.action.setMenu(self.menu)
+        self.setPopupMode(QToolButton.MenuButtonPopup)
+        self.setMenu(self.menu)
 
         if main_action is not None:
             self.setup(title, main_action, secondary_actions, icon)
@@ -39,9 +39,12 @@ class DropdownToolButton:
         if secondary_actions is None:
             secondary_actions = []
 
-        self.action.setText(title)
-        self.action.setIcon(icon or main_action.icon())
-        self.action.setToolTip(main_action.toolTip())
+        self.setText(title)
+        self.setIcon(icon or main_action.icon())
+        self.setToolTip(main_action.toolTip())
+
+        # Conectar o clique principal à ação principal
+        self.clicked.connect(main_action.trigger)
 
         self.menu.clear()
         self.menu.setToolTipsVisible(True)
@@ -52,6 +55,3 @@ class DropdownToolButton:
                 self.menu.addSeparator()
             else:
                 self.menu.addAction(act)
-
-        # Conectar triggered da action à execução da main_action
-        self.action.triggered.connect(lambda: main_action.trigger())

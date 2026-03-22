@@ -1,3 +1,18 @@
+#2.1.3.9.11 2026/03/22
+- Corrigida toolbar vazia: adicionado ícone explícito ao DropdownToolButton; adicionado update() na toolbar após adicionar ações; adicionados logs detalhados para debug (contagem de ferramentas por categoria, main_tools, secondary_tools); implementado fallback para adicionar main_actions diretamente se dropdown_buttons falhar; melhorado diagnóstico de problemas na criação da toolbar.
+
+#2.1.3.9.10 2026/03/22
+- Corrigida toolbar não aparecendo: substituído CadmusToolBar por QToolBar padrão para melhor compatibilidade com QGIS; adicionado parent (iface.mainWindow()) às QActions criadas no MenuManager; adicionados logs detalhados para debug de criação da toolbar; garantida visibilidade da toolbar com show(); corrigida adição de ações dropdown diretamente à QToolBar em vez de usar método customizado.
+
+#2.1.3.9.9 2026/03/22
+- Corrigidos ícones nos menus QMenu: adicionada importação de IconManager no MenuManager e mapeamento de ícones por categoria (SYSTEM, LAYOUTS, VECTOR, AGRICULTURE, RASTER) para submenus; corrigida criação de toolbar usando CadmusToolBar em vez de iface.addToolBar() para compatibilidade com DropdownToolButton; toolbar agora usa add_dropdown_buttons() para adicionar múltiplos botões dropdown corretamente.
+
+#2.1.3.9.8 2026/03/22
+- Corrigido import cycle entre ToolRegistry e MenuManager: movidas constantes de categoria (SYSTEM, LAYOUTS, VECTOR, AGRICULTURE, RASTER) diretamente para ToolRegistry; removida importação desnecessária de ToolRegistry no MenuManager; ToolRegistry agora usa self.CATEGORY em vez de MenuManager.CATEGORY.
+
+#2.1.3.9.7 2026/03/22
+- Integração completa da nova arquitetura modular no CadmusPlugin: removido todo código manual de criação de QAction, QMenu, QToolBar e DropdownToolButton do initGui(); initGui() agora usa ToolRegistry + MenuManager para gerar automaticamente menus e toolbar a partir das ferramentas registradas; unload() delega limpeza para menu_manager.unload(); plugin agora totalmente orientado a dados com separação clara de responsabilidades.
+
 #2.1.3.9.6 2026/03/22
 - Transferida responsabilidade de criação de QAction da classe Tool para MenuManager: Tool.__init__ não cria mais self.action, MenuManager._create_actions_for_tools() cria QActions para todas as ferramentas e conecta executores; adicionado atributo tooltip à Tool para acesso no MenuManager.
 

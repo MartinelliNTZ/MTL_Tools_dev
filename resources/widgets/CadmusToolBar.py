@@ -22,6 +22,7 @@ class CadmusToolBar(QToolBar):
         self.logger = LogUtils(tool=ToolKey.SYSTEM, class_name="CadmusToolBar", level=LogUtils.DEBUG)
         super().__init__(title, parent)
         self.setObjectName(f"{title}_Toolbar")
+        self.setVisible(True)  # Garantir que a toolbar seja visível
         self.logger.debug(f"Toolbar '{title}' inicializada com sucesso")
 
     def add_dropdown_buttons(self, buttons):
@@ -37,3 +38,6 @@ class CadmusToolBar(QToolBar):
             # Adicionar separador após cada botão, exceto o último
             if button != buttons[-1]:
                 self.addSeparator()
+        
+        # Garantir que a toolbar seja visível após adicionar botões
+        self.show()

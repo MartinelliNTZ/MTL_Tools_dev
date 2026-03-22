@@ -2,7 +2,6 @@
 import sys
 import traceback
 from .model.Tool import Tool
-from .MenuManager import MenuManager
 from ..resources.IconManager import IconManager as im
 from .config.LogUtils import LogUtils
 from ..utils.ToolKeys import ToolKey
@@ -15,6 +14,14 @@ class ToolRegistry:
     DIALOG = "DIALOG"
     MAP_TOOL = "MAP_TOOL"
     BACKGROUND = "BACKGROUND"
+
+    # Categorias de ferramentas
+    SYSTEM = "SYSTEM"  # 1
+    LAYOUTS = "LAYOUTS"  # 2
+    FOLDER = "FOLDER"  # 3
+    VECTOR = "VECTOR"  # 4
+    AGRICULTURE = "AGRICULTURE"  # 5
+    RASTER = "RASTER"  # 6
 
     def __init__(self, iface):
         self.iface = iface
@@ -31,7 +38,7 @@ class ToolRegistry:
         export_layouts = Tool(
             name="Exportar todos os Layouts",
             icon=im.icon(im.EXPORT_ALL_LAYOUTS),
-            category=MenuManager.LAYOUTS,
+            category=self.LAYOUTS,
             tool_type=self.DIALOG,
             main_action=True,
             executor=self.run_export_layouts,
@@ -40,11 +47,12 @@ class ToolRegistry:
             show_in_toolbar=True,
         )
         tools.append(export_layouts)
+        print(f"ToolRegistry: added {export_layouts.name} category {export_layouts.category} main {export_layouts.main_action}")
 
         replace_layouts = Tool(
             name="Substituir textos nos Layouts",
             icon=im.icon(im.REPLACE_IN_LAYOUTS),
-            category=MenuManager.LAYOUTS,
+            category=self.LAYOUTS,
             tool_type=self.DIALOG,
             executor=self.run_replace_layouts,
             tooltip="Substitui textos em massa nos Layouts do projeto.\n"
@@ -62,7 +70,7 @@ class ToolRegistry:
         restart_qgis = Tool(
             name="Salvar, Fechar e Reabrir Projeto",
             icon=im.icon(im.RESTART_QGIS),
-            category=MenuManager.SYSTEM,
+            category=self.SYSTEM,
             tool_type=self.INSTANT,
             main_action=True,
             executor=self.run_restart_qgis,
@@ -76,7 +84,7 @@ class ToolRegistry:
         logcat = Tool(
             name="Logcat Viewer",
             icon=im.icon(im.LOGCAT),
-            category=MenuManager.SYSTEM,
+            category=self.SYSTEM,
             tool_type=self.DIALOG,
             executor=self.run_logcat,
             tooltip="Abre o Logcat, uma ferramenta de visualização dos logs do plugin Cadmus.",
@@ -88,7 +96,7 @@ class ToolRegistry:
         settings = Tool(
             name="Configurações",
             icon=im.icon(im.SETTINGS),
-            category=MenuManager.SYSTEM,
+            category=self.SYSTEM,
             tool_type=self.DIALOG,
             executor=self.run_settings,
             tooltip="Configurações do plugin Cadmus.",
@@ -100,7 +108,7 @@ class ToolRegistry:
         about = Tool(
             name="Sobre o Cadmus",
             icon=im.icon(im.ABOUT),
-            category=MenuManager.SYSTEM,
+            category=self.SYSTEM,
             tool_type=self.DIALOG,
             executor=self.run_about_dialog,
             tooltip="Informações sobre o plugin Cadmus.",
@@ -109,6 +117,38 @@ class ToolRegistry:
         )
         tools.append(about)
 
+        # =====================================================        # FOLDER (Ordem: Load=10)
+        # =====================================================
+
+        load_folder = Tool(
+            name="Carregar Pasta de Arquivos",
+            icon=im.icon(im.LOAD_FOLDER_LAYER),
+            category=self.FOLDER,
+            tool_type=self.DIALOG,
+            main_action=True,
+            executor=self.run_load_folder,
+            tooltip="Carrega em massa uma pasta de arquivos como camadas no QGIS.",
+            order=10,
+            show_in_toolbar=True,
+        )
+        tools.append(load_folder)
+        print(f"ToolRegistry: added {load_folder.name} category {load_folder.category} main {load_folder.main_action}")
+
+        # =====================================================        # FOLDER (Ordem: Load Folder=10)
+        # =====================================================
+
+        load_folder = Tool(
+            name="Carregar pasta de arquivos",
+            icon=im.icon(im.LOAD_FOLDER_LAYER),
+            category=self.FOLDER,
+            tool_type=self.DIALOG,
+            executor=self.run_load_folder,
+            tooltip="Carrega em massa uma pasta de arquivos como camadas no QGIS.",
+            order=10,
+            show_in_toolbar=True,
+        )
+        tools.append(load_folder)
+
         # =====================================================
         # VECTOR (Ordem: Fields=10, Coords=20, Pasta=30, Multipart=40, Copy=50)
         # =====================================================
@@ -116,7 +156,7 @@ class ToolRegistry:
         vector_fields = Tool(
             name="Calcular Campos Vetoriais",
             icon=im.icon(im.VECTOR_FIELD),
-            category=MenuManager.VECTOR,
+            category=self.VECTOR,
             tool_type=self.INSTANT,
             main_action=True,
             executor=self.run_vector_fields,
@@ -131,7 +171,7 @@ class ToolRegistry:
         coord_click = Tool(
             name="Capturar Coordenadas",
             icon=im.icon(im.COORD_CLICK_TOOL),
-            category=MenuManager.VECTOR,
+            category=self.VECTOR,
             tool_type=self.MAP_TOOL,
             executor=self.run_coord_click,
             tooltip="Clique no mapa para obter coordenadas geográficas\n"
@@ -143,22 +183,11 @@ class ToolRegistry:
         )
         tools.append(coord_click)
 
-        load_folder = Tool(
-            name="Carregar pasta de arquivos",
-            icon=im.icon(im.LOAD_FOLDER_LAYER),
-            category=MenuManager.VECTOR,
-            tool_type=self.DIALOG,
-            executor=self.run_load_folder,
-            tooltip="Carrega em massa uma pasta de arquivos como camadas no QGIS.",
-            order=30,
-            show_in_toolbar=True,
-        )
-        tools.append(load_folder)
 
         multipart = Tool(
             name="Converter Multipart",
             icon=im.icon(im.VECTOR_MULTPART),
-            category=MenuManager.VECTOR,
+            category=self.VECTOR,
             tool_type=self.INSTANT,
             executor=self.run_multpart,
             tooltip="Promove feições para o tipo multiparte.\n"
@@ -172,7 +201,7 @@ class ToolRegistry:
         copy_attributes = Tool(
             name="Copiar Atributos",
             icon=im.icon(im.COPY_ATTRIBUTES),
-            category=MenuManager.VECTOR,
+            category=self.VECTOR,
             tool_type=self.DIALOG,
             executor=self.run_copy_atributes,
             tooltip="Copia atributos entre camadas.",
@@ -188,7 +217,7 @@ class ToolRegistry:
         drone_coords = Tool(
             name="Obter Coordenadas de Drone",
             icon=im.icon(im.DRONE_COORDINATES),
-            category=MenuManager.AGRICULTURE,
+            category=self.AGRICULTURE,
             tool_type=self.DIALOG,
             main_action=True,
             executor=self.run_drone_coords,
@@ -204,7 +233,7 @@ class ToolRegistry:
         gerar_rastro = Tool(
             name="Gerar Rastro Implemento",
             icon=im.icon(im.GENERATE_TRAIL),
-            category=MenuManager.AGRICULTURE,
+            category=self.AGRICULTURE,
             tool_type=self.DIALOG,
             executor=self.run_gerar_rastro,
             tooltip="Gera um rastro do movimento de um implemento agrícola com base em uma linha.",

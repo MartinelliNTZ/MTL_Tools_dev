@@ -2,26 +2,23 @@
 import sys
 import traceback
 from qgis.core import QgsApplication
-from qgis.PyQt.QtWidgets import QAction, QMenu, QToolButton, QWidgetAction
 from pathlib import Path
 from .utils.ToolKeys import ToolKey
 from .utils.QgisMessageUtil import QgisMessageUtil
 from .core.config.LogUtils import LogUtils
-from .resources.IconManager import IconManager as im
 from .i18n.TranslationManager import STR
 from .core.config.PluginBootstrap import PluginBootstrap
-from .resources.widgets.DropdownToolButton import DropdownToolButton
-from .resources.widgets.CadmusToolBar import CadmusToolBar
+from .core.ToolRegistry import ToolRegistry
+from .core.MenuManager import MenuManager
 
 
 class CadmusPlugin:
     def __init__(self, iface):
         self.iface = iface
-        self.menu = None
-        self.toolbar = None
-        self.actions = []
         self.provider = None
         self.logger = None
+        self.tool_registry = None
+        self.menu_manager = None
         self.TOOL_KEY = ToolKey.SYSTEM
 
     # =====================================================
@@ -43,341 +40,39 @@ class CadmusPlugin:
 
         self.logger.info("Plugin inicializado")
         self.logger.info(f"Locale: {locale}. TM.STR: {STR.APP_NAME}")
-        # -------------------------
-        # 2) CRIAR TOOLBAR EXCLUSIVA
-        # -------------------------
+
+        # -------------------------------
+        # INTEGRAÇÃO COM NOVA ARQUITETURA
+        # -------------------------------
         try:
-            self.toolbar = CadmusToolBar("Cadmus", self.iface.mainWindow())
-            self.iface.addToolBar(self.toolbar)
-            self.logger.debug("Toolbar Cadmus criada com sucesso")
+            # Criar ToolRegistry com todas as ferramentas
+            self.tool_registry = ToolRegistry(self.iface)
+            tools = self.tool_registry.tools
+
+            # Criar MenuManager para gerenciar menus e toolbar
+            self.menu_manager = MenuManager(self.iface, tools, self.logger)
+
+            # Criar menu principal e submenus
+            self.menu_manager.create_menu()
+
+            # Criar toolbar com botões dropdown
+            self.logger.debug("Criando toolbar para o plugin")
+            self.menu_manager.create_toolbar()
+
+            # Popular menus com ferramentas ordenadas
+            self.menu_manager.populate_menus()
+
+            self.logger.info(f"Nova arquitetura integrada com sucesso. {self.menu_manager}. Registry{self.tool_registry.tools}.")
         except Exception as e:
-            self.logger.error(f"Erro ao criar toolbar: {str(e)}")
+            self.logger.error(f"Erro ao integrar nova arquitetura: {str(e)}")
             return
 
         # -------------------------
-        # 3) MENU PRINCIPAL E SUBMENUS
-        # -------------------------
-        try:
-            self.menu = QMenu("Cadmus", self.iface.mainWindow())
-            self.menu.setObjectName("Cadmus")
-            standard_menu = self.iface.firstRightStandardMenu()
-            self.iface.mainWindow().menuBar().insertMenu(
-                standard_menu.menuAction(), self.menu
-            )
-            self.menu.clear()
-            self.logger.debug("Menu Cadmus criado com sucesso")
-        except Exception as e:
-            self.logger.error(f"Erro ao criar menu principal: {str(e)}")
-            return
 
-        # Submenus
-        try:
-            self.agriculture_menu = QMenu("Agricultura de Precisão", self.menu)
-            self.agriculture_menu.setIcon(im.icon(im.AGRICULTURE))
 
-            self.layers_menu = QMenu("Camadas", self.menu)
-            self.layers_menu.setIcon(im.icon(im.LAYER))
 
-            self.layouts_menu = QMenu("Layouts", self.menu)
-            self.layouts_menu.setIcon(im.icon(im.LAYOUT))
 
-            self.raster_menu = QMenu("Raster", self.menu)
-            self.raster_menu.setIcon(im.icon(im.RASTER))
 
-            self.system_menu = QMenu("Sistema", self.menu)
-            self.system_menu.setIcon(im.icon(im.SYSTEM))
-
-            self.vectors_menu = QMenu("Vetores", self.menu)
-            self.vectors_menu.setIcon(im.icon(im.VECTOR))
-
-            # Adiciona submenus ao menu principal
-            self.menu.addMenu(self.agriculture_menu)
-            self.menu.addMenu(self.layers_menu)
-            self.menu.addMenu(self.layouts_menu)
-            self.menu.addMenu(self.raster_menu)
-            self.menu.addMenu(self.vectors_menu)
-            self.menu.addMenu(self.system_menu)
-            self.logger.debug("Submenus criados com sucesso")
-        except Exception as e:
-            self.logger.error(f"Erro ao criar submenus: {str(e)}")
-            return
-
-        # -------------------------
-        # 4) CONFIGURAÇÃO DAS AÇÕES (ORDEM NUMÉRICA)
-        # -------------------------
-        try:
-            # 1-Export All Layouts
-            self.action_export_all = QAction(
-                im.icon(im.EXPORT_ALL_LAYOUTS),
-                "Exportar todos os Layouts",
-                self.iface.mainWindow(),
-            )
-            self.action_export_all.triggered.connect(self.run_export_layouts)
-            self.action_export_all.setToolTip(
-                "Exporta todos os Layouts do projeto para arquivos PDF ou imagens.\n"
-            )
-
-            # 2-Replace in Layouts
-            self.action_replace_layouts = QAction(
-                im.icon(im.REPLACE_IN_LAYOUTS),
-                "Substituir textos nos Layouts",
-                self.iface.mainWindow(),
-            )
-            self.action_replace_layouts.triggered.connect(self.run_replace_layouts)
-            self.action_replace_layouts.setToolTip(
-                "Substitui textos em massa nos Layouts do projeto.\n"
-                "Permite criar um mapa de substituição a partir de uma camada vetorial ou tabela, onde um campo é usado para identificar os Layouts e outro campo é usado para o novo valor a ser inserido.\n"
-                "Útil para atualizar informações como títulos, legendas ou rótulos em múltiplos Layouts de forma rápida e consistente."
-            )
-
-            # 3-Restart QGIS
-            self.action_restart_qgis = QAction(
-                im.icon(im.RESTART_QGIS),
-                "Salvar, Fechar e Reabrir Projeto",
-                self.iface.mainWindow(),
-            )
-            self.action_restart_qgis.triggered.connect(self.run_restart_qgis)
-            self.action_restart_qgis.setToolTip(
-                "Salva o projeto atual, fecha o QGIS e reabre o mesmo projeto automaticamente.\n"
-                "Útil para resolver travamentos, bugs visuais ou de renderização sem perder o trabalho."
-            )
-
-            # 4-Carregar pasta de arquivos
-            self.action_load_folder = QAction(
-                im.icon(im.LOAD_FOLDER_LAYER),
-                "Carregar pasta de arquivos",
-                self.iface.mainWindow(),
-            )
-            self.action_load_folder.triggered.connect(self.run_load_folder)
-            self.action_load_folder.setToolTip(
-                "Carrega em massa uma pasta de arquivos como camadas no QGIS.\n"
-            )
-
-            # 5-Gerar Rastro Implemento
-            self.action_gerar_rastro = QAction(
-                im.icon(im.GENERATE_TRAIL),
-                "Gerar Rastro Implemento",
-                self.iface.mainWindow(),
-            )
-            self.action_gerar_rastro.triggered.connect(self.run_gerar_rastro)
-            self.action_gerar_rastro.setToolTip(
-                "Gera um rastro do movimento de um implemento agrícola com base em uma linha.\n"
-            )
-
-            # 6-About Dialog
-            self.action_about_dialog = QAction(
-                im.icon(im.ABOUT), "Sobre o Cadmus", self.iface.mainWindow()
-            )
-            self.action_about_dialog.triggered.connect(self.run_about_dialog)
-            self.action_about_dialog.setToolTip("Informações sobre o plugin Cadmus.")
-
-            # 12-Logcat Tool
-            self.action_logcat = QAction(
-                im.icon(im.LOGCAT), "Logcat - Viewer de Logs", self.iface.mainWindow()
-            )
-            self.action_logcat.triggered.connect(self.run_logcat)
-            self.action_logcat.setToolTip(
-                "Abre o Logcat, uma ferramenta de visualização dos logs do plugin Cadmus"
-            )
-
-            # 13-Settings
-            self.action_settings = QAction(
-                im.icon(im.SETTINGS), "Configurações", self.iface.mainWindow()
-            )
-            self.action_settings.triggered.connect(self.run_settings)
-            self.action_settings.setToolTip("Configurações do plugin Cadmus.")
-
-            # 7-Capturar Coordenadas
-            self.action_coord_click = QAction(
-                im.icon(im.COORD_CLICK_TOOL),
-                "Capturar Coordenadas",
-                self.iface.mainWindow(),
-            )
-            self.action_coord_click.triggered.connect(self.run_coord_click)
-            self.action_coord_click.setToolTip(
-                "Clique no mapa para obter coordenadas geográficas\n"
-                "Ative a ferramenta e clique em qualquer ponto do mapa para\n"
-                "visualizar diversas informações a respeito daquele ponto"
-                "Incluindo, UTM Zone, Municipio, Altitude em SRTM 90m."
-            )
-
-            # 8-Calcular campos vetoriais
-            self.action_vector_fields = QAction(
-                im.icon(im.VECTOR_FIELD),
-                "Calcular Campos Vetoriais",
-                self.iface.mainWindow(),
-            )
-            self.action_vector_fields.triggered.connect(self.run_vector_fields)
-            self.action_vector_fields.setToolTip(
-                "Calcula automaticamente campos: Área, Comprimento ou X/Y\n"
-                "Selecione uma camada vetorial ativa e execute a ferramenta\n"
-                "para adicionar os campos calculados."
-            )
-
-            # 09-Obter coordenadas de drone
-            self.action_drone_coords = QAction(
-                im.icon(im.DRONE_COORDINATES),
-                "Obter Coordenadas de Drone",
-                self.iface.mainWindow(),
-            )
-            self.action_drone_coords.triggered.connect(self.run_drone_coords)
-            self.action_drone_coords.setToolTip(
-                "Gera uma camada de pontos com as coordenadas de cada foto.\n"
-                "Gera um linha da trajetória do drone, conectando os pontos na ordem de captura.\n"
-                "Pode cruzar os pontos das fotos com os metadados das fotos para adicionar atributos/n"
-                "como altitude, data/hora, etc."
-            )
-
-            # 10-Realizar multipart de todas as feições
-            self.action_multpart = QAction(
-                im.icon(im.VECTOR_MULTPART),
-                "Promover a multiparte",
-                self.iface.mainWindow(),
-            )
-            self.action_multpart.triggered.connect(self.run_multpart)
-            self.action_multpart.setToolTip(
-                "Promove feições para o tipo multiparte\n"
-                "Selecione uma camada vetorial ativa e execute a ferramenta\n"
-                "para promover as feições."
-            )
-
-            # 11-Copiar atributos entre camadas
-            self.action_copy_atributes = QAction(
-                im.icon(im.COPY_ATTRIBUTES), "Copiar Atributos", self.iface.mainWindow()
-            )
-            self.action_copy_atributes.triggered.connect(self.run_copy_atributes)
-            self.logger.debug("Todas as ações criadas com sucesso")
-        except Exception as e:
-            self.logger.error(f"Erro ao criar ações: {str(e)}")
-            return
-
-        # -------------------------
-        # 5) ADICIONAR AÇÕES AO MENU (ORDEM ALFABÉTICA)
-        # -------------------------
-        try:
-            # Agricultura de Precisão
-            self.agriculture_menu.addAction(self.action_gerar_rastro)
-            self.agriculture_menu.addAction(self.action_drone_coords)
-
-            # Camadas
-            self.layers_menu.addAction(self.action_load_folder)
-
-            # Layouts
-            self.layouts_menu.addAction(self.action_export_all)
-            self.layouts_menu.addAction(self.action_replace_layouts)
-
-            # Sistema
-            self.system_menu.addAction(self.action_restart_qgis)
-            self.system_menu.addAction(self.action_logcat)
-            self.system_menu.addAction(self.action_settings)
-
-            # Vetores
-            self.vectors_menu.addAction(self.action_coord_click)
-            self.vectors_menu.addAction(self.action_vector_fields)
-
-            # Menu principal
-            self.menu.addAction(self.action_about_dialog)
-
-            self.logger.debug("Ações adicionadas aos menus com sucesso")
-        except Exception as e:
-            self.logger.error(f"Erro ao adicionar ações aos menus: {str(e)}")
-            return
-
-        # -------------------------
-        # 6) TOOLBAR
-        # -------------------------
-        try:
-            # Instanciar botões dropdown
-            self.button_system = DropdownToolButton(
-                iface=self.iface,
-                title="Sistema",
-                main_action=self.action_restart_qgis,
-                secondary_actions=[
-                    self.action_restart_qgis,
-                    self.action_logcat,
-                    self.action_settings,
-                    self.action_about_dialog,
-                ],
-            )
-            self.logger.debug("Botão Sistema criado")
-
-            self.button_layouts = DropdownToolButton(
-                iface=self.iface,
-                title="Layouts",
-                main_action=self.action_export_all,
-                secondary_actions=[
-                    self.action_export_all,
-                    self.action_replace_layouts,
-                ],
-            )
-            self.logger.debug("Botão Layouts criado")
-
-            self.button_load_folder = DropdownToolButton(
-                iface=self.iface,
-                title="Vetores",
-                main_action=self.action_load_folder,
-                secondary_actions=[self.action_load_folder],
-            )
-            self.logger.debug("Botão Pastas criado")
-
-            self.button_vectors = DropdownToolButton(
-                iface=self.iface,
-                title="Vetores",
-                main_action=self.action_vector_fields,
-                secondary_actions=[
-                    self.action_vector_fields,
-                    self.action_coord_click,
-                    self.action_copy_atributes,
-                    self.action_multpart,
-                ],
-            )
-            self.logger.debug("Botão Vetores criado")
-
-            self.button_agriculture = DropdownToolButton(
-                iface=self.iface,
-                title="Agricultura de Precisão",
-                main_action=self.action_drone_coords,
-                secondary_actions=[self.action_drone_coords, self.action_gerar_rastro],
-            )
-            self.logger.debug("Botão Agricultura criado")
-
-            # Adicionar botões à toolbar
-            self.toolbar.add_dropdown_buttons(
-                [
-                    self.button_system,
-                    self.button_layouts,
-                    self.button_load_folder,
-                    self.button_vectors,
-                    self.button_agriculture,
-                ]
-            )
-            self.logger.debug("Botões adicionados à toolbar com sucesso")
-        except Exception as e:
-            self.logger.error(f"Erro ao criar botões da toolbar: {str(e)}")
-            return
-
-        # Salva todas as ações para cleanup
-        try:
-            self.actions.extend(
-                [
-                    self.action_export_all,
-                    self.action_replace_layouts,
-                    self.action_restart_qgis,
-                    self.action_load_folder,
-                    self.action_gerar_rastro,
-                    self.action_about_dialog,
-                    self.action_logcat,
-                    self.action_settings,
-                    self.action_coord_click,
-                    self.action_vector_fields,
-                    self.action_drone_coords,
-                    self.action_multpart,
-                    self.action_copy_atributes,
-                ]
-            )
-            self.logger.info("Cadmus: GUI inicializada com sucesso")
-        except Exception as e:
-            self.logger.error(f"Erro ao salvar ações para cleanup: {str(e)}")
 
     # =====================================================
     # DESCARREGAR PLUGIN
@@ -392,39 +87,12 @@ class CadmusPlugin:
             self.logger.error(f"Erro ao remover Processing Provider: {str(e)}")
 
         try:
-            # Remover ações do menu
-            for act in self.actions:
-                self.iface.removePluginMenu("Cadmus", act)
-            self.logger.info("Ações do menu removidas com sucesso")
+            # Descarregar MenuManager (remove menus e toolbar)
+            if self.menu_manager:
+                self.menu_manager.unload()
+                self.logger.info("MenuManager descarregado com sucesso")
         except Exception as e:
-            self.logger.error(f"Erro ao remover ações do menu: {str(e)}")
-
-        try:
-            # Remover botões da toolbar
-            buttons = [
-                getattr(self, attr, None)
-                for attr in [
-                    "button_system",
-                    "button_layouts",
-                    "button_load_folder",
-                    "button_vectors",
-                    "button_agriculture",
-                ]
-            ]
-            for button in buttons:
-                if button and hasattr(button, "button"):
-                    self.toolbar.removeWidget(button.button)
-            self.logger.info("Botões da toolbar removidos com sucesso")
-        except Exception as e:
-            self.logger.error(f"Erro ao remover botões da toolbar: {str(e)}")
-
-        try:
-            # Remover toolbar
-            if self.toolbar:
-                del self.toolbar
-                self.logger.info("Toolbar removida com sucesso")
-        except Exception as e:
-            self.logger.error(f"Erro ao remover toolbar: {str(e)}")
+            self.logger.error(f"Erro ao descarregar MenuManager: {str(e)}")
 
         self.logger.info("Plugin Cadmus descarregado")
 
