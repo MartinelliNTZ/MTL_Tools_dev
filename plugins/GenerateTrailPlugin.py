@@ -29,7 +29,7 @@ class GenerateTrailPlugin(BasePluginMTL):
         # precisamos das preferências globais (Settings) para ler o limiar
         # assíncrono definido pelo usuário
         self.init(
-            ToolKey.GERAR_RASTRO_IMPLEMENTO,
+            ToolKey.GENERATE_TRAIL,
             "GenerateTrailPlugin",
             load_settings_prefs=True,
         )

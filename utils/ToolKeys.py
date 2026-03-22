@@ -11,7 +11,7 @@ class ToolKey:
     LOAD_FOLDER_LAYERS = "load_folder_layers"
     REPLACE_IN_LAYOUTS = "replace_in_layouts"
     RESTART_QGIS = "restart_qgis"
-    GERAR_RASTRO_IMPLEMENTO = "generate_trail"
+    GENERATE_TRAIL = "generate_trail"
     COORD_CLICK_TOOL = "coord_click_tool"
     COPY_ATTRIBUTES = "copy_attributes"
     CONVERTER_MULTIPART = "converter_multipart"
@@ -40,7 +40,7 @@ class ToolKey:
         LOAD_FOLDER_LAYERS: "#96CEB4",  # verde → carga de dados
         REPLACE_IN_LAYOUTS: "#F8C471",  # laranja → alteração / replace
         RESTART_QGIS: "#FF6B6B",  # vermelho → ação crítica
-        GERAR_RASTRO_IMPLEMENTO: "#82E0AA",  # verde limão → geração geométrica
+        GENERATE_TRAIL: "#82E0AA",  # verde limão → geração geométrica
         COORD_CLICK_TOOL: "#85C1E9",  # azul céu → map tool
         COPY_ATTRIBUTES: "#DDA0DD",  # plum → dados / atributos
         CONVERTER_MULTIPART: "#F5A962",  # laranja-pêssego → conversão geométrica

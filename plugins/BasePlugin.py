@@ -61,7 +61,7 @@ class BasePluginMTL(BaseDialog):
         # Carregar preferências globais do Settings se solicitado
         if load_settings_prefs:
             self.logger.debug("Carregando preferências globais do Cadmus Settings")
-            self.settings_preferences = load_tool_prefs(ToolKey.SETTINGS)
+            self.settings_preferences = load_tool_prefs(ToolKey.SYSTEM)
             self.logger.debug(
                 f"Preferências globais carregadas: {list(self.settings_preferences.keys())}"
             )

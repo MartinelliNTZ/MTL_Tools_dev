@@ -27,7 +27,7 @@ class SettingsPlugin(BasePluginMTL):
     def __init__(self, iface):
         super().__init__(iface.mainWindow())
         self.iface = iface
-        self.init(ToolKey.SETTINGS, "SettingsPlugin")
+        self.init(ToolKey.SYSTEM, "SettingsPlugin")
         self.logger.info("SettingsPlugin inicializado")
 
     def _build_ui(self, **kwargs):
@@ -61,7 +61,7 @@ class SettingsPlugin(BasePluginMTL):
             columns=3,
             title=f"⚙️ {STR.VECTOR_CALCULATION_METHOD}",
             checked_index=0,
-            tool_key=ToolKey.SETTINGS,
+            tool_key=ToolKey.SYSTEM,
             separator_top=True,
             separator_bottom=True,
             parent=self,
@@ -103,7 +103,7 @@ class SettingsPlugin(BasePluginMTL):
                 run_callback=self.execute_tool,
                 close_callback=self.close,
                 info_callback=self.show_info_dialog,
-                tool_key=ToolKey.SETTINGS,
+                tool_key=ToolKey.SYSTEM,
                 run_text=STR.SAVE,
             )
         )
@@ -126,7 +126,7 @@ class SettingsPlugin(BasePluginMTL):
     def _load_prefs(self):
         """Carrega preferências salvas."""
         self.logger.debug("Carregando preferências")
-        self.preferences = load_tool_prefs(ToolKey.SETTINGS)
+        self.preferences = load_tool_prefs(ToolKey.SYSTEM)
 
         # Carregar método de cálculo selecionado
         calc_method = self.preferences.get(
@@ -187,7 +187,7 @@ class SettingsPlugin(BasePluginMTL):
         self.preferences["vector_field_precision"] = precision_val
         self.logger.debug(f"Precisão de campos vetoriais salva: {precision_val} casas")
 
-        save_tool_prefs(ToolKey.SETTINGS, self.preferences)
+        save_tool_prefs(ToolKey.SYSTEM, self.preferences)
         self.logger.info(f"Preferências salvas: cálculo={selected_text}")
 
     def execute_tool(self):
