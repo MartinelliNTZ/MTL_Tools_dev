@@ -152,7 +152,7 @@ class SettingsPlugin(BasePluginMTL):
             self.radio_calc.set_selected_index(0)
 
 
-        selected_language = self.prefer_System.get("language_plugin", "pt")
+        selected_language = self.prefer_System.get("plugin_language", "pt")
         try:
             self.lang_selector.set_selected_key(selected_language)
             self.logger.debug(f"Idioma selecionado carregado: {selected_language}")
@@ -209,7 +209,7 @@ class SettingsPlugin(BasePluginMTL):
         self.logger.debug(f"Precisão de campos vetoriais salva: {precision_val} casas")
 
         selected_language = self.lang_selector.get_selected_key()
-        self.prefer_System["language_plugin"] = selected_language
+        self.prefer_System["plugin_language"] = selected_language
         self.logger.debug(f"Idioma selecionado salvo: {selected_language}")
 
         save_tool_prefs(ToolKey.SYSTEM, self.prefer_System)

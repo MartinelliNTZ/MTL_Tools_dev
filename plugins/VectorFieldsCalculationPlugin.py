@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsWkbTypes
+
+from ..core.engine_tasks.AsyncPipelineEngine import AsyncPipelineEngine
+from ..core.engine_tasks.ExecutionContext import ExecutionContext
+from ..core.engine_tasks.LineFieldsStep import LineFieldsStep
+from ..core.engine_tasks.PointFieldsStep import PointFieldsStep
+from ..core.engine_tasks.PolygonFieldsStep import PolygonFieldsStep
+from ..i18n.TranslationManager import STR
+from ..utils.QgisMessageUtil import QgisMessageUtil
+from ..utils.ToolKeys import ToolKey
 from ..utils.vector.VectorLayerAttributes import VectorLayerAttributes
 from ..utils.vector.VectorLayerMetrics import VectorLayerMetrics
 from ..utils.vector.VectorLayerProjection import VectorLayerProjection
-from ..utils.QgisMessageUtil import QgisMessageUtil
-from ..utils.ToolKeys import ToolKey
-from ..core.engine_tasks.AsyncPipelineEngine import AsyncPipelineEngine
-from ..core.engine_tasks.ExecutionContext import ExecutionContext
-from ..core.engine_tasks.PointFieldsStep import PointFieldsStep
-from ..core.engine_tasks.LineFieldsStep import LineFieldsStep
-from ..core.engine_tasks.PolygonFieldsStep import PolygonFieldsStep
 from .BasePlugin import BasePluginMTL
 
 
@@ -28,7 +30,7 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
     def initGui(self):
         self.create_action(
             "../resources/icons/vector_field.png",
-            "Calcular Campos Vetoriais",
+            STR.VECTOR_FIELDS_TITLE,
             self.run_vector_field,
         )
 
@@ -48,36 +50,30 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
             self.iface.activeLayer(), self.logger, require_editable=True
         )
         if not layer:
-            QgisMessageUtil.bar_critical(
-                self.iface, "Selecione uma camada vetorial editável"
-            )
+            QgisMessageUtil.bar_critical(self.iface, STR.SELECT_EDITABLE_VECTOR_LAYER)
             self.logger.warning("Nenhuma camada vetorial editável disponível")
             return
 
-        # estatísticas iniciais (agrega contagem de feições em relatórios)
         try:
             self.start_stats(layer)
         except Exception:
-            # se houver problema, apenas continue, não deve quebrar a ferramenta
             self.logger.debug("Falha ao iniciar estatísticas")
 
-        # Verificar se a camada é KML (não editável)
         source = layer.source().lower()
-        if (
-            source.endswith(".kml") or "|layername=" in source and source.startswith("file://") and ".kml" in source
+        if source.endswith(".kml") or (
+            "|layername=" in source and source.startswith("file://") and ".kml" in source
         ):
             self.logger.warning("Camada KML não pode ser editada")
             QgisMessageUtil.bar_critical(
                 self.iface,
-                "❌ Arquivos KML não são editáveis.\n\n"
-                "Converta a camada para GeoPackage (.gpkg) ou Shapefile (.shp) antes de usar esta ferramenta.",
+                f"❌ {STR.KML_FILES_ARE_NOT_EDITABLE}\n\n"
+                f"{STR.CONVERT_LAYER_TO_GPKG_OR_SHP_BEFORE_USING}",
             )
             return
 
         geom_type = layer.geometryType()
         self.logger.debug(f"Camada: {layer.name()}, Geometria: {geom_type}")
 
-        # Mapear tipo de geometria para step class
         step_map = {
             QgsWkbTypes.PointGeometry: (PointFieldsStep, self._prepare_point_fields),
             QgsWkbTypes.LineGeometry: (LineFieldsStep, self._prepare_line_fields),
@@ -89,28 +85,24 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
 
         if geom_type not in step_map:
             self.logger.error(f"Geometria não suportada: {geom_type}")
-            QgisMessageUtil.bar_warning(self.iface, "Tipo de geometria não suportado")
+            QgisMessageUtil.bar_warning(self.iface, STR.GEOMETRY_TYPE_NOT_SUPPORTED)
             return
 
         step_class, prepare_func = step_map[geom_type]
 
-        # Preparar contexto e field_map
         try:
             field_map, mode_altered = prepare_func(layer)
             if field_map is None:
                 return
         except Exception as e:
             self.logger.error(f"Erro ao preparar campos: {str(e)}")
-            QgisMessageUtil.bar_critical(self.iface, f"Erro na preparação: {str(e)}")
+            QgisMessageUtil.bar_critical(
+                self.iface, f"{STR.ERROR_IN_PREPARATION} {str(e)}"
+            )
             return
 
-        # Decidir entre sync/async baseado em feature count (mais confiável que tamanho de arquivo)
         precision = int(self.settings_preferences.get("vector_field_precision", 2))
-
-        # Feature count é muito mais confiável que compute_size() para decidir
-        # Threshold: 1000 features = sempre assíncrono (evita UI travada)
         feature_count = layer.featureCount()
-        # valor padrão de segurança
         threshold_features = int(
             self.settings_preferences.get("async_threshold_features", 1000)
         )
@@ -120,8 +112,6 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
         )
 
         try:
-            # SEMPRE usar assíncrono para evitar travamento da UI
-            # Feature count > 1000 ou qualquer memória layer = assíncrono obrigatório
             if feature_count >= threshold_features or layer.source().startswith(
                 "memory:"
             ):
@@ -132,34 +122,24 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
                     layer, step_class, field_map, mode_altered, precision
                 )
             else:
-                # Mesmo com < 1000 features, considerar usar async para consistência
-                # Descomentar a linha abaixo para forçar SEMPRE assíncrono
-                # self.logger.info("Forçando processamento assíncrono para consistência")
-                # self._start_async_calculation(layer, step_class, field_map, mode_altered, precision)
-
                 self.logger.info(
                     "Usando processamento síncrono (features={})".format(feature_count)
                 )
                 self._execute_sync_calculation(
                     layer, field_map, mode_altered, precision
                 )
-                # estatísticas finais após término síncrono
                 try:
                     self.finish_stats()
                 except Exception:
                     self.logger.debug("Falha ao finalizar estatísticas")
         except Exception as e:
             self.logger.error(f"Erro: {str(e)}")
-            QgisMessageUtil.bar_critical(self.iface, f"Erro: {str(e)}")
+            QgisMessageUtil.bar_critical(self.iface, f"{STR.ERROR}: {str(e)}")
 
     # ==================== PREPARATION METHODS ====================
 
     def _prepare_point_fields(self, layer):
-        """Prepara field_map e parâmetros para cálculo de coordenadas X e Y.
-
-        A funcionalidade de Z foi removida por decisão de design, portanto não
-        há mais prompt ao usuário nem criação de campo Z.
-        """
+        """Prepara field_map e parâmetros para cálculo de coordenadas X e Y."""
         field_map = {}
         for base in ["x", "y"]:
             name = self._resolve_field_name(layer, base)
@@ -173,7 +153,7 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
     def _prepare_line_fields(self, layer):
         """Prepara field_map para cálculo de comprimento."""
         requested_mode = self.settings_preferences.get(
-            "calculation_method", "Elipsoidal"
+            "calculation_method", STR.ELLIPSOIDAL
         )
         calc_mode, mode_altered = self._resolve_calculation_mode(layer, requested_mode)
 
@@ -194,7 +174,7 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
     def _prepare_polygon_fields(self, layer):
         """Prepara field_map para cálculo de área."""
         requested_mode = self.settings_preferences.get(
-            "calculation_method", "Elipsoidal"
+            "calculation_method", STR.ELLIPSOIDAL
         )
         calc_mode, mode_altered = self._resolve_calculation_mode(layer, requested_mode)
 
@@ -216,19 +196,19 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
 
     def _resolve_calculation_mode(self, layer, requested_mode):
         """Valida e ajusta modo de cálculo (CRS geográfico com Cartesiana -> Ambos)."""
-        if requested_mode != "Cartesiana" or VectorLayerProjection.is_geographic_crs(
+        if requested_mode != STR.CARTESIAN or VectorLayerProjection.is_geographic_crs(
             layer
         ):
             return requested_mode, False
 
         self.logger.warning("CRS geográfico com modo Cartesiana -> mudando para Ambos")
         msg = (
-            f"⚠️ Camada usa CRS Geográfico ({layer.crs().authid()})\n\n"
-            f"Modo 'Cartesiano' resultaria em valores em graus².\n\n"
-            f"Calculando AMBOS os modos automaticamente."
+            f"⚠️ {STR.LAYER_USES_GEOGRAPHIC_CRS} ({layer.crs().authid()})\n\n"
+            f"{STR.CARTESIAN_MODE_RESULTS_IN_DEGREES2}\n\n"
+            f"{STR.CALCULATING_BOTH_MODES_AUTOMATICALLY}"
         )
         QgisMessageUtil.bar_warning(self.iface, msg)
-        return "Ambos", True
+        return STR.BOTH, True
 
     def _resolve_field_name(self, layer, base_name):
         """Resolve conflito de nomes de campo."""
@@ -257,7 +237,6 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
             )
 
             if geom_type == QgsWkbTypes.PointGeometry:
-                # XY sempre em 8 casas, ignorar preferência
                 const_prec = 8
                 self.logger.debug(
                     f"Criando campos de coordenadas com precisão {const_prec}"
@@ -269,53 +248,53 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
                 VectorLayerAttributes.update_point_xy_coordinates(
                     layer, field_map, precision=const_prec
                 )
-                msg = "Campos X/Y calculados com sucesso"
+                msg = STR.XY_FIELDS_CALCULATED_SUCCESS
 
             elif geom_type == QgsWkbTypes.LineGeometry:
                 self.logger.debug("Criando campos de comprimento")
                 VectorLayerAttributes.create_point_coordinate_fields(
                     layer, field_map, precision=precision
                 )
-                if "Elipsoidal" in field_map:
-                    self.logger.debug("Calculando comprimento elispoidal")
+                if STR.ELLIPSOIDAL in field_map:
+                    self.logger.debug("Calculando comprimento elipsoidal")
                     VectorLayerMetrics.calculate_line_length(
                         layer,
-                        field_map["Elipsoidal"],
+                        field_map[STR.ELLIPSOIDAL],
                         use_ellipsoidal=True,
                         precision=precision,
                     )
-                if "Cartesiana" in field_map:
+                if STR.CARTESIAN in field_map:
                     self.logger.debug("Calculando comprimento cartesiano")
                     VectorLayerMetrics.calculate_line_length(
                         layer,
-                        field_map["Cartesiana"],
+                        field_map[STR.CARTESIAN],
                         use_ellipsoidal=False,
                         precision=precision,
                     )
-                msg = "Comprimento de linhas calculado com sucesso"
+                msg = STR.LINE_LENGTH_CALCULATED_SUCCESS
 
             elif geom_type == QgsWkbTypes.PolygonGeometry:
                 self.logger.debug("Criando campos de área")
                 VectorLayerAttributes.create_point_coordinate_fields(
                     layer, field_map, precision=precision
                 )
-                if "Elipsoidal" in field_map:
-                    self.logger.debug("Calculando área elispoidal")
+                if STR.ELLIPSOIDAL in field_map:
+                    self.logger.debug("Calculando área elipsoidal")
                     VectorLayerMetrics.calculate_polygon_area(
                         layer,
-                        field_map["Elipsoidal"],
+                        field_map[STR.ELLIPSOIDAL],
                         use_ellipsoidal=True,
                         precision=precision,
                     )
-                if "Cartesiana" in field_map:
+                if STR.CARTESIAN in field_map:
                     self.logger.debug("Calculando área cartesiana")
                     VectorLayerMetrics.calculate_polygon_area(
                         layer,
-                        field_map["Cartesiana"],
+                        field_map[STR.CARTESIAN],
                         use_ellipsoidal=False,
                         precision=precision,
                     )
-                msg = "Área de polígonos calculada com sucesso"
+                msg = STR.POLYGON_AREA_CALCULATED_SUCCESS
 
             if not mode_altered:
                 QgisMessageUtil.bar_success(self.iface, msg)
@@ -329,17 +308,7 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
     def _start_async_calculation(
         self, layer, step_class, field_map, mode_altered, precision
     ):
-        """Inicia pipeline assíncrona com AsyncPipelineEngine.
-
-        Contexto:
-        - A task executa em thread de trabalho; ela **não** toca na camada,
-          apenas calcula os valores e devolve um mapeamento de atualizações.
-        - O step correspondente roda no thread principal e aplica os atributos
-          à camada existente em lotes (via provider.changeAttributeValues).
-
-        Resultado: UI não trava, arquivo original recebe os novos campos e
-        valores sem criar vetores temporários.
-        """
+        """Inicia pipeline assíncrona com AsyncPipelineEngine."""
         try:
             context = ExecutionContext()
             context.set("layer", layer)
@@ -356,7 +325,6 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
                 f"Parâmetros: field_map={field_map}, precision={precision}"
             )
 
-            # Pipeline com 1 step: calcula campos NO arquivo original
             calc_step = step_class()
 
             engine = AsyncPipelineEngine(
@@ -373,7 +341,7 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
         except Exception as e:
             self.logger.error(f"Erro ao iniciar pipeline: {str(e)}")
             QgisMessageUtil.bar_critical(
-                self.iface, f"Erro ao iniciar cálculo: {str(e)}"
+                self.iface, f"{STR.ERROR_STARTING_CALCULATION} {str(e)}"
             )
             raise
 
@@ -387,17 +355,16 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
         if layer:
             geom_type = layer.geometryType()
             if geom_type == QgsWkbTypes.PointGeometry:
-                msg = "Campos X/Y calculados com sucesso"
+                msg = STR.XY_FIELDS_CALCULATED_SUCCESS
             elif geom_type == QgsWkbTypes.LineGeometry:
-                msg = "Comprimento de linhas calculado com sucesso"
+                msg = STR.LINE_LENGTH_CALCULATED_SUCCESS
             else:
-                msg = "Área de polígonos calculada com sucesso"
+                msg = STR.POLYGON_AREA_CALCULATED_SUCCESS
 
             if not mode_altered:
                 QgisMessageUtil.bar_success(self.iface, msg)
                 self.logger.info(msg)
 
-        # terminar estatísticas
         try:
             self.finish_stats()
             self.logger.debug("Estatísticas finalizadas")
@@ -406,9 +373,11 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
 
     def _on_async_error(self, errors):
         """Callback de erro da pipeline assíncrona."""
-        error_msg = "\n".join(str(e) for e in errors) if errors else "Erro desconhecido"
+        error_msg = "\n".join(str(e) for e in errors) if errors else STR.UNKNOWN_ERROR
         self.logger.error(f"ERRO na pipeline: {error_msg}")
-        QgisMessageUtil.bar_critical(self.iface, f"Falha no cálculo:\n{error_msg}")
+        QgisMessageUtil.bar_critical(
+            self.iface, f"{STR.CALCULATION_FAILED}\n{error_msg}"
+        )
         try:
             self.finish_stats()
             self.logger.debug("Estatísticas finalizadas após erro")
@@ -418,7 +387,7 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
     def _on_async_cancelled(self, context):
         """Callback de cancelamento da pipeline assíncrona."""
         self.logger.warning("Pipeline assíncrona CANCELADA pelo usuário")
-        QgisMessageUtil.bar_warning(self.iface, "Operação cancelada pelo usuário.")
+        QgisMessageUtil.bar_warning(self.iface, STR.OPERATION_CANCELLED_BY_USER)
         try:
             self.finish_stats()
             self.logger.debug("Estatísticas finalizadas após cancelamento")

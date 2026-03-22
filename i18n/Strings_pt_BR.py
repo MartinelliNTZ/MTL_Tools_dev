@@ -172,6 +172,39 @@ class Strings_pt_BR:
     LOCATION_COPIED_TO_CLIPBOARD = "Localização copiada para a área de transferência"
     ADDRESS_COPIED_TO_CLIPBOARD = "Endereço copiado para a área de transferência"
 
+    SELECT_VECTOR_LAYER = "Selecione uma camada vetorial"
+    SELECT_EDITABLE_VECTOR_LAYER = "Selecione uma camada vetorial editável"
+    LAYER_HAS_NO_FEATURES = "A camada não possui feições"
+    OPERATION_CANCELLED_BY_USER = "Operação cancelada pelo usuário"
+    GEOMETRY_TYPE_NOT_SUPPORTED = "Tipo de geometria não suportado"
+    ERROR_IN_PREPARATION = "Erro na preparação:"
+    KML_FILES_ARE_NOT_EDITABLE = "Arquivos KML não são editáveis."
+    CONVERT_LAYER_TO_GPKG_OR_SHP_BEFORE_USING = (
+        "Converta a camada para GeoPackage (.gpkg) ou Shapefile (.shp) antes de usar esta ferramenta."
+    )
+    LAYER_USES_GEOGRAPHIC_CRS = "Camada usa CRS Geográfico"
+    CARTESIAN_MODE_RESULTS_IN_DEGREES2 = (
+        "Modo 'Cartesiano' resultaria em valores em graus²."
+    )
+    CALCULATING_BOTH_MODES_AUTOMATICALLY = (
+        "Calculando ambos os modos automaticamente."
+    )
+    XY_FIELDS_CALCULATED_SUCCESS = "Campos X/Y calculados com sucesso"
+    LINE_LENGTH_CALCULATED_SUCCESS = "Comprimento de linhas calculado com sucesso"
+    POLYGON_AREA_CALCULATED_SUCCESS = "Área de polígonos calculada com sucesso"
+    ERROR_STARTING_CALCULATION = "Erro ao iniciar cálculo:"
+    UNKNOWN_ERROR = "Erro desconhecido"
+    CALCULATION_FAILED = "Falha no cálculo:"
+    GEOMETRIES_CONVERTED_TO_MULTIPART_NOT_SAVED = (
+        "Geometrias convertidas para multipart (não salvas)"
+    )
+    CONVERT_SELECTED_FEATURES_TO_MULTIPART = (
+        "Converter apenas as feições selecionadas para multipart?"
+    )
+    CONVERT_ALL_FEATURES_TO_MULTIPART = (
+        "Converter todas as feições para multipart?"
+    )
+
     # plugins/DroneCoordinates.py
     DRONE_COORDINATES_TITLE = "Coordenadas de Drone"
     DRONE_COORDINATES_TOOLTIP = (
