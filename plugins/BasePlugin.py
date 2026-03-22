@@ -148,6 +148,10 @@ class BasePluginMTL(BaseDialog):
         self._save_prefs()
         super().closeEvent(event)
 
+    def _save_prefs(self):
+        """Salva preferências."""
+        self.logger.debug("Salvando preferências")
+
     def start_stats(self, input_obj=None, modal_info="YES", total_files=None):
         try:
             self.preferences["t0"] = time.time()

@@ -18,12 +18,10 @@ class InstructionsManager:
 
         filename = cls._build_filename(tool_key)
 
-        locale = TM.locale   # ex: pt_BR
-        lang = TM.lang       # ex: pt
+        locale = TM.locale   # ex: pt_BR 
 
         candidates = [
             cls.BASE_DIR / "instructions" / locale / filename,
-            cls.BASE_DIR / "instructions" / lang / filename,
             cls.BASE_DIR / "instructions" / "pt_BR" / filename,
         ]
 

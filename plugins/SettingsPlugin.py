@@ -27,7 +27,7 @@ class SettingsPlugin(BasePluginMTL):
     def __init__(self, iface):
         super().__init__(iface.mainWindow())
         self.iface = iface
-        self.init(ToolKey.SYSTEM, "SettingsPlugin")
+        self.init(ToolKey.SETTINGS, "SettingsPlugin")
         self.logger.info("SettingsPlugin inicializado")
 
     def _build_ui(self, **kwargs):
@@ -61,7 +61,7 @@ class SettingsPlugin(BasePluginMTL):
             columns=3,
             title=f"⚙️ {STR.VECTOR_CALCULATION_METHOD}",
             checked_index=0,
-            tool_key=ToolKey.SYSTEM,
+            tool_key=ToolKey.SETTINGS,
             separator_top=True,
             separator_bottom=True,
             parent=self,
@@ -103,7 +103,7 @@ class SettingsPlugin(BasePluginMTL):
                 run_callback=self.execute_tool,
                 close_callback=self.close,
                 info_callback=self.show_info_dialog,
-                tool_key=ToolKey.SYSTEM,
+                tool_key=ToolKey.SETTINGS,
                 run_text=STR.SAVE,
             )
         )
@@ -126,7 +126,8 @@ class SettingsPlugin(BasePluginMTL):
     def _load_prefs(self):
         """Carrega preferências salvas."""
         self.logger.debug("Carregando preferências")
-        self.preferences = load_tool_prefs(ToolKey.SYSTEM)
+        self.preferences = load_tool_prefs(ToolKey.SETTINGS)
+        self.prefer_System = load_tool_prefs(ToolKey.SYSTEM)
 
         # Carregar método de cálculo selecionado
         calc_method = self.preferences.get(
@@ -175,19 +176,20 @@ class SettingsPlugin(BasePluginMTL):
 
         # Salvar método de cálculo selecionado
         selected_text = self.radio_calc.get_selected_text()
-        self.preferences["calculation_method"] = selected_text
+        self.prefer_System["calculation_method"] = selected_text
 
         # Salvar limiar assíncrono (número de feições)
         feats_value = int(self.spin_threshold.value())
-        self.preferences["async_threshold_features"] = feats_value
+        self.prefer_System["async_threshold_features"] = feats_value
         self.logger.debug(f"Limiar assíncrono por feições salvo: {feats_value} feições")
 
         # Salvar precisão de campos vetoriais
         precision_val = int(self.spin_precision.value())
-        self.preferences["vector_field_precision"] = precision_val
+        self.prefer_System["vector_field_precision"] = precision_val
         self.logger.debug(f"Precisão de campos vetoriais salva: {precision_val} casas")
 
-        save_tool_prefs(ToolKey.SYSTEM, self.preferences)
+        save_tool_prefs(ToolKey.SYSTEM, self.prefer_System)
+        save_tool_prefs(self.TOOL_KEY, self.preferences)
         self.logger.info(f"Preferências salvas: cálculo={selected_text}")
 
     def execute_tool(self):

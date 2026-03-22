@@ -103,12 +103,6 @@ class PluginBootstrap:
                 Preferences.save_tool_prefs(
                     ToolKey.GENERATE_TRAIL, prefs_gt
                 )  # Re-salva para atualizar estrutura se necessário
-            prefs_settings = Preferences.load_tool_prefs("settings")
-            if prefs_settings:
-                Preferences.save_tool_prefs(
-                    ToolKey.SYSTEM, prefs_settings
-                )  # Re-salva para atualizar estrutura se necessário
-
             # Aqui você pode implementar migração de preferências se necessário
             prefs_system["prefs_version"] = self.PREFERENCES_VERSION
             Preferences.save_tool_prefs(ToolKey.SYSTEM, prefs_system)
