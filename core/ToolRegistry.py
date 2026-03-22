@@ -24,6 +24,10 @@ class ToolRegistry:
     def _create_tool_list(self):
         tools = []
 
+        # =====================================================
+        # LAYOUTS (Ordem: Export=10, Replace=20)
+        # =====================================================
+
         export_layouts = Tool(
             name="Exportar todos os Layouts",
             icon=im.icon(im.EXPORT_ALL_LAYOUTS),
@@ -31,8 +35,9 @@ class ToolRegistry:
             tool_type=self.DIALOG,
             main_action=True,
             executor=self.run_export_layouts,
-            executor_name="run_export_layouts",
-            tooltip="Exporta todos os Layouts do projeto para arquivos PDF ou imagens",
+            tooltip="Exporta todos os Layouts do projeto para arquivos PDF ou imagens.",
+            order=10,
+            show_in_toolbar=True,
         )
         tools.append(export_layouts)
 
@@ -42,10 +47,17 @@ class ToolRegistry:
             category=MenuManager.LAYOUTS,
             tool_type=self.DIALOG,
             executor=self.run_replace_layouts,
-            executor_name="run_replace_layouts",
-            tooltip="Substitui textos em massa nos Layouts do projeto",
+            tooltip="Substitui textos em massa nos Layouts do projeto.\n"
+                    "Permite criar um mapa de substituição a partir de uma camada vetorial ou tabela, onde um campo é usado para identificar os Layouts e outro campo é usado para o novo valor a ser inserido.\n"
+                    "Útil para atualizar informações como títulos, legendas ou rótulos em múltiplos Layouts de forma rápida e consistente.",
+            order=20,
+            show_in_toolbar=True,
         )
         tools.append(replace_layouts)
+
+        # =====================================================
+        # SYSTEM (Ordem: Restart=10, Logcat=20, Settings=30, About=40)
+        # =====================================================
 
         restart_qgis = Tool(
             name="Salvar, Fechar e Reabrir Projeto",
@@ -54,99 +66,12 @@ class ToolRegistry:
             tool_type=self.INSTANT,
             main_action=True,
             executor=self.run_restart_qgis,
-            executor_name="run_restart_qgis",
-            tooltip="Salva, fecha e reabre projeto automaticamente",
+            tooltip="Salva o projeto atual, fecha o QGIS e reabre o mesmo projeto automaticamente.\n"
+                    "Útil para resolver travamentos, bugs visuais ou de renderização sem perder o trabalho.",
+            order=10,
+            show_in_toolbar=True,
         )
         tools.append(restart_qgis)
-
-        load_folder = Tool(
-            name="Carregar pasta de arquivos",
-            icon=im.icon(im.LOAD_FOLDER_LAYER),
-            category=MenuManager.VECTOR,
-            tool_type=self.DIALOG,
-            executor=self.run_load_folder,
-            executor_name="run_load_folder",
-            tooltip="Carrega uma pasta de arquivos como camadas",
-        )
-        tools.append(load_folder)
-
-        gerar_rastro = Tool(
-            name="Gerar Rastro Implemento",
-            icon=im.icon(im.GENERATE_TRAIL),
-            category=MenuManager.AGRICULTURE,
-            tool_type=self.DIALOG,
-            executor=self.run_gerar_rastro,
-            executor_name="run_gerar_rastro",
-            tooltip="Gera rastro de implemento agrícola",
-        )
-        tools.append(gerar_rastro)
-
-        about = Tool(
-            name="Sobre o Cadmus",
-            icon=im.icon(im.ABOUT),
-            category=MenuManager.SYSTEM,
-            tool_type=self.DIALOG,
-            executor=self.run_about_dialog,
-            executor_name="run_about_dialog",
-            tooltip="Informações sobre o plugin Cadmus",
-        )
-        tools.append(about)
-
-        coord_click = Tool(
-            name="Capturar Coordenadas",
-            icon=im.icon(im.COORD_CLICK_TOOL),
-            category=MenuManager.VECTOR,
-            tool_type=self.INSTANT,
-            executor=self.run_coord_click,
-            executor_name="run_coord_click",
-            tooltip="Captura coordenadas ao clicar no mapa",
-        )
-        tools.append(coord_click)
-
-        vector_fields = Tool(
-            name="Calcular Campos Vetoriais",
-            icon=im.icon(im.VECTOR_FIELD),
-            category=MenuManager.VECTOR,
-            tool_type=self.INSTANT,
-            main_action=True,
-            executor=self.run_vector_fields,
-            executor_name="run_vector_fields",
-            tooltip="Calcula campos vetoriais automaticamente",
-        )
-        tools.append(vector_fields)
-
-        drone_coords = Tool(
-            name="Obter Coordenadas de Drone",
-            icon=im.icon(im.DRONE_COORDINATES),
-            category=MenuManager.AGRICULTURE,
-            tool_type=self.DIALOG,
-            executor=self.run_drone_coords,
-            executor_name="run_drone_coords",
-            tooltip="Gera coordenadas a partir de fotos de drone",
-        )
-        tools.append(drone_coords)
-
-        multipart = Tool(
-            name="Converter Multipart",
-            icon=im.icon(im.VECTOR_MULTPART),
-            category=MenuManager.VECTOR,
-            tool_type=self.INSTANT,
-            executor=self.run_multpart,
-            executor_name="run_multpart",
-            tooltip="Converte feições em multipart",
-        )
-        tools.append(multipart)
-
-        copy_attributes = Tool(
-            name="Copiar Atributos",
-            icon=im.icon(im.COPY_ATTRIBUTES),
-            category=MenuManager.VECTOR,
-            tool_type=self.DIALOG,
-            executor=self.run_copy_atributes,
-            executor_name="run_copy_atributes",
-            tooltip="Copia atributos entre camadas",
-        )
-        tools.append(copy_attributes)
 
         logcat = Tool(
             name="Logcat Viewer",
@@ -154,8 +79,9 @@ class ToolRegistry:
             category=MenuManager.SYSTEM,
             tool_type=self.DIALOG,
             executor=self.run_logcat,
-            executor_name="run_logcat",
-            tooltip="Visualizador de logs Cadmus",
+            tooltip="Abre o Logcat, uma ferramenta de visualização dos logs do plugin Cadmus.",
+            order=20,
+            show_in_toolbar=True,
         )
         tools.append(logcat)
 
@@ -165,10 +91,127 @@ class ToolRegistry:
             category=MenuManager.SYSTEM,
             tool_type=self.DIALOG,
             executor=self.run_settings,
-            executor_name="run_settings",
-            tooltip="Configurações do plugin Cadmus",
+            tooltip="Configurações do plugin Cadmus.",
+            order=30,
+            show_in_toolbar=True,
         )
         tools.append(settings)
+
+        about = Tool(
+            name="Sobre o Cadmus",
+            icon=im.icon(im.ABOUT),
+            category=MenuManager.SYSTEM,
+            tool_type=self.DIALOG,
+            executor=self.run_about_dialog,
+            tooltip="Informações sobre o plugin Cadmus.",
+            order=40,
+            show_in_toolbar=True,
+        )
+        tools.append(about)
+
+        # =====================================================
+        # VECTOR (Ordem: Fields=10, Coords=20, Pasta=30, Multipart=40, Copy=50)
+        # =====================================================
+
+        vector_fields = Tool(
+            name="Calcular Campos Vetoriais",
+            icon=im.icon(im.VECTOR_FIELD),
+            category=MenuManager.VECTOR,
+            tool_type=self.INSTANT,
+            main_action=True,
+            executor=self.run_vector_fields,
+            tooltip="Calcula automaticamente campos: Área, Comprimento ou X/Y\n"
+                    "Selecione uma camada vetorial ativa e execute a ferramenta\n"
+                    "para adicionar os campos calculados.",
+            order=10,
+            show_in_toolbar=True,
+        )
+        tools.append(vector_fields)
+
+        coord_click = Tool(
+            name="Capturar Coordenadas",
+            icon=im.icon(im.COORD_CLICK_TOOL),
+            category=MenuManager.VECTOR,
+            tool_type=self.MAP_TOOL,
+            executor=self.run_coord_click,
+            tooltip="Clique no mapa para obter coordenadas geográficas\n"
+                    "Ative a ferramenta e clique em qualquer ponto do mapa para\n"
+                    "visualizar diversas informações a respeito daquele ponto.\n"
+                    "Incluindo: UTM Zone, Município, Altitude em SRTM 90m.",
+            order=20,
+            show_in_toolbar=True,
+        )
+        tools.append(coord_click)
+
+        load_folder = Tool(
+            name="Carregar pasta de arquivos",
+            icon=im.icon(im.LOAD_FOLDER_LAYER),
+            category=MenuManager.VECTOR,
+            tool_type=self.DIALOG,
+            executor=self.run_load_folder,
+            tooltip="Carrega em massa uma pasta de arquivos como camadas no QGIS.",
+            order=30,
+            show_in_toolbar=True,
+        )
+        tools.append(load_folder)
+
+        multipart = Tool(
+            name="Converter Multipart",
+            icon=im.icon(im.VECTOR_MULTPART),
+            category=MenuManager.VECTOR,
+            tool_type=self.INSTANT,
+            executor=self.run_multpart,
+            tooltip="Promove feições para o tipo multiparte.\n"
+                    "Selecione uma camada vetorial ativa e execute a ferramenta\n"
+                    "para promover as feições.",
+            order=40,
+            show_in_toolbar=True,
+        )
+        tools.append(multipart)
+
+        copy_attributes = Tool(
+            name="Copiar Atributos",
+            icon=im.icon(im.COPY_ATTRIBUTES),
+            category=MenuManager.VECTOR,
+            tool_type=self.DIALOG,
+            executor=self.run_copy_atributes,
+            tooltip="Copia atributos entre camadas.",
+            order=50,
+            show_in_toolbar=True,
+        )
+        tools.append(copy_attributes)
+
+        # =====================================================
+        # AGRICULTURE (Ordem: Drone=10, Trail=20)
+        # =====================================================
+
+        drone_coords = Tool(
+            name="Obter Coordenadas de Drone",
+            icon=im.icon(im.DRONE_COORDINATES),
+            category=MenuManager.AGRICULTURE,
+            tool_type=self.DIALOG,
+            main_action=True,
+            executor=self.run_drone_coords,
+            tooltip="Gera uma camada de pontos com as coordenadas de cada foto.\n"
+                    "Gera uma linha da trajetória do drone, conectando os pontos na ordem de captura.\n"
+                    "Pode cruzar os pontos das fotos com os metadados das fotos para adicionar atributos\n"
+                    "como altitude, data/hora, etc.",
+            order=10,
+            show_in_toolbar=True,
+        )
+        tools.append(drone_coords)
+
+        gerar_rastro = Tool(
+            name="Gerar Rastro Implemento",
+            icon=im.icon(im.GENERATE_TRAIL),
+            category=MenuManager.AGRICULTURE,
+            tool_type=self.DIALOG,
+            executor=self.run_gerar_rastro,
+            tooltip="Gera um rastro do movimento de um implemento agrícola com base em uma linha.",
+            order=20,
+            show_in_toolbar=True,
+        )
+        tools.append(gerar_rastro)
 
         return tools
 

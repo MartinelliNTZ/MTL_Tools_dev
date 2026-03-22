@@ -1,3 +1,12 @@
+#2.1.3.9.6 2026/03/22
+- Transferida responsabilidade de criação de QAction da classe Tool para MenuManager: Tool.__init__ não cria mais self.action, MenuManager._create_actions_for_tools() cria QActions para todas as ferramentas e conecta executores; adicionado atributo tooltip à Tool para acesso no MenuManager.
+
+#2.1.3.9.5 2026/03/22
+- Corrigida ordem sequencial dentro de cada categoria no ToolRegistry: VECTOR (10,20,30,40,50), SYSTEM (10,20,30,40); movido load_folder para categoria VECTOR; ajustada ordem dos menus no MenuManager para SYSTEM(1), LAYOUTS(2), FOLDER(3), VECTOR(4), AGRICULTURE(5), RASTER(6); definido show_in_toolbar=True para todas as ferramentas; order agora representa a posição dentro do menu da categoria correspondente.
+
+#2.1.3.9.4 2026/03/22
+- Reorganizado CadmusPlugin.initGui(): seção "4) CONFIGURAÇÃO DAS AÇÕES" agora apresenta ações ordenadas sequencialmente por (10, 20, 30...130), agrupadas por categoria com comentários visuais (LAYOUTS, SYSTEM, VECTOR, AGRICULTURE); cada ação comentada com seu número de ordem correspondente à ToolRegistry para consistência e rastreabilidade; mantido alinhamento com Tool.order e MenuManager sorting.
+
 #2.1.3.9 2026/03/21
 - Nova arquitetura criada: Tool (resources/widgets/Tool.py), ToolRegistry (core/ToolRegistry.py) e MenuManager (core/MenuManager.py); DropdownToolButton atualizado para suportar separator (None) em secondary_actions.
 
@@ -33,7 +42,17 @@
 
 #2.1.2 2026/03/20
 
-#2.1.3.9.1 2026/03/22
+#2.1.3.9.3 2026/03/22
+- Reorganizado ToolRegistry._create_tool_list() com comentários separando por categorias (LAYOUTS, SYSTEM, VECTOR, AGRICULTURE) mostrando a ordem (order) de cada ferramenta.
+- Atualizado tooltips completas em ToolRegistry copiadas de cadmus_plugin.py, com todas as informações detalhadas.
+- Melhorada legibilidade do código com separação visual por seção de categoria.
+
+- Adicionado `order` (int, padrão 100) ao Tool para ordenação de menus e toolbar.
+- Adicionado `show_in_toolbar` (bool, padrão True) ao Tool para controle fino sobre visibilidade em toolbar.
+- Removido `executor_name` de todas as ferramentas (redundante com `executor`).
+- MenuManager.create_toolbar() agora respeita `show_in_toolbar` e ordena ações secundárias por `order`.
+- MenuManager.populate_menus() ordena ferramentas por `order` dentro de cada categoria.
+
 - Corrigido ToolRegistry para importar MenuManager e remover bloco duplicado residual após get_tools(), eliminando erro de sintaxe.
 - Adaptado ToolRegistry para aceitar iface no __init__, mover todos os run_ methods para ToolRegistry, corrigir imports para ..plugins, adicionar executor=self.run_xxx em cada Tool para conectar ações diretamente.
 - Unificado constantes de categoria em MenuManager para uppercase, consistente com ToolRegistry.

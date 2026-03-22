@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import QMenu
+from qgis.PyQt.QtWidgets import QMenu, QAction
 from .ToolRegistry import ToolRegistry
 from ..resources.widgets.DropdownToolButton import DropdownToolButton
 from ..core.config.LogUtils import LogUtils
@@ -7,11 +7,12 @@ from ..utils.ToolKeys import ToolKey
 
 
 class MenuManager:
-    SYSTEM = "SYSTEM"
-    VECTOR = "VECTOR"
-    AGRICULTURE = "AGRICULTURE"
-    LAYOUTS = "LAYOUTS"
-    RASTER = "RASTER"
+    SYSTEM = "SYSTEM"#1
+    LAYOUTS = "LAYOUTS"#2
+    FOLDER = "FOLDER"#3
+    VECTOR = "VECTOR"#4
+    AGRICULTURE = "AGRICULTURE"#5
+    RASTER = "RASTER"#6
 
     def __init__(self, iface,tools=None):
         self.iface = iface
@@ -20,6 +21,17 @@ class MenuManager:
         self.toolbar = None
         self.tools = tools if tools is not None else []
         self.logger = LogUtils(tool=ToolKey.SYSTEM, class_name="MenuManager")
+        self._create_actions_for_tools()
+
+    def _create_actions_for_tools(self):
+        """Cria QActions para todas as ferramentas e conecta executores."""
+        for tool in self.tools:
+            tool.action = QAction(tool.icon, tool.name)
+            tool.action.setToolTip(tool.tooltip or tool.name)
+            tool.action.setData(tool)
+            if tool.executor is not None:
+                tool.action.triggered.connect(tool.executor)
+        self.logger.debug("Actions criadas para todas as ferramentas")
 
     def create_menu(self):
         self.menu = QMenu("Cadmus", self.iface.mainWindow())
@@ -29,9 +41,10 @@ class MenuManager:
 
         for category in [
             self.SYSTEM,
+            self.LAYOUTS,
+            self.FOLDER,
             self.VECTOR,
             self.AGRICULTURE,
-            self.LAYOUTS,
             self.RASTER,
         ]:
             submenu = QMenu(category.title(), self.menu)
@@ -44,16 +57,17 @@ class MenuManager:
         self.toolbar = self.iface.addToolBar("Cadmus")
         self.toolbar.setObjectName("Cadmus_Toolbar")
 
-        # Adicionar toolbars por main_action por categoria
+        # Adicionar toolbars por main_action por categoria, respeitando show_in_toolbar e order
         for category in [
             self.SYSTEM,
             self.LAYOUTS,
+            self.FOLDER,
             self.VECTOR,
             self.AGRICULTURE,
             self.RASTER,
         ]:
-            main_tools = [t for t in self.tools if t.category == category and t.main_action]
-            secondary_actions = [t.action for t in self.tools if t.category == category and not t.main_action]
+            main_tools = [t for t in self.tools if t.category == category and t.main_action and t.show_in_toolbar]
+            secondary_actions = [t.action for t in sorted([t for t in self.tools if t.category == category and not t.main_action and t.show_in_toolbar], key=lambda x: x.order)]
 
             if not main_tools:
                 continue
@@ -72,12 +86,14 @@ class MenuManager:
         self.logger.debug("Toolbar preenchida a partir do ToolRegistry")
 
     def populate_menus(self):
-        for tool in self.tools:
-            category = tool.category
+        # Ordenar ferramentas por order dentro de cada categoria
+        for category in [self.SYSTEM, self.LAYOUTS, self.FOLDER, self.VECTOR, self.AGRICULTURE, self.RASTER]:
             if category not in self.submenus:
                 continue
-            self.submenus[category].addAction(tool.action)
-        self.logger.debug("Submenus populados com ferramentas")
+            sorted_tools = sorted([t for t in self.tools if t.category == category], key=lambda x: x.order)
+            for tool in sorted_tools:
+                self.submenus[category].addAction(tool.action)
+        self.logger.debug("Submenus populados com ferramentas (ordenadas)")
 
     def unload(self):
         if self.menu:

@@ -15,8 +15,9 @@ class Tool:
         tool_type,
         main_action=False,
         executor=None,
-        executor_name=None,
         tooltip=None,
+        order=100,
+        show_in_toolbar=True,
     ):
         self.logger = LogUtils(tool=ToolKey.SYSTEM, class_name="Tool")
 
@@ -26,20 +27,18 @@ class Tool:
         self.tool_type = tool_type
         self.main_action = main_action
         self.executor = executor
-        self.executor_name = executor_name
+        self.tooltip = tooltip
+        self.order = order
+        self.show_in_toolbar = show_in_toolbar
 
-        self.action = QAction(icon, name)
-        self.action.setToolTip(tooltip or name)
-        self.action.setData(self)
-
-        if executor is not None:
-            self.action.triggered.connect(executor)
+        self.action = None  # Será criado pelo MenuManager
 
     def set_executor(self, executor):
         self.executor = executor
-        try:
-            self.action.triggered.disconnect()
-        except Exception as e:
-            self.logger.error(f"Falha ao desconectar executor anterior: {e}")
-        self.action.triggered.connect(executor)
+        if self.action is not None:
+            try:
+                self.action.triggered.disconnect()
+            except Exception as e:
+                self.logger.error(f"Falha ao desconectar executor anterior: {e}")
+            self.action.triggered.connect(executor)
 
