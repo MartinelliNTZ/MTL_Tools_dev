@@ -1,7 +1,7 @@
-#2.1.3.8 2026/03/21
-- Refatoração do DropdownToolButton: modificado __init__ para aceitar parâmetros (title, main_action, etc.) e chamar setup automaticamente; ajustado CadmusPlugin para instanciar DropdownToolButton com parâmetros em vez de chamar setup() separadamente, simplificando o código.
+#2.1.3.9 2026/03/21
+- Nova arquitetura criada: Tool (resources/widgets/Tool.py), ToolRegistry (core/ToolRegistry.py) e MenuManager (core/MenuManager.py); DropdownToolButton atualizado para suportar separator (None) em secondary_actions.
 
-#2.1.3.7 2026/03/21
+#2.1.3.8 2026/03/21
 - Refatoração crítica do DropdownToolButton: substituído QToolButton por QAction com setMenu, conectando triggered à main_action para comportamento correto de dropdown (clique no botão executa ação principal, seta abre menu); CadmusToolBar alterado para addAction(button.action).
 
 #2.1.3.6 2026/03/21
@@ -32,3 +32,10 @@
 - Refatorado DroneCoordinates para usar strings internacionalizadas via STR e Strings_pt_BR, substituindo todas as strings hardcoded exibidas ao usuário.
 
 #2.1.2 2026/03/20
+
+#2.1.3.9.1 2026/03/22
+- Corrigido ToolRegistry para importar MenuManager e remover bloco duplicado residual após get_tools(), eliminando erro de sintaxe.
+- Adaptado ToolRegistry para aceitar iface no __init__, mover todos os run_ methods para ToolRegistry, corrigir imports para ..plugins, adicionar executor=self.run_xxx em cada Tool para conectar ações diretamente.
+- Unificado constantes de categoria em MenuManager para uppercase, consistente com ToolRegistry.
+- ToolRegistry agora centraliza criação de ferramentas e execução, reduzindo responsabilidades do CadmusPlugin.
+

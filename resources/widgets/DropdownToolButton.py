@@ -48,7 +48,10 @@ class DropdownToolButton:
         self.menu.addAction(main_action)  # Ação principal no topo
 
         for act in secondary_actions:
-            self.menu.addAction(act)
+            if act is None:
+                self.menu.addSeparator()
+            else:
+                self.menu.addAction(act)
 
         # Conectar triggered da action à execução da main_action
         self.action.triggered.connect(lambda: main_action.trigger())
