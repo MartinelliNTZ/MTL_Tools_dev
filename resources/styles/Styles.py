@@ -305,6 +305,29 @@ class Styles(BaseStyles):
         """
 
     @staticmethod
+    def dropdown_selector_widget():
+
+        return f"""
+        {Styles.label()}
+        QComboBox {{
+            background: {Styles.COLOR_BACKGROUND_PANEL};
+            color: {Styles.COLOR_TEXT_PRIMARY};
+            border: 1px solid {Styles.COLOR_BORDER};
+            border-radius: {Styles.INPUT_BORDER_RADIUS}px;
+            padding: {Styles.INPUT_PADDING};
+            min-height: {Styles.INPUT_HEIGHT}px;
+        }}
+
+        QComboBox:hover {{
+            border: 1px solid {Styles.COLOR_PRIMARY_LIGHT};
+        }}
+
+        QComboBox:focus {{
+            border: 1px solid {Styles.COLOR_PRIMARY};
+        }}
+        """
+
+    @staticmethod
     def simple_button_widget():
 
         return f"""

@@ -67,6 +67,15 @@ class SettingsPlugin(BasePluginMTL):
             parent=self,
         )
         self.logger.debug("Widget de cálculo vetorial adicionado")
+        langs = {"es": "Español", "en": "English", "pt": "Português"}
+        lang_layout, self.lang_selector = WidgetFactory.create_dropdown_selector(
+            title=f"⚙️ {STR.VECTOR_CALCULATION_METHOD}",
+            options_dict=langs,
+            selected_key="pt",
+            separator_top=True,
+            separator_bottom=True,
+            parent=self,
+        )
 
         # ========== SEÇÃO 3: Precisão para campos vetoriais ==========
         prec_layout, self.spin_precision = WidgetFactory.create_double_spin_input(
@@ -115,6 +124,7 @@ class SettingsPlugin(BasePluginMTL):
             [
                 prefs_label,
                 pref_link,
+                lang_layout,
                 calc_layout,
                 prec_layout,
                 thresh_layout,
@@ -130,9 +140,7 @@ class SettingsPlugin(BasePluginMTL):
         self.prefer_System = load_tool_prefs(ToolKey.SYSTEM)
 
         # Carregar método de cálculo selecionado
-        calc_method = self.preferences.get(
-            "calculation_method", STR.ELLIPSOIDAL
-        )
+        calc_method = self.prefer_System.get("calculation_method", STR.ELLIPSOIDAL)
         try:
             idx = self.CALCULATION_METHODS.index(calc_method)
             self.radio_calc.set_selected_index(idx)
@@ -143,12 +151,24 @@ class SettingsPlugin(BasePluginMTL):
             )
             self.radio_calc.set_selected_index(0)
 
+
+        selected_language = self.prefer_System.get("language_plugin", "pt")
+        try:
+            self.lang_selector.set_selected_key(selected_language)
+            self.logger.debug(f"Idioma selecionado carregado: {selected_language}")
+        except Exception:
+            self.logger.warning(
+                f"Idioma inválido: {selected_language}, usando padrão"
+            )
+            self.lang_selector.set_selected_key("pt")
+
+
         # Carregar limiar assíncrono (número de feições)
         # suporte retrocompatível: se usuário ainda tiver threshold em bytes, avisar e usar padrão
-        if "async_threshold_features" in self.preferences:
-            thresh_feats = self.preferences.get("async_threshold_features", 1000)
+        if "async_threshold_features" in self.prefer_System:
+            thresh_feats = self.prefer_System.get("async_threshold_features", 1000)
         else:
-            old_bytes = self.preferences.get("async_threshold_bytes")
+            old_bytes = self.prefer_System.get("async_threshold_bytes")
             if old_bytes is not None:
                 self.logger.warning(
                     "Preferência antiga 'async_threshold_bytes' encontrada, substituindo por limite de feições padrão"
@@ -161,7 +181,7 @@ class SettingsPlugin(BasePluginMTL):
             self.logger.warning(f"Erro ao carregar limiar assíncrono: {thresh_feats}")
 
         # Carregar precisão de campos vetoriais
-        prec = self.preferences.get("vector_field_precision", 2)
+        prec = self.prefer_System.get("vector_field_precision", 2)
         try:
             self.spin_precision.setValue(int(prec))
             self.logger.debug(f"Precisão de campos vetoriais carregada: {prec}")
@@ -187,6 +207,10 @@ class SettingsPlugin(BasePluginMTL):
         precision_val = int(self.spin_precision.value())
         self.prefer_System["vector_field_precision"] = precision_val
         self.logger.debug(f"Precisão de campos vetoriais salva: {precision_val} casas")
+
+        selected_language = self.lang_selector.get_selected_key()
+        self.prefer_System["language_plugin"] = selected_language
+        self.logger.debug(f"Idioma selecionado salvo: {selected_language}")
 
         save_tool_prefs(ToolKey.SYSTEM, self.prefer_System)
         save_tool_prefs(self.TOOL_KEY, self.preferences)

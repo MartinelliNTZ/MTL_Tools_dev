@@ -22,6 +22,7 @@ from ...resources.widgets.InputFieldsWidget import InputFieldsWidget
 from ...resources.widgets.SimpleButtonWidget import SimpleButtonWidget
 from ...resources.widgets.CheckboxGridWidget import CheckboxGridWidget
 from ...resources.widgets.ReadOnlyFieldWidget import ReadOnlyFieldWidget
+from ...resources.widgets.DropdownSelectorWidget import DropdownSelectorWidget
 
 
 class WidgetFactory:
@@ -254,6 +255,7 @@ class WidgetFactory:
         browser.setReadOnly(read_only)
         return browser
 
+    @staticmethod
     def create_main_layout(
         self, title: str = "Title", enable_scroll: bool = False, icon_path: str = None
     ):
@@ -734,6 +736,41 @@ class WidgetFactory:
 
         widget = InputFieldsWidget(fields_dict, parent=parent)
         widget.setStyleSheet(Styles.input_fields_widget())
+        layout.addWidget(widget)
+
+        if separator_bottom:
+            layout.addWidget(WidgetFactory.create_separator())
+
+        return layout, widget
+
+    @staticmethod
+    def create_dropdown_selector(
+        *,
+        title: str,
+        options_dict: dict,
+        selected_key=None,
+        allow_empty: bool = False,
+        empty_text: str = "Selecione...",
+        parent=None,
+        separator_top: bool = False,
+        separator_bottom: bool = True,
+    ):
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(Styles.LAYOUT_V_SPACING)
+
+        if separator_top:
+            layout.addWidget(WidgetFactory.create_separator())
+
+        widget = DropdownSelectorWidget(
+            title=title,
+            options_dict=options_dict,
+            selected_key=selected_key,
+            allow_empty=allow_empty,
+            empty_text=empty_text,
+            parent=parent,
+        )
+        widget.setStyleSheet(Styles.dropdown_selector_widget())
         layout.addWidget(widget)
 
         if separator_bottom:
