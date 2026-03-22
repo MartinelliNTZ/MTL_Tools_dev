@@ -370,7 +370,7 @@ class ExportAllLayoutsDialog(BasePluginMTL):
             raise
 
 
-def run_export_all_layouts(iface):
+def run(iface):
     """Função de entrada do plugin."""
     dlg = ExportAllLayoutsDialog(iface)
     dlg.setModal(False)

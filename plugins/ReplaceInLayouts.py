@@ -188,7 +188,7 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
             QgisMessageUtil.bar_critical(self, str(e), STR.ERROR)
 
 
-def run_replace_in_layouts(iface):
+def run(iface):
     dlg = ReplaceInLayoutsDialog(iface)
     dlg.setModal(False)
     dlg.show()

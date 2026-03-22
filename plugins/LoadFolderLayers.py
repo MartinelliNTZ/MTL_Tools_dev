@@ -399,7 +399,7 @@ class LoadFolderLayersDialog(BasePluginMTL):
 
 
 # Função pública
-def run_load_folder_layers(iface):
+def run(iface):
     dlg = LoadFolderLayersDialog(iface)
     dlg.setModal(False)
     dlg.show()

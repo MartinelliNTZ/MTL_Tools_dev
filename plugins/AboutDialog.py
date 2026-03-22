@@ -97,7 +97,7 @@ class AboutDialog(BaseDialog):
             raise
 
 
-def run_about_dialog(iface):
+def run(iface):
     dlg = AboutDialog(iface)
     dlg.setModal(False)
     dlg.show()

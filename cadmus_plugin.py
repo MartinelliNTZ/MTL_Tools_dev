@@ -30,7 +30,6 @@ class CadmusPlugin:
     def initGui(self):
 
         locale = QgsApplication.locale()  # ex: 'pt_BR'
-
         plugin_root = Path(__file__).resolve().parent
 
         # Inicializar componentes críticos via PluginBootstrap
@@ -492,7 +491,7 @@ class CadmusPlugin:
     # =====================================================
     def run_coord_click(self):
         try:
-            from .plugins.coord_click_tool import CoordClickTool
+            from .plugins.CoordClickTool import CoordClickTool
 
             self.logger.info("Ativando ferramenta: Capturar Coordenadas")
             self.coord_click_tool = CoordClickTool(self.iface)
@@ -510,10 +509,10 @@ class CadmusPlugin:
     # =====================================================
     def run_export_layouts(self):
         try:
-            from .plugins.ExportAllLayouts import run_export_all_layouts
+            from .plugins.ExportAllLayouts import run
 
             self.logger.info("Abrindo diálogo: Exportar todos os Layouts")
-            self.export_dlg = run_export_all_layouts(self.iface)
+            self.export_dlg = run(self.iface)
             self.logger.info("Diálogo Exportar Layouts fechado")
         except Exception as e:
             self.logger.error(f"Erro ao executar Exportar Layouts: {str(e)}")
@@ -526,10 +525,10 @@ class CadmusPlugin:
     # =====================================================
     def run_gerar_rastro(self):
         try:
-            from .plugins.GenerateTrailPlugin import run_gerar_rastro
+            from .plugins.GenerateTrailPlugin import run
 
             self.logger.info("Abrindo diálogo: Gerar Rastro Implemento")
-            self.gerar_rastro_dlg = run_gerar_rastro(self.iface)
+            self.gerar_rastro_dlg = run(self.iface)
             self.logger.info("Diálogo Gerar Rastro Implemento aberto com sucesso")
         except Exception as e:
             self.logger.error(f"Erro ao executar Gerar Rastro Implemento: {str(e)}")
@@ -604,10 +603,10 @@ class CadmusPlugin:
     # =====================================================
     def run_drone_coords(self):
         try:
-            from .plugins.DroneCoordinates import run_drone_cordinates
+            from .plugins.DroneCoordinates import run
 
             self.logger.info("Abrindo diálogo: Obter Coordenadas de Drone")
-            self.drone_cordinates_dlg = run_drone_cordinates(self.iface)
+            self.drone_cordinates_dlg = run(self.iface)
             self.logger.info("Diálogo Obter Coordenadas de Drone aberto com sucesso")
         except Exception as e:
             self.logger.error(f"Erro ao executar Obter Coordenadas de Drone: {str(e)}")
@@ -621,10 +620,10 @@ class CadmusPlugin:
     # =====================================================
     def run_replace_layouts(self):
         try:
-            from .plugins.ReplaceInLayouts import run_replace_in_layouts
+            from .plugins.ReplaceInLayouts import run
 
             self.logger.info("Abrindo diálogo: Substituir textos nos Layouts")
-            self.replace_layouts_dlg = run_replace_in_layouts(self.iface)
+            self.replace_layouts_dlg = run(self.iface)
             self.logger.info("Diálogo Substituir Layouts aberto com sucesso")
         except Exception as e:
             self.logger.error(f"Erro ao executar Substituir Layouts: {str(e)}")
@@ -637,10 +636,10 @@ class CadmusPlugin:
     # =====================================================
     def run_load_folder(self):
         try:
-            from .plugins.LoadFolderLayers import run_load_folder_layers
+            from .plugins.LoadFolderLayers import run
 
             self.logger.info("Iniciando plugin: Carregar pasta de arquivos")
-            self.load_folder_dlg = run_load_folder_layers(self.iface)
+            self.load_folder_dlg = run(self.iface)
             self.logger.info("Plugin Carregar pasta de arquivos executado com sucesso")
         except Exception as e:
             self.logger.error(f"Erro ao executar Carregar pasta de arquivos: {str(e)}")
@@ -653,10 +652,10 @@ class CadmusPlugin:
     # =====================================================
     def run_about_dialog(self):
         try:
-            from .plugins.AboutDialog import run_about_dialog
+            from .plugins.AboutDialog import run
 
             self.logger.info("Abrindo diálogo: Sobre o Cadmus")
-            self.about_dlg = run_about_dialog(self.iface)
+            self.about_dlg = run(self.iface)
             self.logger.info("Diálogo Sobre Cadmus fechado")
         except Exception as e:
             self.logger.error(f"Erro ao executar Sobre o Cadmus: {str(e)}")
@@ -669,10 +668,10 @@ class CadmusPlugin:
     # =====================================================
     def run_copy_atributes(self):
         try:
-            from .plugins.CopyAttributesPlugin import run_copy_attributes
+            from .plugins.CopyAttributesPlugin import run
 
             self.logger.info("Abrindo diálogo: Copiar Atributos")
-            self.copy_attributes_dlg = run_copy_attributes(self.iface)
+            self.copy_attributes_dlg = run(self.iface)
             self.logger.info("Diálogo Copiar Atributos aberto com sucesso")
         except Exception as e:
             self.logger.error(f"Erro ao executar Copiar Atributos: {str(e)}")
@@ -685,10 +684,10 @@ class CadmusPlugin:
     # =====================================================
     def run_settings(self):
         try:
-            from .plugins.SettingsPlugin import run_settings
+            from .plugins.SettingsPlugin import run
 
             self.logger.info("Abrindo diálogo: Configurações")
-            self.settings_dlg = run_settings(self.iface)
+            self.settings_dlg = run(self.iface)
             self.logger.info("Diálogo de configurações aberto com sucesso")
         except Exception as e:
             self.logger.error(f"Erro ao executar Configurações: {str(e)}")

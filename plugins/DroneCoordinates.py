@@ -347,7 +347,7 @@ class DroneCordinates(BasePluginMTL):
         QgisMessageUtil.bar_success(self.iface, STR.SUCCESS_MESSAGE)
 
 
-def run_drone_cordinates(iface):
+def run(iface):
     dlg = DroneCordinates(iface)
     dlg.setModal(False)
     dlg.show()

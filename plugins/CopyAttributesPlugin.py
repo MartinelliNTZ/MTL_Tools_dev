@@ -137,7 +137,7 @@ class CopyAttributes(BasePluginMTL):
             self.logger.error("Falha na cópia de atributos")
 
 
-def run_copy_attributes(iface):
+def run(iface):
     dlg = CopyAttributes(iface)
     dlg.setModal(False)
     dlg.show()

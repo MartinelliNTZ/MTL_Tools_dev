@@ -10,7 +10,7 @@ from ..core.engine_tasks.ReverseGeocodeStep import ReverseGeocodeStep
 from ..core.engine_tasks.AltimetryStep import AltimetryStep
 from ..core.engine_tasks.ParallelStep import ParallelStep
 from ..utils.vector.VectorLayerProjection import VectorLayerProjection
-from .coord_result_dialog import CoordResultDialog
+from .CoorResultDialog import CoordResultDialog
 from ..core.config.LogUtils import LogUtils
 
 

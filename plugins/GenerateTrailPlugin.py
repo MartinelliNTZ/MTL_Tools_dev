@@ -381,7 +381,7 @@ class GenerateTrailPlugin(BasePluginMTL):
         self.finish_stats()
 
 
-def run_gerar_rastro(iface):
+def run(iface):
     dlg = GenerateTrailPlugin(iface)
     dlg.setModal(False)
     dlg.show()

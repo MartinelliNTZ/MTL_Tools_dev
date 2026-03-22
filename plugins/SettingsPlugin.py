@@ -225,7 +225,7 @@ class SettingsPlugin(BasePluginMTL):
             )
 
 
-def run_settings(iface):
+def run(iface):
     """Função de entrada do plugin."""
     dlg = SettingsPlugin(iface)
     dlg.setModal(False)
