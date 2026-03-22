@@ -23,6 +23,7 @@ from qgis.PyQt.QtWidgets import (
 
 from typing import Dict, Optional, Any
 from ...utils.ProjectUtils import ProjectUtils
+from ...i18n.TranslationManager import STR
 
 
 class ReadOnlyFieldWidget(QWidget):
@@ -32,7 +33,7 @@ class ReadOnlyFieldWidget(QWidget):
         *,
         title: Optional[str] = None,
         title_button_copy_all: Optional[str] = None,
-        default_button_title: str = "Copiar",
+        default_button_title: str = STR.COPY,
         num_columns: int = 1,
         parent=None,
     ):

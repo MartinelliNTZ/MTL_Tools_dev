@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from ...core.config.LogUtils import LogUtils
+from ...i18n.TranslationManager import STR
 from qgis.PyQt.QtWidgets import QFrame, QLabel, QPushButton, QHBoxLayout
 from qgis.PyQt.QtCore import Qt, pyqtSignal, QPoint
 from qgis.PyQt.QtGui import QPixmap
@@ -84,13 +85,13 @@ class AppBarWidget(QFrame):
         layout.addStretch()
 
         if show_run:
-            self.btn_run = QPushButton("Executar")
+            self.btn_run = QPushButton(STR.EXECUTE)
             self.btn_run.setObjectName("app_bar_btn_run")
             self.btn_run.clicked.connect(self.runClicked.emit)
             layout.addWidget(self.btn_run)
 
         if show_info:
-            self.btn_info = QPushButton("Info")
+            self.btn_info = QPushButton(STR.INFO)
             self.btn_info.setObjectName("app_bar_btn_info")
             self.btn_info.clicked.connect(self.infoClicked.emit)
             layout.addWidget(self.btn_info)

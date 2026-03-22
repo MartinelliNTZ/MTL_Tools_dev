@@ -11,6 +11,7 @@ from qgis.PyQt.QtWidgets import (
     QListWidgetItem,
 )
 from qgis.PyQt.QtCore import Qt
+from ...i18n.TranslationManager import STR
 
 
 class AttributeSelectorWidget(QWidget):
@@ -21,8 +22,8 @@ class AttributeSelectorWidget(QWidget):
     def __init__(
         self,
         *,
-        title="Atributos",
-        check_all_text="Usar todos os atributos",
+        title=STR.ATTRIBUTES,
+        check_all_text=STR.USE_ALL_ATTRIBUTES,
         parent=None
     ):
         super().__init__(parent)
@@ -45,9 +46,9 @@ class AttributeSelectorWidget(QWidget):
 
         btn_layout = QHBoxLayout()
 
-        self.btn_select = QPushButton("✔ Selecionar")
-        self.btn_unselect = QPushButton("✖ Remover")
-        self.btn_invert = QPushButton("⇄ Inverter")
+        self.btn_select = QPushButton(f"✔ {STR.SELECT}")
+        self.btn_unselect = QPushButton(f"✖ {STR.REMOVE}")
+        self.btn_invert = QPushButton(f"⇄ {STR.INVERT}")
 
         btn_layout.addWidget(self.btn_select)
         btn_layout.addWidget(self.btn_unselect)

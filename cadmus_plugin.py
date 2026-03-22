@@ -8,8 +8,8 @@ from .utils.QgisMessageUtil import QgisMessageUtil
 from .core.config.LogUtils import LogUtils
 from .i18n.TranslationManager import STR
 from .core.config.PluginBootstrap import PluginBootstrap
-from .core.ToolRegistry import ToolRegistry
-from .core.MenuManager import MenuManager
+from .core.config.ToolRegistry import ToolRegistry
+from .core.config.MenuManager import MenuManager
 
 
 class CadmusPlugin:

@@ -2,6 +2,7 @@
 
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QComboBox
+from ...i18n.TranslationManager import STR
 
 
 class DropdownSelectorWidget(QWidget):
@@ -14,7 +15,7 @@ class DropdownSelectorWidget(QWidget):
         options_dict: dict,
         selected_key=None,
         allow_empty: bool = False,
-        empty_text: str = "Selecione...",
+        empty_text: str = f"{STR.SELECT}...",
         parent=None,
     ):
         super().__init__(parent)

@@ -13,6 +13,8 @@ from qgis.PyQt.QtWidgets import (
 )
 from qgis.PyQt.QtCore import pyqtSignal
 from ...core.config.LogUtils import LogUtils
+from ...i18n.TranslationManager import STR
+from ...utils.StringUtils import StringUtils
 
 # Logger do widget
 logger = LogUtils(tool="widgets", class_name="SelectorWidget")
@@ -45,11 +47,11 @@ class SelectorWidget(QWidget):
     def __init__(
         self,
         *,
-        title: str = "Selecionar",
-        file_filter: str = "Todos (*.*)",
+        title: str = STR.SELECT,
+        file_filter: str = StringUtils.FILTER_ALL,
         mode: str = MODE_FOLDER,
         checkbox: bool = False,
-        checkbox_text: str = "Ativar",
+        checkbox_text: str = STR.ENABLE,
         parent=None,
     ):
         """Inicializa widget universal.
@@ -99,7 +101,7 @@ class SelectorWidget(QWidget):
         input_layout.addWidget(label)
 
         self._input = QLineEdit()
-        self._input.setPlaceholderText("Nenhum caminho selecionado")
+        self._input.setPlaceholderText(STR.NO_PATH_SELECTED)
         self._input.setMaximumHeight(24)
         self._input.setMinimumWidth(50)
         self._input.textChanged.connect(self._on_input_changed)
@@ -255,7 +257,7 @@ class SelectorWidget(QWidget):
             if len(files) == 1:
                 self._input.setText(files[0])
             else:
-                self._input.setText(f"{len(files)} arquivo(s) selecionado(s)")
+                self._input.setText(f"{len(files)} {STR.FILES_SELECTED}")
 
             self.pathsChanged.emit(files)
 
@@ -307,7 +309,7 @@ class SelectorWidget(QWidget):
             if len(paths) == 1:
                 self._input.setText(paths[0])
             else:
-                self._input.setText(f"{len(paths)} item(s)")
+                self._input.setText(f"{len(paths)} {STR.ITEMS_SELECTED}")
             self._paths = paths.copy()
             self.pathsChanged.emit(paths)
 

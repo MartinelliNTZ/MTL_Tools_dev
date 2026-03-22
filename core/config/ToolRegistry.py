@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import sys
 import traceback
-from .model.Tool import Tool
-from ..resources.IconManager import IconManager as im
-from .config.LogUtils import LogUtils
-from ..utils.ToolKeys import ToolKey
-from ..utils.QgisMessageUtil import QgisMessageUtil
-from ..i18n.TranslationManager import STR
+from ..model.Tool import Tool
+from ...resources.IconManager import IconManager as im
+from .LogUtils import LogUtils
+from ...utils.ToolKeys import ToolKey
+from ...utils.QgisMessageUtil import QgisMessageUtil
+from ...i18n.TranslationManager import STR
 
 
 class ToolRegistry:
@@ -230,7 +230,7 @@ class ToolRegistry:
     # =================================================
     def run_restart_qgis(self):
         try:
-            from ..plugins.RestartQgis import run_restart_qgis
+            from ...plugins.RestartQgis import run_restart_qgis
 
             self.logger.info("Iniciando plugin: Restart QGIS")
             run_restart_qgis(self.iface)
@@ -247,7 +247,7 @@ class ToolRegistry:
     # ======================================
     def run_vector_fields(self):
         try:
-            from ..plugins.VectorFieldsCalculationPlugin import (
+            from ...plugins.VectorFieldsCalculationPlugin import (
                 VectorFieldsCalculationPlugin,
             )
 
@@ -267,7 +267,7 @@ class ToolRegistry:
     # =====================================================
     def run_multpart(self):
         try:
-            from ..plugins.VectorMultipartPlugin import VectorMultipartPlugin
+            from ...plugins.VectorMultipartPlugin import VectorMultipartPlugin
 
             self.logger.info("Iniciando plugin: Converter para Multipart")
             # manter referência viva
@@ -287,7 +287,7 @@ class ToolRegistry:
     # =====================================================
     def run_coord_click(self):
         try:
-            from ..plugins.CoordClickTool import CoordClickTool
+            from ...plugins.CoordClickTool import CoordClickTool
 
             self.logger.info("Ativando ferramenta: Capturar Coordenadas")
             self.coord_click_tool = CoordClickTool(self.iface)
@@ -305,7 +305,7 @@ class ToolRegistry:
     # =====================================================
     def run_export_layouts(self):
         try:
-            from ..plugins.ExportAllLayouts import run
+            from ...plugins.ExportAllLayouts import run
 
             self.logger.info("Abrindo diálogo: Exportar todos os Layouts")
             self.export_dlg = run(self.iface)
@@ -321,7 +321,7 @@ class ToolRegistry:
     # =====================================================
     def run_gerar_rastro(self):
         try:
-            from ..plugins.GenerateTrailPlugin import run
+            from ...plugins.GenerateTrailPlugin import run
 
             self.logger.info("Abrindo diálogo: Gerar Rastro Implemento")
             self.gerar_rastro_dlg = run(self.iface)
@@ -346,7 +346,7 @@ class ToolRegistry:
 
             # Import isolado
             try:
-                from ..plugins.logcat.logcat_plugin import run
+                from ...plugins.logcat.logcat_plugin import run
 
                 self.logger.info("LOGCAT: Módulo logcat_plugin importado")
             except ImportError as import_err:
@@ -399,7 +399,7 @@ class ToolRegistry:
     # =====================================================
     def run_drone_coords(self):
         try:
-            from ..plugins.DroneCoordinates import run
+            from ...plugins.DroneCoordinates import run
 
             self.logger.info("Abrindo diálogo: Obter Coordenadas de Drone")
             self.drone_cordinates_dlg = run(self.iface)
@@ -416,7 +416,7 @@ class ToolRegistry:
     # =====================================================
     def run_replace_layouts(self):
         try:
-            from ..plugins.ReplaceInLayouts import run
+            from ...plugins.ReplaceInLayouts import run
 
             self.logger.info("Abrindo diálogo: Substituir textos nos Layouts")
             self.replace_layouts_dlg = run(self.iface)
@@ -432,7 +432,7 @@ class ToolRegistry:
     # =====================================================
     def run_load_folder(self):
         try:
-            from ..plugins.LoadFolderLayers import run
+            from ...plugins.LoadFolderLayers import run
 
             self.logger.info("Iniciando plugin: Carregar pasta de arquivos")
             self.load_folder_dlg = run(self.iface)
@@ -448,7 +448,7 @@ class ToolRegistry:
     # =====================================================
     def run_about_dialog(self):
         try:
-            from ..plugins.AboutDialog import run
+            from ...plugins.AboutDialog import run
 
             self.logger.info("Abrindo diálogo: Sobre o Cadmus")
             self.about_dlg = run(self.iface)
@@ -464,7 +464,7 @@ class ToolRegistry:
     # =====================================================
     def run_copy_atributes(self):
         try:
-            from ..plugins.CopyAttributesPlugin import run
+            from ...plugins.CopyAttributesPlugin import run
 
             self.logger.info("Abrindo diálogo: Copiar Atributos")
             self.copy_attributes_dlg = run(self.iface)
@@ -480,7 +480,7 @@ class ToolRegistry:
     # =====================================================
     def run_settings(self):
         try:
-            from ..plugins.SettingsPlugin import run
+            from ...plugins.SettingsPlugin import run
 
             self.logger.info("Abrindo diálogo: Configurações")
             self.settings_dlg = run(self.iface)

@@ -14,6 +14,7 @@ Uso:
 """
 
 from qgis.PyQt.QtWidgets import QPushButton, QSizePolicy
+from ...i18n.TranslationManager import STR
 
 
 class SimpleButtonWidget(QPushButton):
@@ -27,7 +28,7 @@ class SimpleButtonWidget(QPushButton):
     - Aplicar estilo via: widget.setStyleSheet(Styles.simple_button_widget())
     """
 
-    def __init__(self, text: str = "Botão", parent=None):
+    def __init__(self, text: str = STR.BUTTON, parent=None):
         """
         Inicializa botão simples.
 

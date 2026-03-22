@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from qgis.PyQt.QtWidgets import QWidget, QHBoxLayout, QPushButton
+from ...i18n.TranslationManager import STR
 
 
 class BottomActionButtonsWidget(QWidget):
@@ -14,8 +15,8 @@ class BottomActionButtonsWidget(QWidget):
         run_callback,
         close_callback,
         info_callback=None,
-        run_text="Executar",
-        close_text="Fechar",
+        run_text=STR.EXECUTE,
+        close_text=STR.CLOSE,
         height=24,
         tool_key=None,
         parent=None,

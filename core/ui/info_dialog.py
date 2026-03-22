@@ -3,13 +3,15 @@ import os
 from ...core.config.LogUtils import LogUtils
 from ...plugins.BaseDialog import BaseDialog
 from ...core.ui.WidgetFactory import WidgetFactory
+from ...i18n.TranslationManager import STR
+from ...utils.ToolKeys import ToolKey
 
 
 class InfoDialog(BaseDialog):
-    def __init__(self, instructions_path: str, parent=None, title="Cadmus"):
+    def __init__(self, instructions_path: str, parent=None, title=STR.APP_NAME, tool_key=ToolKey.UNTRACEABLE):
         super().__init__(parent)
         self.logger = LogUtils(
-            tool="untraceable", class_name=self.__class__.__name__, level=LogUtils.DEBUG
+            tool=tool_key, class_name=self.__class__.__name__, level=LogUtils.DEBUG
         )
         self.logger.debug(f"Inicializando InfoDialog com arquivo: {instructions_path}")
 
@@ -34,12 +36,12 @@ class InfoDialog(BaseDialog):
 
         else:
             browser.setPlainText(
-                f"Arquivo de instruções não encontrado:\n{instructions_path}"
+                f"{STR.FILE_NOT_FOUND}:\n{instructions_path}"
             )
 
         self.layout.addWidget(browser)
         btn_layout, btn_widget = WidgetFactory.create_simple_button(
-            text="Fechar", parent=self, spacing=20
+            text=STR.CLOSE, parent=self, spacing=20
         )
         try:
             btn_widget.clicked.connect(self.close)

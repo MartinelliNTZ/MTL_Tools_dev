@@ -69,7 +69,7 @@ class SettingsPlugin(BasePluginMTL):
         self.logger.debug("Widget de cálculo vetorial adicionado")
         langs = {"es": "Español", "en": "English", "pt": "Português"}
         lang_layout, self.lang_selector = WidgetFactory.create_dropdown_selector(
-            title=f"⚙️ {STR.VECTOR_CALCULATION_METHOD}",
+            title=f"⚙️ {STR.PLUGIN_LANGUAGE}",
             options_dict=langs,
             selected_key="pt",
             separator_top=True,

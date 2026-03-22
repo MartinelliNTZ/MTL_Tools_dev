@@ -26,6 +26,7 @@ from qgis.PyQt.QtWidgets import (
 )
 from qgis.PyQt.QtCore import Qt, QPropertyAnimation, QEasingCurve, pyqtSignal
 from ..styles.Styles import Styles
+from ...i18n.TranslationManager import STR
 
 
 class CollapsibleParametersWidget(QWidget):
@@ -38,7 +39,7 @@ class CollapsibleParametersWidget(QWidget):
 
     expandedChanged = pyqtSignal(bool)
 
-    def __init__(self, title: str = "Parâmetros Avançados", parent=None):
+    def __init__(self, title: str = STR.ADVANCED_PARAMETERS, parent=None):
         """
         Inicializa o widget.
 

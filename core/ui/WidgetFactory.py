@@ -23,6 +23,7 @@ from ...resources.widgets.SimpleButtonWidget import SimpleButtonWidget
 from ...resources.widgets.CheckboxGridWidget import CheckboxGridWidget
 from ...resources.widgets.ReadOnlyFieldWidget import ReadOnlyFieldWidget
 from ...resources.widgets.DropdownSelectorWidget import DropdownSelectorWidget
+from ...i18n.TranslationManager import STR
 
 
 class WidgetFactory:
@@ -35,8 +36,8 @@ class WidgetFactory:
     def create_attribute_selector(
         *,
         parent=None,
-        title="Atributos",
-        check_all_text="Usar todos os atributos",
+        title=STR.ATTRIBUTES,
+        check_all_text=STR.USE_ALL_ATTRIBUTES,
         separator_top=False,
         separator_bottom=True,
     ):
@@ -149,8 +150,8 @@ class WidgetFactory:
         separator_top=False,
         separator_bottom=False,
         tool_key=None,
-        run_text="Executar",
-        close_text="Fechar",
+        run_text=STR.EXECUTE,
+        close_text=STR.CLOSE,
     ):
         layout = QVBoxLayout()
 
@@ -213,8 +214,8 @@ class WidgetFactory:
         separator_top=False,
         separator_bottom=True,
         file_filter=StringUtils.FILTER_QGIS_STYLE,
-        checkbox_text="Aplicar estilo QML",
-        label_text="QML:",
+        checkbox_text=STR.APPLY_QML_STYLE,
+        label_text=STR.QML_LABEL,
     ):
         """Criar seletor de arquivo QML com checkbox."""
         layout = QVBoxLayout()
@@ -257,7 +258,7 @@ class WidgetFactory:
 
     @staticmethod
     def create_main_layout(
-        self, title: str = "Title", enable_scroll: bool = False, icon_path: str = None
+        self, title: str = STR.APP_NAME, enable_scroll: bool = False, icon_path: str = None
     ):
         """
         Criar layout principal com AppBar.
@@ -293,8 +294,8 @@ class WidgetFactory:
         separator_top=False,
         separator_bottom=True,
         file_filter=StringUtils.FILTER_VECTOR,
-        checkbox_text: str = "Salvar em arquivo: ",
-        label_text: str = "Salvar em:",
+        checkbox_text: str = STR.SAVE_TO_FILE,
+        label_text: str = STR.SAVE_IN,
     ):
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -511,7 +512,7 @@ class WidgetFactory:
         fields: dict = None,
         num_columns: int = 1,
         copy_all_button_title: str = None,
-        default_button_title: str = "Copiar",
+        default_button_title: str = STR.COPY,
         tool_key: str = None,
         separator_top: bool = False,
         separator_bottom: bool = True,
@@ -576,7 +577,7 @@ class WidgetFactory:
     def create_collapsible_parameters(
         *,
         parent=None,
-        title: str = "Parâmetros Avançados",
+        title: str = STR.ADVANCED_PARAMETERS,
         expanded_by_default: bool = False,
         separator_top: bool = False,
         separator_bottom: bool = True,
@@ -656,8 +657,8 @@ class WidgetFactory:
     def create_path_selector(
         *,
         parent=None,
-        title: str = "Selecionar Caminho",
-        file_filter: str = "Todos (*.*)",
+        title: str = STR.SELECT_PATH,
+        file_filter: str = StringUtils.FILTER_ALL,
         mode: str = "radio",
         separator_top: bool = False,
         separator_bottom: bool = True,
@@ -750,7 +751,7 @@ class WidgetFactory:
         options_dict: dict,
         selected_key=None,
         allow_empty: bool = False,
-        empty_text: str = "Selecione...",
+        empty_text: str = f"{STR.SELECT}...",
         parent=None,
         separator_top: bool = False,
         separator_bottom: bool = True,
@@ -781,7 +782,7 @@ class WidgetFactory:
     @staticmethod
     def create_simple_button(
         *,
-        text: str = "Botão",
+        text: str = STR.BUTTON,
         parent=None,
         separator_top=False,
         separator_bottom=False,

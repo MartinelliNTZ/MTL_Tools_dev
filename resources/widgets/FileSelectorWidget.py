@@ -6,6 +6,7 @@ from qgis.PyQt.QtWidgets import (
 )
 from ...utils.StringUtils import StringUtils
 from qgis.PyQt.QtWidgets import QFileDialog
+from ...i18n.TranslationManager import STR
 
 
 class FileSelectorWidget(QWidget):
@@ -18,8 +19,8 @@ class FileSelectorWidget(QWidget):
     def __init__(
         self,
         *,
-        checkbox_text="Arquivo?",
-        label_text="Arquivo:",
+        checkbox_text=STR.SAVE_TO_FILE,
+        label_text=f"{STR.SELECT_FILE}:",
         file_filter=StringUtils.FILTER_ALL,
         mode=MODE_OPEN,
         parent=None
@@ -94,14 +95,14 @@ class FileSelectorWidget(QWidget):
         if mode == FileSelectorWidget.MODE_SAVE:
             path, _ = QFileDialog.getSaveFileName(
                 self,
-                "Salvar arquivo",
+                STR.SAVE_FILE,
                 line_edit.text(),
                 file_filter
             )
         else:
             path, _ = QFileDialog.getOpenFileName(
                 self,
-                "Selecionar arquivo",
+                STR.SELECT_FILE,
                 line_edit.text(),
                 file_filter
             )

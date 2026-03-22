@@ -6,6 +6,7 @@ class Strings_pt_BR:
 
     # General
     APP_NAME = "Cadmus"
+    PLUGIN_LANGUAGE = "Idioma do Plugin"
 
     # About
     ABOUT_CADMUS = "Sobre o Cadmus"
@@ -23,6 +24,12 @@ class Strings_pt_BR:
     CANCEL = "Cancelar"
     EXECUTE = "Executar"
     COPIED = "Copiado"
+    COPY = "Copiar"
+    SELECT = "Selecionar"
+    REMOVE = "Remover"
+    INVERT = "Inverter"
+    ENABLE = "Ativar"
+    INFO = "Info"
 
     # Common labels
     OPTIONS = "Opções"
@@ -47,6 +54,8 @@ class Strings_pt_BR:
     SEARCH_TEXT = "Texto a buscar:"
     REPLACE_WITH_NEW_TEXT = "Texto a substituir (novo):"
     SOURCE_LAYER_ATTRIBUTES = "Atributos da camada origem"
+    ATTRIBUTES = "Atributos"
+    USE_ALL_ATTRIBUTES = "Usar todos os atributos"
     EXPORT_OPTIONS = "Opções de Exportação"
     MAX_WIDTH_PNG = "Max Width para PNG (px):"
     USE_PROJECT_FOLDER = "Usar pasta do projeto"
@@ -73,6 +82,7 @@ class Strings_pt_BR:
     ZONE = "Zona"
     HEMISPHERE = "Hemisfério"
     CITY = "Município"
+    FILE_NOT_FOUND = "Arquivo não encontrado"
     INTERMEDIATE_REGION = "Região Intermediária"
     STATE = "Estado"
     REGION = "Região"
@@ -80,6 +90,17 @@ class Strings_pt_BR:
     LOADING = "Carregando..."
     LOADING_LOWER = "carregando..."
     UNAVAILABLE = "Indisponível"
+    NO_PATH_SELECTED = "Nenhum caminho selecionado"
+    FILES_SELECTED = "arquivo(s) selecionado(s)"
+    ITEMS_SELECTED = "item(s)"
+    ONLY_SELECTED_FEATURES = "Somente feições selecionadas"
+    APPLY_QML_STYLE = "Aplicar estilo QML"
+    QML_LABEL = "QML:"
+    SAVE_TO_FILE = "Salvar em arquivo:"
+    SELECT_PATH = "Selecionar Caminho"
+    BUTTON = "Botão"
+    SAVE_FILE = "Salvar arquivo"
+    SELECT_FILE = "Selecionar arquivo"
 
     # Common option labels
     CASE_SENSITIVE = "Diferenciar maiúsculas/minúsculas"

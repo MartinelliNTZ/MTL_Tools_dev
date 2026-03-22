@@ -5,6 +5,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.gui import QgsMapLayerComboBox
 from qgis.core import QgsVectorLayer, QgsMapLayerProxyModel, QgsProject
 from ...core.config.LogUtils import LogUtils
+from ...i18n.TranslationManager import STR
 
 # Logger do widget
 logger = LogUtils(tool="widgets", class_name="LayerInputWidget")
@@ -44,7 +45,7 @@ class LayerInputWidget(QWidget):
 
         self._chk_selected = None
         if enable_selected_checkbox:
-            self._chk_selected = QCheckBox("Somente feições selecionadas")
+            self._chk_selected = QCheckBox(STR.ONLY_SELECTED_FEATURES)
             self._chk_selected.setEnabled(False)
 
         self._build_layout()

@@ -7,6 +7,7 @@ class Strings_es(Strings_pt_BR):
 
     # General
     APP_NAME = "Cadmus"
+    PLUGIN_LANGUAGE = "Idioma del plugin"
 
     # About
     ABOUT_CADMUS = "Acerca de Cadmus"
@@ -24,6 +25,12 @@ class Strings_es(Strings_pt_BR):
     CANCEL = "Cancelar"
     EXECUTE = "Ejecutar"
     COPIED = "Copiado"
+    COPY = "Copiar"
+    SELECT = "Seleccionar"
+    REMOVE = "Quitar"
+    INVERT = "Invertir"
+    ENABLE = "Activar"
+    INFO = "Info"
 
     # Common labels
     OPTIONS = "Opciones"
@@ -48,6 +55,8 @@ class Strings_es(Strings_pt_BR):
     SEARCH_TEXT = "Texto a buscar:"
     REPLACE_WITH_NEW_TEXT = "Reemplazar por:"
     SOURCE_LAYER_ATTRIBUTES = "Atributos de la capa de origen"
+    ATTRIBUTES = "Atributos"
+    USE_ALL_ATTRIBUTES = "Usar todos los atributos"
     EXPORT_OPTIONS = "Opciones de exportación"
     MAX_WIDTH_PNG = "Ancho máximo PNG (px):"
     USE_PROJECT_FOLDER = "Usar carpeta del proyecto"
@@ -81,6 +90,17 @@ class Strings_es(Strings_pt_BR):
     LOADING = "Cargando..."
     LOADING_LOWER = "cargando..."
     UNAVAILABLE = "No disponible"
+    NO_PATH_SELECTED = "Ninguna ruta seleccionada"
+    FILES_SELECTED = "archivo(s) seleccionado(s)"
+    ITEMS_SELECTED = "elemento(s)"
+    ONLY_SELECTED_FEATURES = "Solo entidades seleccionadas"
+    APPLY_QML_STYLE = "Aplicar estilo QML"
+    QML_LABEL = "QML:"
+    SAVE_TO_FILE = "Guardar en archivo:"
+    SELECT_PATH = "Seleccionar Ruta"
+    BUTTON = "Botón"
+    SAVE_FILE = "Guardar archivo"
+    SELECT_FILE = "Seleccionar archivo"
 
     # Common option labels
     CASE_SENSITIVE = "Distinguir mayúsculas/minúsculas"

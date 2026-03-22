@@ -9,6 +9,7 @@ class Strings_en(Strings_pt_BR):
 
     # General
     APP_NAME = "Cadmus"
+    PLUGIN_LANGUAGE = "Plugin Language"
 
     # About
     ABOUT_CADMUS = "About Cadmus"
@@ -26,6 +27,12 @@ class Strings_en(Strings_pt_BR):
     CANCEL = "Cancel"
     EXECUTE = "Run"
     COPIED = "Copied"
+    COPY = "Copy"
+    SELECT = "Select"
+    REMOVE = "Remove"
+    INVERT = "Invert"
+    ENABLE = "Enable"
+    INFO = "Info"
 
     # Common labels
     OPTIONS = "Options"
@@ -50,6 +57,8 @@ class Strings_en(Strings_pt_BR):
     SEARCH_TEXT = "Text to search:"
     REPLACE_WITH_NEW_TEXT = "Replace with:"
     SOURCE_LAYER_ATTRIBUTES = "Source layer attributes"
+    ATTRIBUTES = "Attributes"
+    USE_ALL_ATTRIBUTES = "Use all attributes"
     EXPORT_OPTIONS = "Export Options"
     MAX_WIDTH_PNG = "Max PNG width (px):"
     USE_PROJECT_FOLDER = "Use project folder"
@@ -83,6 +92,17 @@ class Strings_en(Strings_pt_BR):
     LOADING = "Loading..."
     LOADING_LOWER = "loading..."
     UNAVAILABLE = "Unavailable"
+    NO_PATH_SELECTED = "No path selected"
+    FILES_SELECTED = "file(s) selected"
+    ITEMS_SELECTED = "item(s)"
+    ONLY_SELECTED_FEATURES = "Selected features only"
+    APPLY_QML_STYLE = "Apply QML style"
+    QML_LABEL = "QML:"
+    SAVE_TO_FILE = "Save to file:"
+    SELECT_PATH = "Select Path"
+    BUTTON = "Button"
+    SAVE_FILE = "Save file"
+    SELECT_FILE = "Select file"
 
     # Common option labels
     CASE_SENSITIVE = "Case sensitive"
