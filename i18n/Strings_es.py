@@ -13,12 +13,13 @@ class Strings_es(Strings_pt_BR):
     VERSION = "Versión"
     UPDATED_ON = "Actualizado el"
     CREATED_ON = "Creado el"
-    CREATOR = "Creador"
+    CREATOR = "Autor"
     LOCATION = "Ubicación"
 
     # Buttons
     CLOSE = "Cerrar"
     SAVE = "Guardar"
+    LOAD_FILES = "Cargar archivos"
     EXPORT = "Exportar"
     CANCEL = "Cancelar"
     EXECUTE = "Ejecutar"
@@ -26,54 +27,54 @@ class Strings_es(Strings_pt_BR):
 
     # Common labels
     OPTIONS = "Opciones"
-    SAVING = "Guardado"
+    SAVING = "Guardando"
     STYLES = "Estilos"
-    WARNING = "Aviso"
+    WARNING = "Advertencia"
     ERROR = "Error"
-    ADVANCED_PARAMETERS = "Parámetros Avanzados"
-    APP_PREFERENCES = "Preferencias de la Aplicación"
-    OPEN_PREFERENCES_FOLDER = "Abrir Carpeta de Preferencias"
-    FILE_TYPES = "Tipos de Archivo"
+    ADVANCED_PARAMETERS = "Parámetros avanzados"
+    APP_PREFERENCES = "Preferencias de la aplicación"
+    OPEN_PREFERENCES_FOLDER = "Abrir carpeta de preferencias"
+    FILE_TYPES = "Tipos de archivo"
     ROOT_FOLDER = "Carpeta raíz:"
     OUTPUT_FOLDER = "Carpeta de salida:"
-    INPUT_LINE_LAYER = "Capa de Líneas (ENTRADA):"
-    SOURCE_LAYER = "Capa de Origen:"
-    TARGET_LAYER = "Capa de Destino:"
-    IMPLEMENT_SIZE = "Tamaño del implemento: (siempre en metros)"
-    VECTOR_CALCULATION_METHOD = "Método de Cálculo Vectorial"
+    INPUT_LINE_LAYER = "Capa de líneas (INPUT):"
+    SOURCE_LAYER = "Capa de origen:"
+    TARGET_LAYER = "Capa de destino:"
+    IMPLEMENT_SIZE = "Ancho del implemento (metros):"
+    VECTOR_CALCULATION_METHOD = "Método de cálculo vectorial"
     VECTOR_FIELDS_PRECISION = "Precisión de campos vectoriales (decimales):"
     ASYNC_THRESHOLD = "Umbral asíncrono (nº de entidades):"
     CALCULATION_METHOD_LABEL = "Método de cálculo vectorial:"
     SEARCH_TEXT = "Texto a buscar:"
-    REPLACE_WITH_NEW_TEXT = "Texto de reemplazo (nuevo):"
+    REPLACE_WITH_NEW_TEXT = "Reemplazar por:"
     SOURCE_LAYER_ATTRIBUTES = "Atributos de la capa de origen"
-    EXPORT_OPTIONS = "Opciones de Exportación"
-    MAX_WIDTH_PNG = "Ancho máximo para PNG (px):"
+    EXPORT_OPTIONS = "Opciones de exportación"
+    MAX_WIDTH_PNG = "Ancho máximo PNG (px):"
     USE_PROJECT_FOLDER = "Usar carpeta del proyecto"
-    EXPORT_PDF = "Exportar PDF"
-    EXPORT_PNG = "Exportar PNG"
-    MERGE_PDFS_FINAL = "Unir PDFs en PDF final"
-    MERGE_PNGS_FINAL = "Unir PNGs en PDF final"
-    REPLACE_EXISTING_FILES = "Reemplazar archivos existentes"
+    EXPORT_PDF = "Exportar como PDF"
+    EXPORT_PNG = "Exportar como PNG"
+    MERGE_PDFS_FINAL = "Unir PDFs en archivo final"
+    MERGE_PNGS_FINAL = "Convertir PNGs a PDF"
+    REPLACE_EXISTING_FILES = "Sobrescribir archivos existentes"
     WGS84_EPSG4326 = "WGS 84 (EPSG:4326)"
     UTM_SIRGAS_2000 = "UTM SIRGAS 2000"
     ALTIMETRY_OPENTOPO = "Altimetría (OpenTopoData)"
-    APPROX_ALTITUDE_METERS = "Altitud aproximada (m)"
-    LATITUDE_DECIMAL = "Latitud (Decimal)"
-    LONGITUDE_DECIMAL = "Longitud (Decimal)"
+    APPROX_ALTITUDE_METERS = "Altitud aprox. (m)"
+    LATITUDE_DECIMAL = "Latitud (decimal)"
+    LONGITUDE_DECIMAL = "Longitud (decimal)"
     LATITUDE_DMS = "Latitud (DMS)"
     LONGITUDE_DMS = "Longitud (DMS)"
     EASTING_X = "Este (X)"
     NORTHING_Y = "Norte (Y)"
     ADDRESS_OSM = "Dirección (OSM):"
-    COPY_WGS84_FULL = "Copiar WGS 84 (Completo)"
-    COPY_UTM_FULL = "Copiar UTM (Completo)"
-    COPY_LOCATION_FULL = "Copiar Ubicación (Completa)"
-    POINT_COORDINATES = "Coordenadas del Punto"
+    COPY_WGS84_FULL = "Copiar WGS84 (completo)"
+    COPY_UTM_FULL = "Copiar UTM (completo)"
+    COPY_LOCATION_FULL = "Copiar ubicación (completa)"
+    POINT_COORDINATES = "Coordenadas del punto"
     ZONE = "Zona"
     HEMISPHERE = "Hemisferio"
     CITY = "Municipio"
-    INTERMEDIATE_REGION = "Región Intermedia"
+    INTERMEDIATE_REGION = "Región intermedia"
     STATE = "Estado"
     REGION = "Región"
     COUNTRY = "País"
@@ -83,109 +84,186 @@ class Strings_es(Strings_pt_BR):
 
     # Common option labels
     CASE_SENSITIVE = "Distinguir mayúsculas/minúsculas"
-    FULL_LABEL_REPLACE = "Reemplazar la etiqueta completa cuando se encuentre el texto"
-    LOAD_ONLY_MISSING_FILES = "Cargar solo archivos que aún no están en el proyecto"
-    PRESERVE_FOLDER_STRUCTURE = (
-        "Crear grupos según la estructura de carpetas/subcarpetas"
-    )
-    DO_NOT_GROUP_LAST_FOLDER = "No agrupar la última carpeta"
+    FULL_LABEL_REPLACE = "Reemplazar todo el texto del label al encontrar coincidencia"
+    LOAD_ONLY_MISSING_FILES = "Cargar solo archivos que aún no estén en el proyecto"
+    PRESERVE_FOLDER_STRUCTURE = "Agrupar según la estructura de carpetas/subcarpetas"
+    DO_NOT_GROUP_LAST_FOLDER = "No agrupar el último nivel de carpeta"
     CREATE_PROJECT_BACKUP_IF_SAVED = (
-        "Crear copia de seguridad del proyecto antes de cargar (solo si ya está guardado)"
+        "Crear copia de seguridad antes de cargar (si el proyecto está guardado)"
     )
 
     # Common messages
-    SUCCESS_MESSAGE = "Procesamiento completado con éxito."
-    ERROR_LAYER_NOT_FOUND = "Error: Capa no encontrada."
+    SUCCESS_MESSAGE = "Proceso ejecutado con éxito."
+    ERROR_LAYER_NOT_FOUND = "Error: capa no encontrada."
     SELECT_VALID_FOLDER = "Seleccione una carpeta válida."
     SELECT_AT_LEAST_ONE_FILE_TYPE = "Seleccione al menos un tipo de archivo."
-    SELECT_AT_LEAST_ONE_EXPORT_FORMAT = (
-        "Seleccione al menos un formato (PDF o PNG)"
-    )
+    SELECT_AT_LEAST_ONE_EXPORT_FORMAT = "Seleccione al menos un formato (PDF o PNG)"
     SELECT_VALID_LINE_LAYER = "Seleccione una capa de líneas válida."
     INVALID_SOURCE_LAYER = "Capa de origen inválida"
     INVALID_TARGET_LAYER = "Capa de destino inválida"
     INVALID_INPUT_LAYER = "Capa de entrada inválida."
     FINAL_LAYER_NOT_FOUND = "Error: capa final no encontrada en el contexto."
     BUFFER_CANNOT_BE_ZERO = "El buffer no puede ser 0"
-    ASYNC_STARTED = "La ejecución en segundo plano ha comenzado. Revise el registro para ver el progreso."
+    ASYNC_STARTED = (
+        "Ejecución en segundo plano iniciada. Revise el log para ver el progreso."
+    )
     ASYNC_START_ERROR = "Error al iniciar la ejecución asíncrona:"
-    ASYNC_FINISHED = "La ejecución asíncrona se completó."
-    ASYNC_EXECUTION_ERROR = "Error en la ejecución asíncrona:"
+    ASYNC_FINISHED = "Ejecución asíncrona finalizada."
+    ASYNC_EXECUTION_ERROR = "Error durante la ejecución asíncrona:"
     FILES_LOADED_PREFIX = "Se cargaron"
     FILES_SUFFIX = "archivos."
-    SETTINGS_SAVED_TITLE = "Configuración Guardada"
-    SETTINGS_SAVED_MESSAGE = "La configuración se guardó correctamente."
+    SETTINGS_SAVED_TITLE = "Configuraciones guardadas"
+    SETTINGS_SAVED_MESSAGE = "Las configuraciones se guardaron correctamente."
     PREFERENCES_FOLDER_NOT_FOUND = "Carpeta de preferencias no encontrada:"
     ENTER_TEXT_TO_SEARCH = "Ingrese el texto a buscar."
     CONFIRM_REPLACEMENTS = "Confirmar reemplazos"
     SEARCH_LABEL = "Buscar:"
     REPLACE_WITH_LABEL = "Reemplazar por:"
-    DESTRUCTIVE_OPERATION_WARNING = "Atención - operación destructiva"
-    LAYOUTS_ANALYZED = "Diseños analizados:"
+    DESTRUCTIVE_OPERATION_WARNING = "Advertencia - operación destructiva"
+    LAYOUTS_ANALYZED = "Layouts analizados:"
     CHANGES_APPLIED = "Reemplazos aplicados:"
     REPLACEMENT_COMPLETED_TITLE = "Reemplazo completado"
-    PROJECT_BACKUP_INFO = (
-        "Copia de seguridad: se creará una copia del proyecto (.qgz) en la carpeta backup junto al archivo del proyecto."
-    )
-    LAYER_MUST_BE_EDITABLE = "La capa debe estar en modo de edición"
+    PROJECT_BACKUP_INFO = "Copia de seguridad: se creará una copia del proyecto (.qgz) en la carpeta backup junto al archivo del proyecto."
+    LAYER_MUST_BE_EDITABLE = "La capa debe estar en modo edición"
     NO_ATTRIBUTE_SELECTED = "Ningún atributo seleccionado"
     ATTRIBUTES_COPIED_SUCCESS = (
         "Atributos copiados correctamente (cambios no guardados)"
     )
-    REQUIRED_LIBRARY = "Biblioteca necesaria"
-    PYPDF2_REQUIRED_MESSAGE = (
-        "Para unir PDFs es necesario instalar el paquete PyPDF2.\n\n¿Desea instalarlo ahora?"
-    )
-    PILLOW_REQUIRED_MESSAGE = (
-        "Para unir PNGs en PDF es necesario instalar el paquete Pillow.\n\n¿Desea instalarlo ahora?"
-    )
-    EXPORTING_LAYOUTS = "Exportando diseños..."
+    REQUIRED_LIBRARY = "Biblioteca requerida"
+    PYPDF2_REQUIRED_MESSAGE = "Para unir PDFs es necesario instalar el paquete PyPDF2.\n\n¿Desea instalarlo ahora?"
+    PILLOW_REQUIRED_MESSAGE = "Para convertir PNGs a PDF es necesario instalar el paquete Pillow.\n\n¿Desea instalarlo ahora?"
+    EXPORTING_LAYOUTS = "Exportando layouts..."
     FAILED_EXPORT_PDF = "Error al exportar PDF:"
     FAILED_EXPORT_PNG = "Error al exportar PNG:"
-    ERROR_EXPORTING = "Error exportando"
+    ERROR_EXPORTING = "Error durante la exportación"
     FAILED_MERGE_PDFS = "Error al unir PDFs:"
     FAILED_MERGE_PNGS = "Error al unir PNGs:"
     ERRORS_FOUND = "Errores encontrados:"
-    LAYOUTS_EXPORTED_SUCCESS = "diseño(s) exportado(s) con éxito"
+    LAYOUTS_EXPORTED_SUCCESS = "¡Layout(s) exportado(s) correctamente!"
     PDFS_MERGED = "PDFs unidos"
     PNGS_MERGED = "PNGs unidos"
-    EXPORT_LAYOUTS_COMPLETED = "Exportación de Diseños Completada"
+    EXPORT_LAYOUTS_COMPLETED = "Exportación de layouts completada"
     LOCATION_COPIED_TO_CLIPBOARD = "Ubicación copiada al portapapeles"
     ADDRESS_COPIED_TO_CLIPBOARD = "Dirección copiada al portapapeles"
 
     # plugins/DroneCoordinates.py
-    DRONE_COORDINATES_TITLE = "Coordenadas del Dron"
-    RECURSIVE_SEARCH = "Buscar subcarpetas"
+    DRONE_COORDINATES_TITLE = "Coordenadas de dron"
+    DRONE_COORDINATES_TOOLTIP = (
+        "Lee archivos MRK de dron para generar puntos de fotos y la ruta de vuelo.\n"
+        "Puede cruzar los puntos con metadatos de imágenes,\n"
+        "guardar los resultados en archivo y aplicar estilos QML\n"
+        "a los puntos y a la trayectoria generada."
+    )
+    RECURSIVE_SEARCH = "Buscar en subcarpetas"
     PHOTOS_METADATA = "Cruzar con metadatos de fotos"
     MRK_FOLDER = "Carpeta MRK:"
     SAVE_POINTS_CHECKBOX = "¿Guardar puntos MRK en archivo?"
     SAVE_IN = "Guardar en:"
-    SAVE_TRACK_CHECKBOX = "¿Guardar la trayectoria en archivo?"
+    SAVE_TRACK_CHECKBOX = "¿Guardar trayectoria en archivo?"
     APPLY_STYLE_POINTS = "¿Aplicar estilo (QML) a los puntos?"
-    QML_POINTS = "QML de puntos:"
+    QML_POINTS = "QML puntos:"
     APPLY_STYLE_TRACK = "¿Aplicar estilo (QML) a la trayectoria?"
     QML_TRACK = "QML:"
 
     # plugins/SettingsPlugin.py
-    SETTINGS_TITLE = "Configuración de Cadmus"
-    SETTINGS_CALCULATION_METHOD_ELLIPSOIDAL = "Elipsoidal"
-    SETTINGS_CALCULATION_METHOD_CARTESIAN = "Cartesiana"
-    SETTINGS_CALCULATION_METHOD_BOTH = "Ambos"
+    SETTINGS_TITLE = "Configuraciones de Cadmus"
+    SETTINGS_TOOLTIP = (
+        "Abre las configuraciones globales de Cadmus.\n"
+        "Permite definir el método predeterminado de cálculo vectorial,\n"
+        "la precisión de los campos y el umbral de entidades\n"
+        "para el procesamiento asíncrono."
+    )
+    ELLIPSOIDAL = "Elipsoidal"
+    CARTESIAN = "Cartesiano"
+    BOTH = "Ambos"
 
     # plugins/ReplaceInLayouts.py
-    REPLACE_IN_LAYOUTS_TITLE = "Reemplazar Texto en Diseños"
-    REPLACE_IN_LAYOUTS_SWAP = "Intercambiar"
+    REPLACE_IN_LAYOUTS_TITLE = "Reemplazar texto en layouts"
+    REPLACE_IN_LAYOUTS_TOOLTIP = (
+        "Busca textos en los labels de los layouts del proyecto\n"
+        "y los reemplaza por el nuevo valor indicado.\n"
+        "Permite reemplazo parcial o total del contenido\n"
+        "cuando se encuentra coincidencia."
+    )
+    REPLACE_IN_LAYOUTS_SWAP = "Invertir"
     REPLACE_IN_LAYOUTS_RUN = "Ejecutar reemplazo"
 
     # plugins/LoadFolderLayers.py
-    LOAD_FOLDER_LAYERS_TITLE = "Cargar Archivos de Carpeta"
-    LOAD_FOLDER_LAYERS_RUN = "Cargar Archivos"
+    LOAD_FOLDER_LAYERS_TITLE = "Cargar carpeta de archivos"
+    LOAD_FOLDER_LAYERS_TOOLTIP = (
+        "Carga en lote archivos vectoriales y raster desde una carpeta\n"
+        "y sus subcarpetas en el proyecto QGIS.\n"
+        "Permite filtrar por tipo de archivo, evitar duplicados\n"
+        "y organizar capas según la estructura de carpetas."
+    )
 
     # plugins/GenerateTrailPlugin.py
-    GENERATE_TRAIL_TITLE = "Generar Rastro de Máquinas"
+    GENERATE_TRAIL_TITLE = "Generar rastro de máquinas"
+    GENERATE_TRAIL_TOOLTIP = (
+        "Genera el área cubierta por un implemento a partir de una capa de líneas.\n"
+        "Convierte el ancho informado a la unidad de la capa,\n"
+        "aplica un buffer con la mitad del valor y crea\n"
+        "una nueva capa con el rastro resultante."
+    )
 
     # plugins/CopyAttributesPlugin.py
-    COPY_ATTRIBUTES_TITLE = "Copiar Atributos de Vector"
+    COPY_ATTRIBUTES_TITLE = "Copiar atributos vectoriales"
+    COPY_ATTRIBUTES_TOOLTIP = (
+        "Copia la estructura de campos de una capa vectorial de origen\n"
+        "a una capa vectorial de destino.\n"
+        "Permite seleccionar qué atributos crear y manejar conflictos\n"
+        "de nombre cuando ya existen campos en la capa destino."
+    )
 
     # plugins/ExportAllLayouts.py
-    EXPORT_ALL_LAYOUTS_TITLE = "Exportar Todos los Diseños"
+    EXPORT_ALL_LAYOUTS_TITLE = "Exportar todos los layouts"
+    EXPORT_ALL_LAYOUTS_TOOLTIP = (
+        "Exporta todos los layouts del proyecto a PDF, PNG o ambos.\n"
+        "Puede unir los PDFs en un solo archivo,\n"
+        "convertir PNGs a PDF y controlar la sobrescritura\n"
+        "de archivos en la carpeta de salida."
+    )
+
+    # plugins/VectorMultipartPlugin.py
+    CONVERTER_MULTIPART_TITLE = "Convertir multipart"
+    CONVERTER_MULTIPART_TOOLTIP = (
+        "Procesa entidades multipart de la capa activa\n"
+        "y las divide en entidades simples.\n"
+        "Puede aplicarse solo a las entidades seleccionadas\n"
+        "o a toda la capa, preservando atributos."
+    )
+
+    # plugins/CoordClickTool.py
+    COORD_CLICK_TOOL_TITLE = "Capturar coordenadas"
+    COORD_CLICK_TOOL_TOOLTIP = (
+        "Permite hacer clic en el mapa para obtener coordenadas.\n"
+        "Abre un diálogo con WGS84, UTM, altitud aproximada\n"
+        "y dirección estimada, además de opciones de copia\n"
+        "al portapapeles."
+    )
+
+    # core/ToolRegistry.py
+    RESTART_QGIS_TITLE = "Guardar, cerrar y reabrir proyecto"
+    RESTART_QGIS_TOOLTIP = (
+        "Guarda el proyecto actual, cierra QGIS y lo vuelve a abrir.\n"
+        "Útil para recuperar la sesión tras fallos\n"
+        "o problemas visuales sin perder el trabajo."
+    )
+    LOGCAT_TITLE = "Visor de logs"
+    LOGCAT_TOOLTIP = (
+        "Abre el visor de logs del plugin.\n"
+        "Permite inspeccionar mensajes, errores y eventos internos\n"
+        "registrados por Cadmus."
+    )
+    ABOUT_DIALOG_TOOLTIP = (
+        f"Abre la ventana {ABOUT_CADMUS} de {APP_NAME}.\n"
+        "Muestra información general del plugin,\n"
+        "como versión, autor y contexto del proyecto."
+    )
+    VECTOR_FIELDS_TITLE = "Calcular campos vectoriales"
+    VECTOR_FIELDS_TOOLTIP = (
+        "Calcula automáticamente campos vectoriales como área,\n"
+        "longitud o coordenadas X/Y en la capa activa.\n"
+        "Útil para generar atributos técnicos\n"
+        "sin edición manual campo por campo."
+    )

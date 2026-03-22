@@ -8,6 +8,7 @@ from ...utils.QgisMessageUtil import QgisMessageUtil
 from ...processing.provider import MTLProvider
 from .LogCleanupUtils import LogCleanupUtils
 from .LogUtils import LogUtils
+from ...utils.Preferences import Preferences
 
 # Global logger for error handler
 _logger_global = None
@@ -25,6 +26,7 @@ class PluginBootstrap:
         self.logger = None
         self.provider = None
         self.TOOL_KEY = ToolKey.SYSTEM
+        self.PREFERENCES_VERSION = 2  # Incrementar se mudar estrutura de prefs globais
 
     def bootstrap(self, plugin_root: Path):
         """
@@ -33,6 +35,7 @@ class PluginBootstrap:
         :param plugin_root: Caminho raiz do plugin.
         :return: Tupla (logger, provider) configurados.
         """
+
         try:
             # Inicializar LogUtils primeiro
             LogUtils.init(plugin_root)
@@ -61,7 +64,7 @@ class PluginBootstrap:
             self.logger.debug("Limpeza de logs antigos executada")
 
             # Registrar provider de processamento
-
+            self.prefs_version_check()  # Verificar e atualizar versão das preferências globais
             # Registrar provider de processamento
             self.provider = MTLProvider()
             QgsApplication.processingRegistry().addProvider(self.provider)
@@ -85,6 +88,31 @@ class PluginBootstrap:
                 self.iface, f"Erro crítico na inicialização do plugin: {e}"
             )
             raise  # Re-raise para parar inicialização
+
+    def prefs_version_check(self):
+        """Verifica se as preferências globais estão na versão esperada."""
+        prefs_system = Preferences.load_tool_prefs(ToolKey.SYSTEM)
+        version = prefs_system.get("prefs_version", 0)
+        if version < self.PREFERENCES_VERSION:
+            self.logger.info(
+                f"Versão de preferências antiga detectada: {version}. "
+                f"Atualizando para versão {self.PREFERENCES_VERSION}."
+            )
+            prefs_gt = Preferences.load_tool_prefs("gerar_rastro_implemento")
+            if prefs_gt:
+                Preferences.save_tool_prefs(
+                    ToolKey.GENERATE_TRAIL, prefs_gt
+                )  # Re-salva para atualizar estrutura se necessário
+            prefs_settings = Preferences.load_tool_prefs("settings")
+            if prefs_settings:
+                Preferences.save_tool_prefs(
+                    ToolKey.SYSTEM, prefs_settings
+                )  # Re-salva para atualizar estrutura se necessário
+
+            # Aqui você pode implementar migração de preferências se necessário
+            prefs_system["prefs_version"] = self.PREFERENCES_VERSION
+            Preferences.save_tool_prefs(ToolKey.SYSTEM, prefs_system)
+            self.logger.debug("Preferências globais atualizadas para nova versão")
 
     def _install_global_error_handler(self):
         """Instala handler global para capturar exceções não tratadas."""
