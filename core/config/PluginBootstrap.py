@@ -1,0 +1,107 @@
+# -*- coding: utf-8 -*-
+import sys
+import traceback
+from pathlib import Path
+from qgis.core import QgsApplication
+from ...utils.ToolKeys import ToolKey
+from ...utils.QgisMessageUtil import QgisMessageUtil
+from ...processing.provider import MTLProvider
+from .LogCleanupUtils import LogCleanupUtils
+from .LogUtils import LogUtils
+
+# Global logger for error handler
+_logger_global = None
+
+
+class PluginBootstrap:
+    """
+    Responsável pela inicialização crítica do plugin Cadmus.
+    Encapsula a instalação do handler global de erros, inicialização de logs,
+    limpeza de logs antigos, criação do logger e registro do provider de processamento.
+    """
+
+    def __init__(self, iface):
+        self.iface = iface
+        self.logger = None
+        self.provider = None
+        self.TOOL_KEY = ToolKey.SYSTEM
+
+    def bootstrap(self, plugin_root: Path):
+        """
+        Executa a inicialização do plugin.
+
+        :param plugin_root: Caminho raiz do plugin.
+        :return: Tupla (logger, provider) configurados.
+        """
+        try:
+            # Inicializar LogUtils primeiro
+            LogUtils.init(plugin_root)
+
+            # Criar logger global para handler
+            global _logger_global
+            _logger_global = LogUtils(
+                tool=self.TOOL_KEY, class_name="GlobalHandler", level=LogUtils.DEBUG
+            )
+
+            # Instalar proteção global contra crashes
+            self._install_global_error_handler()
+
+            # Limpar logs antigos
+            LogCleanupUtils.keep_last_n(plugin_root, keep=15)
+
+            # Criar logger
+            self.logger = LogUtils(
+                tool=self.TOOL_KEY, class_name="PluginBootstrap", level=LogUtils.DEBUG
+            )
+            self.logger.info("Logger criado com sucesso")
+            self.logger.info(
+                "SYSTEM: Global error handler instalado para capturar crashes"
+            )
+            self.logger.debug("LogUtils inicializado")
+            self.logger.debug("Limpeza de logs antigos executada")
+
+            # Registrar provider de processamento
+
+            # Registrar provider de processamento
+            self.provider = MTLProvider()
+            QgsApplication.processingRegistry().addProvider(self.provider)
+            self.logger.info("Processing Provider carregado com sucesso")
+
+            return self.provider
+
+        except Exception as e:
+            # Se logger ainda não foi criado, tentar criar um básico
+            if self.logger is None:
+                try:
+                    LogUtils.init(plugin_root)
+                    self.logger = LogUtils(
+                        tool=self.TOOL_KEY, class_name="PluginBootstrap"
+                    )
+                except:
+                    pass
+            if self.logger:
+                self.logger.error(f"Erro crítico no bootstrap: {str(e)}")
+            QgisMessageUtil.bar_critical(
+                self.iface, f"Erro crítico na inicialização do plugin: {e}"
+            )
+            raise  # Re-raise para parar inicialização
+
+    def _install_global_error_handler(self):
+        """Instala handler global para capturar exceções não tratadas."""
+
+        def handle_exception(exc_type, exc_value, exc_traceback):
+            error_msg = "".join(
+                traceback.format_exception(exc_type, exc_value, exc_traceback)
+            )
+            _logger_global.critical(
+                f"UNCAUGHT EXCEPTION (possibly crash): {exc_type.__name__}: {str(exc_value)}",
+                error_type=exc_type.__name__,
+                traceback=error_msg,
+            )
+
+            # Chamar handler original
+            _original_excepthook(exc_type, exc_value, exc_traceback)
+
+        # Salvar handler original
+        _original_excepthook = sys.excepthook
+        sys.excepthook = handle_exception

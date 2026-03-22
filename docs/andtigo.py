@@ -8,11 +8,9 @@ from .utils.ToolKeys import ToolKey
 from .utils.QgisMessageUtil import QgisMessageUtil
 from .core.config.LogUtils import LogUtils
 from .resources.IconManager import IconManager as im
-from .i18n.TranslationManager import STR
+from .i18n.TranslationManager import TM, STR
 from .core.config.PluginBootstrap import PluginBootstrap
 from .resources.widgets.DropdownToolButton import DropdownToolButton
-from .resources.widgets.CadmusToolBar import CadmusToolBar
-
 
 class CadmusPlugin:
     def __init__(self, iface):
@@ -38,9 +36,7 @@ class CadmusPlugin:
         self.provider = bootstrap.bootstrap(plugin_root)
 
         # Criar logger para CadmusPlugin
-        self.logger = LogUtils(
-            tool=self.TOOL_KEY, class_name="Cadmus", level=LogUtils.DEBUG
-        )
+        self.logger = LogUtils(tool=self.TOOL_KEY, class_name="Cadmus", level=LogUtils.DEBUG)
 
         self.logger.info("Plugin inicializado")
         self.logger.info(f"Locale: {locale}. TM.STR: {STR.APP_NAME}")
@@ -48,8 +44,8 @@ class CadmusPlugin:
         # 2) CRIAR TOOLBAR EXCLUSIVA
         # -------------------------
         try:
-            self.toolbar = CadmusToolBar("Cadmus", self.iface.mainWindow())
-            self.iface.addToolBar(self.toolbar)
+            self.toolbar = self.iface.addToolBar("Cadmus")
+            self.toolbar.setObjectName("Cadmus_Toolbar")
             self.logger.debug("Toolbar Cadmus criada com sucesso")
         except Exception as e:
             self.logger.error(f"Erro ao criar toolbar: {str(e)}")
@@ -288,9 +284,11 @@ class CadmusPlugin:
         # 6) TOOLBAR
         # -------------------------
         try:
-            # Instanciar botões dropdown
-            self.button_system = DropdownToolButton(
-                iface=self.iface,
+            # ==================================================
+            # BOTÃO SISTEMA NA TOOLBAR (com dropdown)
+            # ==================================================
+            button = DropdownToolButton(self.iface.mainWindow())
+            button.setup(
                 title="Sistema",
                 main_action=self.action_restart_qgis,
                 secondary_actions=[
@@ -300,10 +298,15 @@ class CadmusPlugin:
                     self.action_about_dialog,
                 ],
             )
-            self.logger.debug("Botão Sistema criado")
+            widget_action = QWidgetAction(self.toolbar)
+            widget_action.setDefaultWidget(button)
+            self.toolbar.addAction(widget_action)
 
-            self.button_layouts = DropdownToolButton(
-                iface=self.iface,
+            # ==================================================
+            # BOTÃO LAYOUTS NA TOOLBAR (com dropdown)
+            # ==================================================
+            button = DropdownToolButton(self.iface.mainWindow())
+            button.setup(
                 title="Layouts",
                 main_action=self.action_export_all,
                 secondary_actions=[
@@ -311,18 +314,27 @@ class CadmusPlugin:
                     self.action_replace_layouts,
                 ],
             )
-            self.logger.debug("Botão Layouts criado")
+            widget_action = QWidgetAction(self.toolbar)
+            widget_action.setDefaultWidget(button)
+            self.toolbar.addAction(widget_action)
 
-            self.button_load_folder = DropdownToolButton(
-                iface=self.iface,
+            # ==================================================
+            # BOTÃO CAMADAS NA TOOLBAR (com dropdown)
+            # ==================================================
+            button = DropdownToolButton(self.iface.mainWindow())
+            button.setup(
                 title="Vetores",
                 main_action=self.action_load_folder,
                 secondary_actions=[self.action_load_folder],
             )
-            self.logger.debug("Botão Pastas criado")
-
-            self.button_vectors = DropdownToolButton(
-                iface=self.iface,
+            widget_action = QWidgetAction(self.toolbar)
+            widget_action.setDefaultWidget(button)
+            self.toolbar.addAction(widget_action)
+            # ==================================================
+            # BOTÃO "VETORES" NA TOOLBAR (com dropdown)
+            # ==================================================
+            button = DropdownToolButton(self.iface.mainWindow())
+            button.setup(
                 title="Vetores",
                 main_action=self.action_vector_fields,
                 secondary_actions=[
@@ -332,27 +344,27 @@ class CadmusPlugin:
                     self.action_multpart,
                 ],
             )
-            self.logger.debug("Botão Vetores criado")
-
-            self.button_agriculture = DropdownToolButton(
-                iface=self.iface,
+            widget_action = QWidgetAction(self.toolbar)
+            widget_action.setDefaultWidget(button)
+            self.toolbar.addAction(widget_action)
+            # ==================================================
+            # BOTÃO "AGRICULTURA DE PRECISÃO" NA TOOLBAR (com dropdown)
+            # ==================================================
+            button = DropdownToolButton(self.iface.mainWindow())
+            button.setup(
                 title="Agricultura de Precisão",
                 main_action=self.action_drone_coords,
                 secondary_actions=[self.action_drone_coords, self.action_gerar_rastro],
             )
-            self.logger.debug("Botão Agricultura criado")
+            widget_action = QWidgetAction(self.toolbar)
+            widget_action.setDefaultWidget(button)
+            self.toolbar.addAction(widget_action)
+            # ==================================================
+            # BOTÃO "RASTER" NA TOOLBAR (com dropdown)
+            # ==================================================
 
-            # Adicionar botões à toolbar
-            self.toolbar.add_dropdown_buttons(
-                [
-                    self.button_system,
-                    self.button_layouts,
-                    self.button_load_folder,
-                    self.button_vectors,
-                    self.button_agriculture,
-                ]
-            )
-            self.logger.debug("Botões adicionados à toolbar com sucesso")
+            self.toolbar.addSeparator()
+            self.logger.debug("Botões de toolbar criados com sucesso")
         except Exception as e:
             self.logger.error(f"Erro ao criar botões da toolbar: {str(e)}")
             return
@@ -393,31 +405,13 @@ class CadmusPlugin:
             self.logger.error(f"Erro ao remover Processing Provider: {str(e)}")
 
         try:
-            # Remover ações do menu
+            # Remover ações do menu e toolbar
             for act in self.actions:
                 self.iface.removePluginMenu("Cadmus", act)
-            self.logger.info("Ações do menu removidas com sucesso")
+                self.iface.removeToolBarIcon(act)
+            self.logger.info("Ações removidas com sucesso")
         except Exception as e:
-            self.logger.error(f"Erro ao remover ações do menu: {str(e)}")
-
-        try:
-            # Remover botões da toolbar
-            buttons = [
-                getattr(self, attr, None)
-                for attr in [
-                    "button_system",
-                    "button_layouts",
-                    "button_load_folder",
-                    "button_vectors",
-                    "button_agriculture",
-                ]
-            ]
-            for button in buttons:
-                if button and hasattr(button, "button"):
-                    self.toolbar.removeWidget(button.button)
-            self.logger.info("Botões da toolbar removidos com sucesso")
-        except Exception as e:
-            self.logger.error(f"Erro ao remover botões da toolbar: {str(e)}")
+            self.logger.error(f"Erro ao remover ações: {str(e)}")
 
         try:
             # Remover toolbar

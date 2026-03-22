@@ -407,19 +407,3 @@ class BasePluginMTL(BaseDialog):
 
         return bool(ok)
 
-    def save_vector_layer(
-        self,
-        buffer_layer: QgsVectorLayer,
-        output_path: Optional[str],
-        save_to_folder: bool,
-        output_name: str,
-    ) -> Optional[QgsVectorLayer]:
-        """DEPRECADO: Use SaveVectorTask."""
-
-        return VectorLayerSource.save_vector_layer(
-            layer=buffer_layer,
-            output_path=output_path,
-            save_to_folder=save_to_folder,
-            output_name=output_name,
-            external_tool_key=self.TOOL_KEY,
-        )

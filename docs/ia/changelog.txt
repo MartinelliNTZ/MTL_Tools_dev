@@ -1,3 +1,27 @@
+#2.1.3.8 2026/03/21
+- Refatoração do DropdownToolButton: modificado __init__ para aceitar parâmetros (title, main_action, etc.) e chamar setup automaticamente; ajustado CadmusPlugin para instanciar DropdownToolButton com parâmetros em vez de chamar setup() separadamente, simplificando o código.
+
+#2.1.3.7 2026/03/21
+- Refatoração crítica do DropdownToolButton: substituído QToolButton por QAction com setMenu, conectando triggered à main_action para comportamento correto de dropdown (clique no botão executa ação principal, seta abre menu); CadmusToolBar alterado para addAction(button.action).
+
+#2.1.3.6 2026/03/21
+- Correção no CadmusToolBar: alterado add_dropdown_buttons para adicionar QToolButton diretamente via addWidget(button.button) em vez de usar QWidgetAction, resolvendo erro de tipo 'DropdownToolButton' não sendo QWidget.
+
+#2.1.3.5 2026/03/21
+- Correção crítica no DropdownToolButton: removida herança de QWidgetAction (inapropriada para toolbars) e alterada para classe simples que configura QToolButton diretamente, resolvendo problema de cliques não funcionais na toolbar.
+
+#2.1.3.4 2026/03/21
+- Correção na funcionalidade dos botões dropdown: adicionado clicked.connect no DropdownToolButton.setup() para garantir que cliques no botão acionem a ação principal; adicionado logging de debug no CadmusPlugin.initGui() para rastrear criação de botões e facilitar diagnóstico.
+
+#2.1.3.3 2026/03/21
+- Refatoração adicional: criado widget CadmusToolBar exclusivo em resources/widgets/CadmusToolBar.py para gerenciar toolbar com método add_dropdown_buttons em massa; modificado DropdownToolButton para herdar de QWidgetAction, encapsulando QToolButton interno; reduzido código repetido na criação de botões na CadmusPlugin, mantendo referências individuais para limpeza.
+
+#2.1.3.2 2026/03/21
+- Refatoração adicional da classe CadmusPlugin: extraído método _add_toolbar_dropdown para widget exclusivo DropdownToolButton em resources/widgets/DropdownToolButton.py, reduzindo responsabilidades da classe principal e melhorando reutilização.
+
+#2.1.3.1 2026/03/21
+- Refatoração da classe CadmusPlugin para aliviar responsabilidades: criada classe PluginBootstrap em core/PluginBootstrap.py, responsável pela inicialização de logs, handler global de erros, limpeza de logs e registro do provider de processamento. CadmusPlugin agora orquestra via PluginBootstrap.
+
 #2.1.3 2026/03/20
 - Internacionalização expandida para os plugins `SettingsPlugin`, `ReplaceInLayouts`, `LoadFolderLayers`, `GenerateTrailPlugin`, `CopyAttributesPlugin`, `ExportAllLayouts` e `coord_result_dialog`, com centralização das strings exibidas ao usuário em `Strings_pt_BR`.
 - Reorganização do catálogo `Strings_pt_BR` em grupos mais intuitivos, separando botões, labels comuns, mensagens comuns e títulos específicos de plugins para incentivar reaproveitamento de strings genéricas.
