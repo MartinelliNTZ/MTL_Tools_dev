@@ -18,6 +18,7 @@ class Strings_pt_BR:
     # Buttons
     CLOSE = "Fechar"
     SAVE = "Salvar"
+    LOAD_FILES = "Carregar Arquivos"
     EXPORT = "Exportar"
     CANCEL = "Cancelar"
     EXECUTE = "Executar"
@@ -177,9 +178,9 @@ class Strings_pt_BR:
         "a precisão dos campos vetoriais e o limiar de feições\n"
         "usado para processamento assíncrono."
     )
-    SETTINGS_CALCULATION_METHOD_ELLIPSOIDAL = "Elipsoidal"
-    SETTINGS_CALCULATION_METHOD_CARTESIAN = "Cartesiana"
-    SETTINGS_CALCULATION_METHOD_BOTH = "Ambos"
+    ELLIPSOIDAL = "Elipsoidal"
+    CARTESIAN = "Cartesiana"
+    BOTH = "Ambos"
 
     # plugins/ReplaceInLayouts.py
     REPLACE_IN_LAYOUTS_TITLE = "Substituir Texto em Layouts"
@@ -200,7 +201,6 @@ class Strings_pt_BR:
         "Pode filtrar por tipo de arquivo, evitar duplicados\n"
         "e organizar as camadas conforme a estrutura de pastas."
     )
-    LOAD_FOLDER_LAYERS_RUN = "Carregar Arquivos"
 
     # plugins/GenerateTrailPlugin.py
     GENERATE_TRAIL_TITLE = "Gerar Rastro de Máquinas"
@@ -230,6 +230,7 @@ class Strings_pt_BR:
     )
 
     # plugins/VectorMultipartPlugin.py
+    CONVERTER_MULTIPART_TITLE = "Converter Multipart"
     CONVERTER_MULTIPART_TOOLTIP = (
         "Processa feições multipart da camada vetorial ativa\n"
         "e separa cada parte em feições simples.\n"
@@ -238,9 +239,35 @@ class Strings_pt_BR:
     )
 
     # plugins/CoordClickTool.py
+    COORD_CLICK_TOOL_TITLE = "Capturar Coordenadas"
     COORD_CLICK_TOOL_TOOLTIP = (
         "Permite clicar no mapa para consultar coordenadas do ponto.\n"
         "Abre um dialogo com WGS84, UTM, altitude aproximada\n"
         "e endereco estimado, alem de opcoes de copia\n"
         "para a area de transferencia."
+    )
+
+    # core/ToolRegistry.py
+    RESTART_QGIS_TITLE = "Salvar, Fechar e Reabrir Projeto"
+    RESTART_QGIS_TOOLTIP = (
+        "Salva o projeto atual, fecha o QGIS e reabre o mesmo projeto.\n"
+        "E util para recuperar a sessao apos travamentos\n"
+        "ou problemas visuais sem perder o trabalho."
+    )
+    LOGCAT_TITLE = "Logcat Viewer"
+    LOGCAT_TOOLTIP = (
+        "Abre o visualizador de logs do plugin.\n"
+        "Permite inspecionar mensagens, erros e eventos internos\n"
+        "registrados pelo Cadmus."
+    )
+    ABOUT_DIALOG_TOOLTIP = (
+        f"Abre a janela {ABOUT_CADMUS} do {APP_NAME}.\n"
+        "Mostra informacoes gerais sobre o plugin,\n"
+        "como versao, autoria e contexto do projeto."
+    )
+    VECTOR_FIELDS_TITLE = "Calcular Campos Vetoriais"
+    VECTOR_FIELDS_TOOLTIP = (
+        "Calcula automaticamente campos vetoriais como area,\n"
+        "comprimento ou coordenadas X/Y na camada ativa.\n"
+        "E util para gerar atributos tecnicos sem editar campo por campo."
     )

@@ -37,13 +37,13 @@ class ToolRegistry:
         # =====================================================
 
         export_layouts = Tool(
-            name="Exportar todos os Layouts",
+            name=STR.EXPORT_ALL_LAYOUTS_TITLE,
             icon=im.icon(im.EXPORT_ALL_LAYOUTS),
             category=self.LAYOUTS,
             tool_type=self.DIALOG,
             main_action=True,
             executor=self.run_export_layouts,
-            tooltip="Exporta todos os Layouts do projeto para arquivos PDF ou imagens.",
+            tooltip=STR.EXPORT_ALL_LAYOUTS_TOOLTIP,
             order=10,
             show_in_toolbar=True,
         )
@@ -53,14 +53,12 @@ class ToolRegistry:
         )
 
         replace_layouts = Tool(
-            name="Substituir textos nos Layouts",
+            name=STR.REPLACE_IN_LAYOUTS_TITLE,
             icon=im.icon(im.REPLACE_IN_LAYOUTS),
             category=self.LAYOUTS,
             tool_type=self.DIALOG,
             executor=self.run_replace_layouts,
-            tooltip="Substitui textos em massa nos Layouts do projeto.\n"
-            "Permite criar um mapa de substituição a partir de uma camada vetorial ou tabela, onde um campo é usado para identificar os Layouts e outro campo é usado para o novo valor a ser inserido.\n"
-            "Útil para atualizar informações como títulos, legendas ou rótulos em múltiplos Layouts de forma rápida e consistente.",
+            tooltip=STR.REPLACE_IN_LAYOUTS_TOOLTIP,
             order=20,
             show_in_toolbar=True,
         )
@@ -71,50 +69,49 @@ class ToolRegistry:
         # =====================================================
 
         restart_qgis = Tool(
-            name="Salvar, Fechar e Reabrir Projeto",
+            name=STR.RESTART_QGIS_TITLE,
             icon=im.icon(im.RESTART_QGIS),
             category=self.SYSTEM,
             tool_type=self.INSTANT,
             main_action=True,
             executor=self.run_restart_qgis,
-            tooltip="Salva o projeto atual, fecha o QGIS e reabre o mesmo projeto automaticamente.\n"
-            "Útil para resolver travamentos, bugs visuais ou de renderização sem perder o trabalho.",
+            tooltip=STR.RESTART_QGIS_TOOLTIP,
             order=10,
             show_in_toolbar=True,
         )
         tools.append(restart_qgis)
 
         logcat = Tool(
-            name="Logcat Viewer",
+            name=STR.LOGCAT_TITLE,
             icon=im.icon(im.LOGCAT),
             category=self.SYSTEM,
             tool_type=self.DIALOG,
             executor=self.run_logcat,
-            tooltip="Abre o Logcat, uma ferramenta de visualização dos logs do plugin Cadmus.",
+            tooltip=STR.LOGCAT_TOOLTIP,
             order=20,
             show_in_toolbar=True,
         )
         tools.append(logcat)
 
         settings = Tool(
-            name="Configurações",
+            name=STR.SETTINGS_TITLE,
             icon=im.icon(im.SETTINGS),
             category=self.SYSTEM,
             tool_type=self.DIALOG,
             executor=self.run_settings,
-            tooltip="Configurações do plugin Cadmus.",
+            tooltip=STR.SETTINGS_TOOLTIP,
             order=30,
             show_in_toolbar=True,
         )
         tools.append(settings)
 
         about = Tool(
-            name="Sobre o Cadmus",
+            name=STR.ABOUT_CADMUS,
             icon=im.icon(im.ABOUT),
             category=self.SYSTEM,
             tool_type=self.DIALOG,
             executor=self.run_about_dialog,
-            tooltip="Informações sobre o plugin Cadmus.",
+            tooltip=STR.ABOUT_DIALOG_TOOLTIP,
             order=40,
             show_in_toolbar=True,
         )
@@ -125,13 +122,13 @@ class ToolRegistry:
         # =====================================================
 
         load_folder = Tool(
-            name="Carregar Pasta de Arquivos",
+            name=STR.LOAD_FOLDER_LAYERS_TITLE,
             icon=im.icon(im.LOAD_FOLDER_LAYER),
             category=self.FOLDER,
             tool_type=self.DIALOG,
             main_action=True,
             executor=self.run_load_folder,
-            tooltip="Carrega em massa uma pasta de arquivos como camadas no QGIS.",
+            tooltip=STR.LOAD_FOLDER_LAYERS_TOOLTIP,
             order=10,
             show_in_toolbar=True,
         )
@@ -145,56 +142,49 @@ class ToolRegistry:
         # =====================================================
 
         vector_fields = Tool(
-            name="Calcular Campos Vetoriais",
+            name=STR.VECTOR_FIELDS_TITLE,
             icon=im.icon(im.VECTOR_FIELD),
             category=self.VECTOR,
             tool_type=self.INSTANT,
             main_action=True,
             executor=self.run_vector_fields,
-            tooltip="Calcula automaticamente campos: Área, Comprimento ou X/Y\n"
-            "Selecione uma camada vetorial ativa e execute a ferramenta\n"
-            "para adicionar os campos calculados.",
+            tooltip=STR.VECTOR_FIELDS_TOOLTIP,
             order=10,
             show_in_toolbar=True,
         )
         tools.append(vector_fields)
 
         coord_click = Tool(
-            name="Capturar Coordenadas",
+            name=STR.COORD_CLICK_TOOL_TITLE,
             icon=im.icon(im.COORD_CLICK_TOOL),
             category=self.VECTOR,
             tool_type=self.MAP_TOOL,
             executor=self.run_coord_click,
-            tooltip="Clique no mapa para consultar coordenadas do ponto.\n"
-            "A ferramenta abre um dialogo com WGS84, UTM,\n"
-            "altitude aproximada e endereco estimado,\n"
-            "alem de opcoes para copiar as informacoes.",
+            tooltip=STR.COORD_CLICK_TOOL_TOOLTIP,
             order=20,
             show_in_toolbar=True,
         )
         tools.append(coord_click)
 
         multipart = Tool(
-            name="Converter Multipart",
+            name=STR.CONVERTER_MULTIPART_TITLE,
             icon=im.icon(im.VECTOR_MULTPART),
             category=self.VECTOR,
             tool_type=self.INSTANT,
             executor=self.run_multpart,
-            tooltip="Promove feições para o tipo multiparte.\n"
-            "Selecione uma camada vetorial ativa e execute a ferramenta\n"
-            "para promover as feições.",
+            tooltip=STR.CONVERTER_MULTIPART_TOOLTIP,
             order=40,
             show_in_toolbar=True,
         )
         tools.append(multipart)
 
         copy_attributes = Tool(
-            name="Copiar Atributos",
+            name=STR.COPY_ATTRIBUTES_TITLE,
             icon=im.icon(im.COPY_ATTRIBUTES),
             category=self.VECTOR,
             tool_type=self.DIALOG,
             executor=self.run_copy_atributes,
-            tooltip="Copia atributos entre camadas.",
+            tooltip=STR.COPY_ATTRIBUTES_TOOLTIP,
             order=50,
             show_in_toolbar=True,
         )
@@ -205,28 +195,25 @@ class ToolRegistry:
         # =====================================================
 
         drone_coords = Tool(
-            name="Obter Coordenadas de Drone",
+            name=STR.DRONE_COORDINATES_TITLE,
             icon=im.icon(im.DRONE_COORDINATES),
             category=self.AGRICULTURE,
             tool_type=self.DIALOG,
             main_action=True,
             executor=self.run_drone_coords,
-            tooltip="Le arquivos MRK de drone para gerar pontos das fotos\n"
-            "e uma linha com o rastro do voo.\n"
-            "Pode cruzar os pontos com metadados das imagens,\n"
-            "salvar os resultados e aplicar estilos QML.",
+            tooltip=STR.DRONE_COORDINATES_TOOLTIP,
             order=10,
             show_in_toolbar=True,
         )
         tools.append(drone_coords)
 
         gerar_rastro = Tool(
-            name="Gerar Rastro Implemento",
+            name=STR.GENERATE_TRAIL_TITLE,
             icon=im.icon(im.GENERATE_TRAIL),
             category=self.AGRICULTURE,
             tool_type=self.DIALOG,
             executor=self.run_gerar_rastro,
-            tooltip="Gera um rastro do movimento de um implemento agrícola com base em uma linha.",
+            tooltip=STR.GENERATE_TRAIL_TOOLTIP,
             order=20,
             show_in_toolbar=True,
         )

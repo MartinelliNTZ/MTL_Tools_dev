@@ -19,9 +19,9 @@ class SettingsPlugin(BasePluginMTL):
     """
 
     CALCULATION_METHODS = [
-        STR.SETTINGS_CALCULATION_METHOD_ELLIPSOIDAL,
-        STR.SETTINGS_CALCULATION_METHOD_CARTESIAN,
-        STR.SETTINGS_CALCULATION_METHOD_BOTH,
+        STR.ELLIPSOIDAL,
+        STR.CARTESIAN,
+        STR.BOTH,
     ]
 
     def __init__(self, iface):
@@ -130,7 +130,7 @@ class SettingsPlugin(BasePluginMTL):
 
         # Carregar método de cálculo selecionado
         calc_method = self.preferences.get(
-            "calculation_method", STR.SETTINGS_CALCULATION_METHOD_ELLIPSOIDAL
+            "calculation_method", STR.ELLIPSOIDAL
         )
         try:
             idx = self.CALCULATION_METHODS.index(calc_method)

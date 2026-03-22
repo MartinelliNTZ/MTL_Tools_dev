@@ -133,7 +133,7 @@ class LoadFolderLayersDialog(BasePluginMTL):
                 close_callback=self.close,
                 info_callback=self.show_info_dialog,
                 tool_key=self.TOOL_KEY,
-                run_text=STR.LOAD_FOLDER_LAYERS_RUN,
+                run_text=STR.LOAD_FILES,
             )
         )
 
