@@ -43,6 +43,17 @@ Traducao: 9
 changelog=
 
   2.1.4 2026/03/21
+    - Implementacao de Bootsatrap, Toolregistry e MenmuManager, para aliviar responsabilidades da classe principal
+    - **Arquitetura Modular:** Implementada nova arquitetura com ToolRegistry (registro centralizado de ferramentas), MenuManager (gerenciamento unificado de menus e toolbar) e PluginBootstrap (inicialização de logs e providers), removendo responsabilidades da classe principal CadmusPlugin
+    - **Correções Críticas:** Toolbar vazia resolvida com adição explícita de ícones, uso de addWidget() em vez de addAction(), e verificação de toolbars existentes antes da criação. Botões dropdown agora funcionam corretamente com QToolButton encapsulado e ações conectadas
+    - **Internacionalização:** Todas as strings exibidas ao usuário foram externalizadas via STR e catálogos de tradução (pt_BR, en, es), abrangendo todos os plugins
+    - **Ordenação e Controle:** Adicionados atributos order e show_in_toolbar às ferramentas para ordenação sequencial nos menus e controle fino de visibilidade na toolbar
+    - **Prevenção de Duplicação:** Implementada verificação e remoção de menus e toolbars existentes antes da recriação, com uso de deleteLater() para destruição adequada dos objetos Qt
+    - **Persistência de Posição:** Toolbar agora salva e restaura sua posição (Top, Bottom, Left, Right) nas preferências, mantendo o local escolhido pelo usuário após recarregar o plugin
+    - **Logs Detalhados:** Adicionados logs extensivos em todas as etapas de criação de menus e toolbar, facilitando diagnóstico de problemas com contagem de ferramentas por categoria
+    - **Internacionalização Expandida:** Plugins Settings, ReplaceInLayouts, LoadFolderLayers, GenerateTrail, CopyAttributes, ExportAllLayouts e DroneCoordinates totalmente internacionalizados
+    - **Refatoração de Execução:** ToolRegistry agora centraliza a criação de ferramentas e execução, com todos os run_ methods movidos para dentro do registro, reduzindo responsabilidades do CadmusPlugin
+  
   2.1.3 2026/03/20
     - TRaducao de plugins
   2.1.2 2026/03/20
