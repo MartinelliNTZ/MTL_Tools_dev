@@ -1,74 +1,64 @@
-## 📦 Bibliotecas necessárias
-# 🧾 Export All Layouts — Guia de Uso
+# Exportar Todos os Layouts — Guia Rapido
 
-ExportAllLayouts é uma ferramenta do pacote **Cadmus** para exportar todos os layouts do projeto em PDF e/ou PNG, com opções adicionais de união de arquivos e controle de sobrescrita.
+Esta ferramenta exporta todos os layouts do projeto atual em PDF, PNG ou nos dois formatos.
 
----
+Ela tambem pode:
 
-## 🎯 Objetivo
+- unir todos os PDFs exportados em um arquivo final;
+- transformar os PNGs exportados em um PDF unico;
+- evitar sobrescrita criando nomes com sufixo;
+- salvar as preferencias usadas na interface.
 
-Automatizar a exportação em lote de layouts, oferecendo:
-- Exportação por layout em PDF e/ou PNG
-- União dos PDFs gerados em um único arquivo final
-- Conversão/união de PNGs em PDF final (opcional)
-- Controle de sobrescrita de arquivos existentes
-- Persistência das preferências do usuário
+## Como usar
 
----
+1. Abra `Cadmus > Export All Layouts`.
+2. Marque pelo menos um formato de saida: `Export PDF` e/ou `Export PNG`.
+3. Ajuste as opcoes extras, se necessario:
+- `Merge PDF`: junta os PDFs exportados em `_PDF_UNICO_FINAL.pdf`.
+- `Merge PNG`: converte os PNGs exportados em um PDF final chamado `_PNG_MERGED_FINAL.pdf`.
+- `Replace Existing`: sobrescreve arquivos existentes.
+- `Max Width`: define a largura maxima usada no PDF gerado a partir dos PNGs.
+4. Escolha a pasta de saida.
+5. Se quiser usar a pasta do projeto, clique no botao que aponta para `.../exports`.
+6. Clique em `Export`.
 
-## 🛠️ Como usar
+## O que o plugin faz de verdade
 
-### 1️⃣ Abra a ferramenta
-Menu → Cadmus → Export All Layouts
+- Lê todos os layouts do projeto atual via `layoutManager().layouts()`.
+- Cria a pasta de saida automaticamente se ela nao existir.
+- Limpa caracteres invalidos do nome de cada layout antes de gerar os arquivos.
+- Quando `Replace Existing` estiver desmarcado, cria nomes como `Layout_1`, `Layout_2` e assim por diante para evitar conflito.
+- Exporta cada layout individualmente com `QgsLayoutExporter`.
+- Exibe uma janela de progresso durante o processamento.
+- Permite cancelar a exportacao no meio do processo.
+- Ao final, mostra um resumo com sucessos, erros e a pasta de destino.
 
-### 2️⃣ Defina formatos
-Marque `Exportar PDF` e/ou `Exportar PNG`.
+## Dependencias opcionais
 
-### 3️⃣ Ajuste opções extras
-- `Unir PDFs`: mescla os PDFs gerados em um único arquivo
-- `Unir PNGs`: gera PNGs e os converte/une em PDF
-- `Substituir arquivos existentes`: controla sobrescrita (se desmarcado, sufixos serão adicionados)
-- `Max Width`: largura máxima para PNGs quando unidos em PDF
+- `PyPDF2` e usado apenas se voce marcar a uniao dos PDFs.
+- `Pillow` e usado apenas se voce marcar a uniao dos PNGs em PDF.
+- Se a dependencia estiver faltando, o plugin pede confirmacao para instalar.
+- Se voce recusar a instalacao, a exportacao continua sem a etapa de merge correspondente.
 
-### 4️⃣ Escolha a pasta de saída
-Informe manualmente, selecione via seletor ou use a pasta do projeto (`.../exports/`). A pasta será criada se não existir.
+## Comportamento importante
 
-### 5️⃣ Execute
-Clique em `Exportar`. O diálogo exibirá progresso, permitirá cancelar e mostrará um resumo ao final.
+- E obrigatorio selecionar pelo menos um formato de exportacao.
+- O plugin conta um layout como sucesso se pelo menos um dos formatos selecionados for exportado com sucesso.
+- Se um layout falhar em um formato e funcionar no outro, o erro aparece no resumo final.
+- O cancelamento interrompe o loop no ponto atual; o que ja foi exportado permanece na pasta.
 
----
+## Quando usar
 
-## 🔎 Dependências
+Use esta ferramenta quando precisar exportar rapidamente todos os layouts de um projeto sem abrir e salvar um por um.
 
-Algumas funcionalidades exigem bibliotecas externas:
-- `PyPDF2`: necessária para unir PDFs
-- `Pillow`: necessária para trabalhar com PNG → PDF
+Ela e especialmente util para:
 
-Se estiverem ausentes, a ferramenta oferece instalação assistida (scripts em `lib/`); reinicie o QGIS após instalar.
+- entregar um conjunto completo de pranchas;
+- gerar revisoes em lote;
+- consolidar saidas PDF em um unico arquivo final.
 
----
+## Cuidados
 
-## 🧾 Logs e resultado
-
-- Logs detalhados por layout (nome, formato, destino, status)
-- Resumo final com contagem de layouts processados e arquivos gerados
-
----
-
-## ✅ Boas práticas
-
-- Verifique espaço em disco antes de executar em grandes projetos
-- Teste com alguns layouts antes de exportar tudo
-- Se pedir união de PDFs/PNGs, prefira uma pasta de saída vazia para evitar confusão com arquivos antigos
-
----
-
-## 🧩 Chave de preferências
-
-`export_all_layouts`
-
----
-
-## ❤️ Criado por
-
-Matheus A.S. Martinelli
+- Revise a pasta de saida antes de executar, principalmente se `Replace Existing` estiver marcado.
+- Se houver layouts com nomes parecidos, confira os arquivos gerados apos a exportacao.
+- Para projetos grandes, considere exportar primeiro sem merge para validar o resultado.

@@ -1,60 +1,46 @@
-# 📘 Converter Multipart — Guia Rápido e Intuitivo
+# Converter Multipart — Guia Rapido
 
-Breve: converte geometrias multipart em singlepart (ou vice-versa), permitindo separar ou unir partes de feições. 🔗
+Esta ferramenta, no estado atual do plugin, atua sobre feicoes multipart e as separa em feicoes simples.
 
----
+Em outras palavras: apesar do nome "Converter para Multipart", o processamento executado hoje quebra cada geometria multipart em partes individuais.
 
-## ▶ Passo a passo (rápido) ✅
+## Como usar
 
-1. Abra: Menu → **Cadmus** → **Converter Multipart**
-2. Selecione a **camada vetorial** (pontos, linhas ou polígonos). 🗂️
-3. Decida o escopo:
-   - **Apenas selecionadas**: Se houver feições selecionadas, confirme se quer converter só essas. ✂️
-   - **Todas**: Se não houver seleção, todas as feições serão convertidas. 🌐
-4. Confirme a operação quando solicitado. ✅
-5. A camada fica em modo de edição — revise os resultados antes de salvar. 💾
+1. Ative uma camada vetorial no QGIS.
+2. Abra `Cadmus > Converter para Multipart`.
+3. Se houver feicoes selecionadas, o plugin pergunta se deve processar apenas as selecionadas.
+4. Se nao houver selecao, o plugin pergunta se deve processar todas as feicoes da camada.
+5. Confirme a operacao.
+6. Revise o resultado na camada antes de salvar as edicoes.
 
----
+## O que a ferramenta faz de verdade
 
-## ℹ️ O que acontece por trás (resumido)
+- Processa a camada ativa somente se ela for vetorial e possuir feicoes.
+- Se a camada tiver feicoes multipart, remove a feicao original e cria novas feicoes simples, uma para cada parte da geometria.
+- Copia os mesmos atributos da feicao original para cada nova feicao criada.
+- Respeita a selecao atual quando houver feicoes selecionadas.
 
-- **Multipart para Singlepart**: Geometrias com múltiplas partes são divididas em feições individuais, cada uma com uma parte. 📍
-- **Singlepart para Multipart**: Geometrias com apenas uma parte são agrupadas (mais comum em workflows específicos). 🔀
-- **Edit Buffer**: A operação roda no edit buffer — suas alterações ficam na memória até você salvar ou descartar. 💾
-- **Não salva automaticamente**: Se a camada já estava em edição, as alterações não são salvas automaticamente. ⚠️
+## Comportamento de edicao
 
----
+- Se a camada nao estiver em modo de edicao, o plugin inicia a edicao antes de processar.
+- As alteracoes acontecem na propria camada, sem criar uma camada nova.
+- O codigo atual nao faz salvamento automatico ao final.
+- Se a operacao falhar ou for cancelada, o plugin executa `rollBack()`.
 
-## 💡 Dicas rápidas
+## Limitacoes importantes
 
-- **Faça backup**: Sempre salve uma cópia de backup da camada original antes de converter. 📦
-- **Use seleção**: Para converter apenas parte dos dados, selecione as feições desejadas antes de abrir a ferramenta. ✂️
-- **Revise antes de salvar**: Após a conversão, revise visualmente no mapa antes de confirmar as alterações. 👀
-- **Camadas Shapefile**: Shapefiles podem ter limitações — considere usar GeoPackage (`.gpkg`) para operações complexas. 🗄️
+- A rotina atual so altera feicoes cuja geometria ja esteja em formato multipart.
+- Feicoes que ja sao simples nao sao modificadas.
+- Se a camada nao estiver definida como tipo multipart, a rotina pode encerrar sem alterar nada.
+- O texto da interface e o nome da ferramenta ainda estao desalinhados com o comportamento real do codigo.
 
----
+## Quando usar
 
-## ⚠️ Problemas comuns e solução
+Use esta ferramenta quando voce tiver uma feicao multipart e quiser transformar cada parte em uma feicao separada, mantendo os atributos originais.
 
-- **"Camada não editável"** → Desbloqueie a camada ou copie para uma nova camada editável. 🔐
-- **Muitas novas feições criadas** → Esperado! Multipart → Singlepart cria uma feição por parte. Você pode desfazer (Ctrl+Z). 🔄
-- **Atributos duplicados** → Cada nova feição herda os mesmos atributos da feição original. 📋
-- **Erro ao salvar após conversão** → Verifique se o formato suporta o número de feições (Shapefile tem limite). 🚨
+## Cuidados
 
----
-
-## ✅ Checklist rápido pós-execução
-
-- Feições foram convertidas conforme esperado? ✔️
-- Número de feições está correto? ✔️
-- Atributos foram preservados? ✔️
-- Salvou (ou descartou) as alterações? ✔️
-
----
-
-## 🔧 Preferências e suporte
-
-- A ferramenta usa a chave interna `vector_multipart` para logs.
-- **Desfazer (Ctrl+Z)**: Funciona enquanto a camada estiver em edição.
-- **Cancelar operação**: Clique no "X" da barra de progresso durante a operação.
-- Em caso de erro, reporte com: tipo de geometria, número de feições e formato do arquivo (`.shp`, `.gpkg`, etc). 🐞
+- Revise a quantidade final de feicoes apos a execucao.
+- Confira se a duplicacao de atributos atende ao seu fluxo de trabalho.
+- Salve a camada somente depois de validar o resultado.
+- Se a camada for sensivel, faca backup antes de executar.

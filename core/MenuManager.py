@@ -4,26 +4,31 @@ from ..resources.IconManager import IconManager as im
 from ..resources.widgets.DropdownToolButton import DropdownToolButton
 from ..core.config.LogUtils import LogUtils
 from ..utils.ToolKeys import ToolKey
+from ..utils.Preferences import Preferences
 
 
 class MenuManager:
-    SYSTEM = "SYSTEM"#1
-    LAYOUTS = "LAYOUTS"#2
-    FOLDER = "FOLDER"#3
-    VECTOR = "VECTOR"#4
-    AGRICULTURE = "AGRICULTURE"#5
-    RASTER = "RASTER"#6
+    SYSTEM = "SYSTEM"  # 1
+    LAYOUTS = "LAYOUTS"  # 2
+    FOLDER = "FOLDER"  # 3
+    VECTOR = "VECTOR"  # 4
+    AGRICULTURE = "AGRICULTURE"  # 5
+    RASTER = "RASTER"  # 6
 
-    def __init__(self, iface,tools=None, logger=None):
+    def __init__(self, iface, tools=None, logger=None):
         self.iface = iface
         self.menu = None
         self.submenus = {}
         self.toolbar = None
         self.tools = tools if tools is not None else []
-        self.logger = logger or LogUtils(tool="menumanager", class_name="MenuManager")
+        self.TOOLKEY = ToolKey.SYSTEM
+        self.logger = LogUtils(tool=self.TOOLKEY, class_name="MenuManager")
         self._create_actions_for_tools()
-        self.logger.debug(f"MenuManager: {self.menu}. Tools: {self.tools}. "
-                          f"Toolbar: {self.toolbar}.")
+        self.prefs = Preferences.load_tool_prefs(self.TOOLKEY)
+        self.logger.debug(
+            f"MenuManager: {self.menu}. Tools: {self.tools}. "
+            f"Toolbar: {self.toolbar}."
+        )
 
     def _create_actions_for_tools(self):
         """Cria QActions para todas as ferramentas e conecta executores."""
@@ -40,7 +45,9 @@ class MenuManager:
         self.menu = QMenu("Cadmus", self.iface.mainWindow())
         self.menu.setObjectName("Cadmus")
         standard_menu = self.iface.firstRightStandardMenu()
-        self.iface.mainWindow().menuBar().insertMenu(standard_menu.menuAction(), self.menu)
+        self.iface.mainWindow().menuBar().insertMenu(
+            standard_menu.menuAction(), self.menu
+        )
 
         # Mapeamento de categoria para ícone
         category_icons = {
@@ -51,7 +58,9 @@ class MenuManager:
             self.AGRICULTURE: im.icon(im.AGRICULTURE),
             self.RASTER: im.icon(im.RASTER),
         }
-        self.logger.debug(f"Criando submenus para cada categoria: {list(category_icons.keys())}")
+        self.logger.debug(
+            f"Criando submenus para cada categoria: {list(category_icons.keys())}"
+        )
         for category in [
             self.SYSTEM,
             self.LAYOUTS,
@@ -65,21 +74,28 @@ class MenuManager:
                 submenu.setIcon(category_icons[category])
             self.submenus[category] = submenu
             self.menu.addMenu(submenu)
-            self.logger.debug(f"Submenu '{category}' criado com ícone: {category_icons.get(category)}")
+            self.logger.debug(
+                f"Submenu '{category}' criado com ícone: {category_icons.get(category)}"
+            )
 
         self.logger.debug("Menus principais criados")
 
     def create_toolbar(self):
-        self.logger.debug("Iniciando criação da toolbar")
         self.logger.debug(f"Iniciando toolbar:Total de ferramentas: {len(self.tools)}")
         self.toolbar = QToolBar("Cadmus", self.iface.mainWindow())
         self.toolbar.setObjectName("Cadmus_Toolbar")
         self.iface.addToolBar(self.toolbar)
-        self.logger.debug(f"Toolbar criada e adicionada ao QGIS: {self.toolbar.objectName()}")
+        self.logger.debug(
+            f"Toolbar criada e adicionada ao QGIS: {self.toolbar.objectName()}"
+        )
+
+        self.logger.debug(
+            f"Toolbar criada e adicionada ao QGIS: {self.toolbar.objectName()}"
+        )
 
         # Coletar todos os dropdown buttons por categoria
         dropdown_buttons = []
-        
+
         for category in [
             self.SYSTEM,
             self.LAYOUTS,
@@ -90,23 +106,41 @@ class MenuManager:
         ]:
             self.logger.debug(f"Verificando categoria {category}")
             all_tools_in_category = [t for t in self.tools if t.category == category]
-            self.logger.debug(f"Total de ferramentas na categoria {category}: {len(all_tools_in_category)}")
-            
-            main_tools = [t for t in self.tools if t.category == category and t.main_action and t.show_in_toolbar]
+            self.logger.debug(
+                f"Total de ferramentas na categoria {category}: {len(all_tools_in_category)}"
+            )
+
+            main_tools = [
+                t
+                for t in self.tools
+                if t.category == category and t.main_action and t.show_in_toolbar
+            ]
             self.logger.debug(f"Main tools na categoria {category}: {len(main_tools)}")
-            
-            secondary_tools = [t for t in self.tools if t.category == category and not t.main_action and t.show_in_toolbar]
-            self.logger.debug(f"Secondary tools na categoria {category}: {len(secondary_tools)}")
+
+            secondary_tools = [
+                t
+                for t in self.tools
+                if t.category == category and not t.main_action and t.show_in_toolbar
+            ]
+            self.logger.debug(
+                f"Secondary tools na categoria {category}: {len(secondary_tools)}"
+            )
 
             if not main_tools:
-                self.logger.debug(f"Pulando categoria {category} - nenhum main_tool encontrado")
+                self.logger.debug(
+                    f"Pulando categoria {category} - nenhum main_tool encontrado"
+                )
                 continue
 
             main_tool = main_tools[0]
-            self.logger.debug(f"Criando dropdown para categoria {category} com main_tool: {main_tool.name}")
-            secondary_actions = [t.action for t in sorted(secondary_tools, key=lambda x: x.order)]
+            self.logger.debug(
+                f"Criando dropdown para categoria {category} com main_tool: {main_tool.name}"
+            )
+            secondary_actions = [
+                t.action for t in sorted(secondary_tools, key=lambda x: x.order)
+            ]
             self.logger.debug(f"Secondary actions: {len(secondary_actions)}")
-            
+
             dropdown = DropdownToolButton(
                 iface=self.iface,
                 title=main_tool.name,
@@ -114,12 +148,16 @@ class MenuManager:
                 secondary_actions=secondary_actions,
                 icon=main_tool.icon,  # Adicionado ícone
             )
-            self.logger.debug(f"Dropdown criado com text: {dropdown.text() if hasattr(dropdown, 'text') else 'None'}")
+            self.logger.debug(
+                f"Dropdown criado com text: {dropdown.text() if hasattr(dropdown, 'text') else 'None'}"
+            )
             dropdown_buttons.append(dropdown)
 
         # TESTE: Adicionar main_actions diretamente sem DropdownToolButton
         if dropdown_buttons:
-            self.logger.debug(f"Adicionando {len(dropdown_buttons)} botões dropdown à toolbar")
+            self.logger.debug(
+                f"Adicionando {len(dropdown_buttons)} botões dropdown à toolbar"
+            )
             for button in dropdown_buttons:
                 self.logger.debug(f"Adicionando botão: {button.text()}")
                 self.toolbar.addWidget(button)
@@ -129,21 +167,38 @@ class MenuManager:
                     self.toolbar.addSeparator()
         else:
             # Fallback: adicionar main_actions diretamente
-            self.logger.warning("Nenhum botão dropdown criado, tentando adicionar main_actions diretamente")
+            self.logger.warning(
+                "Nenhum botão dropdown criado, tentando adicionar main_actions diretamente"
+            )
             for category in [self.SYSTEM, self.LAYOUTS, self.VECTOR, self.AGRICULTURE]:
-                main_tools = [t for t in self.tools if t.category == category and t.main_action and t.show_in_toolbar]
+                main_tools = [
+                    t
+                    for t in self.tools
+                    if t.category == category and t.main_action and t.show_in_toolbar
+                ]
                 if main_tools:
                     main_tool = main_tools[0]
-                    self.logger.debug(f"Adicionando main_action diretamente: {main_tool.name}")
+                    self.logger.debug(
+                        f"Adicionando main_action diretamente: {main_tool.name}"
+                    )
                     self.toolbar.addAction(main_tool.action)
                     self.toolbar.addSeparator()
 
     def populate_menus(self):
         # Ordenar ferramentas por order dentro de cada categoria
-        for category in [self.SYSTEM, self.LAYOUTS, self.FOLDER, self.VECTOR, self.AGRICULTURE, self.RASTER]:
+        for category in [
+            self.SYSTEM,
+            self.LAYOUTS,
+            self.FOLDER,
+            self.VECTOR,
+            self.AGRICULTURE,
+            self.RASTER,
+        ]:
             if category not in self.submenus:
                 continue
-            sorted_tools = sorted([t for t in self.tools if t.category == category], key=lambda x: x.order)
+            sorted_tools = sorted(
+                [t for t in self.tools if t.category == category], key=lambda x: x.order
+            )
             for tool in sorted_tools:
                 self.submenus[category].addAction(tool.action)
         self.logger.debug("Submenus populados com ferramentas (ordenadas)")
@@ -153,21 +208,21 @@ class MenuManager:
         for tool in self.tools:
             if tool.action:
                 self.iface.removePluginMenu("Cadmus", tool.action)
-        
+
         # Remover menu principal
         if self.menu:
             self.iface.mainWindow().menuBar().removeAction(self.menu.menuAction())
             # Importante: deletar o menu após remover
             self.menu.deleteLater()
             self.menu = None
-        
+
         # Remover toolbar - MÉTODO CORRETO
         if self.toolbar:
             # Remove da interface
             self.iface.mainWindow().removeToolBar(self.toolbar)
             # Força a destruição do objeto
             self.toolbar.deleteLater()
-            #self.toolbar = None
-        
+            # self.toolbar = None
+
         self.submenus.clear()
         self.logger.debug("MenuManager unloaded")
