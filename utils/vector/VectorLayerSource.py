@@ -218,6 +218,15 @@ class VectorLayerSource:
         )
 
     @staticmethod
+    def load_existing_vector_layer(
+        file_path: str, tool_key: str = "untraceable"
+    ) -> Optional[QgsVectorLayer]:
+        """Carrega camada vetorial existente a partir de um caminho no disco."""
+        return VectorLayerSource().load_vector_layer_from_file(
+            file_path, external_tool_key=tool_key
+        )
+
+    @staticmethod
     def get_layer_file_size(layer: QgsVectorLayer) -> int:
         """Retorna tamanho em bytes do datasource se for arquivo"""
         try:

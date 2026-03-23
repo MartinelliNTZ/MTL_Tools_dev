@@ -316,6 +316,22 @@ class ProjectUtils:
             return None
 
     @staticmethod
+    def add_layer_if_missing(layer):
+        """Adiciona a layer ao projeto apenas se ainda nao estiver registrada."""
+        try:
+            if layer is None:
+                return None
+
+            project = QgsProject.instance()
+            if layer.id() not in project.mapLayers():
+                project.addMapLayer(layer)
+            return layer
+        except Exception as e:
+            logger = LogUtils(tool="project_utils", class_name="ProjectUtils")
+            logger.error(f"Erro ao adicionar camada se ausente: {e}")
+            return None
+
+    @staticmethod
     def add_layer_to_group(layer, group):
         """Adiciona uma camada já registrada no projeto dentro de um grupo (QgsLayerTreeGroup)."""
         try:

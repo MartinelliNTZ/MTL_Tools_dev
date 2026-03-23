@@ -55,6 +55,11 @@ class ExplorerUtils:
         return str(p.with_name(f"{p.stem}_{suffix}{extension}"))
 
     @staticmethod
+    def is_file(path: str) -> bool:
+        """Verifica se o caminho existe e aponta para um arquivo."""
+        return bool(path) and Path(path).is_file()
+
+    @staticmethod
     def open_folder(folder: str, tool_key: str) -> bool:
         """Abre uma pasta no explorador do sistema."""
         logger = ExplorerUtils._get_logger(tool_key)

@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
-import os
-
-from qgis.core import QgsProject, QgsVectorLayer
-
 from ..engine_tasks.AsyncPipelineEngine import AsyncPipelineEngine
 from ..engine_tasks.ExecutionContext import ExecutionContext
 from ..engine_tasks.MrkParseStep import MrkParseStep
 from ...i18n.TranslationManager import STR
+from ...utils.ProjectUtils import ProjectUtils
 from ...utils.QgisMessageUtil import QgisMessageUtil
 from ...utils.ToolKeys import ToolKey
 from ...utils.ExplorerUtils import ExplorerUtils
@@ -31,7 +28,7 @@ class DroneCoordinatesRunner:
         on_finished=None,
         on_error=None,
     ) -> bool:
-        if not file_path or not os.path.isfile(file_path):
+        if not ExplorerUtils.is_file(file_path):
             return False
 
         self._on_finished = on_finished
@@ -44,8 +41,13 @@ class DroneCoordinatesRunner:
             file_path, STR.TRACK.lower()
         )
 
-        existing_points = self._load_existing_layer(points_path)
-        existing_track = self._load_existing_layer(track_path)
+        existing_points = VectorLayerSource.load_existing_vector_layer(
+            points_path, tool_key=self.tool_key
+        )
+
+        existing_track = VectorLayerSource.load_existing_vector_layer(
+            track_path, tool_key=self.tool_key
+        )
         if existing_points and existing_track:
             self._load_layer(existing_points)
             self._load_layer(existing_track)
@@ -100,7 +102,7 @@ class DroneCoordinatesRunner:
             fallback_name=STR.POINTS,
         )
         if points_layer and points_layer.id() != layer.id():
-            QgsProject.instance().removeMapLayer(layer.id())
+            ProjectUtils.remove_layer_from_project(layer)
 
         line_layer = VectorLayerGeometry.create_line_layer_from_points(
             points,
@@ -146,12 +148,14 @@ class DroneCoordinatesRunner:
 
     def _save_or_load_existing(
         self,
-        layer: QgsVectorLayer,
+        layer,
         output_path: str,
         *,
         fallback_name: str,
     ):
-        existing = self._load_existing_layer(output_path)
+        existing = VectorLayerSource.load_existing_vector_layer(
+            output_path, tool_key=self.tool_key
+        )
         if existing:
             self._load_layer(existing)
             return existing
@@ -173,16 +177,7 @@ class DroneCoordinatesRunner:
         self._load_layer(layer)
         return layer
 
-    def _load_existing_layer(self, path: str):
-        if not path or not os.path.exists(path):
-            return None
-        layer = QgsVectorLayer(path, os.path.splitext(os.path.basename(path))[0], "ogr")
-        if not layer.isValid():
-            return None
-        return layer
-
-    def _load_layer(self, layer: QgsVectorLayer):
+    def _load_layer(self, layer):
         if not layer or not layer.isValid():
             return
-        if not QgsProject.instance().mapLayer(layer.id()):
-            QgsProject.instance().addMapLayer(layer)
+        ProjectUtils.add_layer_if_missing(layer)
