@@ -1,75 +1,12 @@
-#2.1.3.9.11 2026/03/22
-- Corrigida toolbar vazia: adicionado ícone explícito ao DropdownToolButton; adicionado update() na toolbar após adicionar ações; adicionados logs detalhados para debug (contagem de ferramentas por categoria, main_tools, secondary_tools); implementado fallback para adicionar main_actions diretamente se dropdown_buttons falhar; melhorado diagnóstico de problemas na criação da toolbar.
+2.1.5
 
-#2.1.3.9.10 2026/03/22
-- Corrigida toolbar não aparecendo: substituído CadmusToolBar por QToolBar padrão para melhor compatibilidade com QGIS; adicionado parent (iface.mainWindow()) às QActions criadas no MenuManager; adicionados logs detalhados para debug de criação da toolbar; garantida visibilidade da toolbar com show(); corrigida adição de ações dropdown diretamente à QToolBar em vez de usar método customizado.
-
-#2.1.3.9.9 2026/03/22
-- Corrigidos ícones nos menus QMenu: adicionada importação de IconManager no MenuManager e mapeamento de ícones por categoria (SYSTEM, LAYOUTS, VECTOR, AGRICULTURE, RASTER) para submenus; corrigida criação de toolbar usando CadmusToolBar em vez de iface.addToolBar() para compatibilidade com DropdownToolButton; toolbar agora usa add_dropdown_buttons() para adicionar múltiplos botões dropdown corretamente.
-
-#2.1.3.9.8 2026/03/22
-- Corrigido import cycle entre ToolRegistry e MenuManager: movidas constantes de categoria (SYSTEM, LAYOUTS, VECTOR, AGRICULTURE, RASTER) diretamente para ToolRegistry; removida importação desnecessária de ToolRegistry no MenuManager; ToolRegistry agora usa self.CATEGORY em vez de MenuManager.CATEGORY.
-
-#2.1.3.9.7 2026/03/22
-- Integração completa da nova arquitetura modular no CadmusPlugin: removido todo código manual de criação de QAction, QMenu, QToolBar e DropdownToolButton do initGui(); initGui() agora usa ToolRegistry + MenuManager para gerar automaticamente menus e toolbar a partir das ferramentas registradas; unload() delega limpeza para menu_manager.unload(); plugin agora totalmente orientado a dados com separação clara de responsabilidades.
-
-#2.1.3.9.6 2026/03/22
-- Transferida responsabilidade de criação de QAction da classe Tool para MenuManager: Tool.__init__ não cria mais self.action, MenuManager._create_actions_for_tools() cria QActions para todas as ferramentas e conecta executores; adicionado atributo tooltip à Tool para acesso no MenuManager.
-
-#2.1.3.9.5 2026/03/22
-- Corrigida ordem sequencial dentro de cada categoria no ToolRegistry: VECTOR (10,20,30,40,50), SYSTEM (10,20,30,40); movido load_folder para categoria VECTOR; ajustada ordem dos menus no MenuManager para SYSTEM(1), LAYOUTS(2), FOLDER(3), VECTOR(4), AGRICULTURE(5), RASTER(6); definido show_in_toolbar=True para todas as ferramentas; order agora representa a posição dentro do menu da categoria correspondente.
-
-#2.1.3.9.4 2026/03/22
-- Reorganizado CadmusPlugin.initGui(): seção "4) CONFIGURAÇÃO DAS AÇÕES" agora apresenta ações ordenadas sequencialmente por (10, 20, 30...130), agrupadas por categoria com comentários visuais (LAYOUTS, SYSTEM, VECTOR, AGRICULTURE); cada ação comentada com seu número de ordem correspondente à ToolRegistry para consistência e rastreabilidade; mantido alinhamento com Tool.order e MenuManager sorting.
-
-#2.1.3.9 2026/03/21
-- Nova arquitetura criada: Tool (resources/widgets/Tool.py), ToolRegistry (core/ToolRegistry.py) e MenuManager (core/MenuManager.py); DropdownToolButton atualizado para suportar separator (None) em secondary_actions.
-
-#2.1.3.8 2026/03/21
-- Refatoração crítica do DropdownToolButton: substituído QToolButton por QAction com setMenu, conectando triggered à main_action para comportamento correto de dropdown (clique no botão executa ação principal, seta abre menu); CadmusToolBar alterado para addAction(button.action).
-
-#2.1.3.6 2026/03/21
-- Correção no CadmusToolBar: alterado add_dropdown_buttons para adicionar QToolButton diretamente via addWidget(button.button) em vez de usar QWidgetAction, resolvendo erro de tipo 'DropdownToolButton' não sendo QWidget.
-
-#2.1.3.5 2026/03/21
-- Correção crítica no DropdownToolButton: removida herança de QWidgetAction (inapropriada para toolbars) e alterada para classe simples que configura QToolButton diretamente, resolvendo problema de cliques não funcionais na toolbar.
-
-#2.1.3.4 2026/03/21
-- Correção na funcionalidade dos botões dropdown: adicionado clicked.connect no DropdownToolButton.setup() para garantir que cliques no botão acionem a ação principal; adicionado logging de debug no CadmusPlugin.initGui() para rastrear criação de botões e facilitar diagnóstico.
-
-#2.1.3.3 2026/03/21
-- Refatoração adicional: criado widget CadmusToolBar exclusivo em resources/widgets/CadmusToolBar.py para gerenciar toolbar com método add_dropdown_buttons em massa; modificado DropdownToolButton para herdar de QWidgetAction, encapsulando QToolButton interno; reduzido código repetido na criação de botões na CadmusPlugin, mantendo referências individuais para limpeza.
-
-#2.1.3.2 2026/03/21
-- Refatoração adicional da classe CadmusPlugin: extraído método _add_toolbar_dropdown para widget exclusivo DropdownToolButton em resources/widgets/DropdownToolButton.py, reduzindo responsabilidades da classe principal e melhorando reutilização.
-
-#2.1.3.1 2026/03/21
-- Refatoração da classe CadmusPlugin para aliviar responsabilidades: criada classe PluginBootstrap em core/PluginBootstrap.py, responsável pela inicialização de logs, handler global de erros, limpeza de logs e registro do provider de processamento. CadmusPlugin agora orquestra via PluginBootstrap.
-
-#2.1.3 2026/03/20
-- Internacionalização expandida para os plugins `SettingsPlugin`, `ReplaceInLayouts`, `LoadFolderLayers`, `GenerateTrailPlugin`, `CopyAttributesPlugin`, `ExportAllLayouts` e `coord_result_dialog`, com centralização das strings exibidas ao usuário em `Strings_pt_BR`.
-- Reorganização do catálogo `Strings_pt_BR` em grupos mais intuitivos, separando botões, labels comuns, mensagens comuns e títulos específicos de plugins para incentivar reaproveitamento de strings genéricas.
-- Traduções completas adicionadas em `Strings_en` e `Strings_es` para todas as novas chaves introduzidas no catálogo em português.
-- Atualização do histórico para consolidar as mudanças recentes de internacionalização e padronização dos plugins.
-
-#2.1.2.1 2026/03/20
-- Refatorado DroneCoordinates para usar strings internacionalizadas via STR e Strings_pt_BR, substituindo todas as strings hardcoded exibidas ao usuário.
-
-#2.1.2 2026/03/20
-
-#2.1.3.9.3 2026/03/22
-- Reorganizado ToolRegistry._create_tool_list() com comentários separando por categorias (LAYOUTS, SYSTEM, VECTOR, AGRICULTURE) mostrando a ordem (order) de cada ferramenta.
-- Atualizado tooltips completas em ToolRegistry copiadas de cadmus_plugin.py, com todas as informações detalhadas.
-- Melhorada legibilidade do código com separação visual por seção de categoria.
-
-- Adicionado `order` (int, padrão 100) ao Tool para ordenação de menus e toolbar.
-- Adicionado `show_in_toolbar` (bool, padrão True) ao Tool para controle fino sobre visibilidade em toolbar.
-- Removido `executor_name` de todas as ferramentas (redundante com `executor`).
-- MenuManager.create_toolbar() agora respeita `show_in_toolbar` e ordena ações secundárias por `order`.
-- MenuManager.populate_menus() ordena ferramentas por `order` dentro de cada categoria.
-
-- Corrigido ToolRegistry para importar MenuManager e remover bloco duplicado residual após get_tools(), eliminando erro de sintaxe.
-- Adaptado ToolRegistry para aceitar iface no __init__, mover todos os run_ methods para ToolRegistry, corrigir imports para ..plugins, adicionar executor=self.run_xxx em cada Tool para conectar ações diretamente.
-- Unificado constantes de categoria em MenuManager para uppercase, consistente com ToolRegistry.
-- ToolRegistry agora centraliza criação de ferramentas e execução, reduzindo responsabilidades do CadmusPlugin.
-
+- Internacionalização ampliada com centralização de strings visíveis ao usuário em `STR.*` para os plugins `VectorMultipartPlugin`, `VectorFieldsCalculationPlugin`, `SettingsPlugin`, `ReplaceInLayouts`, `LoadFolderLayers`, `GenerateTrailPlugin`, `CopyAttributesPlugin`, `ExportAllLayouts` e `coord_result_dialog`.
+- Internacionalização ampliada para widgets base e `WidgetFactory`, removendo hardcodes de UI em `resources/widgets/*` e `core/ui/WidgetFactory.py`.
+- Reorganização do catálogo de strings com reaproveitamento de chaves genéricas em `Strings_pt_BR.py` e sincronização das novas chaves em `Strings_en.py` e `Strings_es.py`.
+- Criação do guia `docs/GUIA_INTERNACIONALIZACAO.md` documentando o padrão de uso de `STR.*`, reaproveitamento de chaves e fluxo para continuidade.
+- Criação do widget `DropdownSelectorWidget` em `resources/widgets/DropdownSelectorWidget.py`, integração em `WidgetFactory.py` e uso prático em `SettingsPlugin.py`.
+- Refatoração dos algoritmos de processing para usar `STR.*` e persistência de preferências, incluindo `RasterMassSampler`, `RasterMassClipper`, `RasterDifferenceStatiscs`, `GeometryLineFromPoints`, `AttributeStatistics` e `DifferenceFields`.
+- Adição do checkbox `Abrir pasta de saída` com persistência em preferências nos algoritmos `RasterMassSampler`, `RasterMassClipper`, `RasterDifferenceStatiscs` e `AttributeStatistics`.
+- Criação do método utilitário `open_folder_in_explorer()` em `processing/BaseProcessingAlgorithm.py` para abertura da pasta de saída no explorador.
+- Refatoração do sistema de instruções HTML com separação por idioma em `resources/instructions/html/HtmlInstructions_pt_BR.py`, `HtmlInstructions_en.py` e `HtmlInstructions_es.py`.
+- Atualização de `resources/HtmlInstructionsProvider.py` para selecionar dinamicamente o provedor HTML conforme o locale definido em `i18n/TranslationManager.py`, mantendo fallback para `pt_BR`.
