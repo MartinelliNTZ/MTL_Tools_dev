@@ -85,63 +85,113 @@ class MrkParser:
         points = []
         folder = os.path.abspath(folder)
 
+        total_files = 0
         for root, _, files in os.walk(folder):
-
             for f in files:
-
                 if not f.lower().endswith(".mrk"):
                     continue
 
                 file_path = os.path.join(root, f)
-
-                file_meta = MrkParser._extract_file_metadata(f)
-
-                date_match = MrkParser.DATE_RE.search(f)
-                data_mrk = date_match.group(1) if date_match else None
-
-                folder_fields = {}
-                if gerarpastas:
-                    folder_fields = MrkParser._generate_folder_fields(
-                        root, folder, tool_key
-                    )
-                    logger.debug(
-                        f"Generated folder fields for file: {file_path} - {folder_fields}"
-                    )
-
-                with open(file_path, "r", encoding="utf-8", errors="ignore") as fh:
-
-                    for line in fh:
-
-                        m = MrkParser.LINE_RE.search(line)
-                        if not m:
-                            continue
-
-                        point = {
-                            "foto": int(m.group("foto")),
-                            "lat": float(m.group("lat")),
-                            "lon": float(m.group("lon")),
-                            "alt": float(m.group("alt")),
-                            "data_name": data_mrk,
-                            "folder": os.path.basename(root),
-                            "folder_path": root,
-                            "mrk_file": f,
-                            "mrk_path": file_path,
-                            "numdovoo": file_meta["numdovoo"],
-                            "nomedovoo": file_meta["nomedovoo"],
-                        }
-
-                        if gerarpastas:
-                            point.update(folder_fields)
-
-                        points.append(point)
+                file_points = MrkParser.parse_file(
+                    file_path,
+                    base_folder=folder,
+                    extra_fields=extra_fields,
+                    gerarpastas=gerarpastas,
+                    tool_key=tool_key,
+                )
+                total_files += 1
+                points.extend(file_points)
 
             if not recursive:
                 break
 
         if gerarpastas:
             points = MrkParser._normalize_folder_fields(points)
+
         logger.debug(
-            f"Parsed point: {point} from file: {file_path}Points parsed so far: {len(points)}"
+            "MRK folder parsing completed",
+            code="MRK_FOLDER_PARSED",
+            folder=folder,
+            mrk_count=total_files,
+            points_count=len(points),
+            recursive=recursive,
+        )
+        return points
+
+    @staticmethod
+    def parse_file(
+        file_path,
+        base_folder=None,
+        extra_fields=None,
+        gerarpastas=True,
+        tool_key="untraceable",
+    ):
+        """
+        Lê um único arquivo MRK e retorna lista de pontos.
+        """
+        logger = MrkParser._get_logger(tool_key)
+
+        if not file_path:
+            return []
+
+        file_path = os.path.abspath(file_path)
+        if not os.path.isfile(file_path):
+            logger.warning(
+                "MRK file not found",
+                code="MRK_FILE_NOT_FOUND",
+                file_path=file_path,
+            )
+            return []
+
+        root = os.path.dirname(file_path)
+        file_name = os.path.basename(file_path)
+        base_folder = os.path.abspath(base_folder or root)
+
+        file_meta = MrkParser._extract_file_metadata(file_name)
+        date_match = MrkParser.DATE_RE.search(file_name)
+        data_mrk = date_match.group(1) if date_match else None
+
+        folder_fields = {}
+        if gerarpastas:
+            folder_fields = MrkParser._generate_folder_fields(root, base_folder, tool_key)
+            logger.debug(
+                f"Generated folder fields for file: {file_path} - {folder_fields}"
+            )
+
+        points = []
+        with open(file_path, "r", encoding="utf-8", errors="ignore") as fh:
+            for line in fh:
+                m = MrkParser.LINE_RE.search(line)
+                if not m:
+                    continue
+
+                point = {
+                    "foto": int(m.group("foto")),
+                    "lat": float(m.group("lat")),
+                    "lon": float(m.group("lon")),
+                    "alt": float(m.group("alt")),
+                    "data_name": data_mrk,
+                    "folder": os.path.basename(root),
+                    "folder_path": root,
+                    "mrk_file": file_name,
+                    "mrk_path": file_path,
+                    "numdovoo": file_meta["numdovoo"],
+                    "nomedovoo": file_meta["nomedovoo"],
+                }
+
+                if gerarpastas:
+                    point.update(folder_fields)
+
+                points.append(point)
+
+        if gerarpastas:
+            points = MrkParser._normalize_folder_fields(points)
+
+        logger.debug(
+            "MRK file parsing completed",
+            code="MRK_FILE_PARSED",
+            file_path=file_path,
+            points_count=len(points),
         )
         return points
 

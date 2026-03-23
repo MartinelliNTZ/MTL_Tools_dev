@@ -252,15 +252,6 @@ Beneficios:
 
 Evitar depender de parse por pasta quando a entrada real e um unico arquivo.
 
-### D. Preferencias especificas do modo automatico
-
-Adicionar preferencias futuras como:
-
-- auto_process_mrk_dragdrop = True/False
-- auto_apply_photo_metadata = True/False
-- auto_load_results = True/False
-- auto_rename_existing_outputs = True/False
-
 ## Riscos Tecnicos
 
 ### 1. Ponto real de interceptacao no QGIS
@@ -375,18 +366,16 @@ Responder estas perguntas antes de codar:
    - carregar as camadas e mostrar uma barra de sucesso;
    - carregar as camadas e abrir uma janela resumo com os caminhos salvos?
 
-## Recomendacao Inicial
+## Decisoes Fechadas
 
-Para uma primeira implementacao segura, eu recomendo estas respostas base:
-
-1. processar automaticamente sem confirmacao;
-2. processar somente o arquivo arrastado;
-3. metadados de fotos desligados por padrao;
-4. nomes `_pontos.gpkg` e `_trilha.gpkg`;
-5. renomear automaticamente se ja existir;
-6. processar varios `.mrk` separadamente;
-7. implementar primeiro no drag and drop e depois expandir;
-8. carregar as camadas e mostrar barra de sucesso.
+1. O processamento sera automatico, sem confirmacao.
+2. Apenas o arquivo `.mrk` arrastado/importado sera processado.
+3. O cruzamento com fotos ficara desligado por padrao neste ciclo.
+4. Os nomes de saida usarao sufixos localizados via i18n.
+5. Se os `.gpkg` ja existirem, o sistema deve carregar as saidas existentes.
+6. Multiplos `.mrk` devem ser tratados separadamente.
+7. O alvo e cobrir drag and drop e tambem o fluxo equivalente no Browser/importacao suportada pelo ponto oficial do QGIS.
+8. No sucesso, o sistema deve carregar as camadas e exibir apenas uma mensagem rapida nao modal.
 
 ## Proximo Passo
 

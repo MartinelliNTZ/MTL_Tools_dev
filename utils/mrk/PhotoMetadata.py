@@ -357,7 +357,7 @@ class PhotoMetadata:
             percent_done = i / total
             if percent_done >= next_log:
                 logger.info(
-                    "Progresso de indexação",
+                    f"Progresso de indexação: {int(percent_done * 100)}%",
                     code="PHOTO_INDEXING_PROGRESS",
                     data={
                         "percentual": int(percent_done * 100),

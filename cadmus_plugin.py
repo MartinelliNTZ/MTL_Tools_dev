@@ -7,6 +7,7 @@ from .i18n.TranslationManager import STR
 from .core.config.PluginBootstrap import PluginBootstrap
 from .core.config.ToolRegistry import ToolRegistry
 from .core.config.MenuManager import MenuManager
+from .core.services.MrkDropHandler import MrkDropRegistration
 
 
 class CadmusPlugin:
@@ -16,6 +17,7 @@ class CadmusPlugin:
         self.logger = None
         self.tool_registry = None
         self.menu_manager = None
+        self.mrk_drop_registration = None
         self.TOOL_KEY = ToolKey.SYSTEM
 
     # =====================================================
@@ -37,6 +39,10 @@ class CadmusPlugin:
 
         self.logger.info("Plugin inicializado")
         self.logger.info(f"Locale: {locale}. TM.STR: {STR.APP_NAME}")
+
+        self.mrk_drop_registration = MrkDropRegistration(self.iface)
+        self.mrk_drop_registration.register()
+        self.logger.info("MRK drop handler registrado com sucesso")
 
         # -------------------------------
         # INTEGRAÇÃO COM NOVA ARQUITETURA
@@ -79,6 +85,13 @@ class CadmusPlugin:
                 self.logger.info("Processing Provider removido com sucesso")
         except Exception as e:
             self.logger.error(f"Erro ao remover Processing Provider: {str(e)}")
+
+        try:
+            if self.mrk_drop_registration:
+                self.mrk_drop_registration.unregister()
+                self.logger.info("MRK drop handler removido com sucesso")
+        except Exception as e:
+            self.logger.error(f"Erro ao remover MRK drop handler: {str(e)}")
 
         try:
             # Descarregar MenuManager (remove menus e toolbar)
