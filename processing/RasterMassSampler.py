@@ -1,20 +1,26 @@
 # -*- coding: utf-8 -*-
 import os
-from .BaseProcessingAlgorithm import BaseProcessingAlgorithm
+import re
+
+from qgis.PyQt.QtCore import QVariant
 from qgis.core import (
-    QgsProcessingParameterFeatureSource,
-    QgsProcessingParameterMultipleLayers,
-    QgsProcessingParameterFeatureSink,
+    QgsCoordinateTransform,
+    QgsFeature,
+    QgsFeatureSink,
+    QgsField,
+    QgsFields,
+    QgsProcessing,
     QgsProcessingParameterBoolean,
     QgsProcessingParameterCrs,
-    QgsFeatureSink,
-    QgsProcessing,
+    QgsProcessingParameterFeatureSink,
+    QgsProcessingParameterFeatureSource,
+    QgsProcessingParameterMultipleLayers,
 )
-import re
-from qgis.PyQt.QtCore import QVariant
-from qgis.core import QgsFields, QgsField, QgsFeature, QgsCoordinateTransform
-from ..utils.vector.VectorLayerProjection import VectorLayerProjection
+
+from ..i18n.TranslationManager import STR
 from ..utils.ToolKeys import ToolKey
+from ..utils.vector.VectorLayerProjection import VectorLayerProjection
+from .BaseProcessingAlgorithm import BaseProcessingAlgorithm
 
 
 class RasterMassSampler(BaseProcessingAlgorithm):
@@ -24,90 +30,91 @@ class RasterMassSampler(BaseProcessingAlgorithm):
 
     TOOL_KEY = ToolKey.RASTER_MASS_SAMPLER
     ALGORITHM_NAME = "raster_mass_sampler"
-    ALGORITHM_DISPLAY_NAME = "Amostragem Massiva de Rasters"
+    ALGORITHM_DISPLAY_NAME = STR.RASTER_MASS_SAMPLER_TITLE
     ALGORITHM_GROUP = BaseProcessingAlgorithm.GROUP_RASTER
     ICON = "raster_mass.ico"
     INSTRUCTIONS_FILE = "raster_mass_sampler.html"
 
-    # Especificas do algoritmo
     INPUT_POINTS = "INPUT_POINTS"
     INPUT_RASTERS = "INPUT_RASTERS"
     OUTPUT_CRS = "OUTPUT_CRS"
     OUTPUT = "OUTPUT"
     DISPLAY_HELP = "DISPLAY_HELP"
+    OPEN_OUTPUT_FOLDER = "OPEN_OUTPUT_FOLDER"
 
-    # -------------------------- INIT -------------------------
-
-    # -------------------------- INIT -------------------------
     def initAlgorithm(self, config=None):
         self.load_preferences()
 
         self.addParameter(
             QgsProcessingParameterFeatureSource(
-                self.INPUT_POINTS, "Pontos de entrada", [QgsProcessing.TypeVectorPoint]
+                self.INPUT_POINTS,
+                STR.INPUT_POINTS,
+                [QgsProcessing.TypeVectorPoint],
             )
         )
 
         self.addParameter(
             QgsProcessingParameterMultipleLayers(
-                self.INPUT_RASTERS, "Rasters", QgsProcessing.TypeRaster
+                self.INPUT_RASTERS,
+                STR.RASTERS,
+                QgsProcessing.TypeRaster,
             )
         )
 
-        # Agora só existe CRS DE SAÍDA
         self.addParameter(
             QgsProcessingParameterCrs(
-                self.OUTPUT_CRS, "Reprojetar camada de saída (opcional)", optional=True
+                self.OUTPUT_CRS,
+                STR.REPROJECT_OUTPUT_LAYER_OPTIONAL,
+                optional=True,
             )
         )
 
         self.addParameter(
-            QgsProcessingParameterFeatureSink(self.OUTPUT, "Valores_Amostrados")
+            QgsProcessingParameterFeatureSink(self.OUTPUT, STR.SAMPLED_VALUES)
+        )
+
+        self.addParameter(
+            QgsProcessingParameterBoolean(
+                self.OPEN_OUTPUT_FOLDER,
+                STR.OPEN_OUTPUT_FOLDER,
+                defaultValue=self.prefs.get("open_output_folder", True),
+            )
         )
 
         self.addParameter(
             QgsProcessingParameterBoolean(
                 self.DISPLAY_HELP,
-                "Exibir campo de ajuda (Necessario executar e reiniciar)",
+                STR.DISPLAY_HELP_FIELD,
                 defaultValue=self.prefs.get("display_help", True),
             )
         )
 
-    # ----------------------- PROCESS -------------------------
     def processAlgorithm(self, params, context, feedback):
         pts = self.parameterAsSource(params, self.INPUT_POINTS, context)
         rasters = self.parameterAsLayerList(params, self.INPUT_RASTERS, context)
+        open_output_folder = self.parameterAsBool(params, self.OPEN_OUTPUT_FOLDER, context)
+        display_help = self.parameterAsBool(params, self.DISPLAY_HELP, context)
 
-        # ----------------- CRS DE SAÍDA -----------------
-        output_crs = None
         output_crs = self.parameterAsCrs(params, self.OUTPUT_CRS, context)
         if not output_crs.isValid():
             output_crs = None
 
         feedback.pushInfo(
-            f"CRS de saída: {output_crs.authid() if output_crs else 'None'}"
+            f"{STR.OUTPUT_CRS_LABEL} {output_crs.authid() if output_crs else STR.NONE}"
         )
 
-        # Construir campos de saída e nomes de campo raster
         out_fields, raster_fields = self.build_output_fields(pts, rasters)
-
-        # Preparar transforms CRS (pontos -> raster)
         transforms = self.build_transforms(pts, rasters, context)
-
-        # Executar amostragem
         features = self.sample_features(pts, rasters, transforms, out_fields, feedback)
 
-        # ----------------- REPROJEÇÃO SE NECESSÁRIO -----------------
         if output_crs:
             source_crs = pts.sourceCrs()
-
             features = VectorLayerProjection.reproject_features(
                 features, source_crs, output_crs, context
             )
 
         final_crs = output_crs if output_crs else pts.sourceCrs()
 
-        # ----------------- SINK -----------------
         sink, dest = self.parameterAsSink(
             params, self.OUTPUT, context, out_fields, pts.wkbType(), final_crs
         )
@@ -115,30 +122,26 @@ class RasterMassSampler(BaseProcessingAlgorithm):
         for f in features:
             sink.addFeature(f, QgsFeatureSink.FastInsert)
 
-        # ----------------- LINK E PREFERÊNCIAS DE SAÍDA -----------------
+        self.prefs.update(
+            {
+                "display_help": bool(display_help),
+                "open_output_folder": bool(open_output_folder),
+            }
+        )
+
         if dest and isinstance(dest, str) and not dest.startswith("memory:"):
             out_folder = os.path.dirname(dest)
-            clickable = f'<a href="file:///{out_folder}">{out_folder}</a>'
-            feedback.pushInfo(f"Arquivo salvo em: {clickable}")
-
+            feedback.pushInfo(f"{STR.FILE_SAVED_IN} {out_folder}")
             self.prefs.update(
                 {"last_output_folder": out_folder, "last_output_file": dest}
             )
-            self.save_preferences()
+            if open_output_folder:
+                self.open_folder_in_explorer(out_folder)
 
+        self.save_preferences()
         return {self.OUTPUT: dest}
 
-    # ------------------------ UI INFO ------------------------
-
-    # ---------------------- Helpers ----------------------
     def build_output_fields(self, pts, rasters, max_len: int = 10):
-        """
-        Cria e retorna (out_fields, raster_field_names).
-
-        - Copia os campos de `pts` para `out_fields`.
-        - Gera nomes de campo a partir de `r.name()` para cada raster,
-          sanitiza, trunca e garante unicidade.
-        """
         out_fields = QgsFields()
         try:
             for f in pts.fields():
@@ -162,12 +165,6 @@ class RasterMassSampler(BaseProcessingAlgorithm):
     def _sanitize_field_name(
         self, layer_name: str, existing: list, max_len: int = 10
     ) -> str:
-        """
-        Sanitiza `layer_name` para um identificador de campo válido:
-        - substituir caracteres inválidos por `_`
-        - truncar para `max_len`
-        - quando já existir, acrescentar sufixo numérico garantindo unicidade
-        """
         field_base = re.sub(r"[^0-9A-Za-z_]", "_", layer_name)
         candidate = field_base[:max_len]
         if candidate in existing:
@@ -187,7 +184,6 @@ class RasterMassSampler(BaseProcessingAlgorithm):
         return candidate
 
     def build_transforms(self, pts, rasters, context):
-        """Cria lista de QgsCoordinateTransform do CRS dos pontos para o CRS de cada raster."""
         effective_pts_crs = None
         try:
             effective_pts_crs = pts.sourceCrs()
@@ -204,10 +200,6 @@ class RasterMassSampler(BaseProcessingAlgorithm):
         return transforms
 
     def sample_features(self, pts, rasters, transforms, out_fields, feedback):
-        """
-        Itera sobre os pontos e amostra cada raster, retornando lista de QgsFeature.
-        Usa `dataProvider().sample()` para ler valores.
-        """
         result = []
         for feat in pts.getFeatures():
             geom = feat.geometry()
@@ -236,7 +228,6 @@ class RasterMassSampler(BaseProcessingAlgorithm):
         return result
 
     def write_sink(self, params, context, out_fields, features, pts, feedback):
-        """Escreve `features` no sink configurado pelos `params` e persiste preferências."""
         sink, dest = self.parameterAsSink(
             params, self.OUTPUT, context, out_fields, pts.wkbType(), pts.sourceCrs()
         )
@@ -246,21 +237,29 @@ class RasterMassSampler(BaseProcessingAlgorithm):
 
         if dest and isinstance(dest, str) and not dest.startswith("memory:"):
             out_folder = os.path.dirname(dest)
-            clickable = f'<a href="file:///{out_folder}">{out_folder}</a>'
-            feedback.pushInfo(f"Arquivo salvo em: {clickable}")
+            feedback.pushInfo(f"{STR.FILE_SAVED_IN} {out_folder}")
 
             display_help = (
                 bool(self.parameterAsBool(params, self.DISPLAY_HELP, context))
                 if self.DISPLAY_HELP in params
                 else False
             )
+            open_output_folder = (
+                bool(self.parameterAsBool(params, self.OPEN_OUTPUT_FOLDER, context))
+                if self.OPEN_OUTPUT_FOLDER in params
+                else True
+            )
             self.prefs.update(
                 {
                     "last_output_folder": out_folder,
                     "last_output_file": dest,
                     "display_help": display_help,
+                    "open_output_folder": open_output_folder,
                 }
             )
             self.save_preferences()
+
+            if open_output_folder:
+                self.open_folder_in_explorer(out_folder)
 
         return {self.OUTPUT: dest}

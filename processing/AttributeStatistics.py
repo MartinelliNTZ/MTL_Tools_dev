@@ -1,31 +1,33 @@
 # -*- coding: utf-8 -*-
-import os
 import math
+import os
+
 from qgis.core import (
+    QgsProcessing,
+    QgsProcessingException,
+    QgsProcessingParameterBoolean,
+    QgsProcessingParameterDefinition,
     QgsProcessingParameterFeatureSource,
     QgsProcessingParameterField,
     QgsProcessingParameterFileDestination,
     QgsProcessingParameterNumber,
-    QgsProcessingParameterBoolean,
-    QgsProcessing,
-    QgsProcessingParameterDefinition,
-    QgsProcessingException,
-    QgsVectorLayer,
     QgsProject,
+    QgsVectorLayer,
 )
-from .BaseProcessingAlgorithm import BaseProcessingAlgorithm
-from ..utils.ToolKeys import ToolKey
-from .model.attribute_statistics_model import AttributeStatisticsModel
+
+from ..i18n.TranslationManager import STR
 from ..resources.IconManager import IconManager as im
+from ..utils.ToolKeys import ToolKey
+from .BaseProcessingAlgorithm import BaseProcessingAlgorithm
+from .model.attribute_statistics_model import AttributeStatisticsModel
 
 
 class AttributeStatistics(BaseProcessingAlgorithm):
     TOOL_KEY = ToolKey.ATTRIBUTE_STATISTICS
     ALGORITHM_NAME = "attribute_statistics"
-    ALGORITHM_DISPLAY_NAME = "Estatísticas de Atributos"
+    ALGORITHM_DISPLAY_NAME = STR.ATTRIBUTE_STATISTICS_TITLE
     ALGORITHM_GROUP = BaseProcessingAlgorithm.GROUP_ESTATISTICA
     ICON = im.ATTRIBUTE_STATS
-
     INPUT_LAYER = "INPUT_LAYER"
     EXCLUDE_FIELDS = "EXCLUDE_FIELDS"
     PRECISION = "PRECISION"
@@ -33,252 +35,176 @@ class AttributeStatistics(BaseProcessingAlgorithm):
     LOAD_AFTER = "LOAD_AFTER"
     OUTPUT = "OUTPUT"
     DISPLAY_HELP = "DISPLAY_HELP"
+    OPEN_OUTPUT_FOLDER = "OPEN_OUTPUT_FOLDER"
 
-    # Rótulos (usados na UI e para decidir colunas)
     STATS = {
-        "MEAN": "Media",
-        "MEAN_ABS": "Media Absoluta",
-        "STD_POP": "Desvio Padrao (Pop.)",
-        "STD_SAMP": "Desvio Padrao (Amostra)",
-        "MIN": "Minimo",
-        "MAX": "Maximo",
-        "RANGE": "Amplitude",
-        "MEDIAN": "Mediana",
-        "P5": "Percentil 5%",
-        "P95": "Percentil 95%",
-        "MODE": "Moda",
-        "VARIANCE": "Variancia",
-        "SUM": "Soma",
-        "CV": "Coeficiente de Variaçao",
-        "SKEW": "Assimetria",
-        "KURT": "Curtose",
+        "MEAN": STR.MEAN,
+        "MEAN_ABS": STR.MEAN_ABSOLUTE,
+        "STD_POP": STR.STD_POP,
+        "STD_SAMP": STR.STD_SAMPLE,
+        "MIN": STR.MINIMUM,
+        "MAX": STR.MAXIMUM,
+        "RANGE": STR.RANGE,
+        "MEDIAN": STR.MEDIAN,
+        "P5": STR.PERCENTILE_5,
+        "P95": STR.PERCENTILE_95,
+        "MODE": STR.MODE,
+        "VARIANCE": STR.VARIANCE,
+        "SUM": STR.SUM,
+        "CV": STR.COEFFICIENT_OF_VARIATION,
+        "SKEW": STR.SKEWNESS,
+        "KURT": STR.KURTOSIS,
     }
 
-    # ----------------------------------------------------
-    # INIT: parâmetros -> aqui apenas constrói UI usando prefs via BaseProcessingAlgorithm
-    # ----------------------------------------------------
     def initAlgorithm(self, config=None):
-
         self.load_preferences()
         prefs = self.prefs or {}
         self._model = AttributeStatisticsModel()
-        # Camada de entrada
         self.addParameter(
             QgsProcessingParameterFeatureSource(
-                self.INPUT_LAYER,
-                "Camada de entrada",
-                [QgsProcessing.TypeVectorAnyGeometry],
+                self.INPUT_LAYER, STR.INPUT_LAYER, [QgsProcessing.TypeVectorAnyGeometry]
             )
         )
-
-        # Campos a excluir
         self.addParameter(
             QgsProcessingParameterField(
                 self.EXCLUDE_FIELDS,
-                "Campos a excluir (opcional)",
+                STR.EXCLUDE_FIELDS_OPTIONAL,
                 parentLayerParameterName=self.INPUT_LAYER,
                 type=QgsProcessingParameterField.Any,
                 allowMultiple=True,
                 optional=True,
             )
         )
-
-        # Precisão
         self.addParameter(
             QgsProcessingParameterNumber(
                 self.PRECISION,
-                "Precisão (casas decimais)",
+                STR.PRECISION_DECIMAL_PLACES,
                 type=QgsProcessingParameterNumber.Integer,
                 minValue=0,
                 maxValue=12,
                 defaultValue=prefs.get("precision", 2),
             )
         )
-        # Mostrar ajuda
         self.addParameter(
             QgsProcessingParameterBoolean(
                 self.DISPLAY_HELP,
-                "Exibir campo de ajuda (Necessario executar e reiniciar)",
+                STR.DISPLAY_HELP_FIELD,
                 defaultValue=prefs.get("display_help", True),
             )
         )
-
-        # Avançados: carregar após
         p_load = QgsProcessingParameterBoolean(
             self.LOAD_AFTER,
-            "Carregar CSV automaticamente após execução",
+            STR.LOAD_CSV_AUTOMATICALLY_AFTER_EXECUTION,
             defaultValue=prefs.get("load_after", False),
         )
         p_load.setFlags(p_load.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
         self.addParameter(p_load)
-
-        # , forçar PT-BR
         p_force_ptbr = QgsProcessingParameterBoolean(
             self.PTBR_FORMAT,
-            "Forçar CSV no formato PT-BR (usar ; e ,)",
+            STR.FORCE_CSV_PTBR_FORMAT,
             defaultValue=prefs.get("force_ptbr", False),
         )
         p_force_ptbr.setFlags(
             p_force_ptbr.flags() | QgsProcessingParameterDefinition.FlagAdvanced
         )
         self.addParameter(p_force_ptbr)
-
-        # Checkboxes de estatísticas (marcados conforme prefs)
+        p_open = QgsProcessingParameterBoolean(
+            self.OPEN_OUTPUT_FOLDER,
+            STR.OPEN_OUTPUT_FOLDER,
+            defaultValue=prefs.get("open_output_folder", True),
+        )
+        p_open.setFlags(p_open.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+        self.addParameter(p_open)
         enabled_stats = prefs.get("stats_enabled", {})
         for key, label in self.STATS.items():
             p = QgsProcessingParameterBoolean(
-                key, f"Calcular: {label}", defaultValue=enabled_stats.get(key, True)
+                key, f"{STR.CALCULATE}: {label}", defaultValue=enabled_stats.get(key, True)
             )
             p.setFlags(p.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
             self.addParameter(p)
-
-        # Output (arquivo CSV) — default folder do último usado
         last_folder = prefs.get("last_output_folder", "")
-        last_name = "atributos_estatistica.csv"
-        default_output = os.path.join(last_folder, last_name) if last_folder else None
-
+        default_output = os.path.join(last_folder, "atributos_estatistica.csv") if last_folder else None
         self.addParameter(
             QgsProcessingParameterFileDestination(
-                self.OUTPUT,
-                "Arquivo CSV de saída",
-                fileFilter="CSV (*.csv)",
-                defaultValue=default_output,
+                self.OUTPUT, STR.OUTPUT_CSV_FILE, fileFilter="CSV (*.csv)", defaultValue=default_output
             )
         )
 
-    # ----------------------------------------------------
-    # PROCESSAMENTO: usa AttributeStatisticsModel para toda a lógica
-    # ----------------------------------------------------
     def processAlgorithm(self, parameters, context, feedback):
-
         layer = self.parameterAsLayer(parameters, self.INPUT_LAYER, context)
         if layer is None:
-            raise QgsProcessingException("Camada inválida.")
-
-        exclude_fields = (
-            self.parameterAsFields(parameters, self.EXCLUDE_FIELDS, context) or []
-        )
+            raise QgsProcessingException(STR.INVALID_LAYER)
+        exclude_fields = self.parameterAsFields(parameters, self.EXCLUDE_FIELDS, context) or []
         precision = int(self.parameterAsInt(parameters, self.PRECISION, context))
         ptbr_format = bool(self.parameterAsBool(parameters, self.PTBR_FORMAT, context))
         load_after = bool(self.parameterAsBool(parameters, self.LOAD_AFTER, context))
-        stats_enabled = {
-            k: self.parameterAsBool(parameters, k, context) for k in self.STATS.keys()
-        }
-
+        open_output_folder = bool(self.parameterAsBool(parameters, self.OPEN_OUTPUT_FOLDER, context))
+        stats_enabled = {k: self.parameterAsBool(parameters, k, context) for k in self.STATS.keys()}
         output_path = self.parameterAsFileOutput(parameters, self.OUTPUT, context)
         out_folder = os.path.dirname(output_path)
-
-        # Extrair campos numéricos (model faz isso)
-        numeric_fields = self._model.extract_numeric_fields(layer.fields())
-        # remover os excluídos pelo usuário
-        numeric_fields = [f for f in numeric_fields if f not in exclude_fields]
-
+        numeric_fields = [f for f in self._model.extract_numeric_fields(layer.fields()) if f not in exclude_fields]
         if not numeric_fields:
-            feedback.pushInfo("Nenhum campo numérico encontrado.")
+            feedback.pushInfo(STR.NO_NUMERIC_FIELD_FOUND)
             return {self.OUTPUT: output_path}
-
-        # coletar valores (model)
         total = layer.featureCount()
-        # Para alimentar progress bar, iteramos e adicionamos features a uma lista generator.
-        # O model aceita um iterable de features.
-        features_iter = layer.getFeatures()
         values_by_field = {fn: [] for fn in numeric_fields}
-
-        for i, feat in enumerate(features_iter):
+        for i, feat in enumerate(layer.getFeatures()):
             for fn in numeric_fields:
                 v = feat[fn]
-                if v is None:
-                    continue
-
-                val = float(v)
-                if math.isfinite(val):
-                    values_by_field[fn].append(val)
-
+                if v is not None:
+                    val = float(v)
+                    if math.isfinite(val):
+                        values_by_field[fn].append(val)
             if total:
                 feedback.setProgress(int(100 * i / total))
-
-        # formato CSV (ptbr)
         force_ptbr = bool(self.parameterAsBool(parameters, self.PTBR_FORMAT, context))
-        if force_ptbr:
-            sep = ";"
-            dec = ","
-        else:
-            sep = ";" if ptbr_format else ","
-            dec = "," if ptbr_format else "."
-
-        # Cabeçalhos
-        headers = ["Campo", "Contagem"]
-        for key, label in self.STATS.items():
-            if stats_enabled.get(key, False):
-                headers.append(label)
+        sep = ";" if (force_ptbr or ptbr_format) else ","
+        dec = "," if (force_ptbr or ptbr_format) else "."
+        headers = [STR.FIELD, STR.COUNT] + [label for key, label in self.STATS.items() if stats_enabled.get(key, False)]
 
         def fmt(v):
             if v is None or (isinstance(v, float) and math.isnan(v)):
                 return ""
-            txt = str(round(v, precision))
-            return txt.replace(".", dec)
+            return str(round(v, precision)).replace(".", dec)
 
         try:
             with open(output_path, "w", encoding="utf-8") as f:
                 f.write(sep.join(headers) + "\n")
-
-                # calcular estatísticas usando model
                 computed = self._model.compute_all(values_by_field, stats_enabled)
-
                 for fn in numeric_fields:
                     vals = sorted(values_by_field[fn])
-                    n = len(vals)
-                    row = [fn, str(n)]
-
-                    if n == 0:
+                    row = [fn, str(len(vals))]
+                    if len(vals) == 0:
                         row += [""] * (len(headers) - 2)
-                        f.write(sep.join(row) + "\n")
-                        continue
-
-                    # Mantivemos a mesma ordem lógica do arquivo original.
-                    for key in self.STATS.keys():
-                        if stats_enabled.get(key, False):
-                            v = computed.get(fn, {}).get(key, float("nan"))
-                            row.append(fmt(v))
-
+                    else:
+                        for key in self.STATS.keys():
+                            if stats_enabled.get(key, False):
+                                row.append(fmt(computed.get(fn, {}).get(key, float("nan"))))
                     f.write(sep.join(row) + "\n")
-
         except Exception as e:
-            raise QgsProcessingException(f"Erro ao salvar CSV: {e}")
-        display_help = (
-            bool(self.parameterAsBool(parameters, self.DISPLAY_HELP, context))
-            if self.DISPLAY_HELP in parameters
-            else False
-        )
-        self.prefs.update(
-            {
-                "precision": precision,
-                "exclude_fields": exclude_fields,
-                "last_output_folder": out_folder,
-                "force_ptbr": force_ptbr,
-                "load_after": load_after,
-                "stats_enabled": stats_enabled,
-                "display_help": display_help,
-            }
-        )
+            raise QgsProcessingException(f"{STR.ERROR_SAVING_CSV} {e}")
+        display_help = bool(self.parameterAsBool(parameters, self.DISPLAY_HELP, context)) if self.DISPLAY_HELP in parameters else False
+        self.prefs.update({
+            "precision": precision,
+            "exclude_fields": exclude_fields,
+            "last_output_folder": out_folder,
+            "force_ptbr": force_ptbr,
+            "load_after": load_after,
+            "stats_enabled": stats_enabled,
+            "display_help": display_help,
+            "open_output_folder": open_output_folder,
+        })
         self.save_preferences()
-
-        # Carregar CSV automaticamente (mesmo comportamento)
         if load_after and output_path:
-            uri = (
-                f"file:///{output_path}"
-                f"?type=csv&delimiter={sep}&detectTypes=yes&decimalPoint={dec}"
-            )
+            uri = f"file:///{output_path}?type=csv&delimiter={sep}&detectTypes=yes&decimalPoint={dec}"
             vl = QgsVectorLayer(uri, os.path.basename(output_path), "delimitedtext")
             if vl.isValid():
                 context.temporaryLayerStore().addMapLayer(vl)
                 QgsProject.instance().addMapLayer(vl)
-                feedback.pushInfo(f"Arquivo carregado como camada: {output_path}")
-
+                feedback.pushInfo(f"{STR.FILE_LOADED_AS_LAYER} {output_path}")
         if output_path:
-            feedback.pushInfo(f"Arquivo CSV gerado: file:///{output_path}")
-
-        clickable = f'<a href="file:///{out_folder}">{out_folder}</a>'
-        feedback.pushInfo(f"Arquivo salvo em: {clickable}")
-
+            feedback.pushInfo(f"{STR.CSV_FILE_GENERATED} {output_path}")
+            feedback.pushInfo(f"{STR.FILE_SAVED_IN} {out_folder}")
+            if open_output_folder:
+                self.open_folder_in_explorer(out_folder)
         return {self.OUTPUT: output_path}

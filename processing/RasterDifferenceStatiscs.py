@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
-import os
 import itertools
-from ..core.config.LogUtils import LogUtils
-import processing
+import os
 
+import processing
+from qgis.analysis import QgsRasterCalculator, QgsRasterCalculatorEntry
 from qgis.core import (
-    QgsRasterLayer,
-    QgsProcessingParameterFolderDestination,
-    QgsProcessingParameterMultipleLayers,
-    QgsProcessingParameterBoolean,
     QgsProcessing,
     QgsProcessingException,
+    QgsProcessingParameterBoolean,
+    QgsProcessingParameterFolderDestination,
+    QgsProcessingParameterMultipleLayers,
+    QgsRasterLayer,
 )
-from qgis.analysis import QgsRasterCalculator, QgsRasterCalculatorEntry
+
+from ..core.config.LogUtils import LogUtils
+from ..i18n.TranslationManager import STR
 from ..utils.ToolKeys import ToolKey
 from .BaseProcessingAlgorithm import BaseProcessingAlgorithm
 
@@ -20,7 +22,7 @@ from .BaseProcessingAlgorithm import BaseProcessingAlgorithm
 class RasterDifferenceStatiscs(BaseProcessingAlgorithm):
     TOOL_KEY = ToolKey.RASTER_MASS_CLIPPER
     ALGORITHM_NAME = "raster_difference_statistics"
-    ALGORITHM_DISPLAY_NAME = "Processar Diferença de Rasters"
+    ALGORITHM_DISPLAY_NAME = STR.RASTER_DIFFERENCE_STATISTICS_TITLE
     ALGORITHM_GROUP = BaseProcessingAlgorithm.GROUP_RASTER
     ICON = "cadmus_icon.ico"
     logger = LogUtils(
@@ -31,6 +33,7 @@ class RasterDifferenceStatiscs(BaseProcessingAlgorithm):
     OUTPUT_FOLDER = "OUTPUT_FOLDER"
     INPUT_LAYERS = "INPUT_LAYERS"
     DISPLAY_HELP = "DISPLAY_HELP"
+    OPEN_OUTPUT_FOLDER = "OPEN_OUTPUT_FOLDER"
 
     def initAlgorithm(self, config=None):
         self.logger.debug("initAlgorithm initialized")
@@ -39,15 +42,15 @@ class RasterDifferenceStatiscs(BaseProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterFolderDestination(
                 self.INPUT_FOLDER,
-                "Pasta de rasters ou selecione camdas raster",
-                defaultValue="",
+                STR.RASTER_FOLDER_OR_SELECT_RASTER_LAYERS,
+                defaultValue=self.prefs.get("last_input_folder", ""),
             )
         )
 
         self.addParameter(
             QgsProcessingParameterMultipleLayers(
                 self.INPUT_LAYERS,
-                "Camadas de raster QGIS ou selecione pasta de rasters",
+                STR.QGIS_RASTER_LAYERS_OR_SELECT_RASTER_FOLDER,
                 QgsProcessing.TypeRaster,
                 optional=True,
             )
@@ -56,16 +59,24 @@ class RasterDifferenceStatiscs(BaseProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterFolderDestination(
                 self.OUTPUT_FOLDER,
-                "Pasta de saída para rasters gerados",
-                defaultValue="",
+                STR.OUTPUT_FOLDER_FOR_GENERATED_RASTERS,
+                defaultValue=self.prefs.get("last_output_folder", ""),
                 optional=True,
             )
         )
 
         self.addParameter(
             QgsProcessingParameterBoolean(
+                self.OPEN_OUTPUT_FOLDER,
+                STR.OPEN_OUTPUT_FOLDER,
+                defaultValue=self.prefs.get("open_output_folder", True),
+            )
+        )
+
+        self.addParameter(
+            QgsProcessingParameterBoolean(
                 self.DISPLAY_HELP,
-                "Exibir campo de ajuda (Necessario executar e reiniciar)",
+                STR.DISPLAY_HELP_FIELD,
                 defaultValue=self.prefs.get("display_help", True),
             )
         )
@@ -74,13 +85,10 @@ class RasterDifferenceStatiscs(BaseProcessingAlgorithm):
     def overlap(r1, r2):
         e1 = r1.extent()
         e2 = r2.extent()
-
         inter = e1.intersect(e2)
-
         return not inter.isEmpty()
 
     def _normalize_placeholders(self, input_folder, output_folder):
-        """Retorna paths válidos, trata placeholders TEMPORARY_OUTPUT e INPUT/OUTPUT_FOLDER."""
         sanitized_input = input_folder or ""
         sanitized_output = output_folder or ""
 
@@ -103,28 +111,26 @@ class RasterDifferenceStatiscs(BaseProcessingAlgorithm):
         return sanitized_input, sanitized_output
 
     def _ensure_output_folder(self, output_folder, feedback):
-        """Garante que a pasta de saída exista; cria temporária se necessária."""
         if not output_folder:
             import tempfile
 
             output_folder = tempfile.mkdtemp(prefix="cadmus_folderlayer_")
             feedback.pushInfo(
-                f"Nenhuma pasta de saída informada. Usando temporária: {output_folder}"
+                f"{STR.NO_OUTPUT_FOLDER_PROVIDED_USING_TEMP} {output_folder}"
             )
-            self.logger.info(f"Output_folder gerada temporária: {output_folder}")
+            self.logger.info(f"Output_folder gerada temporÃ¡ria: {output_folder}")
 
         os.makedirs(output_folder, exist_ok=True)
         return output_folder
 
     def _collect_rasters_from_folder(self, input_folder, feedback):
-        """Recupera rasters válidos da pasta de entrada (recursivo)."""
         rasters = []
         if not input_folder:
             return rasters
 
         if not os.path.isdir(input_folder):
-            self.logger.error(f"Pasta inválida: {input_folder}")
-            raise QgsProcessingException(f"Pasta inválida: {input_folder}")
+            self.logger.error(f"Pasta invÃ¡lida: {input_folder}")
+            raise QgsProcessingException(f"{STR.INVALID_FOLDER}: {input_folder}")
 
         self.logger.info(f"Lendo arquivos de pasta (recursivamente): {input_folder}")
         raster_paths = []
@@ -135,9 +141,9 @@ class RasterDifferenceStatiscs(BaseProcessingAlgorithm):
                     raster_paths.append(os.path.join(root, f))
 
         if not raster_paths:
-            feedback.pushInfo("Nenhum raster encontrado na pasta especificada.")
+            feedback.pushInfo(STR.NO_RASTER_FOUND_IN_SPECIFIED_FOLDER)
             self.logger.warning(
-                "Nenhum arquivo raster válido encontrado na pasta de input."
+                "Nenhum arquivo raster vÃ¡lido encontrado na pasta de input."
             )
 
         for path in sorted(raster_paths):
@@ -146,14 +152,13 @@ class RasterDifferenceStatiscs(BaseProcessingAlgorithm):
                 rasters.append(layer)
                 self.logger.debug(f"Raster carregado da pasta: {path}")
             else:
-                feedback.pushInfo(f"Raster inválido ignorado: {path}")
-                self.logger.warning(f"Raster inválido ignorado: {path}")
+                feedback.pushInfo(f"{STR.INVALID_RASTER_IGNORED}: {path}")
+                self.logger.warning(f"Raster invÃ¡lido ignorado: {path}")
 
         self.logger.info(f"Total de rasters carregados da pasta: {len(rasters)}")
         return rasters
 
     def _collect_rasters_from_layers(self, input_layers):
-        """Adiciona camadas raster válidas diretamente passadas como parâmetro."""
         rasters = []
 
         if not input_layers:
@@ -166,24 +171,21 @@ class RasterDifferenceStatiscs(BaseProcessingAlgorithm):
                 layer = QgsRasterLayer(lay, os.path.splitext(os.path.basename(lay))[0])
                 if layer.isValid():
                     rasters.append(layer)
-            # ignora inválidos sem falhar
 
         return rasters
 
     def _build_formula(self, nd1, nd2):
-        """Retorna fórmula pronta para QgsRasterCalculator."""
         return (
             f'(("A@1" != {nd1}) AND ("B@1" != {nd2})) * ("A@1" - "B@1") + '
             f'(("A@1" = {nd1}) OR ("B@1" = {nd2})) * {nd1}'
         )
 
     def _process_pair(self, r1, r2, output_folder, context, feedback, stats_summary):
-        """Processa um par de rasters e acumula estatísticas."""
         if not self.overlap(r1, r2):
             feedback.pushInfo(
-                f"Sem sobreposição entre {r1.name()} e {r2.name()}. Pulando."
+                f"{STR.NO_OVERLAP_BETWEEN} {r1.name()} {STR.AND} {r2.name()}. {STR.SKIPPING}"
             )
-            self.logger.info(f"Sem sobreposição: {r1.name()} x {r2.name()}")
+            self.logger.info(f"Sem sobreposiÃ§Ã£o: {r1.name()} x {r2.name()}")
             return
 
         nd1 = r1.dataProvider().sourceNoDataValue(1)
@@ -218,19 +220,19 @@ class RasterDifferenceStatiscs(BaseProcessingAlgorithm):
             )
             result = calc.processCalculation()
         except Exception as e:
-            feedback.pushInfo(f"Erro no cálculo para {r1.name()} x {r2.name()}: {e}")
+            feedback.pushInfo(f"{STR.CALCULATION_ERROR_FOR} {r1.name()} x {r2.name()}: {e}")
             self.logger.error(f"Erro em QgsRasterCalculator: {e}")
             return
 
         if result != 0:
-            feedback.pushInfo(f"Erro no cálculo para {r1.name()} x {r2.name()}")
+            feedback.pushInfo(f"{STR.CALCULATION_ERROR_FOR} {r1.name()} x {r2.name()}")
             self.logger.error(
-                f"QgsRasterCalculator retornou código {result} para {r1.name()} x {r2.name()}"
+                f"QgsRasterCalculator retornou cÃ³digo {result} para {r1.name()} x {r2.name()}"
             )
             return
 
-        feedback.pushInfo(f"Raster diferença criado: {out_tif}")
-        self.logger.info(f"Raster diferença criado: {out_tif}")
+        feedback.pushInfo(f"{STR.DIFFERENCE_RASTER_CREATED} {out_tif}")
+        self.logger.info(f"Raster diferenÃ§a criado: {out_tif}")
 
         stats_html = os.path.join(
             output_folder, f"{os.path.splitext(fname)[0]}_stats.html"
@@ -252,7 +254,7 @@ class RasterDifferenceStatiscs(BaseProcessingAlgorithm):
             std_v = stats.get("STD_DEV")
 
             feedback.pushInfo(
-                f"Stats gerados para {fname}: MIN={min_v} MAX={max_v} MEAN={mean_v} STD_DEV={std_v}"
+                f"{STR.STATS_GENERATED_FOR} {fname}: MIN={min_v} MAX={max_v} MEAN={mean_v} STD_DEV={std_v}"
             )
             self.logger.info(f"Stats HTML criado: {stats_html}")
 
@@ -266,7 +268,7 @@ class RasterDifferenceStatiscs(BaseProcessingAlgorithm):
                 }
             )
         except Exception as e:
-            feedback.pushInfo(f"Falha ao gerar stats para {fname}: {e}")
+            feedback.pushInfo(f"{STR.FAILED_TO_GENERATE_STATS_FOR} {fname}: {e}")
             self.logger.error(f"Erro em native:rasterlayerstatistics para {fname}: {e}")
             stats_summary.append(
                 {
@@ -279,20 +281,19 @@ class RasterDifferenceStatiscs(BaseProcessingAlgorithm):
             )
 
     def _write_summary_html(self, output_folder, total, stats_summary):
-        """Escreve o HTML final com resumo de todas as estatísticas."""
         summary_html = os.path.join(
             output_folder, "raster_difference_stats_summary.html"
         )
 
         with open(summary_html, "w", encoding="utf-8") as fh:
             fh.write(
-                "<html><head><meta charset='utf-8'><title>Resumo de Estatísticas de Diferença</title></head><body>"
+                f"<html><head><meta charset='utf-8'><title>{STR.DIFFERENCE_STATISTICS_SUMMARY_TITLE}</title></head><body>"
             )
-            fh.write("<h1>Resumo de Estatísticas de Diferença de Rasters</h1>")
-            fh.write("<p>Total de pares processados: %d</p>" % total)
+            fh.write(f"<h1>{STR.DIFFERENCE_STATISTICS_SUMMARY_TITLE}</h1>")
+            fh.write(f"<p>{STR.TOTAL_PROCESSED_PAIRS} {total}</p>")
             fh.write("<table border='1' cellpadding='6' cellspacing='0'>")
             fh.write(
-                "<tr><th>Raster</th><th>MIN</th><th>MAX</th><th>INTERVALO</th><th>MEAN</th><th>STD_DEV</th></tr>"
+                f"<tr><th>{STR.RASTER}</th><th>MIN</th><th>MAX</th><th>{STR.INTERVAL}</th><th>MEAN</th><th>STD_DEV</th></tr>"
             )
 
             for row in stats_summary:
@@ -326,11 +327,12 @@ class RasterDifferenceStatiscs(BaseProcessingAlgorithm):
         )
         output_folder = self.parameterAsString(params, self.OUTPUT_FOLDER, context)
         display_help = self.parameterAsBool(params, self.DISPLAY_HELP, context)
+        open_output_folder = self.parameterAsBool(params, self.OPEN_OUTPUT_FOLDER, context)
 
         self.logger.info(
             f"ProcessAlgorithm iniciado: input_folder={input_folder}, output_folder={output_folder}, input_layers={len(input_layers)}"
         )
-        self.logger.debug(f"Parâmetros detalhados: {params}")
+        self.logger.debug(f"ParÃ¢metros detalhados: {params}")
 
         input_folder, output_folder = self._normalize_placeholders(
             input_folder, output_folder
@@ -338,51 +340,48 @@ class RasterDifferenceStatiscs(BaseProcessingAlgorithm):
         output_folder = self._ensure_output_folder(output_folder, feedback)
 
         if display_help:
-            feedback.pushInfo("Processando diferença de rasters por pasta/camadas...")
+            feedback.pushInfo(STR.PROCESSING_RASTER_DIFFERENCE_BY_FOLDER_OR_LAYERS)
 
         folder_rasters = self._collect_rasters_from_folder(input_folder, feedback)
         layer_rasters = self._collect_rasters_from_layers(input_layers)
         rasters = folder_rasters + layer_rasters
 
         if not input_folder and not rasters:
-            raise QgsProcessingException(
-                "Informe uma pasta de rasters ou selecione ao menos uma camada raster."
-            )
+            raise QgsProcessingException(STR.INFORM_RASTER_FOLDER_OR_SELECT_LAYER)
 
         if len(rasters) < 2:
             self.logger.error(
-                "Menos de 2 rasters disponíveis para cálculo de diferença."
+                "Menos de 2 rasters disponÃ­veis para cÃ¡lculo de diferenÃ§a."
             )
-            raise QgsProcessingException(
-                "É necessário ao menos 2 rasters para calcular diferenças."
-            )
+            raise QgsProcessingException(STR.AT_LEAST_2_RASTERS_REQUIRED)
 
         pairs = list(itertools.combinations(rasters, 2))
         total = len(pairs)
-        feedback.pushInfo(
-            f"Encontradas {total} combinações de rasters para diferenciação."
-        )
+        feedback.pushInfo(f"{STR.FOUND_RASTER_COMBINATIONS_FOR_DIFFERENCE} {total}.")
         self.logger.info(f"Total {total} pares carregados para processamento.")
 
         stats_summary = []
 
         for idx, (r1, r2) in enumerate(pairs, start=1):
-            feedback.pushInfo(f"Processando {idx}/{total}: {r1.name()} x {r2.name()}")
+            feedback.pushInfo(f"{STR.PROCESSING} {idx}/{total}: {r1.name()} x {r2.name()}")
             self._process_pair(r1, r2, output_folder, context, feedback, stats_summary)
 
         summary_html = self._write_summary_html(output_folder, total, stats_summary)
 
-        feedback.pushInfo(f"Relatório consolidado gerado: {summary_html}")
-        self.logger.info(f"Resumo consolidado de estatísticas criado: {summary_html}")
+        feedback.pushInfo(f"{STR.CONSOLIDATED_REPORT_GENERATED} {summary_html}")
+        self.logger.info(f"Resumo consolidado de estatÃ­sticas criado: {summary_html}")
 
-        display_help = (
-            bool(self.parameterAsBool(params, self.DISPLAY_HELP, context))
-            if self.DISPLAY_HELP in params
-            else False
-        )
         self.prefs.update(
-            {"output_folder": output_folder, "display_help": display_help}
+            {
+                "last_input_folder": input_folder,
+                "last_output_folder": output_folder,
+                "display_help": bool(display_help),
+                "open_output_folder": bool(open_output_folder),
+            }
         )
         self.save_preferences()
+
+        if open_output_folder:
+            self.open_folder_in_explorer(output_folder)
 
         return {self.OUTPUT_FOLDER: output_folder, "SUMMARY_HTML": summary_html}

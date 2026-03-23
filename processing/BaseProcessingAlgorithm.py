@@ -10,6 +10,7 @@ from ..resources.HtmlInstructionsProvider import HtmlInstructionsProvider
 from ..resources.IconManager import IconManager as im
 from ..utils.Preferences import Preferences
 from ..utils.ToolKeys import ToolKey
+from ..i18n.TranslationManager import STR
 
 
 class GroupProcessing:
@@ -24,10 +25,10 @@ class BaseProcessingAlgorithm(QgsProcessingAlgorithm):
     Base class for processing algorithms in the Cadmus plugin.
     """
 
-    GROUP_ESTATISTICA = GroupProcessing(id="estatistica", name="EstatÃ­stica")
-    GROUP_RASTER = GroupProcessing(id="raster", name="Raster")
-    GROUP_VETORIAL = GroupProcessing(id="vetorial", name="Vetorial")
-    prefs = {}
+    GROUP_ESTATISTICA = GroupProcessing(id="estatistica", name=STR.STATISTICS)
+    GROUP_RASTER = GroupProcessing(id="raster", name=STR.RASTER)
+    GROUP_VETORIAL = GroupProcessing(id="vetorial", name=STR.VECTOR)
+    prefs = {}  # para armazenar preferências carregadas
     INSTRUCTIONS_FILE = None
     TOOL_KEY = None
     ALGORITHM_NAME = None
@@ -36,9 +37,9 @@ class BaseProcessingAlgorithm(QgsProcessingAlgorithm):
     ICON = "cadmus_icon.ico"
 
     def shortHelpString(self):
-        if self.prefs.get("display_help", True):
+        if self.prefs.get("display_help", True):  # self.INSTRUCTIONS_FILE:
             html = HtmlInstructionsProvider(self.TOOL_KEY)
-            return html.get_instructions(self.ALGORITHM_NAME)
+            return html.get_instructions(self.ALGORITHM_NAME)  # valor padrão genérico
         else:
             return
 
@@ -78,6 +79,7 @@ class BaseProcessingAlgorithm(QgsProcessingAlgorithm):
         )
 
     def load_preferences(self):
+        """Carrega preferências usando Preferences.load_tool_prefs e armazena em self.prefs. Retorna dict de preferências ou vazio se falhar."""
         if not self.TOOL_KEY:
             return {}
         try:
@@ -87,10 +89,11 @@ class BaseProcessingAlgorithm(QgsProcessingAlgorithm):
                 tool=ToolKey.UNTRACEABLE,
                 class_name=self.__class__.__name__,
                 level=LogUtils.WARNING,
-            ).warning(f"Falha ao carregar preferÃªncias de {self.TOOL_KEY}: {e}")
+            ).warning(f"Falha ao carregar preferências de {self.TOOL_KEY}: {e}")
             return {}
 
     def save_preferences(self):
+        """Salva self.prefs usando Preferences.save_tool_prefs. Espera que self.prefs já esteja atualizada."""
         if not self.TOOL_KEY:
             return
         if self.prefs is None:

@@ -8,6 +8,8 @@ from .DifferenceFields import DifferenceFieldsAlgorithm
 from .AttributeStatistics import AttributeStatistics
 from .GeometryLineFromPoints import GeometryLineFromPoints
 from .RasterDifferenceStatiscs import RasterDifferenceStatiscs
+from ..i18n.TranslationManager import STR
+from ..core.config.LogUtils import LogUtils
 
 
 class MTLProvider(QgsProcessingProvider):
@@ -25,7 +27,7 @@ class MTLProvider(QgsProcessingProvider):
         return "cadmus"
 
     def name(self):
-        return "Cadmus"
+        return STR.APP_NAME
 
     def longName(self):
         return "Cadmus – Processamento"
