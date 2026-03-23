@@ -2,6 +2,8 @@
 import os
 from pathlib import Path
 from typing import List, Dict
+from qgis.PyQt.QtCore import QUrl
+from qgis.PyQt.QtGui import QDesktopServices
 
 from ..core.config.LogUtils import LogUtils
 from .vector.VectorLayerSource import VectorLayerSource
@@ -43,7 +45,7 @@ class ExplorerUtils:
             logger.error(f"open_folder: pasta invalida: {folder}")
             return False
 
-        os.startfile(folder)
+        QDesktopServices.openUrl(QUrl.fromLocalFile(folder))
         logger.info(f"open_folder: pasta aberta: {folder}")
         return True
 

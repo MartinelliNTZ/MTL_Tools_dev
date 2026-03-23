@@ -2,7 +2,7 @@
 name=Cadmus
 description=Advanced automation and geospatial productivity tools for QGIS projects.
 about=Cadmus is a productivity plugin for QGIS focused on cartographic automation and geospatial workflows. It provides tools for batch layout export (PDF/PNG), mass text replacement in layouts, automatic loading of datasets from folders, vector attribute utilities, raster sampling, statistical analysis and interactive coordinate tools. The plugin also exposes algorithms in the Processing Toolbox to support automated workflows and batch processing.
-version=2.1.0
+version=2.2.0
 author=Matheus A.S. Martinelli
 email=martinelli.matheus11@gmail.com
 license=GPL-2.0-or-later
@@ -21,6 +21,13 @@ tracker=https://github.com/MartinelliNTZ/Cadmus/issues
 
 
 changelog= 
+    2.2.0
+        - Toolbar now displays icons correctly
+        - Dropdown buttons work as expected
+        - Menus and toolbars no longer duplicate when reloading the plugin
+        - Full translation in Portuguese, Spanish and English
+        - All screens and messages now appear in the language configured in QGIS
+        - Plugin starts faster and more reliably
     2.1.0
         - Added tooltips in the toolbar for better usability and quick understanding of tools
         - Introduced a new integrated help system with formatted instructions in the processing tools
@@ -28,6 +35,7 @@ changelog=
         - Added option to show/hide help messages during processing (configurable in settings)
         - Improved compatibility with different QGIS/Qt versions (more stable dialogs)
         - New tool: Line Difference Between Points: Create lines from grouped points or between two layers
+        - New tool: Calculate Distance to Nearest Line: Adds distance fields to point layers based on nearest line features
         - Improved consistency and behavior across processing tools
         - Improved drone photo handling (more reliable file matching)
         - General stability improvements and bug fixes
