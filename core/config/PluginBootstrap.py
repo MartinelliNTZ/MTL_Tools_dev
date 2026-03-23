@@ -2,7 +2,7 @@
 import sys
 import traceback
 from pathlib import Path
-from qgis.core import QgsApplication
+from qgis.core import QgsMessageLog, Qgis, QgsApplication
 from ...utils.ToolKeys import ToolKey
 from ...utils.QgisMessageUtil import QgisMessageUtil
 from ...processing.provider import MTLProvider
@@ -38,7 +38,7 @@ class PluginBootstrap:
 
         try:
             # Inicializar LogUtils primeiro
-            LogUtils.init(plugin_root)
+            log = LogUtils.init(plugin_root)
 
             # Criar logger global para handler
             global _logger_global
@@ -69,6 +69,12 @@ class PluginBootstrap:
             self.provider = MTLProvider()
             QgsApplication.processingRegistry().addProvider(self.provider)
             self.logger.info("Processing Provider carregado com sucesso")
+
+            QgsMessageLog.logMessage(
+                f"Log {log}. Provider: {self.provider}. Plugin inicializado sem crashes.",
+                "Cadmus",
+                Qgis.Warning,
+            )
 
             return self.provider
 

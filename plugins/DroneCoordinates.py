@@ -32,10 +32,6 @@ class DroneCordinates(BasePluginMTL):
         super().__init__(iface.mainWindow())
         self.iface = iface
 
-        # Inicializar logger de sessão (arquivo JSON)
-        plugin_root = Path(__file__).parent.parent
-        LogUtils.init(plugin_root)
-
         # Inicializa a UI e preferências via BasePluginMTL
         self.init(
             self.TOOL_KEY,
@@ -266,9 +262,7 @@ class DroneCordinates(BasePluginMTL):
         if not layer or not layer.isValid():
             from ..utils.QgisMessageUtil import QgisMessageUtil
 
-            QgisMessageUtil.modal_error(
-                self.iface, STR.ERROR_LAYER_NOT_FOUND
-            )
+            QgisMessageUtil.modal_error(self.iface, STR.ERROR_LAYER_NOT_FOUND)
             return
 
         if not QgsProject.instance().mapLayer(layer.id()):

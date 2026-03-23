@@ -46,8 +46,8 @@ class LogUtils:
     @classmethod
     def init(cls, plugin_root: Path):
         if cls._initialized:
-            return
-
+            #return f"LogUtils já inicializado. Log file: {cls._log_file}, Session ID: {cls._session_id}"
+            cls._initialized =False  # Forçar reinicialização para testes
         cls._session_id = str(uuid.uuid4())
         cls._plugin_version = cls._read_plugin_version(plugin_root)
 
@@ -68,6 +68,8 @@ class LogUtils:
             code="LOG_START",
             data={},
         )
+        return f"LogUtils initialized. Log file: {cls._log_file}, Session ID: {cls._session_id}. pid: {pid}"
+
 
     # ---------- instância ----------
     def __init__(self, *, tool, class_name, level=INFO):
