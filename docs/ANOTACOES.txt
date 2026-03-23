@@ -34,7 +34,10 @@ Traducao: 9
   - Usar iconManager para carregar ícones de forma centralizada e eficiente
   - Usar InstructionsManager para carregar instruções de forma centralizada e eficiente, com suporte a formatação e imagens
 changelog=
-
+  2.1.5 2026/03/22
+    - Correção crítica: LogUtils agora é inicializado antes de qualquer outro componente, garantindo que o logger esteja disponível para todos os logs, incluindo erros de inicialização do plugin. Logs de inicialização do PluginBootstrap e TranslationManager confirmam que o logger está ativo desde o início, prevenindo falhas silenciosas e garantindo que quaisquer erros durante a carga sejam capturados no log do plugin.
+    - Traducao En e Es finalizada
+    
   2.1.4 2026/03/21
     - Implementacao de Bootsatrap, Toolregistry e MenmuManager, para aliviar responsabilidades da classe principal
     - **Arquitetura Modular:** Implementada nova arquitetura com ToolRegistry (registro centralizado de ferramentas), MenuManager (gerenciamento unificado de menus e toolbar) e PluginBootstrap (inicialização de logs e providers), removendo responsabilidades da classe principal CadmusPlugin
