@@ -34,6 +34,7 @@ O plano foi desenhado para reutilizar o maximo possivel da arquitetura existente
 - `core/task/PhotoMetadataTask.py`
 - `utils/mrk/MrkParser.py`
 - `utils/mrk/PhotoMetadata.py`
+- `utils/ExplorerUtils.py`
 - `utils/vector/VectorLayerGeometry.py`
 - `utils/vector/VectorLayerSource.py`
 
@@ -74,9 +75,7 @@ Opcoes tecnicas a investigar na implementacao:
 
 Meta da etapa:
 
-- centralizar a decisao em um componente proprio do Cadmus, por exemplo:
-  - `core/io/MrkDropHandler.py`
-  - ou `core/config/MrkImportInterceptor.py`
+- centralizar a decisao em um componente proprio do Cadmus, com helpers pequenos reaproveitados em `utils/ExplorerUtils.py`.
 
 Esse componente sera responsavel apenas por:
 

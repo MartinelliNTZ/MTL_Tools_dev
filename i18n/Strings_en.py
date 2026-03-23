@@ -109,6 +109,8 @@ class Strings_en(Strings_pt_BR):
     BUTTON = "Button"
     SAVE_FILE = "Save file"
     SELECT_FILE = "Select file"
+    POINTS = "Points"
+    TRACK = "Track"
 
     # Common option labels
     CASE_SENSITIVE = "Case sensitive"
@@ -325,14 +327,10 @@ class Strings_en(Strings_pt_BR):
     QML_POINTS = "Points QML:"
     APPLY_STYLE_TRACK = "Apply style (QML) to track?"
     QML_TRACK = "QML:"
-    MRK_POINTS_SUFFIX = "points"
-    MRK_TRACK_SUFFIX = "track"
-    MRK_POINTS_LAYER_NAME = "MRK_Points"
-    MRK_TRACK_LAYER_NAME = "MRK_Track"
     MRK_DROP_START = "MRK file detected. Starting conversion."
-    MRK_DROP_SUCCESS = "MRK file converted successfully."
-    MRK_DROP_LOADED_EXISTING = "Existing GPKG outputs loaded successfully."
-    MRK_DROP_FAILED = "Failed to convert MRK file."
+    CONVERT_FILE_SUCCESS = "File converted successfully."
+    LOADED_EXISTING_GPKG = "Existing GPKG outputs loaded successfully."
+    CONVERT_FILE_ERROR = "Failed to convert file."
 
     # plugins/SettingsPlugin.py
     SETTINGS_TITLE = "Cadmus Settings"

@@ -37,6 +37,24 @@ class ExplorerUtils:
         return LogUtils(tool=tool_key, class_name="ExplorerUtils")
 
     @staticmethod
+    def has_extension(path: str, extensions: List[str]) -> bool:
+        """Verifica se `path` possui uma das extensoes informadas."""
+        if not path:
+            return False
+
+        ext = Path(path).suffix.lower()
+        normalized = {e.lower() for e in extensions}
+        return ext in normalized
+
+    @staticmethod
+    def build_suffixed_output_path(
+        file_path: str, suffix: str, extension: str = ".gpkg"
+    ) -> str:
+        """Gera caminho ao lado do arquivo original com sufixo e nova extensao."""
+        p = Path(file_path)
+        return str(p.with_name(f"{p.stem}_{suffix}{extension}"))
+
+    @staticmethod
     def open_folder(folder: str, tool_key: str) -> bool:
         """Abre uma pasta no explorador do sistema."""
         logger = ExplorerUtils._get_logger(tool_key)

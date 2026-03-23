@@ -109,6 +109,8 @@ class Strings_es(Strings_pt_BR):
     BUTTON = "Botón"
     SAVE_FILE = "Guardar archivo"
     SELECT_FILE = "Seleccionar archivo"
+    POINTS = "Puntos"
+    TRACK = "Rastro"
 
     # Common option labels
     CASE_SENSITIVE = "Distinguir mayúsculas/minúsculas"
@@ -344,14 +346,10 @@ class Strings_es(Strings_pt_BR):
     QML_POINTS = "QML puntos:"
     APPLY_STYLE_TRACK = "¿Aplicar estilo (QML) a la trayectoria?"
     QML_TRACK = "QML:"
-    MRK_POINTS_SUFFIX = "puntos"
-    MRK_TRACK_SUFFIX = "rastro"
-    MRK_POINTS_LAYER_NAME = "MRK_Puntos"
-    MRK_TRACK_LAYER_NAME = "MRK_Rastro"
     MRK_DROP_START = "Archivo MRK detectado. Iniciando conversion."
-    MRK_DROP_SUCCESS = "Archivo MRK convertido con exito."
-    MRK_DROP_LOADED_EXISTING = "Salidas GPKG existentes cargadas con exito."
-    MRK_DROP_FAILED = "No fue posible convertir el archivo MRK."
+    CONVERT_FILE_SUCCESS = "Archivo convertido con exito."
+    LOADED_EXISTING_GPKG = "Salidas GPKG existentes cargadas con exito."
+    CONVERT_FILE_ERROR = "No fue posible convertir el archivo."
 
     # plugins/SettingsPlugin.py
     SETTINGS_TITLE = "Configuraciones de Cadmus"

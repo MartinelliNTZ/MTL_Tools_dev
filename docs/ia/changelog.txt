@@ -1,1 +1,16 @@
 2.2.1
+
+- Implementado fluxo inicial de drag and drop/importacao de arquivos `.mrk` via `QgsCustomDropHandler`.
+- Adicionado `DroneCoordinatesRunner` para executar a cadeia de conversao de MRK fora do dialog da ferramenta.
+- `MrkParseTask` agora suporta arquivo `.mrk` unico sem expandir automaticamente para toda a pasta.
+- `MrkParser` agora expõe `parse_file(file_path, ...)` e passou a reutilizar esse fluxo no parse por pasta.
+- Saidas `.gpkg` do drag and drop usam nomes localizados com `STR.POINTS` e `STR.TRACK`.
+- Quando os `.gpkg` de saida ja existem, o sistema carrega as saidas existentes em vez de sobrescrever.
+- Ajustada a nomenclatura das mensagens para reaproveitar strings genericas:
+  - `CONVERT_FILE_SUCCESS`
+  - `LOADED_EXISTING_GPKG`
+  - `CONVERT_FILE_ERROR`
+- Arquitetura simplificada para duas classes centrais:
+  - `core/services/MrkDropHandler.py`
+  - `core/services/DroneCoordinatesRunner.py`
+- Eliminado `MrkDropUtils`; helpers pequenos de extensao e path foram movidos para `utils/ExplorerUtils.py`.

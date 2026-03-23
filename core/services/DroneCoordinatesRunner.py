@@ -9,6 +9,7 @@ from ..engine_tasks.MrkParseStep import MrkParseStep
 from ...i18n.TranslationManager import STR
 from ...utils.QgisMessageUtil import QgisMessageUtil
 from ...utils.ToolKeys import ToolKey
+from ...utils.ExplorerUtils import ExplorerUtils
 from ...utils.vector.VectorLayerGeometry import VectorLayerGeometry
 from ...utils.vector.VectorLayerSource import VectorLayerSource
 
@@ -36,7 +37,12 @@ class DroneCoordinatesRunner:
         self._on_finished = on_finished
         self._on_error = on_error
 
-        points_path, track_path = self._build_output_paths(file_path)
+        points_path = ExplorerUtils.build_suffixed_output_path(
+            file_path, STR.POINTS.lower()
+        )
+        track_path = ExplorerUtils.build_suffixed_output_path(
+            file_path, STR.TRACK.lower()
+        )
 
         existing_points = self._load_existing_layer(points_path)
         existing_track = self._load_existing_layer(track_path)
@@ -44,7 +50,7 @@ class DroneCoordinatesRunner:
             self._load_layer(existing_points)
             self._load_layer(existing_track)
             QgisMessageUtil.bar_success(
-                self.iface, STR.MRK_DROP_LOADED_EXISTING, duration=4
+                self.iface, STR.LOADED_EXISTING_GPKG, duration=4
             )
             if callable(self._on_finished):
                 self._on_finished(
@@ -77,11 +83,6 @@ class DroneCoordinatesRunner:
         self._engine.start()
         return True
 
-    def _build_output_paths(self, file_path: str) -> tuple[str, str]:
-        from ..io.MrkDropHandler import MrkDropHandler
-
-        return MrkDropHandler.build_output_paths(file_path)
-
     def _on_pipeline_finished(self, context: ExecutionContext):
         layer = context.get("layer")
         points = context.get("points", []) or []
@@ -96,14 +97,14 @@ class DroneCoordinatesRunner:
         points_layer = self._save_or_load_existing(
             layer,
             points_output_path,
-            fallback_name=STR.MRK_POINTS_LAYER_NAME,
+            fallback_name=STR.POINTS,
         )
         if points_layer and points_layer.id() != layer.id():
             QgsProject.instance().removeMapLayer(layer.id())
 
         line_layer = VectorLayerGeometry.create_line_layer_from_points(
             points,
-            name=STR.MRK_TRACK_LAYER_NAME,
+            name=STR.TRACK,
             group_by_fields=["mrk_path", "mrk_file"],
             attribute_fields=[
                 "data_name",
@@ -120,10 +121,10 @@ class DroneCoordinatesRunner:
             track_layer = self._save_or_load_existing(
                 line_layer,
                 track_output_path,
-                fallback_name=STR.MRK_TRACK_LAYER_NAME,
+                fallback_name=STR.TRACK,
             )
 
-        QgisMessageUtil.bar_success(self.iface, STR.MRK_DROP_SUCCESS, duration=4)
+        QgisMessageUtil.bar_success(self.iface, STR.CONVERT_FILE_SUCCESS, duration=4)
         if callable(self._on_finished):
             self._on_finished(
                 {
@@ -135,11 +136,11 @@ class DroneCoordinatesRunner:
             )
 
     def _on_pipeline_error(self, errors):
-        exc = errors[0] if errors else Exception(STR.MRK_DROP_FAILED)
+        exc = errors[0] if errors else Exception(STR.CONVERT_FILE_ERROR)
         self._notify_error(str(exc))
 
     def _notify_error(self, message: str):
-        QgisMessageUtil.bar_critical(self.iface, f"{STR.MRK_DROP_FAILED} {message}")
+        QgisMessageUtil.bar_critical(self.iface, f"{STR.CONVERT_FILE_ERROR} {message}")
         if callable(self._on_error):
             self._on_error(message)
 
