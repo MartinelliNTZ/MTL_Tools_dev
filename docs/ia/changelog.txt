@@ -1,12 +1,1 @@
-2.1.5
-
-- Internacionalização ampliada com centralização de strings visíveis ao usuário em `STR.*` para os plugins `VectorMultipartPlugin`, `VectorFieldsCalculationPlugin`, `SettingsPlugin`, `ReplaceInLayouts`, `LoadFolderLayers`, `GenerateTrailPlugin`, `CopyAttributesPlugin`, `ExportAllLayouts` e `coord_result_dialog`.
-- Internacionalização ampliada para widgets base e `WidgetFactory`, removendo hardcodes de UI em `resources/widgets/*` e `core/ui/WidgetFactory.py`.
-- Reorganização do catálogo de strings com reaproveitamento de chaves genéricas em `Strings_pt_BR.py` e sincronização das novas chaves em `Strings_en.py` e `Strings_es.py`.
-- Criação do guia `docs/GUIA_INTERNACIONALIZACAO.md` documentando o padrão de uso de `STR.*`, reaproveitamento de chaves e fluxo para continuidade.
-- Criação do widget `DropdownSelectorWidget` em `resources/widgets/DropdownSelectorWidget.py`, integração em `WidgetFactory.py` e uso prático em `SettingsPlugin.py`.
-- Refatoração dos algoritmos de processing para usar `STR.*` e persistência de preferências, incluindo `RasterMassSampler`, `RasterMassClipper`, `RasterDifferenceStatiscs`, `GeometryLineFromPoints`, `AttributeStatistics` e `DifferenceFields`.
-- Adição do checkbox `Abrir pasta de saída` com persistência em preferências nos algoritmos `RasterMassSampler`, `RasterMassClipper`, `RasterDifferenceStatiscs` e `AttributeStatistics`.
-- Criação do método utilitário `open_folder_in_explorer()` em `processing/BaseProcessingAlgorithm.py` para abertura da pasta de saída no explorador.
-- Refatoração do sistema de instruções HTML com separação por idioma em `resources/instructions/html/HtmlInstructions_pt_BR.py`, `HtmlInstructions_en.py` e `HtmlInstructions_es.py`.
-- Atualização de `resources/HtmlInstructionsProvider.py` para selecionar dinamicamente o provedor HTML conforme o locale definido em `i18n/TranslationManager.py`, mantendo fallback para `pt_BR`.
+2.2.1
