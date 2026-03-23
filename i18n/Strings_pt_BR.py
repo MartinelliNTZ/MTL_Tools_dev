@@ -1,4 +1,4 @@
-from qgis.PyQt.QtCore import QCoreApplication
+# -*- coding: utf-8 -*-
 
 
 class Strings_pt_BR:
@@ -113,12 +113,8 @@ class Strings_pt_BR:
     # Common option labels
     CASE_SENSITIVE = "Diferenciar maiúsculas/minúsculas"
     FULL_LABEL_REPLACE = "Substituir o label inteiro quando encontrar o texto"
-    LOAD_ONLY_MISSING_FILES = (
-        "Carregar apenas arquivos ainda NÃO carregados no projeto"
-    )
-    PRESERVE_FOLDER_STRUCTURE = (
-        "Criar grupos conforme estrutura de pastas/subpastas"
-    )
+    LOAD_ONLY_MISSING_FILES = "Carregar apenas arquivos ainda NÃO carregados no projeto"
+    PRESERVE_FOLDER_STRUCTURE = "Criar grupos conforme estrutura de pastas/subpastas"
     DO_NOT_GROUP_LAST_FOLDER = "Não agrupar a última pasta"
     CREATE_PROJECT_BACKUP_IF_SAVED = (
         "Criar backup do projeto antes de carregar (somente se salvo)"
@@ -153,19 +149,13 @@ class Strings_pt_BR:
     LAYOUTS_ANALYZED = "Layouts analisados:"
     CHANGES_APPLIED = "Substituições aplicadas:"
     REPLACEMENT_COMPLETED_TITLE = "Substituição concluída"
-    PROJECT_BACKUP_INFO = (
-        "Backup: será criada uma cópia do projeto (.qgz) na pasta backup ao lado do arquivo do projeto."
-    )
+    PROJECT_BACKUP_INFO = "Backup: será criada uma cópia do projeto (.qgz) na pasta backup ao lado do arquivo do projeto."
     LAYER_MUST_BE_EDITABLE = "A camada precisa estar em edição"
     NO_ATTRIBUTE_SELECTED = "Nenhum atributo selecionado"
     ATTRIBUTES_COPIED_SUCCESS = "Atributos copiados com sucesso (alterações não salvas)"
     REQUIRED_LIBRARY = "Biblioteca necessária"
-    PYPDF2_REQUIRED_MESSAGE = (
-        "Para unir PDFs é necessário instalar o pacote PyPDF2.\n\nDeseja instalar agora?"
-    )
-    PILLOW_REQUIRED_MESSAGE = (
-        "Para unir PNGs em PDF é necessário instalar o pacote Pillow.\n\nDeseja instalar agora?"
-    )
+    PYPDF2_REQUIRED_MESSAGE = "Para unir PDFs é necessário instalar o pacote PyPDF2.\n\nDeseja instalar agora?"
+    PILLOW_REQUIRED_MESSAGE = "Para unir PNGs em PDF é necessário instalar o pacote Pillow.\n\nDeseja instalar agora?"
     EXPORTING_LAYOUTS = "Exportando layouts..."
     FAILED_EXPORT_PDF = "Falha ao exportar PDF:"
     FAILED_EXPORT_PNG = "Falha ao exportar PNG:"
@@ -187,16 +177,12 @@ class Strings_pt_BR:
     GEOMETRY_TYPE_NOT_SUPPORTED = "Tipo de geometria não suportado"
     ERROR_IN_PREPARATION = "Erro na preparação:"
     KML_FILES_ARE_NOT_EDITABLE = "Arquivos KML não são editáveis."
-    CONVERT_LAYER_TO_GPKG_OR_SHP_BEFORE_USING = (
-        "Converta a camada para GeoPackage (.gpkg) ou Shapefile (.shp) antes de usar esta ferramenta."
-    )
+    CONVERT_LAYER_TO_GPKG_OR_SHP_BEFORE_USING = "Converta a camada para GeoPackage (.gpkg) ou Shapefile (.shp) antes de usar esta ferramenta."
     LAYER_USES_GEOGRAPHIC_CRS = "Camada usa CRS Geográfico"
     CARTESIAN_MODE_RESULTS_IN_DEGREES2 = (
         "Modo 'Cartesiano' resultaria em valores em graus²."
     )
-    CALCULATING_BOTH_MODES_AUTOMATICALLY = (
-        "Calculando ambos os modos automaticamente."
-    )
+    CALCULATING_BOTH_MODES_AUTOMATICALLY = "Calculando ambos os modos automaticamente."
     XY_FIELDS_CALCULATED_SUCCESS = "Campos X/Y calculados com sucesso"
     LINE_LENGTH_CALCULATED_SUCCESS = "Comprimento de linhas calculado com sucesso"
     POLYGON_AREA_CALCULATED_SUCCESS = "Área de polígonos calculada com sucesso"
@@ -209,9 +195,7 @@ class Strings_pt_BR:
     CONVERT_SELECTED_FEATURES_TO_MULTIPART = (
         "Converter apenas as feições selecionadas para multipart?"
     )
-    CONVERT_ALL_FEATURES_TO_MULTIPART = (
-        "Converter todas as feições para multipart?"
-    )
+    CONVERT_ALL_FEATURES_TO_MULTIPART = "Converter todas as feições para multipart?"
 
     RASTERS = "Rasters"
     INPUT_POINTS = "Pontos de entrada"
@@ -228,17 +212,33 @@ class Strings_pt_BR:
     INPUT_MASK_POLYGON_LAYER = "Camada máscara (polígono)"
     CLIP_PER_EACH_POLYGON = "Recortar por cada polígono"
     APPLY_CORRECTION_BUFFER_PIXEL_1_1 = "Aplicar buffer de correção (pixel * 1.1)"
-    RASTER_FOLDER_OR_SELECT_RASTER_LAYERS = "Pasta de rasters ou selecione camadas raster"
-    QGIS_RASTER_LAYERS_OR_SELECT_RASTER_FOLDER = "Camadas de raster QGIS ou selecione pasta de rasters"
+    RASTER_FOLDER_OR_SELECT_RASTER_LAYERS = (
+        "Pasta de rasters ou selecione camadas raster"
+    )
+    QGIS_RASTER_LAYERS_OR_SELECT_RASTER_FOLDER = (
+        "Camadas de raster QGIS ou selecione pasta de rasters"
+    )
     OUTPUT_FOLDER_FOR_GENERATED_RASTERS = "Pasta de saída para rasters gerados"
-    NO_OUTPUT_FOLDER_PROVIDED_USING_TEMP = "Nenhuma pasta de saída informada. Usando temporária:"
+    NO_OUTPUT_FOLDER_PROVIDED_USING_TEMP = (
+        "Nenhuma pasta de saída informada. Usando temporária:"
+    )
     INVALID_FOLDER = "Pasta inválida"
-    NO_RASTER_FOUND_IN_SPECIFIED_FOLDER = "Nenhum raster encontrado na pasta especificada."
+    NO_RASTER_FOUND_IN_SPECIFIED_FOLDER = (
+        "Nenhum raster encontrado na pasta especificada."
+    )
     INVALID_RASTER_IGNORED = "Raster inválido ignorado"
-    PROCESSING_RASTER_DIFFERENCE_BY_FOLDER_OR_LAYERS = "Processando diferença de rasters por pasta/camadas..."
-    INFORM_RASTER_FOLDER_OR_SELECT_LAYER = "Informe uma pasta de rasters ou selecione ao menos uma camada raster."
-    AT_LEAST_2_RASTERS_REQUIRED = "É necessário ao menos 2 rasters para calcular diferenças."
-    FOUND_RASTER_COMBINATIONS_FOR_DIFFERENCE = "Encontradas combinações de rasters para diferenciação:"
+    PROCESSING_RASTER_DIFFERENCE_BY_FOLDER_OR_LAYERS = (
+        "Processando diferença de rasters por pasta/camadas..."
+    )
+    INFORM_RASTER_FOLDER_OR_SELECT_LAYER = (
+        "Informe uma pasta de rasters ou selecione ao menos uma camada raster."
+    )
+    AT_LEAST_2_RASTERS_REQUIRED = (
+        "É necessário ao menos 2 rasters para calcular diferenças."
+    )
+    FOUND_RASTER_COMBINATIONS_FOR_DIFFERENCE = (
+        "Encontradas combinações de rasters para diferenciação:"
+    )
     PROCESSING = "Processando"
     NO_OVERLAP_BETWEEN = "Sem sobreposição entre"
     AND = "e"
@@ -248,14 +248,18 @@ class Strings_pt_BR:
     STATS_GENERATED_FOR = "Stats gerados para"
     FAILED_TO_GENERATE_STATS_FOR = "Falha ao gerar stats para"
     CONSOLIDATED_REPORT_GENERATED = "Relatório consolidado gerado:"
-    DIFFERENCE_STATISTICS_SUMMARY_TITLE = "Resumo de Estatísticas de Diferença de Rasters"
+    DIFFERENCE_STATISTICS_SUMMARY_TITLE = (
+        "Resumo de Estatísticas de Diferença de Rasters"
+    )
     TOTAL_PROCESSED_PAIRS = "Total de pares processados:"
     RASTER = "Raster"
     STATISTICS = "Estatísticas"
     VECTOR = "Vetor"
     INTERVAL = "Intervalo"
     GEOMETRY_LINE_FROM_POINTS_TITLE = "Linha de Diferença entre Pontos"
-    POINT_LAYER_MODE1_FIRST_LAYER_MODE2 = "Camada de Pontos (Modo 1) / Primeira Camada (Modo 2)"
+    POINT_LAYER_MODE1_FIRST_LAYER_MODE2 = (
+        "Camada de Pontos (Modo 1) / Primeira Camada (Modo 2)"
+    )
     BASE_ATTRIBUTE_LAYER_A = "Atributo base - camada A"
     USE_SECOND_LAYER_MODE2 = "Usar segunda camada (modo 2)"
     SECOND_POINT_LAYER_MODE2_OPTIONAL = "Segunda Camada de Pontos (Modo 2 - opcional)"
@@ -263,14 +267,20 @@ class Strings_pt_BR:
     DIFFERENCE_LINES = "Linhas de diferenças"
     INVALID_LAYER_A = "Camada A inválida."
     MODE2_REQUIRES_SECOND_POINT_LAYER = "Modo 2 requisita uma segunda camada de pontos."
-    MODE2_INFORM_GROUP_FIELD_LAYER_B = "No modo 2 informe o campo de agrupamento da camada B."
+    MODE2_INFORM_GROUP_FIELD_LAYER_B = (
+        "No modo 2 informe o campo de agrupamento da camada B."
+    )
     ERROR_CREATING_OUTPUT_LAYER = "Erro ao criar camada de saída."
-    PROCESS_COMPLETED_LINES_GENERATED_SUCCESS = "Processo concluído: linhas geradas com sucesso."
+    PROCESS_COMPLETED_LINES_GENERATED_SUCCESS = (
+        "Processo concluído: linhas geradas com sucesso."
+    )
     ATTRIBUTE_STATISTICS_TITLE = "Estatísticas de Atributos"
     INPUT_LAYER = "Camada de entrada"
     EXCLUDE_FIELDS_OPTIONAL = "Campos a excluir (opcional)"
     PRECISION_DECIMAL_PLACES = "Precisão (casas decimais)"
-    LOAD_CSV_AUTOMATICALLY_AFTER_EXECUTION = "Carregar CSV automaticamente após execução"
+    LOAD_CSV_AUTOMATICALLY_AFTER_EXECUTION = (
+        "Carregar CSV automaticamente após execução"
+    )
     FORCE_CSV_PTBR_FORMAT = "Forçar CSV no formato PT-BR (usar ; e ,)"
     CALCULATE = "Calcular"
     OUTPUT_CSV_FILE = "Arquivo CSV de saída"
@@ -302,7 +312,9 @@ class Strings_pt_BR:
     FIELDS_TO_EXCLUDE_FROM_CALCULATION = "Campos a EXCLUIR do cálculo"
     PREFIX_FOR_NEW_FIELDS = "Prefixo para novos campos"
     DIFFERENCE = "Diferenca"
-    NO_EXCLUDED_FIELD_USING_ALL_NUMERIC = "Nenhum campo excluído → usando todos os campos numéricos."
+    NO_EXCLUDED_FIELD_USING_ALL_NUMERIC = (
+        "Nenhum campo excluído → usando todos os campos numéricos."
+    )
     BASE = "Base"
     EXCLUDED_FIELDS = "Campos EXCLUÍDOS"
     FIELDS_USED_IN_CALCULATION = "Campos utilizados no cálculo"

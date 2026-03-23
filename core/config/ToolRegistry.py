@@ -8,7 +8,7 @@ from ...utils.ToolKeys import ToolKey
 from ...utils.QgisMessageUtil import QgisMessageUtil
 from ...i18n.TranslationManager import STR
 from ...utils.StringManager import StringManager
-from ...enum import ToolTypeEnum
+from ..enum import ToolTypeEnum
 
 
 class ToolRegistry:

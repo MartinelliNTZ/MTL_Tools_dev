@@ -31,6 +31,7 @@ class Strings_es(Strings_pt_BR):
     INVERT = "Invertir"
     ENABLE = "Activar"
     INFO = "Info"
+    AUTO_DETECT = "Auto-detectar"
 
     # Common labels
     MENU_SYSTEM = "Sistema"
@@ -89,6 +90,7 @@ class Strings_es(Strings_pt_BR):
     ZONE = "Zona"
     HEMISPHERE = "Hemisferio"
     CITY = "Municipio"
+    FILE_NOT_FOUND = "Archivo no encontrado"
     INTERMEDIATE_REGION = "Región intermedia"
     STATE = "Estado"
     REGION = "Región"
@@ -179,16 +181,12 @@ class Strings_es(Strings_pt_BR):
     GEOMETRY_TYPE_NOT_SUPPORTED = "Tipo de geometría no soportado"
     ERROR_IN_PREPARATION = "Error en la preparación:"
     KML_FILES_ARE_NOT_EDITABLE = "Los archivos KML no son editables."
-    CONVERT_LAYER_TO_GPKG_OR_SHP_BEFORE_USING = (
-        "Convierta la capa a GeoPackage (.gpkg) o Shapefile (.shp) antes de usar esta herramienta."
-    )
+    CONVERT_LAYER_TO_GPKG_OR_SHP_BEFORE_USING = "Convierta la capa a GeoPackage (.gpkg) o Shapefile (.shp) antes de usar esta herramienta."
     LAYER_USES_GEOGRAPHIC_CRS = "La capa usa CRS geográfico"
     CARTESIAN_MODE_RESULTS_IN_DEGREES2 = (
         "El modo 'Cartesiano' resultaría en valores en grados²."
     )
-    CALCULATING_BOTH_MODES_AUTOMATICALLY = (
-        "Calculando ambos modos automáticamente."
-    )
+    CALCULATING_BOTH_MODES_AUTOMATICALLY = "Calculando ambos modos automáticamente."
     XY_FIELDS_CALCULATED_SUCCESS = "Campos X/Y calculados correctamente"
     LINE_LENGTH_CALCULATED_SUCCESS = "Longitud de líneas calculada correctamente"
     POLYGON_AREA_CALCULATED_SUCCESS = "Área de polígonos calculada correctamente"
@@ -201,9 +199,7 @@ class Strings_es(Strings_pt_BR):
     CONVERT_SELECTED_FEATURES_TO_MULTIPART = (
         "¿Convertir solo las entidades seleccionadas a multipart?"
     )
-    CONVERT_ALL_FEATURES_TO_MULTIPART = (
-        "¿Convertir todas las entidades a multipart?"
-    )
+    CONVERT_ALL_FEATURES_TO_MULTIPART = "¿Convertir todas las entidades a multipart?"
 
     RASTERS = "Rasters"
     INPUT_POINTS = "Puntos de entrada"
@@ -220,17 +216,33 @@ class Strings_es(Strings_pt_BR):
     INPUT_MASK_POLYGON_LAYER = "Capa máscara (polígono)"
     CLIP_PER_EACH_POLYGON = "Recortar por cada polígono"
     APPLY_CORRECTION_BUFFER_PIXEL_1_1 = "Aplicar buffer de corrección (pixel * 1.1)"
-    RASTER_FOLDER_OR_SELECT_RASTER_LAYERS = "Carpeta de rasters o seleccione capas raster"
-    QGIS_RASTER_LAYERS_OR_SELECT_RASTER_FOLDER = "Capas raster de QGIS o seleccione carpeta de rasters"
+    RASTER_FOLDER_OR_SELECT_RASTER_LAYERS = (
+        "Carpeta de rasters o seleccione capas raster"
+    )
+    QGIS_RASTER_LAYERS_OR_SELECT_RASTER_FOLDER = (
+        "Capas raster de QGIS o seleccione carpeta de rasters"
+    )
     OUTPUT_FOLDER_FOR_GENERATED_RASTERS = "Carpeta de salida para rasters generados"
-    NO_OUTPUT_FOLDER_PROVIDED_USING_TEMP = "No se informó carpeta de salida. Usando temporal:"
+    NO_OUTPUT_FOLDER_PROVIDED_USING_TEMP = (
+        "No se informó carpeta de salida. Usando temporal:"
+    )
     INVALID_FOLDER = "Carpeta inválida"
-    NO_RASTER_FOUND_IN_SPECIFIED_FOLDER = "No se encontró ningún raster en la carpeta especificada."
+    NO_RASTER_FOUND_IN_SPECIFIED_FOLDER = (
+        "No se encontró ningún raster en la carpeta especificada."
+    )
     INVALID_RASTER_IGNORED = "Raster inválido ignorado"
-    PROCESSING_RASTER_DIFFERENCE_BY_FOLDER_OR_LAYERS = "Procesando diferencia de rasters por carpeta/capas..."
-    INFORM_RASTER_FOLDER_OR_SELECT_LAYER = "Informe una carpeta de rasters o seleccione al menos una capa raster."
-    AT_LEAST_2_RASTERS_REQUIRED = "Se requieren al menos 2 rasters para calcular diferencias."
-    FOUND_RASTER_COMBINATIONS_FOR_DIFFERENCE = "Combinaciones de rasters encontradas para diferencia:"
+    PROCESSING_RASTER_DIFFERENCE_BY_FOLDER_OR_LAYERS = (
+        "Procesando diferencia de rasters por carpeta/capas..."
+    )
+    INFORM_RASTER_FOLDER_OR_SELECT_LAYER = (
+        "Informe una carpeta de rasters o seleccione al menos una capa raster."
+    )
+    AT_LEAST_2_RASTERS_REQUIRED = (
+        "Se requieren al menos 2 rasters para calcular diferencias."
+    )
+    FOUND_RASTER_COMBINATIONS_FOR_DIFFERENCE = (
+        "Combinaciones de rasters encontradas para diferencia:"
+    )
     PROCESSING = "Procesando"
     NO_OVERLAP_BETWEEN = "Sin superposición entre"
     AND = "y"
@@ -240,13 +252,19 @@ class Strings_es(Strings_pt_BR):
     STATS_GENERATED_FOR = "Estadísticas generadas para"
     FAILED_TO_GENERATE_STATS_FOR = "Error al generar estadísticas para"
     CONSOLIDATED_REPORT_GENERATED = "Reporte consolidado generado:"
-    DIFFERENCE_STATISTICS_SUMMARY_TITLE = "Resumen de Estadísticas de Diferencia de Rasters"
+    DIFFERENCE_STATISTICS_SUMMARY_TITLE = (
+        "Resumen de Estadísticas de Diferencia de Rasters"
+    )
     TOTAL_PROCESSED_PAIRS = "Total de pares procesados:"
     RASTER = "Raster"
+    STATISTICS = "Estadísticas"
+    VECTOR = "Vector"
     RANGE = "Rango"
     INTERVAL = "Intervalo"
     GEOMETRY_LINE_FROM_POINTS_TITLE = "Línea de Diferencia entre Puntos"
-    POINT_LAYER_MODE1_FIRST_LAYER_MODE2 = "Capa de Puntos (Modo 1) / Primera Capa (Modo 2)"
+    POINT_LAYER_MODE1_FIRST_LAYER_MODE2 = (
+        "Capa de Puntos (Modo 1) / Primera Capa (Modo 2)"
+    )
     BASE_ATTRIBUTE_LAYER_A = "Atributo base - capa A"
     USE_SECOND_LAYER_MODE2 = "Usar segunda capa (modo 2)"
     SECOND_POINT_LAYER_MODE2_OPTIONAL = "Segunda Capa de Puntos (Modo 2 - opcional)"
@@ -254,14 +272,20 @@ class Strings_es(Strings_pt_BR):
     DIFFERENCE_LINES = "Líneas de diferencias"
     INVALID_LAYER_A = "Capa A inválida."
     MODE2_REQUIRES_SECOND_POINT_LAYER = "El modo 2 requiere una segunda capa de puntos."
-    MODE2_INFORM_GROUP_FIELD_LAYER_B = "En el modo 2 informe el campo de agrupación de la capa B."
+    MODE2_INFORM_GROUP_FIELD_LAYER_B = (
+        "En el modo 2 informe el campo de agrupación de la capa B."
+    )
     ERROR_CREATING_OUTPUT_LAYER = "Error al crear la capa de salida."
-    PROCESS_COMPLETED_LINES_GENERATED_SUCCESS = "Proceso completado: líneas generadas correctamente."
+    PROCESS_COMPLETED_LINES_GENERATED_SUCCESS = (
+        "Proceso completado: líneas generadas correctamente."
+    )
     ATTRIBUTE_STATISTICS_TITLE = "Estadísticas de Atributos"
     INPUT_LAYER = "Capa de entrada"
     EXCLUDE_FIELDS_OPTIONAL = "Campos a excluir (opcional)"
     PRECISION_DECIMAL_PLACES = "Precisión (decimales)"
-    LOAD_CSV_AUTOMATICALLY_AFTER_EXECUTION = "Cargar CSV automáticamente después de la ejecución"
+    LOAD_CSV_AUTOMATICALLY_AFTER_EXECUTION = (
+        "Cargar CSV automáticamente después de la ejecución"
+    )
     FORCE_CSV_PTBR_FORMAT = "Forzar CSV en formato PT-BR (usar ; y ,)"
     CALCULATE = "Calcular"
     OUTPUT_CSV_FILE = "Archivo CSV de salida"
@@ -293,7 +317,9 @@ class Strings_es(Strings_pt_BR):
     FIELDS_TO_EXCLUDE_FROM_CALCULATION = "Campos a EXCLUIR del cálculo"
     PREFIX_FOR_NEW_FIELDS = "Prefijo para nuevos campos"
     DIFFERENCE = "Diferencia"
-    NO_EXCLUDED_FIELD_USING_ALL_NUMERIC = "Ningún campo excluido -> usando todos los campos numéricos."
+    NO_EXCLUDED_FIELD_USING_ALL_NUMERIC = (
+        "Ningún campo excluido -> usando todos los campos numéricos."
+    )
     BASE = "Base"
     EXCLUDED_FIELDS = "Campos EXCLUIDOS"
     FIELDS_USED_IN_CALCULATION = "Campos utilizados en el cálculo"

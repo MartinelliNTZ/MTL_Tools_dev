@@ -6,7 +6,6 @@ import os
 from typing import Optional
 import time
 from ..utils.FormatUtils import FormatUtils
-from ..utils.vector.VectorLayerSource import VectorLayerSource
 from ..core.config.LogUtils import LogUtils
 from ..core.ui.info_dialog import InfoDialog
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
@@ -94,14 +93,16 @@ class BasePluginMTL(BaseDialog):
         self,
         title: Optional[str] = None,
         icon_path: Optional[str] = "cadmus_icon.ico",
-        enable_scroll: bool = True,        
+        enable_scroll: bool = True,
         **kwargs,
     ):
         super()._build_ui(title=title, icon_path=icon_path, enable_scroll=enable_scroll)
 
         # instruções - resolvidas automaticamente via InstructionsManager.get(TOOL_KEY)
         self.instructions_file = InstructionsManager.get(self.TOOL_KEY)
-        self.logger.debug(f"Instruções carregadas via InstructionsManager: {self.instructions_file}")
+        self.logger.debug(
+            f"Instruções carregadas via InstructionsManager: {self.instructions_file}"
+        )
         # Restaurar tamanho da janela se foi persistido
         self._restore_window_size()
 
@@ -412,4 +413,3 @@ class BasePluginMTL(BaseDialog):
             self.logger.debug("Estilo QML aplicado com sucesso")
 
         return bool(ok)
-

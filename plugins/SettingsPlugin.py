@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import QLabel, QMessageBox
 from ..utils.StringManager import StringManager
 from ..plugins.BasePlugin import BasePluginMTL
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
@@ -7,6 +6,7 @@ from ..utils.ToolKeys import ToolKey
 from ..utils.ExplorerUtils import ExplorerUtils
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..i18n.TranslationManager import STR
+from ..utils.QgisMessageUtil import QgisMessageUtil
 
 
 class SettingsPlugin(BasePluginMTL):
@@ -222,11 +222,9 @@ class SettingsPlugin(BasePluginMTL):
         self._save_prefs()
 
         selected_method = self.radio_calc.get_selected_text()
-        QMessageBox.information(
-            self,
-            STR.SETTINGS_SAVED_TITLE,
-            f"{STR.CALCULATION_METHOD_LABEL} {selected_method}\n\n"
-            f"{STR.SETTINGS_SAVED_MESSAGE}",
+        QgisMessageUtil.modal_info(
+            self.iface,
+            message=f"{STR.CALCULATION_METHOD_LABEL} {selected_method}. {STR.SETTINGS_SAVED_MESSAGE}",
         )
 
         self.logger.info("Configurações aplicadas e salvas")
@@ -242,10 +240,9 @@ class SettingsPlugin(BasePluginMTL):
             self.logger.info(f"Abrindo pasta: {PREF_FOLDER}")
         else:
             self.logger.warning(f"Pasta de preferências não encontrada: {PREF_FOLDER}")
-            QMessageBox.warning(
-                self,
-                STR.WARNING,
-                f"{STR.PREFERENCES_FOLDER_NOT_FOUND}\n{PREF_FOLDER}",
+            QgisMessageUtil.modal_warning(
+                iface=self.iface,
+                message=f"{STR.PREFERENCES_FOLDER_NOT_FOUND} {PREF_FOLDER}",
             )
 
 

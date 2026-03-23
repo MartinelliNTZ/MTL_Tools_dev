@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from .Strings_pt_BR import Strings_pt_BR
 
-from qgis.PyQt.QtCore import QCoreApplication
-
 
 class Strings_en(Strings_pt_BR):
     """Strings for English (en)"""
@@ -33,6 +31,7 @@ class Strings_en(Strings_pt_BR):
     INVERT = "Invert"
     ENABLE = "Enable"
     INFO = "Info"
+    AUTO_DETECT = "Auto-detect"
 
     # Common labels
     MENU_SYSTEM = "System"
@@ -91,6 +90,7 @@ class Strings_en(Strings_pt_BR):
     ZONE = "Zone"
     HEMISPHERE = "Hemisphere"
     CITY = "City"
+    FILE_NOT_FOUND = "File not found"
     INTERMEDIATE_REGION = "Intermediate Region"
     STATE = "State"
     REGION = "Region"
@@ -177,16 +177,12 @@ class Strings_en(Strings_pt_BR):
     GEOMETRY_TYPE_NOT_SUPPORTED = "Unsupported geometry type"
     ERROR_IN_PREPARATION = "Error during preparation:"
     KML_FILES_ARE_NOT_EDITABLE = "KML files are not editable."
-    CONVERT_LAYER_TO_GPKG_OR_SHP_BEFORE_USING = (
-        "Convert the layer to GeoPackage (.gpkg) or Shapefile (.shp) before using this tool."
-    )
+    CONVERT_LAYER_TO_GPKG_OR_SHP_BEFORE_USING = "Convert the layer to GeoPackage (.gpkg) or Shapefile (.shp) before using this tool."
     LAYER_USES_GEOGRAPHIC_CRS = "Layer uses Geographic CRS"
     CARTESIAN_MODE_RESULTS_IN_DEGREES2 = (
         "Cartesian mode would result in values in degrees²."
     )
-    CALCULATING_BOTH_MODES_AUTOMATICALLY = (
-        "Calculating both modes automatically."
-    )
+    CALCULATING_BOTH_MODES_AUTOMATICALLY = "Calculating both modes automatically."
     XY_FIELDS_CALCULATED_SUCCESS = "X/Y fields calculated successfully"
     LINE_LENGTH_CALCULATED_SUCCESS = "Line length calculated successfully"
     POLYGON_AREA_CALCULATED_SUCCESS = "Polygon area calculated successfully"
@@ -217,16 +213,26 @@ class Strings_en(Strings_pt_BR):
     CLIP_PER_EACH_POLYGON = "Clip for each polygon"
     APPLY_CORRECTION_BUFFER_PIXEL_1_1 = "Apply correction buffer (pixel * 1.1)"
     RASTER_FOLDER_OR_SELECT_RASTER_LAYERS = "Raster folder or select raster layers"
-    QGIS_RASTER_LAYERS_OR_SELECT_RASTER_FOLDER = "QGIS raster layers or select raster folder"
+    QGIS_RASTER_LAYERS_OR_SELECT_RASTER_FOLDER = (
+        "QGIS raster layers or select raster folder"
+    )
     OUTPUT_FOLDER_FOR_GENERATED_RASTERS = "Output folder for generated rasters"
     NO_OUTPUT_FOLDER_PROVIDED_USING_TEMP = "No output folder provided. Using temporary:"
     INVALID_FOLDER = "Invalid folder"
     NO_RASTER_FOUND_IN_SPECIFIED_FOLDER = "No raster found in the specified folder."
     INVALID_RASTER_IGNORED = "Invalid raster ignored"
-    PROCESSING_RASTER_DIFFERENCE_BY_FOLDER_OR_LAYERS = "Processing raster difference by folder/layers..."
-    INFORM_RASTER_FOLDER_OR_SELECT_LAYER = "Provide a raster folder or select at least one raster layer."
-    AT_LEAST_2_RASTERS_REQUIRED = "At least 2 rasters are required to calculate differences."
-    FOUND_RASTER_COMBINATIONS_FOR_DIFFERENCE = "Raster combinations found for difference:"
+    PROCESSING_RASTER_DIFFERENCE_BY_FOLDER_OR_LAYERS = (
+        "Processing raster difference by folder/layers..."
+    )
+    INFORM_RASTER_FOLDER_OR_SELECT_LAYER = (
+        "Provide a raster folder or select at least one raster layer."
+    )
+    AT_LEAST_2_RASTERS_REQUIRED = (
+        "At least 2 rasters are required to calculate differences."
+    )
+    FOUND_RASTER_COMBINATIONS_FOR_DIFFERENCE = (
+        "Raster combinations found for difference:"
+    )
     PROCESSING = "Processing"
     NO_OVERLAP_BETWEEN = "No overlap between"
     AND = "and"
@@ -239,6 +245,8 @@ class Strings_en(Strings_pt_BR):
     DIFFERENCE_STATISTICS_SUMMARY_TITLE = "Raster Difference Statistics Summary"
     TOTAL_PROCESSED_PAIRS = "Total processed pairs:"
     RASTER = "Raster"
+    STATISTICS = "Statistics"
+    VECTOR = "Vector"
     INTERVAL = "Interval"
     GEOMETRY_LINE_FROM_POINTS_TITLE = "Difference Line Between Points"
     POINT_LAYER_MODE1_FIRST_LAYER_MODE2 = "Point Layer (Mode 1) / First Layer (Mode 2)"
@@ -251,7 +259,9 @@ class Strings_en(Strings_pt_BR):
     MODE2_REQUIRES_SECOND_POINT_LAYER = "Mode 2 requires a second point layer."
     MODE2_INFORM_GROUP_FIELD_LAYER_B = "In mode 2 inform the grouping field of layer B."
     ERROR_CREATING_OUTPUT_LAYER = "Error creating output layer."
-    PROCESS_COMPLETED_LINES_GENERATED_SUCCESS = "Process completed: lines generated successfully."
+    PROCESS_COMPLETED_LINES_GENERATED_SUCCESS = (
+        "Process completed: lines generated successfully."
+    )
     ATTRIBUTE_STATISTICS_TITLE = "Attribute Statistics"
     INPUT_LAYER = "Input layer"
     EXCLUDE_FIELDS_OPTIONAL = "Fields to exclude (optional)"
@@ -288,7 +298,9 @@ class Strings_en(Strings_pt_BR):
     FIELDS_TO_EXCLUDE_FROM_CALCULATION = "Fields to EXCLUDE from calculation"
     PREFIX_FOR_NEW_FIELDS = "Prefix for new fields"
     DIFFERENCE = "Difference"
-    NO_EXCLUDED_FIELD_USING_ALL_NUMERIC = "No field excluded -> using all numeric fields."
+    NO_EXCLUDED_FIELD_USING_ALL_NUMERIC = (
+        "No field excluded -> using all numeric fields."
+    )
     BASE = "Base"
     EXCLUDED_FIELDS = "EXCLUDED fields"
     FIELDS_USED_IN_CALCULATION = "Fields used in calculation"

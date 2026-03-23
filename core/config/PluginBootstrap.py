@@ -86,8 +86,11 @@ class PluginBootstrap:
                     self.logger = LogUtils(
                         tool=self.TOOL_KEY, class_name="PluginBootstrap"
                     )
-                except:
-                    pass
+                except Exception as e2:
+                    QgsMessageLog.logMessage(
+                        f"Erro crítico no bootstrap e falha ao criar logger: {str(e)}. Logger error: {str(e2)}",
+                        Qgis.Warning,
+                    )
             if self.logger:
                 self.logger.error(f"Erro crítico no bootstrap: {str(e)}")
             QgisMessageUtil.bar_critical(

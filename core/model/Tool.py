@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import QAction
 from ..config.LogUtils import LogUtils
 from ...utils.ToolKeys import ToolKey
 
@@ -41,4 +40,3 @@ class Tool:
             except Exception as e:
                 self.logger.error(f"Falha ao desconectar executor anterior: {e}")
             self.action.triggered.connect(executor)
-

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-
 from qgis.core import QgsProject
 from ..plugins.BasePlugin import BasePluginMTL
 from ..core.engine_tasks.AsyncPipelineEngine import AsyncPipelineEngine
@@ -10,12 +9,10 @@ from ..core.engine_tasks.PhotoMetadataStep import PhotoMetadataStep
 from ..utils.mrk.PhotoMetadata import PhotoMetadata
 from ..utils.vector.VectorLayerGeometry import VectorLayerGeometry
 from ..utils.vector.VectorLayerSource import VectorLayerSource
-from ..core.config.LogUtils import LogUtils
 from ..utils.StringManager import StringManager
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.ToolKeys import ToolKey
 from ..core.ui.WidgetFactory import WidgetFactory
-from pathlib import Path
 from ..i18n.TranslationManager import STR
 
 
