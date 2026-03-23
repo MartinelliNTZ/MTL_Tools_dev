@@ -28,6 +28,7 @@ class BasePluginMTL(BaseDialog):
     preferences = {}
     """Dicionario de status"""
     settings_preferences = {}
+    AUTO_SAVE_PREFS_ON_CLOSE = True  # Define se as preferências devem ser salvas automaticamente ao fechar o plugin
     """Preferências globais do aplicativo (Cadmus Settings)"""
 
     def init(
@@ -145,7 +146,8 @@ class BasePluginMTL(BaseDialog):
         Salva tamanho da janela e demais preferências antes de fechar.
         """
         self._persist_window_size()
-        self._save_prefs()
+        if self.AUTO_SAVE_PREFS_ON_CLOSE:
+            self._save_prefs()
         super().closeEvent(event)
 
     def _save_prefs(self):

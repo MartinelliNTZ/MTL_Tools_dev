@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtWidgets import QLabel, QMessageBox
-from qgis.PyQt.QtGui import QDesktopServices
-from qgis.PyQt.QtCore import QUrl, Qt
 from ..utils.StringManager import StringManager
 from ..plugins.BasePlugin import BasePluginMTL
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.ToolKeys import ToolKey
+from ..utils.ExplorerUtils import ExplorerUtils
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..i18n.TranslationManager import STR
 
@@ -24,12 +23,15 @@ class SettingsPlugin(BasePluginMTL):
         STR.CARTESIAN,
         STR.BOTH,
     ]
+    AUTO_SAVE_PREFS_ON_CLOSE = False  # Define se as preferências devem ser salvas automaticamente ao fechar o plugin
+    prefer_System = {}
 
     def __init__(self, iface):
         super().__init__(iface.mainWindow())
         self.iface = iface
         self.init(ToolKey.SETTINGS, "SettingsPlugin")
         self.logger.info("SettingsPlugin inicializado")
+        
 
     def _build_ui(self, **kwargs):
         """Constrói a interface de configurações."""
@@ -43,18 +45,15 @@ class SettingsPlugin(BasePluginMTL):
         self.logger.info("Construindo componentes de interface")
 
         # ========== SEÇÃO 1: Preferências do App ==========
-        prefs_label = QLabel(f"📋 {STR.APP_PREFERENCES}")
-        prefs_label.setStyleSheet("font-weight: bold; font-size: 11pt;")
 
-        # Link clicável para preferências
-        pref_link = QLabel(
-            f'<a href="open_prefs" style="color: #0066cc; text-decoration: underline;">{STR.OPEN_PREFERENCES_FOLDER}</a>'
+        pref_button_layout, self.pref_button = WidgetFactory.create_simple_button(
+            text=STR.OPEN_PREFERENCES_FOLDER,
+            parent=self,
+            spacing=24,
         )
-        pref_link.setOpenExternalLinks(False)
-        pref_link.setCursor(Qt.PointingHandCursor)
-        pref_link.linkActivated.connect(self._on_open_preferences)
+        self.pref_button.clicked.connect(self._open_preferences_folder)
 
-        self.logger.debug("Link de preferências adicionado")
+        self.logger.debug("Botão de preferências adicionado")
 
         # ========== SEÇÃO 2: Método de Cálculo Vetorial ==========
         calc_layout, self.radio_calc = WidgetFactory.create_radio_button_grid(
@@ -66,13 +65,14 @@ class SettingsPlugin(BasePluginMTL):
             separator_top=True,
             separator_bottom=True,
             parent=self,
-        )#🇧🇷🇺🇸🇪🇸
+        )  # 🇧🇷🇺🇸🇪🇸
         self.logger.debug("Widget de cálculo vetorial adicionado")
         langs = StringManager.AVAILABLE_LANGUAGES
+        selected_lang = self.prefer_System.get("plugin_language", "none")
         lang_layout, self.lang_selector = WidgetFactory.create_dropdown_selector(
             title=f"⚙️ {STR.PLUGIN_LANGUAGE}",
             options_dict=langs,
-            selected_key="pt_BR",
+            selected_key=selected_lang,
             separator_top=True,
             separator_bottom=True,
             parent=self,
@@ -123,8 +123,7 @@ class SettingsPlugin(BasePluginMTL):
         # para evitar reparentings repetidos que destroem widgets internos
         self.layout.add_items(
             [
-                prefs_label,
-                pref_link,
+                pref_button_layout,
                 lang_layout,
                 calc_layout,
                 prec_layout,
@@ -152,17 +151,13 @@ class SettingsPlugin(BasePluginMTL):
             )
             self.radio_calc.set_selected_index(0)
 
-
-        selected_language = self.prefer_System.get("plugin_language", "pt_BR")
+        selected_language = self.prefer_System.get("plugin_language", "none")
         try:
             self.lang_selector.set_selected_key(selected_language)
             self.logger.debug(f"Idioma selecionado carregado: {selected_language}")
         except Exception:
-            self.logger.warning(
-                f"Idioma inválido: {selected_language}, usando padrão"
-            )
+            self.logger.warning(f"Idioma inválido: {selected_language}, usando padrão")
             self.lang_selector.set_selected_key("pt_BR")
-
 
         # Carregar limiar assíncrono (número de feições)
         # suporte retrocompatível: se usuário ainda tiver threshold em bytes, avisar e usar padrão
@@ -238,16 +233,14 @@ class SettingsPlugin(BasePluginMTL):
         self.logger.info("Configurações aplicadas e salvas")
         self.close()
 
-    def _on_open_preferences(self):
+    def _open_preferences_folder(self):
         """Abre a pasta de preferências do Cadmus."""
         self.logger.debug("Abrindo pasta de preferências")
 
         from ..utils.Preferences import PREF_FOLDER
-        import os
 
-        if os.path.exists(PREF_FOLDER):
+        if ExplorerUtils.open_folder(PREF_FOLDER, self.TOOL_KEY):
             self.logger.info(f"Abrindo pasta: {PREF_FOLDER}")
-            QDesktopServices.openUrl(QUrl.fromLocalFile(PREF_FOLDER))
         else:
             self.logger.warning(f"Pasta de preferências não encontrada: {PREF_FOLDER}")
             QMessageBox.warning(

@@ -35,6 +35,19 @@ class ExplorerUtils:
         return LogUtils(tool=tool_key, class_name="ExplorerUtils")
 
     @staticmethod
+    def open_folder(folder: str, tool_key: str) -> bool:
+        """Abre uma pasta no explorador do sistema."""
+        logger = ExplorerUtils._get_logger(tool_key)
+
+        if not folder or not os.path.isdir(folder):
+            logger.error(f"open_folder: pasta invalida: {folder}")
+            return False
+
+        os.startfile(folder)
+        logger.info(f"open_folder: pasta aberta: {folder}")
+        return True
+
+    @staticmethod
     def scan_folder(folder: str, extensions: List[str], tool_key: str) -> List[Dict]:
         """Varre `folder` e retorna lista de registros de arquivos que batem nas `extensions`.
 
