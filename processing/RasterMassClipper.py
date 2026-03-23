@@ -12,6 +12,7 @@ from qgis.core import (
     QgsCoordinateTransform,
     QgsProject,
     QgsGeometry,
+    QgsProcessingOutputHtml,
 )
 import processing
 from ..utils.ToolKeys import ToolKey
@@ -31,6 +32,7 @@ class RasterMassClipper(BaseProcessingAlgorithm):
     INPUT_MASK = "INPUT_MASK"
     INPUT_RASTERS = "INPUT_RASTERS"
     OUTPUT_FOLDER = "OUTPUT_FOLDER"
+    OUTPUT_HTML = "OUTPUT_HTML"
     PER_FEATURE = "PER_FEATURE"
     BUFFER_FIX = "BUFFER_FIX"
     DISPLAY_HELP = "DISPLAY_HELP"
@@ -89,6 +91,7 @@ class RasterMassClipper(BaseProcessingAlgorithm):
                 defaultValue=self.prefs.get("last_output_folder", ""),
             )
         )
+        self.addOutput(QgsProcessingOutputHtml(self.OUTPUT_HTML, "Relatório de resultados"))
 
     # ---------------- PROCESS ----------------
 
@@ -170,10 +173,11 @@ class RasterMassClipper(BaseProcessingAlgorithm):
         )
         self.save_preferences()
 
-        clickable = f'<a href="file:///{out_folder}">{out_folder}</a>'
-        feedback.pushInfo(f"Arquivos salvos em: {clickable}")
+        html_path = os.path.join(out_folder, "resultado.html")
+        with open(html_path, "w", encoding="utf-8") as f:
+            f.write(f'<html><body><h2>Arquivos salvos em:</h2><a href="file:///{out_folder}">{out_folder}</a></body></html>')
 
-        return {self.OUTPUT_FOLDER: out_folder}
+        return {self.OUTPUT_FOLDER: out_folder, self.OUTPUT_HTML: html_path}
 
     # ---------------- CLIP LAYER ----------------
 
