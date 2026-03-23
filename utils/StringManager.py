@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
+from ..i18n.TranslationManager import STR
 
-
-class StringUtils:
-    APP_NAME = "Cadmus"
+class StringManager:
     # Filtros de arquivos
     FILTER_ALL = "All files (*.*)"
     FILTER_VECTOR = "Shapefile (*.shp);;GeoPackage (*.gpkg);;GeoJSON (*.geojson *.json);;KML (*.kml);;CSV (*.csv)"
@@ -15,3 +14,9 @@ class StringUtils:
         ".json": "GeoJSON",
         ".kml": "KML",
     }
+    AVAILABLE_LANGUAGES = {
+            "none": "🔧 " + STR.AUTO_DETECT,
+            "es": "ES Español",
+            "en": "EN English",
+            "pt_BR": "BR Português"
+        }

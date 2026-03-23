@@ -11,7 +11,7 @@ from ..utils.mrk.PhotoMetadata import PhotoMetadata
 from ..utils.vector.VectorLayerGeometry import VectorLayerGeometry
 from ..utils.vector.VectorLayerSource import VectorLayerSource
 from ..core.config.LogUtils import LogUtils
-from ..utils.StringUtils import StringUtils
+from ..utils.StringManager import StringManager
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.ToolKeys import ToolKey
 from ..core.ui.WidgetFactory import WidgetFactory
@@ -85,7 +85,7 @@ class DroneCordinates(BasePluginMTL):
         save_points_layout, self.save_points_selector = (
             WidgetFactory.create_save_file_selector(
                 parent=self,
-                file_filter=StringUtils.FILTER_VECTOR,
+                file_filter=StringManager.FILTER_VECTOR,
                 checkbox_text=STR.SAVE_POINTS_CHECKBOX,
                 label_text=STR.SAVE_IN,
                 separator_top=False,
@@ -96,7 +96,7 @@ class DroneCordinates(BasePluginMTL):
         save_track_layout, self.save_track_selector = (
             WidgetFactory.create_save_file_selector(
                 parent=self,
-                file_filter=StringUtils.FILTER_VECTOR,
+                file_filter=StringManager.FILTER_VECTOR,
                 checkbox_text=STR.SAVE_TRACK_CHECKBOX,
                 label_text=STR.SAVE_IN,
                 separator_top=False,

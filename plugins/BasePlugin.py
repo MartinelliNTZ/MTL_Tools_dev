@@ -13,15 +13,15 @@ from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.ToolKeys import ToolKey
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.ProjectUtils import ProjectUtils
-from ..utils.StringUtils import StringUtils
 from ..resources.InstructionsManager import InstructionsManager
+from ..i18n.TranslationManager import STR
 
 
 # -------------------------------------------------------------
 #  PLUGIN BasePluginMTL
 # -------------------------------------------------------------
 class BasePluginMTL(BaseDialog):
-    APP_NAME = StringUtils.APP_NAME
+    APP_NAME = STR.APP_NAME
     TOOL_KEY = "base_plugin"  # Identificador padrão
     PLUGIN_NAME = ""
     prefs = None

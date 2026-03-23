@@ -10,7 +10,7 @@ from typing import Optional, Tuple
 import os
 import tempfile
 import time
-from ...utils.StringUtils import StringUtils
+from ..StringManager import StringManager
 from ...core.config.LogUtils import LogUtils
 
 
@@ -101,7 +101,7 @@ class VectorLayerSource:
             return None
 
         ext = os.path.splitext(output_path)[1].lower()
-        driver = StringUtils.VECTOR_DRIVERS.get(ext)
+        driver = StringManager.VECTOR_DRIVERS.get(ext)
 
         if not driver:
             logger.critical(f"Formato não suportado: {ext}")
@@ -264,7 +264,7 @@ class VectorLayerSource:
 
         for attempt in range(retries):
             errors = []
-            for ext in StringUtils.SHP_EXTENSIONS:
+            for ext in StringManager.SHP_EXTENSIONS:
                 f = os.path.join(folder, base + ext)
                 if os.path.exists(f):
                     try:

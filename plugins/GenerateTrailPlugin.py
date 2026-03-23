@@ -3,7 +3,7 @@ from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes, QgsMapLayerProxyM
 from typing import Optional, Tuple
 from ..plugins.BasePlugin import BasePluginMTL
 from ..utils.QgisMessageUtil import QgisMessageUtil
-from ..utils.StringUtils import StringUtils
+from ..utils.StringManager import StringManager
 from ..utils.vector.VectorLayerGeometry import VectorLayerGeometry
 from ..utils.vector.VectorLayerProjection import VectorLayerProjection
 from ..utils.vector.VectorLayerSource import VectorLayerSource
@@ -58,7 +58,7 @@ class GenerateTrailPlugin(BasePluginMTL):
         self.logger.debug("Componente de tamanho de implemento adicionado")
 
         save_layout, self.save_selector = WidgetFactory.create_save_file_selector(
-            parent=self, file_filter=StringUtils.FILTER_VECTOR, separator_top=False
+            parent=self, file_filter=StringManager.FILTER_VECTOR, separator_top=False
         )
         self.logger.debug("Componente de salvamento de arquivo adicionado")
 

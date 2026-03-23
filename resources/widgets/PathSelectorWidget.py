@@ -36,7 +36,7 @@ from qgis.PyQt.QtWidgets import (
 )
 from qgis.PyQt.QtCore import pyqtSignal
 from ...i18n.TranslationManager import STR
-from ...utils.StringUtils import StringUtils
+from ...utils.StringManager import StringManager
 
 
 class PathSelectorWidget(QWidget):
@@ -67,7 +67,7 @@ class PathSelectorWidget(QWidget):
         self,
         *,
         title: str = STR.SELECT,
-        file_filter: str = StringUtils.FILTER_ALL,
+        file_filter: str = StringManager.FILTER_ALL,
         mode: str = MODE_FOLDER,
         checkbox: bool = False,
         checkbox_text: str = STR.ENABLE,

@@ -14,12 +14,12 @@ from .ToolKeys import ToolKey
 from .QgisMessageUtil import QgisMessageUtil
 from .DependenciesManager import DependenciesManager
 from .FormatUtils import FormatUtils
-from .StringUtils import StringUtils
+from .StringManager import StringManager
 
 __all__ = [
     "ToolKey",
     "QgisMessageUtil",
     "DependenciesManager",
     "FormatUtils",
-    "StringUtils",
+    "StringManager",
 ]

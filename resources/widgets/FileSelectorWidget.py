@@ -4,7 +4,7 @@ from qgis.PyQt.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QCheckBox, QLineEdit, QPushButton
 )
-from ...utils.StringUtils import StringUtils
+from ...utils.StringManager import StringManager
 from qgis.PyQt.QtWidgets import QFileDialog
 from ...i18n.TranslationManager import STR
 
@@ -21,7 +21,7 @@ class FileSelectorWidget(QWidget):
         *,
         checkbox_text=STR.SAVE_TO_FILE,
         label_text=f"{STR.SELECT_FILE}:",
-        file_filter=StringUtils.FILTER_ALL,
+        file_filter=StringManager.FILTER_ALL,
         mode=MODE_OPEN,
         parent=None
     ):

@@ -14,7 +14,7 @@ from qgis.PyQt.QtWidgets import (
 from qgis.PyQt.QtCore import pyqtSignal
 from ...core.config.LogUtils import LogUtils
 from ...i18n.TranslationManager import STR
-from ...utils.StringUtils import StringUtils
+from ...utils.StringManager import StringManager
 
 # Logger do widget
 logger = LogUtils(tool="widgets", class_name="SelectorWidget")
@@ -48,7 +48,7 @@ class SelectorWidget(QWidget):
         self,
         *,
         title: str = STR.SELECT,
-        file_filter: str = StringUtils.FILTER_ALL,
+        file_filter: str = StringManager.FILTER_ALL,
         mode: str = MODE_FOLDER,
         checkbox: bool = False,
         checkbox_text: str = STR.ENABLE,

@@ -8,7 +8,7 @@ from qgis.PyQt.QtWidgets import (
     QFrame,
 )
 from ...resources.widgets.ImageWidget import ImageWidget
-from ...utils.StringUtils import StringUtils
+from ...utils.StringManager import StringManager
 from ...resources.widgets.LayerInputWidget import LayerInputWidget
 from ...resources.widgets.BottomActionButtonsWidget import BottomActionButtonsWidget
 from ...resources.widgets.MainLayout import MainLayout
@@ -213,7 +213,7 @@ class WidgetFactory:
         parent,
         separator_top=False,
         separator_bottom=True,
-        file_filter=StringUtils.FILTER_QGIS_STYLE,
+        file_filter=StringManager.FILTER_QGIS_STYLE,
         checkbox_text=STR.APPLY_QML_STYLE,
         label_text=STR.QML_LABEL,
     ):
@@ -293,7 +293,7 @@ class WidgetFactory:
         parent,
         separator_top=False,
         separator_bottom=True,
-        file_filter=StringUtils.FILTER_VECTOR,
+        file_filter=StringManager.FILTER_VECTOR,
         checkbox_text: str = STR.SAVE_TO_FILE,
         label_text: str = STR.SAVE_IN,
     ):
@@ -658,7 +658,7 @@ class WidgetFactory:
         *,
         parent=None,
         title: str = STR.SELECT_PATH,
-        file_filter: str = StringUtils.FILTER_ALL,
+        file_filter: str = StringManager.FILTER_ALL,
         mode: str = "radio",
         separator_top: bool = False,
         separator_bottom: bool = True,

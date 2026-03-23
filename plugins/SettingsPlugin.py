@@ -2,6 +2,7 @@
 from qgis.PyQt.QtWidgets import QLabel, QMessageBox
 from qgis.PyQt.QtGui import QDesktopServices
 from qgis.PyQt.QtCore import QUrl, Qt
+from ..utils.StringManager import StringManager
 from ..plugins.BasePlugin import BasePluginMTL
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.ToolKeys import ToolKey
@@ -65,13 +66,13 @@ class SettingsPlugin(BasePluginMTL):
             separator_top=True,
             separator_bottom=True,
             parent=self,
-        )
+        )#🇧🇷🇺🇸🇪🇸
         self.logger.debug("Widget de cálculo vetorial adicionado")
-        langs = {"es": "Español", "en": "English", "pt": "Português"}
+        langs = StringManager.AVAILABLE_LANGUAGES
         lang_layout, self.lang_selector = WidgetFactory.create_dropdown_selector(
             title=f"⚙️ {STR.PLUGIN_LANGUAGE}",
             options_dict=langs,
-            selected_key="pt",
+            selected_key="pt_BR",
             separator_top=True,
             separator_bottom=True,
             parent=self,
@@ -152,7 +153,7 @@ class SettingsPlugin(BasePluginMTL):
             self.radio_calc.set_selected_index(0)
 
 
-        selected_language = self.prefer_System.get("plugin_language", "pt")
+        selected_language = self.prefer_System.get("plugin_language", "pt_BR")
         try:
             self.lang_selector.set_selected_key(selected_language)
             self.logger.debug(f"Idioma selecionado carregado: {selected_language}")
@@ -160,7 +161,7 @@ class SettingsPlugin(BasePluginMTL):
             self.logger.warning(
                 f"Idioma inválido: {selected_language}, usando padrão"
             )
-            self.lang_selector.set_selected_key("pt")
+            self.lang_selector.set_selected_key("pt_BR")
 
 
         # Carregar limiar assíncrono (número de feições)
@@ -209,8 +210,13 @@ class SettingsPlugin(BasePluginMTL):
         self.logger.debug(f"Precisão de campos vetoriais salva: {precision_val} casas")
 
         selected_language = self.lang_selector.get_selected_key()
-        self.prefer_System["plugin_language"] = selected_language
-        self.logger.debug(f"Idioma selecionado salvo: {selected_language}")
+        if selected_language != "none":
+            self.prefer_System["plugin_language"] = selected_language
+            self.logger.debug(f"Idioma selecionado salvo: {selected_language}")
+        else:
+            if "plugin_language" in self.prefer_System:
+                del self.prefer_System["plugin_language"]
+                self.logger.debug("Idioma selecionado removido para auto-detectar")
 
         save_tool_prefs(ToolKey.SYSTEM, self.prefer_System)
         save_tool_prefs(self.TOOL_KEY, self.preferences)
