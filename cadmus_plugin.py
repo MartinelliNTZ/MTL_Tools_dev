@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
-import sys
-import traceback
 from qgis.core import QgsApplication
 from pathlib import Path
 from .utils.ToolKeys import ToolKey
-from .utils.QgisMessageUtil import QgisMessageUtil
 from .core.config.LogUtils import LogUtils
 from .i18n.TranslationManager import STR
 from .core.config.PluginBootstrap import PluginBootstrap

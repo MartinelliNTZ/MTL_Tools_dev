@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from ..i18n.TranslationManager import STR
 
+
 class StringManager:
     # Filtros de arquivos
     FILTER_ALL = "All files (*.*)"
@@ -15,8 +16,8 @@ class StringManager:
         ".kml": "KML",
     }
     AVAILABLE_LANGUAGES = {
-            "none": "🔧 " + STR.AUTO_DETECT,
-            "es": "ES Español",
-            "en": "EN English",
-            "pt_BR": "BR Português"
-        }
+        "none": "🔧 " + STR.AUTO_DETECT,
+        "es": "ES Español",
+        "en": "EN English",
+        "pt_BR": "BR Português",
+    }

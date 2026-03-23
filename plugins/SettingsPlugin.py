@@ -31,7 +31,6 @@ class SettingsPlugin(BasePluginMTL):
         self.iface = iface
         self.init(ToolKey.SETTINGS, "SettingsPlugin")
         self.logger.info("SettingsPlugin inicializado")
-        
 
     def _build_ui(self, **kwargs):
         """Constrói a interface de configurações."""

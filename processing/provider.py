@@ -9,7 +9,6 @@ from .AttributeStatistics import AttributeStatistics
 from .GeometryLineFromPoints import GeometryLineFromPoints
 from .RasterDifferenceStatiscs import RasterDifferenceStatiscs
 from ..i18n.TranslationManager import STR
-from ..core.config.LogUtils import LogUtils
 
 
 class MTLProvider(QgsProcessingProvider):

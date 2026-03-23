@@ -1,4 +1,4 @@
-import os
+# -*- coding: utf-8 -*-
 from pathlib import Path
 from ..i18n.TranslationManager import TM
 
@@ -18,7 +18,7 @@ class InstructionsManager:
 
         filename = cls._build_filename(tool_key)
 
-        locale = TM.locale   # ex: pt_BR 
+        locale = TM.locale  # ex: pt_BR
 
         candidates = [
             cls.BASE_DIR / "instructions" / locale / filename,

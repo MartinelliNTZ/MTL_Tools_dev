@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import QToolButton, QAction, QMenu
+from qgis.PyQt.QtWidgets import QToolButton, QMenu
 
 
 class DropdownToolButton(QToolButton):
@@ -9,7 +9,14 @@ class DropdownToolButton(QToolButton):
     Herda de QToolButton para ser adicionado como widget à toolbar.
     """
 
-    def __init__(self, iface=None, title=None, main_action=None, secondary_actions=None, icon=None):
+    def __init__(
+        self,
+        iface=None,
+        title=None,
+        main_action=None,
+        secondary_actions=None,
+        icon=None,
+    ):
         """
         Inicializa o botão dropdown.
 

@@ -19,7 +19,9 @@ class CadmusToolBar(QToolBar):
         :param title: Título da toolbar
         :param parent: Widget pai
         """
-        self.logger = LogUtils(tool=ToolKey.SYSTEM, class_name="CadmusToolBar", level=LogUtils.DEBUG)
+        self.logger = LogUtils(
+            tool=ToolKey.SYSTEM, class_name="CadmusToolBar", level=LogUtils.DEBUG
+        )
         super().__init__(title, parent)
         self.setObjectName(f"{title}_Toolbar")
         self.setVisible(True)  # Garantir que a toolbar seja visível
@@ -38,6 +40,6 @@ class CadmusToolBar(QToolBar):
             # Adicionar separador após cada botão, exceto o último
             if button != buttons[-1]:
                 self.addSeparator()
-        
+
         # Garantir que a toolbar seja visível após adicionar botões
         self.show()

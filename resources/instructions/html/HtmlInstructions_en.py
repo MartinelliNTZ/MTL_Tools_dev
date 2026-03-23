@@ -135,4 +135,3 @@ class HtmlInstructions:
             Null values are ignored.
             {self.provider.author_info}
         """
-

@@ -258,7 +258,10 @@ class WidgetFactory:
 
     @staticmethod
     def create_main_layout(
-        self, title: str = STR.APP_NAME, enable_scroll: bool = False, icon_path: str = None
+        self,
+        title: str = STR.APP_NAME,
+        enable_scroll: bool = False,
+        icon_path: str = None,
     ):
         """
         Criar layout principal com AppBar.
