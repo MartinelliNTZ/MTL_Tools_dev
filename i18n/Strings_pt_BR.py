@@ -33,6 +33,12 @@ class Strings_pt_BR:
     AUTO_DETECT = "Auto-detectar"
 
     # Common labels
+    MENU_SYSTEM = "Sistema"
+    MENU_LAYOUTS = "Layouts"
+    MENU_FOLDER = "Pasta"
+    MENU_VECTOR = "Vetor"
+    MENU_AGRICULTURE = "Agricultura"
+    MENU_RASTER = "Raster"
     OPTIONS = "Opções"
     SAVING = "Salvamento"
     STYLES = "Estilos"

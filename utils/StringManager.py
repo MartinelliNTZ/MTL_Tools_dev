@@ -3,6 +3,15 @@ from ..i18n.TranslationManager import STR
 
 
 class StringManager:
+    MENU_CATEGORIES = {
+        "SYSTEM": STR.MENU_SYSTEM,
+        "LAYOUTS": STR.MENU_LAYOUTS,
+        "FOLDER": STR.MENU_FOLDER,
+        "VECTOR": STR.MENU_VECTOR,
+        "AGRICULTURE": STR.MENU_AGRICULTURE,
+        "RASTER": STR.MENU_RASTER,
+    }
+
     # Filtros de arquivos
     FILTER_ALL = "All files (*.*)"
     FILTER_VECTOR = "Shapefile (*.shp);;GeoPackage (*.gpkg);;GeoJSON (*.geojson *.json);;KML (*.kml);;CSV (*.csv)"

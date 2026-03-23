@@ -7,22 +7,15 @@ from .LogUtils import LogUtils
 from ...utils.ToolKeys import ToolKey
 from ...utils.QgisMessageUtil import QgisMessageUtil
 from ...i18n.TranslationManager import STR
+from ...utils.StringManager import StringManager
+from ...enum import ToolTypeEnum
 
 
 class ToolRegistry:
     # Tipos de ferramenta (não usar enum separado conforme requisito)
-    INSTANT = "INSTANT"
-    DIALOG = "DIALOG"
-    MAP_TOOL = "MAP_TOOL"
-    BACKGROUND = "BACKGROUND"
-
-    # Categorias de ferramentas
-    SYSTEM = "SYSTEM"  # 1
-    LAYOUTS = "LAYOUTS"  # 2
-    FOLDER = "FOLDER"  # 3
-    VECTOR = "VECTOR"  # 4
-    AGRICULTURE = "AGRICULTURE"  # 5
-    RASTER = "RASTER"  # 6
+    SYSTEM, LAYOUTS, FOLDER, VECTOR, AGRICULTURE, RASTER = (
+        StringManager.MENU_CATEGORIES.keys()
+    )
 
     def __init__(self, iface):
         self.iface = iface
@@ -40,7 +33,7 @@ class ToolRegistry:
             name=STR.EXPORT_ALL_LAYOUTS_TITLE,
             icon=im.icon(im.EXPORT_ALL_LAYOUTS),
             category=self.LAYOUTS,
-            tool_type=self.DIALOG,
+            tool_type=ToolTypeEnum.DIALOG,
             main_action=True,
             executor=self.run_export_layouts,
             tooltip=STR.EXPORT_ALL_LAYOUTS_TOOLTIP,
@@ -56,7 +49,7 @@ class ToolRegistry:
             name=STR.REPLACE_IN_LAYOUTS_TITLE,
             icon=im.icon(im.REPLACE_IN_LAYOUTS),
             category=self.LAYOUTS,
-            tool_type=self.DIALOG,
+            tool_type=ToolTypeEnum.DIALOG,
             executor=self.run_replace_layouts,
             tooltip=STR.REPLACE_IN_LAYOUTS_TOOLTIP,
             order=20,
@@ -72,7 +65,7 @@ class ToolRegistry:
             name=STR.RESTART_QGIS_TITLE,
             icon=im.icon(im.RESTART_QGIS),
             category=self.SYSTEM,
-            tool_type=self.INSTANT,
+            tool_type=ToolTypeEnum.INSTANT,
             main_action=True,
             executor=self.run_restart_qgis,
             tooltip=STR.RESTART_QGIS_TOOLTIP,
@@ -85,7 +78,7 @@ class ToolRegistry:
             name=STR.LOGCAT_TITLE,
             icon=im.icon(im.LOGCAT),
             category=self.SYSTEM,
-            tool_type=self.DIALOG,
+            tool_type=ToolTypeEnum.DIALOG,
             executor=self.run_logcat,
             tooltip=STR.LOGCAT_TOOLTIP,
             order=20,
@@ -97,7 +90,7 @@ class ToolRegistry:
             name=STR.SETTINGS_TITLE,
             icon=im.icon(im.SETTINGS),
             category=self.SYSTEM,
-            tool_type=self.DIALOG,
+            tool_type=ToolTypeEnum.DIALOG,
             executor=self.run_settings,
             tooltip=STR.SETTINGS_TOOLTIP,
             order=30,
@@ -109,7 +102,7 @@ class ToolRegistry:
             name=STR.ABOUT_CADMUS,
             icon=im.icon(im.ABOUT),
             category=self.SYSTEM,
-            tool_type=self.DIALOG,
+            tool_type=ToolTypeEnum.DIALOG,
             executor=self.run_about_dialog,
             tooltip=STR.ABOUT_DIALOG_TOOLTIP,
             order=40,
@@ -125,7 +118,7 @@ class ToolRegistry:
             name=STR.LOAD_FOLDER_LAYERS_TITLE,
             icon=im.icon(im.LOAD_FOLDER_LAYER),
             category=self.FOLDER,
-            tool_type=self.DIALOG,
+            tool_type=ToolTypeEnum.DIALOG,
             main_action=True,
             executor=self.run_load_folder,
             tooltip=STR.LOAD_FOLDER_LAYERS_TOOLTIP,
@@ -145,7 +138,7 @@ class ToolRegistry:
             name=STR.VECTOR_FIELDS_TITLE,
             icon=im.icon(im.VECTOR_FIELD),
             category=self.VECTOR,
-            tool_type=self.INSTANT,
+            tool_type=ToolTypeEnum.INSTANT,
             main_action=True,
             executor=self.run_vector_fields,
             tooltip=STR.VECTOR_FIELDS_TOOLTIP,
@@ -158,7 +151,7 @@ class ToolRegistry:
             name=STR.COORD_CLICK_TOOL_TITLE,
             icon=im.icon(im.COORD_CLICK_TOOL),
             category=self.VECTOR,
-            tool_type=self.MAP_TOOL,
+            tool_type=ToolTypeEnum.MAP_TOOL,
             executor=self.run_coord_click,
             tooltip=STR.COORD_CLICK_TOOL_TOOLTIP,
             order=20,
@@ -170,7 +163,7 @@ class ToolRegistry:
             name=STR.CONVERTER_MULTIPART_TITLE,
             icon=im.icon(im.VECTOR_MULTPART),
             category=self.VECTOR,
-            tool_type=self.INSTANT,
+            tool_type=ToolTypeEnum.INSTANT,
             executor=self.run_multpart,
             tooltip=STR.CONVERTER_MULTIPART_TOOLTIP,
             order=40,
@@ -182,7 +175,7 @@ class ToolRegistry:
             name=STR.COPY_ATTRIBUTES_TITLE,
             icon=im.icon(im.COPY_ATTRIBUTES),
             category=self.VECTOR,
-            tool_type=self.DIALOG,
+            tool_type=ToolTypeEnum.DIALOG,
             executor=self.run_copy_atributes,
             tooltip=STR.COPY_ATTRIBUTES_TOOLTIP,
             order=50,
@@ -198,7 +191,7 @@ class ToolRegistry:
             name=STR.DRONE_COORDINATES_TITLE,
             icon=im.icon(im.DRONE_COORDINATES),
             category=self.AGRICULTURE,
-            tool_type=self.DIALOG,
+            tool_type=ToolTypeEnum.DIALOG,
             main_action=True,
             executor=self.run_drone_coords,
             tooltip=STR.DRONE_COORDINATES_TOOLTIP,
@@ -211,7 +204,7 @@ class ToolRegistry:
             name=STR.GENERATE_TRAIL_TITLE,
             icon=im.icon(im.GENERATE_TRAIL),
             category=self.AGRICULTURE,
-            tool_type=self.DIALOG,
+            tool_type=ToolTypeEnum.DIALOG,
             executor=self.run_gerar_rastro,
             tooltip=STR.GENERATE_TRAIL_TOOLTIP,
             order=20,

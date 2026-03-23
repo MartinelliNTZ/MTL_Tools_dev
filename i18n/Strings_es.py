@@ -33,6 +33,12 @@ class Strings_es(Strings_pt_BR):
     INFO = "Info"
 
     # Common labels
+    MENU_SYSTEM = "Sistema"
+    MENU_LAYOUTS = "Layouts"
+    MENU_FOLDER = "Carpeta"
+    MENU_VECTOR = "Vector"
+    MENU_AGRICULTURE = "Agricultura"
+    MENU_RASTER = "Raster"
     OPTIONS = "Opciones"
     SAVING = "Guardando"
     STYLES = "Estilos"

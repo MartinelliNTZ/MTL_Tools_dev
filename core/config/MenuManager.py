@@ -5,16 +5,10 @@ from ...resources.widgets.DropdownToolButton import DropdownToolButton
 from .LogUtils import LogUtils
 from ...utils.ToolKeys import ToolKey
 from ...utils.Preferences import Preferences
+from ...utils.StringManager import StringManager
 
 
 class MenuManager:
-    SYSTEM = "SYSTEM"  # 1
-    LAYOUTS = "LAYOUTS"  # 2
-    FOLDER = "FOLDER"  # 3
-    VECTOR = "VECTOR"  # 4
-    AGRICULTURE = "AGRICULTURE"  # 5
-    RASTER = "RASTER"  # 6
-
     def __init__(self, iface, tools=None, logger=None):
         self.iface = iface
         self.menu = None
@@ -51,25 +45,18 @@ class MenuManager:
 
         # Mapeamento de categoria para ícone
         category_icons = {
-            self.SYSTEM: im.icon(im.SYSTEM),
-            self.LAYOUTS: im.icon(im.LAYOUT),
-            self.FOLDER: im.icon(im.LAYER),  # Usar ícone de layer para folder
-            self.VECTOR: im.icon(im.VECTOR),
-            self.AGRICULTURE: im.icon(im.AGRICULTURE),
-            self.RASTER: im.icon(im.RASTER),
+            "SYSTEM": im.icon(im.SYSTEM),
+            "LAYOUTS": im.icon(im.LAYOUT),
+            "FOLDER": im.icon(im.LAYER),  # Usar ícone de layer para folder
+            "VECTOR": im.icon(im.VECTOR),
+            "AGRICULTURE": im.icon(im.AGRICULTURE),
+            "RASTER": im.icon(im.RASTER),
         }
         self.logger.debug(
             f"Criando submenus para cada categoria: {list(category_icons.keys())}"
         )
-        for category in [
-            self.SYSTEM,
-            self.LAYOUTS,
-            self.FOLDER,
-            self.VECTOR,
-            self.AGRICULTURE,
-            self.RASTER,
-        ]:
-            submenu = QMenu(category.title(), self.menu)
+        for category, label in StringManager.MENU_CATEGORIES.items():
+            submenu = QMenu(label, self.menu)
             if category in category_icons:
                 submenu.setIcon(category_icons[category])
             self.submenus[category] = submenu
@@ -96,14 +83,7 @@ class MenuManager:
         # Coletar todos os dropdown buttons por categoria
         dropdown_buttons = []
 
-        for category in [
-            self.SYSTEM,
-            self.LAYOUTS,
-            self.FOLDER,
-            self.VECTOR,
-            self.AGRICULTURE,
-            self.RASTER,
-        ]:
+        for category in StringManager.MENU_CATEGORIES:
             self.logger.debug(f"Verificando categoria {category}")
             all_tools_in_category = [t for t in self.tools if t.category == category]
             self.logger.debug(
@@ -170,7 +150,12 @@ class MenuManager:
             self.logger.warning(
                 "Nenhum botão dropdown criado, tentando adicionar main_actions diretamente"
             )
-            for category in [self.SYSTEM, self.LAYOUTS, self.VECTOR, self.AGRICULTURE]:
+            for category in (
+                "SYSTEM",
+                "LAYOUTS",
+                "VECTOR",
+                "AGRICULTURE",
+            ):
                 main_tools = [
                     t
                     for t in self.tools
@@ -186,14 +171,7 @@ class MenuManager:
 
     def populate_menus(self):
         # Ordenar ferramentas por order dentro de cada categoria
-        for category in [
-            self.SYSTEM,
-            self.LAYOUTS,
-            self.FOLDER,
-            self.VECTOR,
-            self.AGRICULTURE,
-            self.RASTER,
-        ]:
+        for category in StringManager.MENU_CATEGORIES:
             if category not in self.submenus:
                 continue
             sorted_tools = sorted(
