@@ -208,6 +208,13 @@ class Strings_es(Strings_pt_BR):
 
     RASTERS = "Rasters"
     INPUT_POINTS = "Puntos de entrada"
+
+    # Dependencies
+    INSTALLING_DEPENDENCY = "Instalando dependencia..."
+    INSTALLING_DEPENDENCIES = "Instalando dependencias"
+    DEPENDENCY = "Dependencia"
+    INSTALLED_SUCCESSFULLY = "instalada correctamente."
+    SUCCESS = "Éxito"
     REPROJECT_OUTPUT_LAYER_OPTIONAL = "Reproyectar capa de salida (opcional)"
     SAMPLED_VALUES = "Valores_Muestreados"
     OPEN_OUTPUT_FOLDER = "Abrir carpeta de salida"

@@ -218,6 +218,13 @@ class Strings_de(Strings_pt_BR):
     RASTER_MASS_CLIPPER_TITLE = "Massenzuschnitt von Rastern"
     RASTER_DIFFERENCE_STATISTICS_TITLE = "Rasterdifferenz verarbeiten"
     INPUT_MASK_POLYGON_LAYER = "Maskenlayer (Polygon)"
+
+    # Dependencies
+    INSTALLING_DEPENDENCY = "Abhängigkeit wird installiert..."
+    INSTALLING_DEPENDENCIES = "Abhängigkeiten werden installiert"
+    DEPENDENCY = "Abhängigkeit"
+    INSTALLED_SUCCESSFULLY = "erfolgreich installiert."
+    SUCCESS = "Erfolg"
     CLIP_PER_EACH_POLYGON = "Pro Polygon zuschneiden"
     APPLY_CORRECTION_BUFFER_PIXEL_1_1 = "Korrekturpuffer anwenden (Pixel * 1,1)"
     RASTER_FOLDER_OR_SELECT_RASTER_LAYERS = (

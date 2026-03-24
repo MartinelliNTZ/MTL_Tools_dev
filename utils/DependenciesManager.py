@@ -19,7 +19,7 @@ from qgis.PyQt.QtWidgets import QProgressDialog
 
 from ..core.config.LogUtils import LogUtils
 from .ToolKeys import ToolKey
-from ..utils.QgisMessageUtil import QgisMessageUtils
+from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..i18n.TranslationManager import STR
 
 
@@ -31,13 +31,11 @@ class DependenciesManager:
     DEPENDENCIES = {
         "PyPDF2": {
             "import": "PyPDF2",
-            "script": "install_pypdf2.bat",
             "description": "Unir/mesclar arquivos PDF",
             "pip": "PyPDF2",
         },
         "Pillow": {
             "import": "PIL",
-            "script": "install_pillow.cmd",
             "description": "Processar e converter imagens (PNG)",
             "pip": "Pillow",
         },
@@ -73,7 +71,6 @@ class DependenciesManager:
         )
         return {
             "import": dependency_name,
-            "script": "",
             "description": dependency_name,
             "pip": dependency_name,
             "mapped": False,
@@ -166,7 +163,6 @@ class DependenciesManager:
         dep_info = DependenciesManager._get_dependency_config(dependency_name, toolkey)
         return {
             "import": dep_info["import"],
-            "script": dep_info["script"],
             "description": dep_info["description"],
             "pip": dep_info["pip"],
         }
@@ -310,9 +306,9 @@ class DependenciesManager:
         try:
             parent = iface.mainWindow() if iface else None
             progress = QProgressDialog(
-                f"Instalando dependência {pip_name}...", "Cancelar", 0, 0, parent
+                STR.INSTALLING_DEPENDENCY + " " + dep_info["description"], STR.CANCEL, 0, 0, parent
             )
-            progress.setWindowTitle("Instalando dependências")
+            progress.setWindowTitle(STR.INSTALLING_DEPENDENCIES)
             progress.setAutoClose(True)
             progress.setModal(True)
             progress.show()
@@ -341,6 +337,7 @@ class DependenciesManager:
                         dependency_name=dependency_name,
                         pip_name=pip_name,
                     )
+                    QgisMessageUtil.modal_info(iface, STR.DEPENDENCY + " " + dep_info["description"] + " " + STR.INSTALLED_SUCCESSFULLY, STR.SUCCESS)
                     
                 else:
                     logger.error(

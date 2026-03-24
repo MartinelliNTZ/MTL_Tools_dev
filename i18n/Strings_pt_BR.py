@@ -198,6 +198,13 @@ class Strings_pt_BR:
         "Converter apenas as feições selecionadas para multipart?"
     )
     CONVERT_ALL_FEATURES_TO_MULTIPART = "Converter todas as feições para multipart?"
+
+    # Dependencies
+    INSTALLING_DEPENDENCY = "Instalando dependência..."
+    INSTALLING_DEPENDENCIES = "Instalando dependências"
+    DEPENDENCY = "Dependência"
+    INSTALLED_SUCCESSFULLY = "instalada com sucesso."
+    SUCCESS = "Sucesso"
     KML_FIELDS_REMOVED_SUCCESS = "Campos KML removidos com sucesso"
     NO_KML_FIELDS_FOUND = "Nenhum campo KML encontrado para remover"
     ERROR_REMOVING_KML_FIELDS = "Erro ao remover campos KML:"

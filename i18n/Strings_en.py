@@ -198,6 +198,13 @@ class Strings_en(Strings_pt_BR):
         "Convert only the selected features to multipart?"
     )
     CONVERT_ALL_FEATURES_TO_MULTIPART = "Convert all features to multipart?"
+
+    # Dependencies
+    INSTALLING_DEPENDENCY = "Installing dependency..."
+    INSTALLING_DEPENDENCIES = "Installing dependencies"
+    DEPENDENCY = "Dependency"
+    INSTALLED_SUCCESSFULLY = "installed successfully."
+    SUCCESS = "Success"
     KML_FIELDS_REMOVED_SUCCESS = "KML fields removed successfully"
     NO_KML_FIELDS_FOUND = "No KML fields found to remove"
     ERROR_REMOVING_KML_FIELDS = "Error removing KML fields:"
