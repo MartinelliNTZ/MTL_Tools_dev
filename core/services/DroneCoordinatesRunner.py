@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+import os
 from ..engine_tasks.AsyncPipelineEngine import AsyncPipelineEngine
 from ..engine_tasks.ExecutionContext import ExecutionContext
 from ..engine_tasks.MrkParseStep import MrkParseStep
+from ..engine_tasks.PhotoMetadataStep import PhotoMetadataStep
 from ...i18n.TranslationManager import STR
 from ...utils.ProjectUtils import ProjectUtils
 from ...utils.QgisMessageUtil import QgisMessageUtil
@@ -9,6 +11,9 @@ from ...utils.ToolKeys import ToolKey
 from ...utils.ExplorerUtils import ExplorerUtils
 from ...utils.vector.VectorLayerGeometry import VectorLayerGeometry
 from ...utils.vector.VectorLayerSource import VectorLayerSource
+from ...utils.Preferences import load_tool_prefs
+from ...utils.mrk.PhotoMetadata import PhotoMetadata
+from qgis.core import QgsProject
 
 
 class DroneCoordinatesRunner:
@@ -65,19 +70,29 @@ class DroneCoordinatesRunner:
                 )
             return True
 
+        # Carregar preferências para configurar o pipeline automaticamente
+        prefs = load_tool_prefs(self.tool_key)
+        apply_photos = prefs.get("photos", False)
+        extra_fields = PhotoMetadata.FIELDS_PHOTO if apply_photos else None
+        base_name = os.path.splitext(os.path.basename(file_path))[0]
         context = ExecutionContext()
         context.set("paths", [file_path])
         context.set("recursive", False)
-        context.set("extra_fields", None)
+        context.set("extra_fields", extra_fields)
         context.set("tool_key", self.tool_key)
-        context.set("points_layer_name", f"{STR.POINTS}")
-        context.set("track_layer_name", f"{STR.TRACK}")
+        context.set("points_layer_name", f"{base_name}_{STR.POINTS}")
+        context.set("track_layer_name", f"{base_name}_{STR.TRACK}")
         context.set("auto_points_output_path", points_path)
         context.set("auto_track_output_path", track_path)
         context.set("source_mrk_file", file_path)
 
+        # Montar steps conforme preferências (mesmo que DroneCoordinates plugin)
+        steps = [MrkParseStep()]
+        if apply_photos:
+            steps.append(PhotoMetadataStep())
+
         self._engine = AsyncPipelineEngine(
-            steps=[MrkParseStep()],
+            steps=steps,
             context=context,
             on_finished=self._on_pipeline_finished,
             on_error=self._on_pipeline_error,
@@ -96,17 +111,35 @@ class DroneCoordinatesRunner:
         points_output_path = context.get("auto_points_output_path")
         track_output_path = context.get("auto_track_output_path")
 
+        points_layer_name = context.get("points_layer_name", STR.POINTS)
+        track_layer_name = context.get("track_layer_name", STR.TRACK)
+
         points_layer = self._save_or_load_existing(
             layer,
             points_output_path,
-            fallback_name=STR.POINTS,
+            fallback_name=points_layer_name,
         )
         if points_layer and points_layer.id() != layer.id():
             ProjectUtils.remove_layer_from_project(layer)
 
+        # Aplicar estilo QML nos pontos conforme preferência
+        prefs = load_tool_prefs(self.tool_key)
+        if (
+            prefs.get("apply_style_points", False)
+            and points_layer
+            and points_layer.isValid()
+        ):
+            qml_path = prefs.get("qml_path_points", "").strip()
+            if qml_path and os.path.exists(qml_path):
+                ok = points_layer.loadNamedStyle(qml_path)
+                if isinstance(ok, tuple):
+                    ok = ok[0]
+                if ok:
+                    points_layer.triggerRepaint()
+
         line_layer = VectorLayerGeometry.create_line_layer_from_points(
             points,
-            name=STR.TRACK,
+            name=track_layer_name,
             group_by_fields=["mrk_path", "mrk_file"],
             attribute_fields=[
                 "data_name",
@@ -123,8 +156,22 @@ class DroneCoordinatesRunner:
             track_layer = self._save_or_load_existing(
                 line_layer,
                 track_output_path,
-                fallback_name=STR.TRACK,
+                fallback_name=track_layer_name,
             )
+
+            # Aplicar estilo QML na trilha conforme preferência
+            if (
+                prefs.get("apply_style_track", False)
+                and track_layer
+                and track_layer.isValid()
+            ):
+                qml_path = prefs.get("qml_path_track", "").strip()
+                if qml_path and os.path.exists(qml_path):
+                    ok = track_layer.loadNamedStyle(qml_path)
+                    if isinstance(ok, tuple):
+                        ok = ok[0]
+                    if ok:
+                        track_layer.triggerRepaint()
 
         QgisMessageUtil.bar_success(self.iface, STR.CONVERT_FILE_SUCCESS, duration=4)
         if callable(self._on_finished):
@@ -157,6 +204,7 @@ class DroneCoordinatesRunner:
             output_path, tool_key=self.tool_key
         )
         if existing:
+            existing.setName(fallback_name)
             self._load_layer(existing)
             return existing
 

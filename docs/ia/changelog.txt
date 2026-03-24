@@ -1,3 +1,16 @@
+2.2.1.2
+
+- DroneCoordinatesRunner agora atribui nomes de camadas baseados no arquivo MRK (ex: `<base>_points`, `<base>_track`).
+- Corrigido para que camadas carregadas de `.gpkg` existentes também herdem o nome correto.
+
+2.2.1.1
+
+- DroneCoordinatesRunner agora lê preferências do plugin DroneCoordinates automaticamente.
+- Se "photos": true nas prefs, o Runner adiciona PhotoMetadataStep ao pipeline (mesmo que plugin).
+- Se "apply_style_points": true e qml_path_points é válido, estilo QML é aplicado aos pontos automaticamente.
+- Se "apply_style_track": true e qml_path_track é válido, estilo QML é aplicado à trilha automaticamente.
+- Runner e Plugin agora compartilham a mesma orquestração de steps e fluxo de estilos QML.
+
 2.2.1
 
 - Implementado fluxo inicial de drag and drop/importacao de arquivos `.mrk` via `QgsCustomDropHandler`.

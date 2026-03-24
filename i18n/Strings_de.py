@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 
 
-class Strings_de_DE:
+from .Strings_pt_BR import Strings_pt_BR
+
+
+class Strings_de(Strings_pt_BR):
     """Strings for German (de-DE)"""
 
     # General

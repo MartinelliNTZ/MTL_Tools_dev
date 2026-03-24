@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from .Strings_de import Strings_de
 from qgis.core import QgsApplication
 from .Strings_pt_BR import Strings_pt_BR
 
@@ -15,6 +16,8 @@ class TranslationManager:
     PORTUGUES_BR = "pt_BR"
     PORTUGES_PT = "pt_PT"
     ESPANHOL = "es"
+    ALEMAO = "de"
+    FRANCES = "fr"
 
     def __init__(self):
 
@@ -34,6 +37,8 @@ class TranslationManager:
 
         elif self.locale == self.ESPANHOL:
             self.STR = Strings_es()  # fallback
+        if self.locale == self.ALEMAO:
+            self.STR = Strings_de()  # fallback
         else:
             self.STR = Strings_pt_BR()
         self.logger.info(
