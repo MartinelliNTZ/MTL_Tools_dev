@@ -160,9 +160,7 @@ class DependenciesManager:
         return ""
 
     @staticmethod
-    def get_dependency_info(
-        dependency_name: str, toolkey=ToolKey.UNTRACEABLE
-    ) -> dict:
+    def get_dependency_info(dependency_name: str, toolkey=ToolKey.UNTRACEABLE) -> dict:
         dep_info = DependenciesManager._get_dependency_config(dependency_name, toolkey)
         return {
             "import": dep_info["import"],
@@ -172,9 +170,7 @@ class DependenciesManager:
         }
 
     @staticmethod
-    def check_dependency(
-        dependency_name: str, toolkey=ToolKey.UNTRACEABLE
-    ) -> bool:
+    def check_dependency(dependency_name: str, toolkey=ToolKey.UNTRACEABLE) -> bool:
         logger = DependenciesManager.get_logger(toolkey)
         dep_info = DependenciesManager._get_dependency_config(dependency_name, toolkey)
         module_name = dep_info["import"]
@@ -214,66 +210,7 @@ class DependenciesManager:
             return False
 
     @staticmethod
-    def get_install_script_path(
-        dependency_name: str, toolkey=ToolKey.UNTRACEABLE
-    ) -> str:
-        logger = DependenciesManager.get_logger(toolkey)
-        dep_info = DependenciesManager._get_dependency_config(dependency_name, toolkey)
-        script_name = dep_info.get("script", "")
-
-        if not script_name:
-            logger.info(
-                "Dependência não usa script externo de instalação",
-                code="INSTALL_SCRIPT_NOT_REQUIRED",
-                dependency_name=dependency_name,
-            )
-            return ""
-
-        try:
-            possible_paths = [
-                os.path.join(os.path.dirname(__file__), "..", "core", "lib", script_name),
-                os.path.join(os.path.dirname(__file__), script_name),
-            ]
-
-            for path in possible_paths:
-                abs_path = os.path.abspath(path)
-                logger.debug(
-                    "Verificando caminho de script de instalação",
-                    code="INSTALL_SCRIPT_PATH_CHECK",
-                    dependency_name=dependency_name,
-                    script_name=script_name,
-                    candidate_path=abs_path,
-                )
-                if os.path.exists(abs_path):
-                    logger.info(
-                        "Script de instalação encontrado",
-                        code="INSTALL_SCRIPT_FOUND",
-                        dependency_name=dependency_name,
-                        script_name=script_name,
-                        script_path=abs_path,
-                    )
-                    return abs_path
-
-            logger.warning(
-                "Script de instalação não encontrado",
-                code="INSTALL_SCRIPT_NOT_FOUND",
-                dependency_name=dependency_name,
-                script_name=script_name,
-            )
-            return ""
-        except Exception as exc:
-            logger.exception(
-                exc,
-                code="INSTALL_SCRIPT_PATH_ERROR",
-                dependency_name=dependency_name,
-                script_name=script_name,
-            )
-            return ""
-
-    @staticmethod
-    def install_dependency(
-        dependency_name: str, toolkey=ToolKey.UNTRACEABLE
-    ) -> bool:
+    def install_dependency(dependency_name: str, toolkey=ToolKey.UNTRACEABLE) -> bool:
         logger = DependenciesManager.get_logger(toolkey)
         dep_info = DependenciesManager._get_dependency_config(dependency_name, toolkey)
         pip_name = dep_info["pip"]
@@ -299,7 +236,14 @@ class DependenciesManager:
         try:
             started = QProcess.startDetached(
                 python_exe,
-                ["-m", "pip", "install", "--user", "--disable-pip-version-check", pip_name],
+                [
+                    "-m",
+                    "pip",
+                    "install",
+                    "--user",
+                    "--disable-pip-version-check",
+                    pip_name,
+                ],
             )
 
             if isinstance(started, tuple):
@@ -419,7 +363,14 @@ class DependenciesManager:
             proc.errorOccurred.connect(_on_error)
             proc.start(
                 python_exe,
-                ["-m", "pip", "install", "--user", "--disable-pip-version-check", pip_name],
+                [
+                    "-m",
+                    "pip",
+                    "install",
+                    "--user",
+                    "--disable-pip-version-check",
+                    pip_name,
+                ],
             )
 
             started = True

@@ -66,6 +66,13 @@ class ExportAllLayoutsDialog(BasePluginMTL):
             separator_bottom=True,
         )
         self.logger.debug("Grid de checkboxes de exportação criado")
+        chk_merge_pdf = self.checkbox_map.get("merge_pdf")
+
+        if chk_merge_pdf:
+            chk_merge_pdf.toggled.connect(self.on_merge_pdf_changed)
+        chk_merge_png = self.checkbox_map.get("merge_png")
+        if chk_merge_png:
+            chk_merge_png.toggled.connect(self.on_merge_png_changed)
 
         max_width_layout, self.max_width_input = (
             WidgetFactory.create_input_fields_widget(
@@ -122,6 +129,11 @@ class ExportAllLayoutsDialog(BasePluginMTL):
         )
 
         self.logger.info("Interface de exportação construída com sucesso")
+        
+    def on_merge_pdf_changed(self, checked: bool):
+        self.logger.debug(f"Estado do checkbox 'merge_pdf' alterado para: {checked}")
+    def on_merge_png_changed(self, checked: bool):
+        self.logger.debug(f"Estado do checkbox 'merge_png' alterado para: {checked}")
 
     def _load_prefs(self):
         self.logger.debug("Carregando preferências de exportação")
