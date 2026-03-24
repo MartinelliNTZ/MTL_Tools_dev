@@ -1,3 +1,12 @@
+2.2.1.3
+
+- Adicionada ferramenta vetorial instantanea `RemoveKmlFieldsPlugin` para remover os campos listados em `StringManager.KML_FIELDS` da camada ativa.
+- A ferramenta valida camada vetorial ativa, exige modo de edicao e nunca salva nem encerra a edicao da camada.
+- Camadas `.kml` e `.kmz` passaram a ser bloqueadas nesse fluxo com validacao por extensao do source.
+- A resolucao de extensao foi centralizada em `VectorLayerSource.get_extension(path, tool_key)`.
+- Removida de `ProjectUtils` a responsabilidade indevida de identificar extensao/tipo de source vetorial.
+- Registrada nova entrada da ferramenta na categoria `VECTOR` do `ToolRegistry` e nova `ToolKey` dedicada.
+
 2.2.1.2
 
 - DroneCoordinatesRunner agora atribui nomes de camadas baseados no arquivo MRK (ex: `<base>_points`, `<base>_track`).
