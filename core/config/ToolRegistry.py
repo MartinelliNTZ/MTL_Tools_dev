@@ -147,6 +147,18 @@ class ToolRegistry:
         )
         tools.append(vector_fields)
 
+        remove_kml_fields = Tool(
+            name=STR.REMOVE_KML_FIELDS_TITLE,
+            icon=im.icon(im.VECTOR_FIELD),
+            category=self.VECTOR,
+            tool_type=ToolTypeEnum.INSTANT,
+            executor=self.run_remove_kml_fields,
+            tooltip=STR.REMOVE_KML_FIELDS_TOOLTIP,
+            order=15,
+            show_in_toolbar=True,
+        )
+        tools.append(remove_kml_fields)
+
         coord_click = Tool(
             name=STR.COORD_CLICK_TOOL_TITLE,
             icon=im.icon(im.COORD_CLICK_TOOL),
@@ -271,6 +283,23 @@ class ToolRegistry:
             self.logger.error(f"Erro ao executar Converter para Multipart: {str(e)}")
             QgisMessageUtil.bar_critical(
                 self.iface, f"Erro no plugin Converter para Multipart: {str(e)}"
+            )
+
+    # =====================================================
+    # EXECUTAR: Remover Campos KML
+    # =====================================================
+    def run_remove_kml_fields(self):
+        try:
+            from ...plugins.RemoveKmlFieldsPlugin import RemoveKmlFieldsPlugin
+
+            self.logger.info("Iniciando plugin: Remover Campos KML")
+            self.remove_kml_fields_plugin = RemoveKmlFieldsPlugin(self.iface)
+            self.remove_kml_fields_plugin.run_remove_kml_fields()
+            self.logger.info("Plugin Remover Campos KML executado com sucesso")
+        except Exception as e:
+            self.logger.error(f"Erro ao executar Remover Campos KML: {str(e)}")
+            QgisMessageUtil.bar_critical(
+                self.iface, f"Erro no plugin Remover Campos KML: {str(e)}"
             )
 
     # =====FERRAMENTAS INSTANTANEA COM JANELA DE RESULTADOS=

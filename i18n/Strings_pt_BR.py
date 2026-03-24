@@ -198,6 +198,9 @@ class Strings_pt_BR:
         "Converter apenas as feições selecionadas para multipart?"
     )
     CONVERT_ALL_FEATURES_TO_MULTIPART = "Converter todas as feições para multipart?"
+    KML_FIELDS_REMOVED_SUCCESS = "Campos KML removidos com sucesso"
+    NO_KML_FIELDS_FOUND = "Nenhum campo KML encontrado para remover"
+    ERROR_REMOVING_KML_FIELDS = "Erro ao remover campos KML:"
 
     RASTERS = "Rasters"
     INPUT_POINTS = "Pontos de entrada"
@@ -446,4 +449,10 @@ class Strings_pt_BR:
         "Calcula automaticamente campos vetoriais como area,\n"
         "comprimento ou coordenadas X/Y na camada ativa.\n"
         "E util para gerar atributos tecnicos sem editar campo por campo."
+    )
+    REMOVE_KML_FIELDS_TITLE = "Remover Campos KML"
+    REMOVE_KML_FIELDS_TOOLTIP = (
+        "Remove da camada ativa os campos de atributos tipicos de KML.\n"
+        "A ferramenta so executa se a camada estiver em edicao\n"
+        "e nao salva nem encerra o modo de edicao."
     )

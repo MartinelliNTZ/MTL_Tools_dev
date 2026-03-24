@@ -201,6 +201,9 @@ class Strings_de(Strings_pt_BR):
         "Nur die ausgewählten Objekte in Multipart umwandeln?"
     )
     CONVERT_ALL_FEATURES_TO_MULTIPART = "Alle Objekte in Multipart umwandeln?"
+    KML_FIELDS_REMOVED_SUCCESS = "KML-Felder erfolgreich entfernt"
+    NO_KML_FIELDS_FOUND = "Keine KML-Felder zum Entfernen gefunden"
+    ERROR_REMOVING_KML_FIELDS = "Fehler beim Entfernen der KML-Felder:"
 
     RASTERS = "Raster"
     INPUT_POINTS = "Eingabepunkte"
@@ -449,4 +452,10 @@ class Strings_de(Strings_pt_BR):
         "Berechnet automatisch Vektorfelder wie Fläche,\n"
         "Länge oder X/Y-Koordinaten im aktiven Layer.\n"
         "Nützlich, um technische Attribute zu erzeugen, ohne jedes Feld einzeln bearbeiten zu müssen."
+    )
+    REMOVE_KML_FIELDS_TITLE = "KML-Felder entfernen"
+    REMOVE_KML_FIELDS_TOOLTIP = (
+        "Entfernt typische KML-Attributfelder aus dem aktiven Layer.\n"
+        "Das Werkzeug lauft nur, wenn der Layer bereits im Bearbeitungsmodus ist,\n"
+        "und speichert nicht und beendet den Bearbeitungsmodus nicht."
     )

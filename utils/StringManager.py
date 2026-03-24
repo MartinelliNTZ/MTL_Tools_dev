@@ -12,7 +12,7 @@ class StringManager:
         "RASTER": STR.MENU_RASTER,
     }
     KML_FIELDS = [
-    "description",
+    "descriptio",
     "timestamp",
     "begin",
     "end",

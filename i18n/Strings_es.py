@@ -202,6 +202,9 @@ class Strings_es(Strings_pt_BR):
         "¿Convertir solo las entidades seleccionadas a multipart?"
     )
     CONVERT_ALL_FEATURES_TO_MULTIPART = "¿Convertir todas las entidades a multipart?"
+    KML_FIELDS_REMOVED_SUCCESS = "Campos KML eliminados correctamente"
+    NO_KML_FIELDS_FOUND = "No se encontraron campos KML para eliminar"
+    ERROR_REMOVING_KML_FIELDS = "Error al eliminar campos KML:"
 
     RASTERS = "Rasters"
     INPUT_POINTS = "Puntos de entrada"
@@ -452,4 +455,10 @@ class Strings_es(Strings_pt_BR):
         "longitud o coordenadas X/Y en la capa activa.\n"
         "Útil para generar atributos técnicos\n"
         "sin edición manual campo por campo."
+    )
+    REMOVE_KML_FIELDS_TITLE = "Eliminar Campos KML"
+    REMOVE_KML_FIELDS_TOOLTIP = (
+        "Elimina de la capa activa los campos de atributos tipicos de KML.\n"
+        "La herramienta solo se ejecuta si la capa ya esta en edicion\n"
+        "y no guarda ni cierra el modo de edicion."
     )

@@ -43,6 +43,25 @@ class ProjectUtils:
             )
         return layer.isEditable()
 
+    @staticmethod
+    def is_kml_or_kmz_layer(layer, logger=None):
+        """Verifica se a source da camada aponta para KML/KMZ."""
+        if not layer or not isinstance(layer, QgsVectorLayer):
+            return False
+
+        source = (layer.source() or "").lower()
+        normalized_source = source.split("|", 1)[0]
+        is_kml_or_kmz = normalized_source.endswith(".kml") or normalized_source.endswith(
+            ".kmz"
+        )
+
+        if logger:
+            logger.debug(
+                f"Verificando se camada Ã© KML/KMZ: {layer.name()}. Resultado: {is_kml_or_kmz}"
+            )
+
+        return is_kml_or_kmz
+
     """
     Utilitários relacionados ao projeto QGIS (.qgz).
     Não possui dependência de UI.

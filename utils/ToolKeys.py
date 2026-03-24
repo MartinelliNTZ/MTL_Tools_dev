@@ -15,6 +15,7 @@ class ToolKey:
     COORD_CLICK_TOOL = "coord_click_tool"
     COPY_ATTRIBUTES = "copy_attributes"
     CONVERTER_MULTIPART = "converter_multipart"
+    REMOVE_KML_FIELDS = "remove_kml_fields"
     SETTINGS = "settings"
     SYSTEM = "SYSTEM"  # para logs genéricos do sistema, sem tool específica
     VECTOR_FIELDS = "vector_fields"
@@ -44,6 +45,7 @@ class ToolKey:
         COORD_CLICK_TOOL: "#85C1E9",  # azul céu → map tool
         COPY_ATTRIBUTES: "#DDA0DD",  # plum → dados / atributos
         CONVERTER_MULTIPART: "#F5A962",  # laranja-pêssego → conversão geométrica
+        REMOVE_KML_FIELDS: "#58D68D",  # verde → limpeza de atributos KML
         SETTINGS: "#95A5A6",  # cinza → configurações / sistema
         VECTOR_FIELDS: "#C39BD3",  # púrpura → cálculos vetoriais
         # === Processing / análises ===

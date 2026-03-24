@@ -19,6 +19,32 @@ class VectorLayerAttributes:
             )
         return layer.featureCount() > 0
 
+    @staticmethod
+    def delete_fields_by_names(layer, field_names, logger=None):
+        """Remove apenas os campos existentes informados."""
+        if not layer or not layer.isValid():
+            return 0
+
+        field_indexes = []
+        for field_name in field_names:
+            idx = layer.fields().lookupField(field_name)
+            if idx != -1:
+                field_indexes.append(idx)
+
+        if not field_indexes:
+            if logger:
+                logger.debug("Nenhum campo encontrado para remoÃ§Ã£o")
+            return 0
+
+        if logger:
+            logger.debug(f"Removendo campos nos Ã­ndices: {field_indexes}")
+
+        if not layer.deleteAttributes(field_indexes):
+            raise RuntimeError("Falha ao remover campos da camada")
+
+        layer.updateFields()
+        return len(field_indexes)
+
     """
     Responsável por campos e atributos de camadas vetoriais.
 

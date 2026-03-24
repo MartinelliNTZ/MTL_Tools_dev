@@ -198,6 +198,9 @@ class Strings_en(Strings_pt_BR):
         "Convert only the selected features to multipart?"
     )
     CONVERT_ALL_FEATURES_TO_MULTIPART = "Convert all features to multipart?"
+    KML_FIELDS_REMOVED_SUCCESS = "KML fields removed successfully"
+    NO_KML_FIELDS_FOUND = "No KML fields found to remove"
+    ERROR_REMOVING_KML_FIELDS = "Error removing KML fields:"
     RANGE = "Range"
     RASTERS = "Rasters"
     INPUT_POINTS = "Input points"
@@ -433,4 +436,10 @@ class Strings_en(Strings_pt_BR):
         "length, or X/Y coordinates in the active layer.\n"
         "Useful for generating technical attributes\n"
         "without manual field editing."
+    )
+    REMOVE_KML_FIELDS_TITLE = "Remove KML Fields"
+    REMOVE_KML_FIELDS_TOOLTIP = (
+        "Removes typical KML attribute fields from the active layer.\n"
+        "The tool only runs when the layer is already in edit mode\n"
+        "and never saves or leaves edit mode."
     )
