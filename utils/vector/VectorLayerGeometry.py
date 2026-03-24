@@ -19,6 +19,7 @@ from qgis.PyQt.QtCore import QVariant
 
 
 from ...core.config.LogUtils import LogUtils
+from ..ToolKeys import ToolKey
 import processing
 
 
@@ -52,7 +53,7 @@ class VectorLayerGeometry:
     """
 
     @staticmethod
-    def _get_logger(tool_key: str = "untraceable") -> LogUtils:
+    def _get_logger(tool_key: str = ToolKey.UNTRACEABLE) -> LogUtils:
         """Helper para obter logger com tool_key específico.
 
         Parameters
@@ -72,8 +73,13 @@ class VectorLayerGeometry:
         points: list,
         name: str = "MRK_Pontos",
         extra_fields: Optional[dict] = None,
+        tool_key: str = ToolKey.UNTRACEABLE,
     ) -> Optional[QgsVectorLayer]:
         """Cria uma camada de pontos em memória a partir de uma lista de dicionários."""
+        logger = VectorLayerGeometry._get_logger(tool_key)
+        logger.debug(
+            f"create_point_layer_from_dicts(points={len(points) if points else 0}, name={name}, extra_fields={list(extra_fields.keys()) if extra_fields else None})"
+        )
         if not points:
             return None
 
@@ -129,12 +135,17 @@ class VectorLayerGeometry:
         name: str = "Trilha",
         group_by_fields: list = None,
         attribute_fields: list = None,
+        tool_key: str = ToolKey.UNTRACEABLE,
     ) -> Optional[QgsVectorLayer]:
         """Cria linha(s) em memória a partir de pontos.
 
         group_by_fields: lista de campos para agrupar em várias linhas.
         attribute_fields: lista de campos a serem incluidos no layer de saída.
         """
+        logger = VectorLayerGeometry._get_logger(tool_key)
+        logger.debug(
+            f"create_line_layer_from_points(points={len(points) if points else 0}, name={name}, group_by_fields={group_by_fields}, attribute_fields={attribute_fields})"
+        )
         if not points:
             return None
 
@@ -163,7 +174,8 @@ class VectorLayerGeometry:
             # Ordenar por foto se existir
             try:
                 group = sorted(group, key=lambda x: int(x.get("foto", 0)))
-            except Exception:
+            except Exception as e:
+                logger.error(f"Erro ordenando pontos para linha: {e}")
                 return None
 
             geometry = QgsGeometry.fromPolylineXY(
@@ -213,14 +225,14 @@ class VectorLayerGeometry:
         join_style: int = 1,
         miter_limit: float = 2.0,
         dissolve: bool = False,
-        external_tool_key="untraceable",
+        external_tool_key=ToolKey.UNTRACEABLE,
     ) -> Optional[QgsVectorLayer]:
         """Cria buffer ao redor das geometrias com distância e número de segmentos especificados."""
         logger = VectorLayerGeometry._get_logger(external_tool_key)
         logger.debug(
             f"create_buffer_geometry: distance={distance}, segments={segments}, dissolve={dissolve}"
         )
-        if VectorLayerGeometry.get_layer_type(layer) not in (
+        if VectorLayerGeometry.get_layer_type(layer, tool_key=external_tool_key) not in (
             QgsWkbTypes.PointGeometry,
             QgsWkbTypes.LineGeometry,
             QgsWkbTypes.PolygonGeometry,
@@ -256,7 +268,7 @@ class VectorLayerGeometry:
         join_style: int = 1,
         miter_limit: float = 2.0,
         dissolve: bool = False,
-        external_tool_key="untraceable",
+        external_tool_key=ToolKey.UNTRACEABLE,
         feedback=None,
     ) -> str:
         """
@@ -290,11 +302,13 @@ class VectorLayerGeometry:
         return output_path
 
     def explode_multipart_features(
-        *, layer: QgsVectorLayer, external_tool_key="untraceable"
+        *, layer: QgsVectorLayer, external_tool_key=ToolKey.UNTRACEABLE
     ) -> Optional[QgsVectorLayer]:
         """Explode feições multipart em feições simples."""
 
-        if VectorLayerGeometry.get_layer_type(layer) == QgsWkbTypes.LineGeometry:
+        logger = VectorLayerGeometry._get_logger(external_tool_key)
+        logger.debug(f"explode_multipart_features(layer={layer})")
+        if VectorLayerGeometry.get_layer_type(layer, tool_key=external_tool_key) == QgsWkbTypes.LineGeometry:
             result = processing.run(
                 "native:explodelines",
                 {"INPUT": layer, "OUTPUT": "memory:"},
@@ -305,7 +319,7 @@ class VectorLayerGeometry:
 
     @staticmethod
     def explode_lines_to_path(
-        *, input_path: str, output_path: str, external_tool_key="untraceable"
+        *, input_path: str, output_path: str, external_tool_key=ToolKey.UNTRACEABLE
     ) -> str:
         """
         Explode linhas usando arquivos físicos.
@@ -325,7 +339,7 @@ class VectorLayerGeometry:
 
     @staticmethod
     def explode_lines_to_path_safe(
-        *, layer: QgsVectorLayer, output_path: str, external_tool_key="untraceable"
+        *, layer: QgsVectorLayer, output_path: str, external_tool_key=ToolKey.UNTRACEABLE
     ) -> str:
         """
         Explode linhas (LineString / MultiLineString) manualmente.
@@ -395,9 +409,11 @@ class VectorLayerGeometry:
         return output_path
 
     @staticmethod
-    def get_layer_type(layer: QgsVectorLayer) -> Optional[str]:
-        logger = VectorLayerGeometry._get_logger()
-        logger.debug("get_layer_type called")
+    def get_layer_type(
+        layer: QgsVectorLayer, tool_key: str = ToolKey.UNTRACEABLE
+    ) -> Optional[str]:
+        logger = VectorLayerGeometry._get_logger(tool_key)
+        logger.debug(f"get_layer_type(layer={layer})")
         if not isinstance(layer, QgsVectorLayer):
             return None
 
@@ -416,9 +432,11 @@ class VectorLayerGeometry:
         return None
 
     @staticmethod
-    def get_selected_features(layer: QgsVectorLayer):
-        logger = VectorLayerGeometry._get_logger()
-        logger.debug("get_selected_features called")
+    def get_selected_features(
+        layer: QgsVectorLayer, tool_key: str = ToolKey.UNTRACEABLE
+    ):
+        logger = VectorLayerGeometry._get_logger(tool_key)
+        logger.debug(f"get_selected_features(layer={layer})")
         if not isinstance(layer, QgsVectorLayer):
             return None, "Layer inválido"
 
@@ -438,9 +456,13 @@ class VectorLayerGeometry:
         return mem_layer, None
 
     @staticmethod
-    def singleparts_to_multparts(layer, feedback=None, only_selected=False):
-        logger = VectorLayerGeometry._get_logger()
-        logger.debug("singleparts_to_multparts start")
+    def singleparts_to_multparts(
+        layer, feedback=None, only_selected=False, tool_key: str = ToolKey.UNTRACEABLE
+    ):
+        logger = VectorLayerGeometry._get_logger(tool_key)
+        logger.debug(
+            f"singleparts_to_multparts(layer={layer}, only_selected={only_selected}, feedback={feedback})"
+        )
         if not isinstance(layer, QgsVectorLayer):
             return False
 
@@ -498,51 +520,79 @@ class VectorLayerGeometry:
         return True
 
     def get_geometry_difference(
-        self, geometry1, geometry2, external_tool_key="untraceable"
+        self, geometry1, geometry2, external_tool_key=ToolKey.UNTRACEABLE
     ):
         """Calcula a diferença entre duas geometrias."""
+        logger = VectorLayerGeometry._get_logger(external_tool_key)
+        logger.debug(
+            f"get_geometry_difference(geometry1={geometry1}, geometry2={geometry2})"
+        )
         pass
 
     def convert_geometry_type(
-        self, layer, target_type, external_tool_key="untraceable"
+        self, layer, target_type, external_tool_key=ToolKey.UNTRACEABLE
     ):
         """Converte geometrias para um tipo diferente quando possível."""
+        logger = VectorLayerGeometry._get_logger(external_tool_key)
+        logger.debug(f"convert_geometry_type(layer={layer}, target_type={target_type})")
         pass
 
-    def simplify_geometry(self, layer, tolerance, external_tool_key="untraceable"):
+    def simplify_geometry(self, layer, tolerance, external_tool_key=ToolKey.UNTRACEABLE):
         """Simplifica geometrias reduzindo vértices mantendo forma geral."""
+        logger = VectorLayerGeometry._get_logger(external_tool_key)
+        logger.debug(f"simplify_geometry(layer={layer}, tolerance={tolerance})")
         pass
 
     def smooth_geometry(
-        self, layer, smoothing_iterations, external_tool_key="untraceable"
+        self, layer, smoothing_iterations, external_tool_key=ToolKey.UNTRACEABLE
     ):
         """Suaviza geometrias através de algoritmo iterativo."""
+        logger = VectorLayerGeometry._get_logger(external_tool_key)
+        logger.debug(
+            f"smooth_geometry(layer={layer}, smoothing_iterations={smoothing_iterations})"
+        )
         pass
 
-    def validate_geometry(self, geometry, external_tool_key="untraceable"):
+    def validate_geometry(self, geometry, external_tool_key=ToolKey.UNTRACEABLE):
         """Verifica se uma geometria é válida e sem problemas topológicos."""
+        logger = VectorLayerGeometry._get_logger(external_tool_key)
+        logger.debug(f"validate_geometry(geometry={geometry})")
         pass
 
-    def fix_invalid_geometry(self, geometry, external_tool_key="untraceable"):
+    def fix_invalid_geometry(self, geometry, external_tool_key=ToolKey.UNTRACEABLE):
         """Tenta corrigir automaticamente uma geometria inválida."""
+        logger = VectorLayerGeometry._get_logger(external_tool_key)
+        logger.debug(f"fix_invalid_geometry(geometry={geometry})")
         pass
 
     def get_geometry_intersection(
-        self, geometry1, geometry2, external_tool_key="untraceable"
+        self, geometry1, geometry2, external_tool_key=ToolKey.UNTRACEABLE
     ):
         """Calcula a interseção entre duas geometrias."""
+        logger = VectorLayerGeometry._get_logger(external_tool_key)
+        logger.debug(
+            f"get_geometry_intersection(geometry1={geometry1}, geometry2={geometry2})"
+        )
         pass
 
-    def get_geometry_union(self, geometry1, geometry2, external_tool_key="untraceable"):
+    def get_geometry_union(self, geometry1, geometry2, external_tool_key=ToolKey.UNTRACEABLE):
         """Calcula a união entre duas geometrias."""
+        logger = VectorLayerGeometry._get_logger(external_tool_key)
+        logger.debug(f"get_geometry_union(geometry1={geometry1}, geometry2={geometry2})")
         pass
 
     def dissolve_geometries_by_attribute(
-        self, layer, dissolve_field, external_tool_key="untraceable"
+        self, layer, dissolve_field, external_tool_key=ToolKey.UNTRACEABLE
     ):
         """Dissolve geometrias agrupadas por um atributo específico."""
+        logger = VectorLayerGeometry._get_logger(external_tool_key)
+        logger.debug(
+            f"dissolve_geometries_by_attribute(layer={layer}, dissolve_field={dissolve_field})"
+        )
         pass
 
-    def merge_geometries(self, geometries_list, external_tool_key="untraceable"):
+    def merge_geometries(self, geometries_list, external_tool_key=ToolKey.UNTRACEABLE):
         """Combina múltiplas geometrias em uma única geometria multipart."""
+        logger = VectorLayerGeometry._get_logger(external_tool_key)
+        logger.debug(f"merge_geometries(geometries_list={geometries_list})")
         pass

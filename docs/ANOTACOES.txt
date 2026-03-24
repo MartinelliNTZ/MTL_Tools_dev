@@ -28,11 +28,16 @@ Documentação de cenarios: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13
 Instrucoes: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18
 Traducao: 9
   - Geral: Impedir múltiplas instâncias de plugins rodando simultaneamente
+  - criar gerador de indices ndvi, ndre, e gli automaticos
   - multpart nao ta em task e pode bugar
   - tentar usar o visualizador de resultados do processing para mostrar o resultado do processing
   - eLIMIAR TODOS OS untraceable exceptions e garantir que tudo seja logado
   - Usar iconManager para carregar ícones de forma centralizada e eficiente
  changelog=
+  2.2.2 
+    - Correção crítica: DroneCoordinatesRunner agora atribui nomes de camadas baseados no arquivo MRK, garantindo que camadas de pontos e trilha tenham nomes distintos e localizados. Camadas carregadas de arquivos .gpkg existentes também herdam o nome correto, evitando confusão e melhorando a organização do projeto.
+    - Nova ferramenta vetorial instantânea `RemoveKmlFieldsPlugin` adicionada para remover campos específicos de camadas vetoriais, com validação rigorosa para garantir que apenas camadas compatíveis sejam processadas, prevenindo erros e garantindo integridade dos dados.
+  2.2.0
   2.1.5 2026/03/22
     - Correção crítica: LogUtils agora é inicializado antes de qualquer outro componente, garantindo que o logger esteja disponível para todos os logs, incluindo erros de inicialização do plugin. Logs de inicialização do PluginBootstrap e TranslationManager confirmam que o logger está ativo desde o início, prevenindo falhas silenciosas e garantindo que quaisquer erros durante a carga sejam capturados no log do plugin.
     - Traducao En e Es finalizada
