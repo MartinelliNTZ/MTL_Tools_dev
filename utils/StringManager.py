@@ -11,6 +11,18 @@ class StringManager:
         "AGRICULTURE": STR.MENU_AGRICULTURE,
         "RASTER": STR.MENU_RASTER,
     }
+    KML_FIELDS = [
+    "description",
+    "timestamp",
+    "begin",
+    "end",
+    "altitudeMo",
+    "tessellate",
+    "extrude",
+    "visibility",
+    "drawOrder",
+    "icon",
+]
 
     # Filtros de arquivos
     FILTER_ALL = "All files (*.*)"
