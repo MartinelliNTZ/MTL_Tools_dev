@@ -215,7 +215,7 @@ class Strings_es(Strings_pt_BR):
     DEPENDENCY = "Dependencia"
     INSTALLED_SUCCESSFULLY = "instalada correctamente."
     SUCCESS = "Éxito"
-    INSTALL_DEPENDENCY_FAILED = "No se pudo iniciar la instalación de la biblioteca {0}."
+    INSTALL_DEPENDENCY_FAILED = "No se pudo iniciar la instalación de la biblioteca."
     REPROJECT_OUTPUT_LAYER_OPTIONAL = "Reproyectar capa de salida (opcional)"
     SAMPLED_VALUES = "Valores_Muestreados"
     OPEN_OUTPUT_FOLDER = "Abrir carpeta de salida"
