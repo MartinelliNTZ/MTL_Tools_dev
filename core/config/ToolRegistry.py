@@ -149,7 +149,7 @@ class ToolRegistry:
 
         remove_kml_fields = Tool(
             name=STR.REMOVE_KML_FIELDS_TITLE,
-            icon=im.icon(im.VECTOR_FIELD),
+            icon=im.icon(im.CADMUS_ICON),
             category=self.VECTOR,
             tool_type=ToolTypeEnum.INSTANT,
             executor=self.run_remove_kml_fields,

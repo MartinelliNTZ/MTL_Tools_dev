@@ -30,14 +30,24 @@ Traducao: 9
   - Geral: Impedir múltiplas instâncias de plugins rodando simultaneamente
   - criar gerador de indices ndvi, ndre, e gli automaticos
   - multpart nao ta em task e pode bugar
+  - criar 2 ico de plugins 
   - tentar usar o visualizador de resultados do processing para mostrar o resultado do processing
   - eLIMIAR TODOS OS untraceable exceptions e garantir que tudo seja logado
   - Usar iconManager para carregar ícones de forma centralizada e eficiente
+  - vetor para svg
  changelog=
-  2.2.2 
+  2.2.2 2026/03/23
     - Correção crítica: DroneCoordinatesRunner agora atribui nomes de camadas baseados no arquivo MRK, garantindo que camadas de pontos e trilha tenham nomes distintos e localizados. Camadas carregadas de arquivos .gpkg existentes também herdam o nome correto, evitando confusão e melhorando a organização do projeto.
     - Nova ferramenta vetorial instantânea `RemoveKmlFieldsPlugin` adicionada para remover campos específicos de camadas vetoriais, com validação rigorosa para garantir que apenas camadas compatíveis sejam processadas, prevenindo erros e garantindo integridade dos dados.
-  2.2.0
+  2.2.1 2026/03/23
+    - Implementação do fluxo de drag and drop para arquivos .mrk, permitindo importação rápida e intuitiva de coordenadas de drone. O sistema agora suporta processamento automático dos arquivos MRK, geração de camadas de pontos e trilha, e aplicação de estilos QML conforme as preferências do usuário, proporcionando uma experiência integrada e eficiente.
+  2.2.0 2026/03/23
+    - Toolbar agora exibe ícones corretamente
+    - Botões dropdown funcionam conforme esperado
+    - Menus e toolbars não duplicam mais ao recarregar o plugin
+    - Tradução completa em Português, Espanhol e Inglês
+    - Todas as telas e mensagens agora aparecem no idioma configurado no QGIS
+    - Plugin inicia mais rápido e de forma mais confiável
   2.1.5 2026/03/22
     - Correção crítica: LogUtils agora é inicializado antes de qualquer outro componente, garantindo que o logger esteja disponível para todos os logs, incluindo erros de inicialização do plugin. Logs de inicialização do PluginBootstrap e TranslationManager confirmam que o logger está ativo desde o início, prevenindo falhas silenciosas e garantindo que quaisquer erros durante a carga sejam capturados no log do plugin.
     - Traducao En e Es finalizada
