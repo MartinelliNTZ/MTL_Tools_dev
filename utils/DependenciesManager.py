@@ -19,6 +19,8 @@ from qgis.PyQt.QtWidgets import QProgressDialog
 
 from ..core.config.LogUtils import LogUtils
 from .ToolKeys import ToolKey
+from ..utils.QgisMessageUtil import QgisMessageUtils
+from ..i18n.TranslationManager import STR
 
 
 class DependenciesManager:
@@ -339,6 +341,7 @@ class DependenciesManager:
                         dependency_name=dependency_name,
                         pip_name=pip_name,
                     )
+                    
                 else:
                     logger.error(
                         "Instalação GUI concluída com erro",

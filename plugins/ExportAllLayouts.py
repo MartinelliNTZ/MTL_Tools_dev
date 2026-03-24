@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 import os
 import re
-from qgis.core import QgsProject, QgsLayoutExporter
+
 from qgis.PyQt.QtCore import QCoreApplication
+from qgis.core import QgsLayoutExporter, QgsProject
+
+from ..core.ui.ProgressDialog import ProgressDialog
+from ..core.ui.WidgetFactory import WidgetFactory
+from ..i18n.TranslationManager import STR
 from ..plugins.BasePlugin import BasePluginMTL
-from ..utils.Preferences import load_tool_prefs, save_tool_prefs
-from ..utils.PDFUtils import PDFUtils
 from ..utils.DependenciesManager import DependenciesManager
+from ..utils.PDFUtils import PDFUtils
+from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.ToolKeys import ToolKey
-from ..core.ui.WidgetFactory import WidgetFactory
-from ..core.ui.ProgressDialog import ProgressDialog
-from ..i18n.TranslationManager import STR
 
 
 class ExportAllLayoutsDialog(BasePluginMTL):
@@ -38,6 +40,7 @@ class ExportAllLayoutsDialog(BasePluginMTL):
     def __init__(self, iface):
         super().__init__(iface.mainWindow())
         self.iface = iface
+        self._suppress_merge_dependency_check = False
 
         self.init(
             self.TOOL_KEY,
@@ -66,13 +69,14 @@ class ExportAllLayoutsDialog(BasePluginMTL):
             separator_bottom=True,
         )
         self.logger.debug("Grid de checkboxes de exportação criado")
-        chk_merge_pdf = self.checkbox_map.get("merge_pdf")
 
-        if chk_merge_pdf:
-            chk_merge_pdf.toggled.connect(self.on_merge_pdf_changed)
-        chk_merge_png = self.checkbox_map.get("merge_png")
-        if chk_merge_png:
-            chk_merge_png.toggled.connect(self.on_merge_png_changed)
+        self.chk_merge_pdf = self.checkbox_map.get("merge_pdf")
+        if self.chk_merge_pdf:
+            self.chk_merge_pdf.toggled.connect(self.on_merge_pdf_changed)
+
+        self.chk_merge_png = self.checkbox_map.get("merge_png")
+        if self.chk_merge_png:
+            self.chk_merge_png.toggled.connect(self.on_merge_png_changed)
 
         max_width_layout, self.max_width_input = (
             WidgetFactory.create_input_fields_widget(
@@ -129,31 +133,94 @@ class ExportAllLayoutsDialog(BasePluginMTL):
         )
 
         self.logger.info("Interface de exportação construída com sucesso")
-        
+
+    def _ensure_merge_dependency(
+        self, *, checkbox_key: str, dependency_name: str, message: str
+    ) -> bool:
+        if DependenciesManager.check_dependency(dependency_name, self.TOOL_KEY):
+            self.logger.info(
+                f"Dependência {dependency_name} disponível para {checkbox_key}"
+            )
+            return True
+
+        confirmed = QgisMessageUtil.confirm(
+            self.iface,
+            message,
+            STR.REQUIRED_LIBRARY,
+        )
+
+        if not confirmed:
+            self.logger.info(
+                f"Usuário recusou instalação de {dependency_name}; desmarcando {checkbox_key}"
+            )
+            self.checkbox_map.get(checkbox_key).setChecked(False)
+            return False
+
+        started = DependenciesManager.install_dependency_gui(
+            dependency_name, self.iface, self.TOOL_KEY
+        )
+
+        if not started:
+            self.logger.warning(
+                f"Não foi possível iniciar instalação de {dependency_name}; desmarcando {checkbox_key}"
+            )
+            QgisMessageUtil.modal_error(
+                self.iface,
+                f"Não foi possível iniciar a instalação da biblioteca {dependency_name}.",
+            )
+            self.checkbox_map.get(checkbox_key).setChecked(False)
+            return False
+
+        self.logger.info(
+            f"Instalação de {dependency_name} iniciada a partir do checkbox {checkbox_key}"
+        )
+        return True
+
     def on_merge_pdf_changed(self, checked: bool):
         self.logger.debug(f"Estado do checkbox 'merge_pdf' alterado para: {checked}")
+        if self._suppress_merge_dependency_check or not checked:
+            return
+
+        self._ensure_merge_dependency(
+            checkbox_key="merge_pdf",
+            dependency_name="colorama",
+            message=STR.PYPDF2_REQUIRED_MESSAGE,
+        )
+
     def on_merge_png_changed(self, checked: bool):
         self.logger.debug(f"Estado do checkbox 'merge_png' alterado para: {checked}")
+        if self._suppress_merge_dependency_check or not checked:
+            return
+
+        self._ensure_merge_dependency(
+            checkbox_key="merge_png",
+            dependency_name="Pillow",
+            message=STR.PILLOW_REQUIRED_MESSAGE,
+        )
 
     def _load_prefs(self):
         self.logger.debug("Carregando preferências de exportação")
         self.preferences = load_tool_prefs(self.TOOL_KEY)
 
-        self.checkbox_map["export_pdf"].setChecked(
-            self.preferences.get("export_pdf", True)
-        )
-        self.checkbox_map["export_png"].setChecked(
-            self.preferences.get("export_png", True)
-        )
-        self.checkbox_map["merge_pdf"].setChecked(
-            self.preferences.get("merge_pdf", False)
-        )
-        self.checkbox_map["merge_png"].setChecked(
-            self.preferences.get("merge_png", False)
-        )
-        self.checkbox_map["replace_existing"].setChecked(
-            self.preferences.get("replace_existing", False)
-        )
+        self._suppress_merge_dependency_check = True
+        try:
+            self.checkbox_map["export_pdf"].setChecked(
+                self.preferences.get("export_pdf", True)
+            )
+            self.checkbox_map["export_png"].setChecked(
+                self.preferences.get("export_png", True)
+            )
+            self.checkbox_map["merge_pdf"].setChecked(
+                self.preferences.get("merge_pdf", False)
+            )
+            self.checkbox_map["merge_png"].setChecked(
+                self.preferences.get("merge_png", False)
+            )
+            self.checkbox_map["replace_existing"].setChecked(
+                self.preferences.get("replace_existing", False)
+            )
+        finally:
+            self._suppress_merge_dependency_check = False
 
         max_width = self.preferences.get("max_width", 3500)
         self.max_width_input.set_value("max_width", max_width)
@@ -232,31 +299,20 @@ class ExportAllLayoutsDialog(BasePluginMTL):
         if merge_pdf and not DependenciesManager.check_dependency(
             "PyPDF2", self.TOOL_KEY
         ):
-            if QgisMessageUtil.confirm(
-                self.iface,
-                STR.PYPDF2_REQUIRED_MESSAGE,
-                STR.REQUIRED_LIBRARY,
-            ):
-                DependenciesManager.install_dependency_gui(
-                    "PyPDF2", self.iface, self.TOOL_KEY
-                )
+            self.logger.warning(
+                "Merge de PDF solicitado sem PyPDF2 disponível; merge será ignorado"
+            )
+            merge_pdf = False
+            self.checkbox_map.get("merge_pdf").setChecked(False)
 
-            else:
-                merge_pdf = False
-        self.testar_dependencia_txt()
         if merge_png and not DependenciesManager.check_dependency(
             "Pillow", self.TOOL_KEY
         ):
-            if QgisMessageUtil.confirm(
-                self.iface,
-                STR.PILLOW_REQUIRED_MESSAGE,
-                STR.REQUIRED_LIBRARY,
-            ):
-                DependenciesManager.install_dependency_gui(
-                    "Pillow", self.iface, self.TOOL_KEY
-                )
-            else:
-                merge_png = False
+            self.logger.warning(
+                "Merge de PNG solicitado sem Pillow disponível; merge será ignorado"
+            )
+            merge_png = False
+            self.checkbox_map.get("merge_png").setChecked(False)
 
         project = QgsProject.instance()
         layouts = project.layoutManager().layouts()
