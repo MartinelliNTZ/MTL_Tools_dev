@@ -225,6 +225,7 @@ class Strings_de(Strings_pt_BR):
     DEPENDENCY = "Abhängigkeit"
     INSTALLED_SUCCESSFULLY = "erfolgreich installiert."
     SUCCESS = "Erfolg"
+    INSTALL_DEPENDENCY_FAILED = "Installation der Bibliothek {0} konnte nicht gestartet werden."
     CLIP_PER_EACH_POLYGON = "Pro Polygon zuschneiden"
     APPLY_CORRECTION_BUFFER_PIXEL_1_1 = "Korrekturpuffer anwenden (Pixel * 1,1)"
     RASTER_FOLDER_OR_SELECT_RASTER_LAYERS = (

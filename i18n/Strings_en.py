@@ -204,6 +204,7 @@ class Strings_en(Strings_pt_BR):
     INSTALLING_DEPENDENCIES = "Installing dependencies"
     DEPENDENCY = "Dependency"
     INSTALLED_SUCCESSFULLY = "installed successfully."
+    SUCCESS = "Success"
     INSTALL_DEPENDENCY_FAILED = "Failed to start installation of the {0} library."
     KML_FIELDS_REMOVED_SUCCESS = "KML fields removed successfully"
     NO_KML_FIELDS_FOUND = "No KML fields found to remove"
