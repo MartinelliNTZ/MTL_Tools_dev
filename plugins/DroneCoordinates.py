@@ -14,6 +14,9 @@ from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.ToolKeys import ToolKey
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..i18n.TranslationManager import STR
+from ..utils.DependenciesManager import DependenciesManager
+from ..utils.QgisMessageUtil import QgisMessageUtil
+
 
 
 class DroneCordinates(BasePluginMTL):
@@ -69,6 +72,11 @@ class DroneCordinates(BasePluginMTL):
             separator_bottom=False,
         )
         self.opts_collapsible.add_content_layout(opts_checkbox_layout)
+
+        # Connect checkbox toggles for dependency checks
+        self.chk_photos = self.checkbox_map.get("photos")
+        if self.chk_photos:
+            self.chk_photos.toggled.connect(self.on_photos_changed)
 
         # ====== SALVAMENTO (CollapsibleParametersWidget) ======
         save_layout, self.save_collapsible = (
@@ -150,6 +158,37 @@ class DroneCordinates(BasePluginMTL):
             [folder_layout, opts_layout, save_layout, styles_layout, buttons_layout]
         )
 
+    def _ensure_photos_dependency(self, checked: bool):
+        if not checked:
+            return
+
+        if DependenciesManager.check_dependency("Pillow", self.TOOL_KEY):
+            return
+
+        confirmed = QgisMessageUtil.confirm(
+            self.iface,
+            STR.PHOTOS_METADATA_REQUIRED_MESSAGE,
+            STR.REQUIRED_LIBRARY,
+        )
+
+        if not confirmed:
+            self.chk_photos.setChecked(False)
+            return
+
+        started = DependenciesManager.install_dependency_gui(
+            "Pillow", self.iface, self.TOOL_KEY
+        )
+
+        if not started:
+            QgisMessageUtil.modal_error(
+                self.iface,
+                STR.INSTALL_DEPENDENCY_FAILED.format("Pillow"),
+            )
+            self.chk_photos.setChecked(False)
+
+    def on_photos_changed(self, checked: bool):
+        self._ensure_photos_dependency(checked)
+
     def _load_prefs(self):
         self.logger.debug("Carregando preferências", code="PREFS_LOAD_START")
         prefs = load_tool_prefs(self.TOOL_KEY)
@@ -226,6 +265,13 @@ class DroneCordinates(BasePluginMTL):
 
         recursive = self.checkbox_map["recursive"].isChecked()
         apply_photos = self.checkbox_map["photos"].isChecked()
+
+        if apply_photos and not DependenciesManager.check_dependency("Pillow", self.TOOL_KEY):
+            self.logger.warning(
+                "Cruzamento com metadados solicitado sem Pillow disponível; será ignorado"
+            )
+            apply_photos = False
+            self.checkbox_map["photos"].setChecked(False)
 
         extra_fields = PhotoMetadata.FIELDS_PHOTO if apply_photos else None
 

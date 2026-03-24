@@ -204,7 +204,7 @@ class Strings_en(Strings_pt_BR):
     INSTALLING_DEPENDENCIES = "Installing dependencies"
     DEPENDENCY = "Dependency"
     INSTALLED_SUCCESSFULLY = "installed successfully."
-    SUCCESS = "Success"
+    INSTALL_DEPENDENCY_FAILED = "Failed to start installation of the {0} library."
     KML_FIELDS_REMOVED_SUCCESS = "KML fields removed successfully"
     NO_KML_FIELDS_FOUND = "No KML fields found to remove"
     ERROR_REMOVING_KML_FIELDS = "Error removing KML fields:"
@@ -329,6 +329,7 @@ class Strings_en(Strings_pt_BR):
     )
     RECURSIVE_SEARCH = "Search subfolders"
     PHOTOS_METADATA = "Match with photo metadata"
+    PHOTOS_METADATA_REQUIRED_MESSAGE = "To match with photo metadata, the Pillow package is required.\n\nWould you like to install it now?"
     MRK_FOLDER = "MRK folder:"
     SAVE_POINTS_CHECKBOX = "Save MRK points to file?"
     SAVE_IN = "Save to:"

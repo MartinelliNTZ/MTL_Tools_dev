@@ -214,7 +214,7 @@ class Strings_es(Strings_pt_BR):
     INSTALLING_DEPENDENCIES = "Instalando dependencias"
     DEPENDENCY = "Dependencia"
     INSTALLED_SUCCESSFULLY = "instalada correctamente."
-    SUCCESS = "Éxito"
+    INSTALL_DEPENDENCY_FAILED = "No se pudo iniciar la instalación de la biblioteca {0}."
     REPROJECT_OUTPUT_LAYER_OPTIONAL = "Reproyectar capa de salida (opcional)"
     SAMPLED_VALUES = "Valores_Muestreados"
     OPEN_OUTPUT_FOLDER = "Abrir carpeta de salida"
@@ -348,6 +348,7 @@ class Strings_es(Strings_pt_BR):
     )
     RECURSIVE_SEARCH = "Buscar en subcarpetas"
     PHOTOS_METADATA = "Cruzar con metadatos de fotos"
+    PHOTOS_METADATA_REQUIRED_MESSAGE = "Para cruzar con metadatos de fotos es necesario instalar el paquete Pillow.\n\n¿Desea instalarlo ahora?"
     MRK_FOLDER = "Carpeta MRK:"
     SAVE_POINTS_CHECKBOX = "¿Guardar puntos MRK en archivo?"
     SAVE_IN = "Guardar en:"

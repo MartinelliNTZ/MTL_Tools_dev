@@ -346,6 +346,7 @@ class Strings_de(Strings_pt_BR):
     )
     RECURSIVE_SEARCH = "Unterordner durchsuchen"
     PHOTOS_METADATA = "Mit Fotometadaten verknüpfen"
+    PHOTOS_METADATA_REQUIRED_MESSAGE = "Zum Verknüpfen mit Fotometadaten muss das Paket Pillow installiert werden.\n\nJetzt installieren?"
     MRK_FOLDER = "MRK-Ordner:"
     SAVE_POINTS_CHECKBOX = "MRK-Punkte in Datei speichern?"
     SAVE_IN = "Speichern in:"
