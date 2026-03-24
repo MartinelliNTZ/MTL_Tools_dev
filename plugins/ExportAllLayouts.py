@@ -209,29 +209,40 @@ class ExportAllLayoutsDialog(BasePluginMTL):
         )
 
         if not export_pdf and not export_png:
-            QgisMessageUtil.modal_error(self.iface, STR.SELECT_AT_LEAST_ONE_EXPORT_FORMAT)
+            QgisMessageUtil.modal_error(
+                self.iface, STR.SELECT_AT_LEAST_ONE_EXPORT_FORMAT
+            )
             return
 
         os.makedirs(output_folder, exist_ok=True)
         self.logger.info(f"Pasta de saída: {output_folder}")
 
-        if merge_pdf and not DependenciesManager.check_dependency("PyPDF2"):
+        if merge_pdf and not DependenciesManager.check_dependency(
+            "PyPDF2", self.TOOL_KEY
+        ):
             if QgisMessageUtil.confirm(
                 self.iface,
                 STR.PYPDF2_REQUIRED_MESSAGE,
                 STR.REQUIRED_LIBRARY,
             ):
-                DependenciesManager.install_dependency("PyPDF2")
+                DependenciesManager.install_dependency_gui(
+                    "PyPDF2", self.iface, self.TOOL_KEY
+                )
+
             else:
                 merge_pdf = False
-
-        if merge_png and not DependenciesManager.check_dependency("Pillow"):
+        self.testar_dependencia_txt()
+        if merge_png and not DependenciesManager.check_dependency(
+            "Pillow", self.TOOL_KEY
+        ):
             if QgisMessageUtil.confirm(
                 self.iface,
                 STR.PILLOW_REQUIRED_MESSAGE,
                 STR.REQUIRED_LIBRARY,
             ):
-                DependenciesManager.install_dependency("Pillow")
+                DependenciesManager.install_dependency_gui(
+                    "Pillow", self.iface, self.TOOL_KEY
+                )
             else:
                 merge_png = False
 

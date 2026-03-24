@@ -4,22 +4,28 @@ DependenciesManager - Gerencia dependências externas (bibliotecas Python)
 
 Responsável por:
 - Verificar se módulos estão instalados
-- Oferecer instalação automática via scripts .cmd/.bat
-- Validação de dependências antes de processos
+- Instalar bibliotecas via pip sem scripts externos
+- Validar dependências antes de processos
 """
 
+import importlib
 import os
+import shutil
 import sys
+from pathlib import Path
 
 from qgis.PyQt.QtCore import QProcess
 from qgis.PyQt.QtWidgets import QProgressDialog
-from .QgisMessageUtil import QgisMessageUtil
+
+from ..core.config.LogUtils import LogUtils
+from .ToolKeys import ToolKey
 
 
 class DependenciesManager:
     """Gerencia validação e instalação de dependências externas."""
 
-    # Mapeamento de dependências: nome_requerimento -> (módulo_import, script_instalação)
+    _active_processes = []
+
     DEPENDENCIES = {
         "PyPDF2": {
             "import": "PyPDF2",
@@ -36,203 +42,452 @@ class DependenciesManager:
     }
 
     @staticmethod
-    def check_dependency(dependency_name: str) -> bool:
-        """
-        Verifica se uma dependência está instalada.
-
-        Parameters
-        ----------
-        dependency_name : str
-            Nome da dependência (ex: 'PyPDF2', 'Pillow')
-
-        Returns
-        -------
-        bool
-            True se instalada, False caso contrário
-
-        Example
-        -------
-        if not DependenciesManager.check_dependency('PyPDF2'):
-            print("PyPDF2 não está instalada")
-        """
-        if dependency_name not in DependenciesManager.DEPENDENCIES:
-            return False
-
-        dep_info = DependenciesManager.DEPENDENCIES[dependency_name]
-        module_name = dep_info["import"]
-
-        try:
-            __import__(module_name)
-            return True
-        except ImportError:
-            return False
+    def get_logger(toolkey=ToolKey.UNTRACEABLE):
+        return LogUtils(tool=toolkey, class_name="DependenciesManager")
 
     @staticmethod
-    def get_dependency_info(dependency_name: str) -> dict:
-        """
-        Retorna informações sobre uma dependência.
+    def _get_dependency_config(
+        dependency_name: str, toolkey=ToolKey.UNTRACEABLE
+    ) -> dict:
+        logger = DependenciesManager.get_logger(toolkey)
+        dep_info = DependenciesManager.DEPENDENCIES.get(dependency_name)
 
-        Returns
-        -------
-        dict
-            Dicionário com 'import', 'script', 'description', 'pip'
-        """
-        return DependenciesManager.DEPENDENCIES.get(dependency_name, {})
+        if dep_info:
+            config = dict(dep_info)
+            config["mapped"] = True
+            logger.debug(
+                "Dependência encontrada no mapeamento",
+                code="DEPENDENCY_CONFIG_MAPPED",
+                dependency_name=dependency_name,
+                pip_name=config.get("pip"),
+                import_name=config.get("import"),
+            )
+            return config
+
+        logger.warning(
+            "Dependência não mapeada; usando fallback direto para import e pip",
+            code="DEPENDENCY_CONFIG_FALLBACK",
+            dependency_name=dependency_name,
+        )
+        return {
+            "import": dependency_name,
+            "script": "",
+            "description": dependency_name,
+            "pip": dependency_name,
+            "mapped": False,
+        }
 
     @staticmethod
-    def get_install_script_path(dependency_name: str) -> str:
-        """
-        Retorna caminho completo do script de instalação.
+    def _is_python_candidate(path_value: str) -> bool:
+        if not path_value:
+            return False
 
-        Parameters
-        ----------
-        dependency_name : str
-            Nome da dependência (ex: 'PyPDF2', 'Pillow')
+        path = Path(path_value)
+        name = path.name.lower()
+        return path.exists() and name.startswith("python") and name.endswith(".exe")
 
-        Returns
-        -------
-        str
-            Caminho do script .cmd/.bat (ou vazio se não encontrado)
-        """
-        if dependency_name not in DependenciesManager.DEPENDENCIES:
-            return ""
+    @staticmethod
+    def _find_python_executable(toolkey=ToolKey.UNTRACEABLE) -> str:
+        logger = DependenciesManager.get_logger(toolkey)
+        current_executable = Path(sys.executable).resolve() if sys.executable else None
+        candidates = []
 
-        dep_info = DependenciesManager.DEPENDENCIES[dependency_name]
-        script_name = dep_info["script"]
+        def _add_candidate(candidate):
+            if not candidate:
+                return
+            candidate_str = str(candidate)
+            if candidate_str not in candidates:
+                candidates.append(candidate_str)
 
-        # Procurar em caminhos padrão
-        possible_paths = [
-            # Relativo ao arquivo atual
-            os.path.join(os.path.dirname(__file__), "..", "core", "lib", script_name),
-            # Relativo ao projeto
-            os.path.join(os.path.dirname(__file__), script_name),
-        ]
+        if current_executable:
+            logger.debug(
+                "Executável atual do processo identificado",
+                code="PYTHON_DISCOVERY_CURRENT_EXECUTABLE",
+                current_executable=str(current_executable),
+            )
 
-        for path in possible_paths:
-            abs_path = os.path.abspath(path)
-            if os.path.exists(abs_path):
-                return abs_path
+            if DependenciesManager._is_python_candidate(str(current_executable)):
+                _add_candidate(current_executable)
+            else:
+                logger.warning(
+                    "Executável atual não parece ser python; tentando localizar interpretador real",
+                    code="PYTHON_DISCOVERY_NON_PYTHON_EXECUTABLE",
+                    current_executable=str(current_executable),
+                )
 
+            _add_candidate(current_executable.parent / "python.exe")
+            _add_candidate(current_executable.parent / "python3.exe")
+            _add_candidate(current_executable.parent.parent / "python.exe")
+            _add_candidate(current_executable.parent.parent / "python3.exe")
+            _add_candidate(current_executable.parent.parent / "bin" / "python.exe")
+
+            for parent in current_executable.parents:
+                apps_dir = parent / "apps"
+                if apps_dir.exists():
+                    for python_dir in sorted(apps_dir.glob("Python*")):
+                        _add_candidate(python_dir / "python.exe")
+                    _add_candidate(parent / "bin" / "python.exe")
+
+        _add_candidate(Path(sys.exec_prefix) / "python.exe")
+        _add_candidate(Path(sys.base_exec_prefix) / "python.exe")
+
+        for command_name in ("python", "python3"):
+            resolved = shutil.which(command_name)
+            if resolved:
+                _add_candidate(resolved)
+
+        for candidate in candidates:
+            logger.debug(
+                "Verificando candidato de interpretador Python",
+                code="PYTHON_DISCOVERY_CANDIDATE",
+                candidate_path=candidate,
+            )
+            if DependenciesManager._is_python_candidate(candidate):
+                logger.info(
+                    "Interpretador Python encontrado para instalação de dependências",
+                    code="PYTHON_DISCOVERY_SUCCESS",
+                    python_executable=candidate,
+                )
+                return candidate
+
+        logger.error(
+            "Nenhum interpretador Python válido foi encontrado para instalar dependências",
+            code="PYTHON_DISCOVERY_FAILED",
+            sys_executable=str(current_executable) if current_executable else "",
+            sys_exec_prefix=sys.exec_prefix,
+            sys_base_exec_prefix=sys.base_exec_prefix,
+        )
         return ""
 
     @staticmethod
-    def install_dependency(dependency_name: str) -> bool:
-        """
-        Instala a dependência usando o Python (`-m pip install --user ...`) de forma
-        assíncrona via `QProcess` para evitar execução de scripts .bat e evitar
-        uso de `shell=True`.
-
-        Este método tenta iniciar o processo de instalação e retorna True se o
-        processo foi iniciado com sucesso. A instalação é feita de forma
-        não-bloqueante; para UI e feedback passe o parâmetro `iface` usando a
-        função `install_dependency_gui` ou chame com `iface` quando disponível.
-        """
-        dep_info = DependenciesManager.get_dependency_info(dependency_name)
-        if not dep_info:
-            return False
-
-        pip_name = dep_info.get("pip", dependency_name)
-
-        python_exe = sys.executable or "python"
-
-        # Use QProcess.startDetached como fallback (sem UI). Retorna True se o
-        # processo foi iniciado corretamente.
-        started = QProcess.startDetached(
-            python_exe, ["-m", "pip", "install", "--user", pip_name]
-        )
-        if started:
-            QgisMessageUtil.bar_info(None, f"Instalação iniciada: {pip_name}")
-            return True
-
-        return False
+    def get_dependency_info(
+        dependency_name: str, toolkey=ToolKey.UNTRACEABLE
+    ) -> dict:
+        dep_info = DependenciesManager._get_dependency_config(dependency_name, toolkey)
+        return {
+            "import": dep_info["import"],
+            "script": dep_info["script"],
+            "description": dep_info["description"],
+            "pip": dep_info["pip"],
+        }
 
     @staticmethod
-    def install_dependency_gui(dependency_name: str, iface) -> bool:
-        """
-        Instala a dependência mostrando um diálogo de progresso não-bloqueante.
+    def check_dependency(
+        dependency_name: str, toolkey=ToolKey.UNTRACEABLE
+    ) -> bool:
+        logger = DependenciesManager.get_logger(toolkey)
+        dep_info = DependenciesManager._get_dependency_config(dependency_name, toolkey)
+        module_name = dep_info["import"]
 
-        - `dependency_name`: nome da dependência (ex: 'PyPDF2')
-        - `iface`: QgisInterface para parent do diálogo
+        logger.debug(
+            "Verificando dependência",
+            code="DEPENDENCY_CHECK_START",
+            dependency_name=dependency_name,
+            module_name=module_name,
+        )
 
-        Retorna True se o processo de instalação foi iniciado, False caso contrário.
-        """
-        dep_info = DependenciesManager.get_dependency_info(dependency_name)
-        if not dep_info:
+        try:
+            importlib.import_module(module_name)
+            logger.info(
+                "Dependência encontrada",
+                code="DEPENDENCY_PRESENT",
+                dependency_name=dependency_name,
+                module_name=module_name,
+            )
+            return True
+        except ImportError as exc:
+            logger.warning(
+                "Dependência ausente",
+                code="DEPENDENCY_MISSING",
+                dependency_name=dependency_name,
+                module_name=module_name,
+                error=str(exc),
+            )
+            return False
+        except Exception as exc:
+            logger.exception(
+                exc,
+                code="DEPENDENCY_CHECK_ERROR",
+                dependency_name=dependency_name,
+                module_name=module_name,
+            )
             return False
 
-        pip_name = dep_info.get("pip", dependency_name)
-        python_exe = sys.executable or "python"
+    @staticmethod
+    def get_install_script_path(
+        dependency_name: str, toolkey=ToolKey.UNTRACEABLE
+    ) -> str:
+        logger = DependenciesManager.get_logger(toolkey)
+        dep_info = DependenciesManager._get_dependency_config(dependency_name, toolkey)
+        script_name = dep_info.get("script", "")
 
-        parent = iface.mainWindow() if iface else None
-        progress = QProgressDialog(
-            f"Instalando dependência {pip_name}...", "Cancelar", 0, 0, parent
+        if not script_name:
+            logger.info(
+                "Dependência não usa script externo de instalação",
+                code="INSTALL_SCRIPT_NOT_REQUIRED",
+                dependency_name=dependency_name,
+            )
+            return ""
+
+        try:
+            possible_paths = [
+                os.path.join(os.path.dirname(__file__), "..", "core", "lib", script_name),
+                os.path.join(os.path.dirname(__file__), script_name),
+            ]
+
+            for path in possible_paths:
+                abs_path = os.path.abspath(path)
+                logger.debug(
+                    "Verificando caminho de script de instalação",
+                    code="INSTALL_SCRIPT_PATH_CHECK",
+                    dependency_name=dependency_name,
+                    script_name=script_name,
+                    candidate_path=abs_path,
+                )
+                if os.path.exists(abs_path):
+                    logger.info(
+                        "Script de instalação encontrado",
+                        code="INSTALL_SCRIPT_FOUND",
+                        dependency_name=dependency_name,
+                        script_name=script_name,
+                        script_path=abs_path,
+                    )
+                    return abs_path
+
+            logger.warning(
+                "Script de instalação não encontrado",
+                code="INSTALL_SCRIPT_NOT_FOUND",
+                dependency_name=dependency_name,
+                script_name=script_name,
+            )
+            return ""
+        except Exception as exc:
+            logger.exception(
+                exc,
+                code="INSTALL_SCRIPT_PATH_ERROR",
+                dependency_name=dependency_name,
+                script_name=script_name,
+            )
+            return ""
+
+    @staticmethod
+    def install_dependency(
+        dependency_name: str, toolkey=ToolKey.UNTRACEABLE
+    ) -> bool:
+        logger = DependenciesManager.get_logger(toolkey)
+        dep_info = DependenciesManager._get_dependency_config(dependency_name, toolkey)
+        pip_name = dep_info["pip"]
+        python_exe = DependenciesManager._find_python_executable(toolkey)
+
+        if not python_exe:
+            logger.error(
+                "Instalação cancelada por ausência de interpretador Python válido",
+                code="INSTALL_DEPENDENCY_NO_PYTHON",
+                dependency_name=dependency_name,
+                pip_name=pip_name,
+            )
+            return False
+
+        logger.info(
+            "Iniciando instalação assíncrona de dependência via pip",
+            code="INSTALL_DEPENDENCY_START",
+            dependency_name=dependency_name,
+            pip_name=pip_name,
+            python_executable=python_exe,
         )
-        progress.setWindowTitle("Instalando dependências")
-        progress.setAutoClose(True)
-        progress.setModal(True)
-        progress.show()
 
-        proc = QProcess(parent)
+        try:
+            started = QProcess.startDetached(
+                python_exe,
+                ["-m", "pip", "install", "--user", "--disable-pip-version-check", pip_name],
+            )
 
-        def _on_finished(exit_code, exit_status):
-            progress.close()
-            if exit_code == 0:
-                QgisMessageUtil.bar_info(iface, f"Dependência instalada: {pip_name}")
+            if isinstance(started, tuple):
+                started = bool(started[0])
             else:
-                QgisMessageUtil.modal_error(
-                    iface, f"Falha ao instalar {pip_name}. Código: {exit_code}"
+                started = bool(started)
+
+            if started:
+                logger.info(
+                    "Processo de instalação iniciado",
+                    code="INSTALL_DEPENDENCY_STARTED",
+                    dependency_name=dependency_name,
+                    pip_name=pip_name,
+                    python_executable=python_exe,
+                )
+                return True
+
+            logger.error(
+                "Falha ao iniciar processo de instalação",
+                code="INSTALL_DEPENDENCY_START_FAILED",
+                dependency_name=dependency_name,
+                pip_name=pip_name,
+                python_executable=python_exe,
+            )
+            return False
+        except Exception as exc:
+            logger.exception(
+                exc,
+                code="INSTALL_DEPENDENCY_EXCEPTION",
+                dependency_name=dependency_name,
+                pip_name=pip_name,
+                python_executable=python_exe,
+            )
+            return False
+
+    @staticmethod
+    def install_dependency_gui(
+        dependency_name: str, iface, toolkey=ToolKey.UNTRACEABLE
+    ) -> bool:
+        logger = DependenciesManager.get_logger(toolkey)
+        dep_info = DependenciesManager._get_dependency_config(dependency_name, toolkey)
+        pip_name = dep_info["pip"]
+        python_exe = DependenciesManager._find_python_executable(toolkey)
+
+        if not python_exe:
+            logger.error(
+                "Instalação GUI cancelada por ausência de interpretador Python válido",
+                code="INSTALL_GUI_NO_PYTHON",
+                dependency_name=dependency_name,
+                pip_name=pip_name,
+            )
+            return False
+
+        logger.info(
+            "Preparando instalação GUI de dependência",
+            code="INSTALL_GUI_START",
+            dependency_name=dependency_name,
+            pip_name=pip_name,
+            python_executable=python_exe,
+        )
+
+        try:
+            parent = iface.mainWindow() if iface else None
+            progress = QProgressDialog(
+                f"Instalando dependência {pip_name}...", "Cancelar", 0, 0, parent
+            )
+            progress.setWindowTitle("Instalando dependências")
+            progress.setAutoClose(True)
+            progress.setModal(True)
+            progress.show()
+
+            proc = QProcess(parent)
+            DependenciesManager._active_processes.append(proc)
+
+            def _cleanup_process():
+                if proc in DependenciesManager._active_processes:
+                    DependenciesManager._active_processes.remove(proc)
+                    logger.debug(
+                        "Processo removido da lista de processos ativos",
+                        code="INSTALL_GUI_PROCESS_CLEANUP",
+                        dependency_name=dependency_name,
+                        active_processes=len(DependenciesManager._active_processes),
+                    )
+
+            def _on_finished(exit_code, exit_status):
+                del exit_status
+                progress.close()
+                _cleanup_process()
+                if exit_code == 0:
+                    logger.info(
+                        "Instalação GUI concluída com sucesso",
+                        code="INSTALL_GUI_FINISHED_SUCCESS",
+                        dependency_name=dependency_name,
+                        pip_name=pip_name,
+                    )
+                else:
+                    logger.error(
+                        "Instalação GUI concluída com erro",
+                        code="INSTALL_GUI_FINISHED_ERROR",
+                        dependency_name=dependency_name,
+                        pip_name=pip_name,
+                        exit_code=exit_code,
+                    )
+
+            def _on_error(err):
+                progress.close()
+                _cleanup_process()
+                logger.error(
+                    "Erro ao iniciar instalação GUI",
+                    code="INSTALL_GUI_PROCESS_ERROR",
+                    dependency_name=dependency_name,
+                    pip_name=pip_name,
+                    qprocess_error=str(err),
                 )
 
-        def _on_error(err):
-            progress.close()
-            QgisMessageUtil.modal_error(iface, f"Erro ao iniciar instalação: {err}")
+            proc.finished.connect(_on_finished)
+            proc.errorOccurred.connect(_on_error)
+            proc.start(
+                python_exe,
+                ["-m", "pip", "install", "--user", "--disable-pip-version-check", pip_name],
+            )
 
-        proc.finished.connect(_on_finished)
-        proc.errorOccurred.connect(_on_error)
+            started = True
+            if hasattr(proc, "waitForStarted"):
+                started = proc.waitForStarted(3000)
+            elif hasattr(proc, "state") and hasattr(QProcess, "NotRunning"):
+                started = proc.state() != QProcess.NotRunning
 
-        started = proc.start(python_exe, ["-m", "pip", "install", "--user", pip_name])
-        if not started:
-            progress.close()
+            if not started:
+                progress.close()
+                _cleanup_process()
+                logger.error(
+                    "Processo GUI não iniciou",
+                    code="INSTALL_GUI_NOT_STARTED",
+                    dependency_name=dependency_name,
+                    pip_name=pip_name,
+                    python_executable=python_exe,
+                )
+                return False
+
+            logger.info(
+                "Processo GUI iniciado com sucesso",
+                code="INSTALL_GUI_STARTED",
+                dependency_name=dependency_name,
+                pip_name=pip_name,
+                python_executable=python_exe,
+            )
+            return True
+        except Exception as exc:
+            logger.exception(
+                exc,
+                code="INSTALL_GUI_EXCEPTION",
+                dependency_name=dependency_name,
+                pip_name=pip_name,
+                python_executable=python_exe,
+            )
             return False
 
-        return True
-
     @staticmethod
-    def validate_dependencies(required_dependencies: list) -> dict:
-        """
-        Valida múltiplas dependências de uma vez.
+    def validate_dependencies(
+        required_dependencies: list, toolkey=ToolKey.UNTRACEABLE
+    ) -> dict:
+        logger = DependenciesManager.get_logger(toolkey)
+        logger.info(
+            "Validando conjunto de dependências",
+            code="VALIDATE_DEPENDENCIES_START",
+            required_dependencies=required_dependencies,
+            total_dependencies=len(required_dependencies),
+        )
 
-        Parameters
-        ----------
-        required_dependencies : list
-            Lista de nomes de dependências (ex: ['PyPDF2', 'Pillow'])
-
-        Returns
-        -------
-        dict
-            {
-                'all_present': bool,  # True se todas instaladas
-                'missing': [],         # Dependências faltantes
-                'present': []          # Dependências presentes
-            }
-
-        Example
-        -------
-        result = DependenciesManager.validate_dependencies(['PyPDF2', 'Pillow'])
-        if not result['all_present']:
-            print(f"Faltam: {result['missing']}")
-        """
         missing = []
         present = []
 
         for dep_name in required_dependencies:
-            if DependenciesManager.check_dependency(dep_name):
+            if DependenciesManager.check_dependency(dep_name, toolkey):
                 present.append(dep_name)
             else:
                 missing.append(dep_name)
 
-        return {
+        result = {
             "all_present": len(missing) == 0,
             "missing": missing,
             "present": present,
         }
+
+        logger.info(
+            "Validação de dependências concluída",
+            code="VALIDATE_DEPENDENCIES_FINISH",
+            result=result,
+        )
+        return result
