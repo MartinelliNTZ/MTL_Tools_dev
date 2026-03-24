@@ -8,22 +8,7 @@ from qgis.PyQt.QtGui import QDesktopServices
 from ..core.config.LogUtils import LogUtils
 from .vector.VectorLayerSource import VectorLayerSource
 from .raster.RasterLayerSource import RasterLayerSource
-
-
-VECTOR_EXTS = {
-    ".shp",
-    ".geojson",
-    ".json",
-    ".kml",
-    ".kmz",
-    ".gpx",
-    ".csv",
-    ".tab",
-    ".las",
-    ".laz",
-    ".gpkg",
-}
-RASTER_EXTS = {".tif", ".tiff", ".ecw", ".jp2", ".asc"}
+from .StringManager import StringManager
 
 
 class ExplorerUtils:
@@ -93,7 +78,7 @@ class ExplorerUtils:
                 if exts_set and ext not in exts_set:
                     continue
                 rec = {"path": str(p), "ext": ext}
-                if ext in RASTER_EXTS:
+                if ext in StringManager.RASTER_EXTS:
                     rec["type"] = "raster"
                 else:
                     rec["type"] = "vector"

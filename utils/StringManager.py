@@ -12,17 +12,17 @@ class StringManager:
         "RASTER": STR.MENU_RASTER,
     }
     KML_FIELDS = [
-    "descriptio",
-    "timestamp",
-    "begin",
-    "end",
-    "altitudeMo",
-    "tessellate",
-    "extrude",
-    "visibility",
-    "drawOrder",
-    "icon",
-]
+        "descriptio",
+        "timestamp",
+        "begin",
+        "end",
+        "altitudeMo",
+        "tessellate",
+        "extrude",
+        "visibility",
+        "drawOrder",
+        "icon",
+    ]
 
     # Filtros de arquivos
     FILTER_ALL = "All files (*.*)"
@@ -42,3 +42,17 @@ class StringManager:
         "en": "EN English",
         "pt_BR": "BR Português",
     }
+    VECTOR_EXTS = {
+        ".shp",
+        ".geojson",
+        ".json",
+        ".kml",
+        ".kmz",
+        ".gpx",
+        ".csv",
+        ".tab",
+        ".las",
+        ".laz",
+        ".gpkg",
+    }
+    RASTER_EXTS = {".tif", ".tiff", ".ecw", ".jp2", ".asc"}

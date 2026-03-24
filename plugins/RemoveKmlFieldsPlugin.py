@@ -5,6 +5,7 @@ from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.StringManager import StringManager
 from ..utils.ToolKeys import ToolKey
 from ..utils.vector.VectorLayerAttributes import VectorLayerAttributes
+from ..utils.vector.VectorLayerSource import VectorLayerSource
 from .BasePlugin import BasePluginMTL
 
 
@@ -39,7 +40,12 @@ class RemoveKmlFieldsPlugin(BasePluginMTL):
             QgisMessageUtil.bar_critical(self.iface, STR.SELECT_VECTOR_LAYER)
             return
 
-        if ProjectUtils.is_kml_or_kmz_layer(layer, self.logger):
+        source_path = (layer.source() or "").split("|", 1)[0]
+        extension = VectorLayerSource.get_extension(
+            source_path, tool_key=self.TOOL_KEY
+        )
+
+        if extension in (".kml", ".kmz"):
             self.logger.warning("Camada KML/KMZ não pode ser editada")
             QgisMessageUtil.bar_critical(
                 self.iface,

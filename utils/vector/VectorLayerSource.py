@@ -244,6 +244,20 @@ class VectorLayerSource:
         return 0
 
     @staticmethod
+    def get_extension(path: str, tool_key: str = "untraceable") -> str:
+        """Retorna a extensao do caminho normalizado."""
+        logger = VectorLayerSource._get_logger(tool_key)
+
+        if not path:
+            logger.debug("Caminho vazio ao obter extensao")
+            return ""
+
+        normalized_path = str(path).split("|", 1)[0].strip().lower()
+        extension = os.path.splitext(normalized_path)[1]
+        logger.debug(f"Extensao resolvida para '{path}': {extension}")
+        return extension
+
+    @staticmethod
     def export_temp_layer(
         layer: QgsVectorLayer,
         prefix: str = "tmp_layer",
