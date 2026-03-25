@@ -34,3 +34,14 @@ class FormatUtils:
         if not ts:
             return "--:--:--"
         return time.strftime("%H:%M:%S", time.localtime(ts))
+
+    @staticmethod
+    def pretty(value: float) -> str:
+        """Formata um valor numérico de forma legível."""
+        if value <= 0:
+            return "0"
+        if value < 1:
+            return f"{value:.2f}"
+        if value < 10:
+            return f"{value:.1f}"
+        return f"{int(value)}"

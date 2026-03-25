@@ -195,21 +195,21 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
     # ==================== HELPERS ====================
 
     def _resolve_calculation_mode(self, layer, requested_mode):
-        """Valida e ajusta modo de cálculo (CRS geográfico com Cartesiana -> Ambos)."""
-        if requested_mode != STR.CARTESIAN or VectorLayerProjection.is_geographic_crs(
-            layer
-        ):
+        """Valida e ajusta modo de cálculo (CRS geográfico -> Ambos por padrão)."""
+        if VectorLayerProjection.is_geographic_crs(layer):
+            if requested_mode != STR.BOTH:
+                self.logger.warning("CRS geográfico -> calculando ambos os modos")
+                msg = (
+                    f"⚠️ {STR.LAYER_USES_GEOGRAPHIC_CRS} ({layer.crs().authid()})\n\n"
+                    f"{STR.CALCULATING_BOTH_MODES_AUTOMATICALLY}"
+                )
+                QgisMessageUtil.bar_warning(self.iface, msg)
+                self.logger.info(msg)
+                return STR.BOTH, True
+            else:
+                return requested_mode, False
+        else:
             return requested_mode, False
-
-        self.logger.warning("CRS geográfico com modo Cartesiana -> mudando para Ambos")
-        msg = (
-            f"⚠️ {STR.LAYER_USES_GEOGRAPHIC_CRS} ({layer.crs().authid()})\n\n"
-            f"{STR.CARTESIAN_MODE_RESULTS_IN_DEGREES2}\n\n"
-            f"{STR.CALCULATING_BOTH_MODES_AUTOMATICALLY}"
-        )
-        QgisMessageUtil.bar_warning(self.iface, msg)
-        self.logger.info(msg)
-        return STR.BOTH, True
 
     def _resolve_field_name(self, layer, base_name):
         """Resolve conflito de nomes de campo."""
