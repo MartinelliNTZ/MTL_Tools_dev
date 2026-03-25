@@ -36,7 +36,12 @@ Traducao: 9
   - Usar iconManager para carregar ícones de forma centralizada e eficiente
   - vetor para svg
  changelog=
-  2.2.2 2026/03/23
+  2.2.4
+    - Correção crítica: VectorFieldPlugin agora detecta automaticamente CRS geográfico e calcula ambos os modos (elipsoidal e cartesiano) por padrão, garantindo que os usuários obtenham resultados precisos sem precisar configurar manualmente. Para CRS projetado, o plugin respeita o modo selecionado nas preferências, proporcionando flexibilidade e controle total sobre os cálculos de campos vetoriais.
+
+  2.2.3 2026/03/24
+   - nao lembro
+-  2.2.2 2026/03/23
     - Correção crítica: DroneCoordinatesRunner agora atribui nomes de camadas baseados no arquivo MRK, garantindo que camadas de pontos e trilha tenham nomes distintos e localizados. Camadas carregadas de arquivos .gpkg existentes também herdam o nome correto, evitando confusão e melhorando a organização do projeto.
     - Nova ferramenta vetorial instantânea `RemoveKmlFieldsPlugin` adicionada para remover campos específicos de camadas vetoriais, com validação rigorosa para garantir que apenas camadas compatíveis sejam processadas, prevenindo erros e garantindo integridade dos dados.
   2.2.1 2026/03/23
