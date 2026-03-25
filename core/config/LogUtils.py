@@ -44,15 +44,41 @@ class LogUtils:
 
     # ---------- init global (igual conceito da antiga) ----------
     @classmethod
-    def init(cls, plugin_root: Path):
+    def _get_default_plugin_root(cls):
+        # O arquivo está em <plugin>/core/config/LogUtils.py.
+        # Usar a raiz do plugin para garantir log em local gravável do plugin.
+        plugin_root = Path(__file__).resolve().parents[3]
+        if plugin_root.exists():
+            return plugin_root
+        # fallback mais seguro para home do usuário
+        return Path.home() / "Cadmus"
+
+    @classmethod
+    def init(cls, plugin_root: Path = None):
         if cls._initialized:
             # return f"LogUtils já inicializado. Log file: {cls._log_file}, Session ID: {cls._session_id}"
             cls._initialized = False  # Forçar reinicialização para testes
+
+        if plugin_root is None:
+            plugin_root = cls._get_default_plugin_root()
+
         cls._session_id = str(uuid.uuid4())
         cls._plugin_version = cls._read_plugin_version(plugin_root)
 
         log_dir = plugin_root / "log"
-        log_dir.mkdir(parents=True, exist_ok=True)
+        try:
+            log_dir.mkdir(parents=True, exist_ok=True)
+        except Exception as e:
+            # Caso o plugin seja chamado de diretório protegido (ex: system32), usar fallback no home do usuário.
+            fallback = Path.home() / "Cadmus" / "log"
+            try:
+                fallback.mkdir(parents=True, exist_ok=True)
+                log_dir = fallback
+            except Exception as fallback_error:
+                # Falha total no log, preserva o funcionamento do plugin sem saída de arquivo.
+                cls._log_file = None
+                cls._initialized = True
+                return f"LogUtils initialized without file (fallback failed): {fallback_error}"
 
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         pid = os.getpid()
@@ -125,8 +151,8 @@ class LogUtils:
     def _ensure_ready(cls):
         if cls._initialized:
             return
-        # fallback: cria sessão mínima no cwd
-        plugin_root = Path.cwd()
+        # fallback: cria sessão mínima baseado na raiz do plugin ou home do usuário
+        plugin_root = cls._get_default_plugin_root()
         cls.init(plugin_root)
 
     @classmethod
@@ -147,6 +173,18 @@ class LogUtils:
         }
 
         with LOG_FILE_LOCK:
+            if cls._log_file is None:
+                # Log file não disponível (ex: erro de permissão em criação). Emitir via QGIS ou stderr.
+                if QGIS_AVAILABLE:
+                    QgsMessageLog.logMessage(
+                        f"LogUtils sem arquivo. Evento: {event}",
+                        cls._plugin_name,
+                        Qgis.Warning,
+                    )
+                else:
+                    import sys
+                    sys.stderr.write(f"Cadmus LogUtils missing file: {event}\n")
+                return
             try:
                 with open(cls._log_file, "a", encoding="utf-8") as f:
                     json.dump(event, f, ensure_ascii=False)

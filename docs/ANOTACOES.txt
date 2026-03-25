@@ -36,14 +36,40 @@ Traducao: 9
   - Usar iconManager para carregar ícones de forma centralizada e eficiente
   - vetor para svg
  changelog=
+  2.2.5
   2.2.4
-    - Correção crítica: VectorFieldPlugin agora detecta automaticamente CRS geográfico e calcula ambos os modos (elipsoidal e cartesiano) por padrão, garantindo que os usuários obtenham resultados precisos sem precisar configurar manualmente. Para CRS projetado, o plugin respeita o modo selecionado nas preferências, proporcionando flexibilidade e controle total sobre os cálculos de campos vetoriais.
-
+    - Correção crítica: VectorFieldPlugin agora detecta automaticamente CRS geográfico e calcula ambos os modos 
+      (elipsoidal e cartesiano) por padrão, garantindo que os usuários obtenham resultados precisos sem precisar configurar 
+      manualmente. Para CRS projetado, o plugin respeita o modo selecionado nas preferências, proporcionando flexibilidade
+      e controle total sobre os cálculos de campos vetoriais.
+    - Corrigido erro em finish_stats: adicionado método FormatUtils.pretty para formatar velocidades de feições e arquivos
+    - Corrigida lógica de cálculo de campos vetoriais: para CRS geográfico, calcula ambos os modos (elipsoidal e cartesiano)
+      por padrão; para CRS projetado, respeita o modo selecionado nas preferências
   2.2.3 2026/03/24
-   - nao lembro
--  2.2.2 2026/03/23
-    - Correção crítica: DroneCoordinatesRunner agora atribui nomes de camadas baseados no arquivo MRK, garantindo que camadas de pontos e trilha tenham nomes distintos e localizados. Camadas carregadas de arquivos .gpkg existentes também herdam o nome correto, evitando confusão e melhorando a organização do projeto.
-    - Nova ferramenta vetorial instantânea `RemoveKmlFieldsPlugin` adicionada para remover campos específicos de camadas vetoriais, com validação rigorosa para garantir que apenas camadas compatíveis sejam processadas, prevenindo erros e garantindo integridade dos dados.
+    - Adicionada ferramenta vetorial instantânea RemoveKmlFieldsPlugin para remover os campos listados em StringManager.KML_FIELDS da camada ativa
+    - Ferramenta valida camada vetorial ativa, exige modo de edição e nunca salva nem encerra a edição da camada
+    - Camadas .kml e .kmz passaram a ser bloqueadas nesse fluxo com validação por extensão do source
+    - Resolução de extensão centralizada em VectorLayerSource.get_extension(path, tool_key)
+    - Removida de ProjectUtils a responsabilidade de identificar extensão/tipo de source vetorial
+    - Registrada nova entrada da ferramenta na categoria VECTOR do ToolRegistry e nova ToolKey dedicada
+  2.2.2 2026/03/23
+    - DroneCoordinatesRunner agora atribui nomes de camadas baseados no arquivo MRK (ex: <base>_points, <base>_track)
+    - Corrigido para que camadas carregadas de .gpkg existentes também herdem o nome correto
+    - DroneCoordinatesRunner agora lê preferências do plugin DroneCoordinates automaticamente
+    - Se "photos": true nas prefs, o Runner adiciona PhotoMetadataStep ao pipeline
+    - Se "apply_style_points": true e qml_path_points válido, estilo QML aplicado aos pontos automaticamente
+    - Se "apply_style_track": true e qml_path_track válido, estilo QML aplicado à trilha automaticamente
+    - Runner e Plugin agora compartilham a mesma orquestração de steps e fluxo de estilos QML
+    - Implementado fluxo inicial de drag and drop/importação de arquivos .mrk via QgsCustomDropHandler
+    - Adicionado DroneCoordinatesRunner para executar cadeia de conversão de MRK fora do diálogo da ferramenta
+    - MrkParseTask agora suporta arquivo .mrk único sem expandir automaticamente para toda a pasta
+    - MrkParser agora expõe parse_file(file_path, ...) e reutiliza esse fluxo no parse por pasta
+    - Saídas .gpkg do drag and drop usam nomes localizados com STR.POINTS e STR.TRACK
+    - Quando os .gpkg de saída já existem, sistema carrega as saídas existentes em vez de sobrescrever
+    - Ajustada nomenclatura das mensagens para reaproveitar strings genéricas: CONVERT_FILE_SUCCESS, LOADED_EXISTING_GPKG,
+       CONVERT_FILE_ERROR
+    - Arquitetura simplificada para duas classes centrais: core/services/MrkDropHandler.py e core/services/DroneCoordinatesRunner.py
+    - Eliminado MrkDropUtils; helpers pequenos de extensão e path movidos para utils/ExplorerUtils.py
   2.2.1 2026/03/23
     - Implementação do fluxo de drag and drop para arquivos .mrk, permitindo importação rápida e intuitiva de coordenadas de drone. O sistema agora suporta processamento automático dos arquivos MRK, geração de camadas de pontos e trilha, e aplicação de estilos QML conforme as preferências do usuário, proporcionando uma experiência integrada e eficiente.
   2.2.0 2026/03/23
