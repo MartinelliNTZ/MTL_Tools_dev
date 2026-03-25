@@ -208,6 +208,7 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
             f"{STR.CALCULATING_BOTH_MODES_AUTOMATICALLY}"
         )
         QgisMessageUtil.bar_warning(self.iface, msg)
+        self.logger.info(msg)
         return STR.BOTH, True
 
     def _resolve_field_name(self, layer, base_name):
