@@ -68,7 +68,7 @@ class LogUtils:
         log_dir = plugin_root / "log"
         try:
             log_dir.mkdir(parents=True, exist_ok=True)
-        except Exception as e:
+        except Exception:
             # Caso o plugin seja chamado de diretório protegido (ex: system32), usar fallback no home do usuário.
             fallback = Path.home() / "Cadmus" / "log"
             try:

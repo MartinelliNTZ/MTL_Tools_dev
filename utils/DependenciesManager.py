@@ -9,14 +9,11 @@ Responsável por:
 """
 
 import importlib
-import os
 import shutil
 import sys
 from pathlib import Path
-
 from qgis.PyQt.QtCore import QProcess
 from qgis.PyQt.QtWidgets import QProgressDialog
-
 from ..core.config.LogUtils import LogUtils
 from .ToolKeys import ToolKey
 from ..utils.QgisMessageUtil import QgisMessageUtil
@@ -338,7 +335,7 @@ class DependenciesManager:
                         pip_name=pip_name,
                     )
                     QgisMessageUtil.modal_info(iface, STR.DEPENDENCY + " " + dep_info["description"] + " " + STR.INSTALLED_SUCCESSFULLY, STR.SUCCESS)
-                    
+
                 else:
                     logger.error(
                         "Instalação GUI concluída com erro",

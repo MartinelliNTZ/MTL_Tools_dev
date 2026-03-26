@@ -2,7 +2,7 @@
 name=Cadmus
 description=Advanced automation and geospatial productivity tools for QGIS projects.
 about=Cadmus is a productivity plugin for QGIS focused on cartographic automation and geospatial workflows. It provides tools for batch layout export (PDF/PNG), mass text replacement in layouts, automatic loading of datasets from folders, vector attribute utilities, raster sampling, statistical analysis and interactive coordinate tools. The plugin also exposes algorithms in the Processing Toolbox to support automated workflows and batch processing.
-version=2.2.0
+version=2.3.0
 author=Matheus A.S. Martinelli
 email=martinelli.matheus11@gmail.com
 license=GPL-2.0-or-later
@@ -20,7 +20,17 @@ repository=https://github.com/MartinelliNTZ/Cadmus
 tracker=https://github.com/MartinelliNTZ/Cadmus/issues
 
 
-changelog= 
+changelog=
+    2.3.0
+        - Partially translated to German
+        - Fixed vector field calculation: for geographic CRS, automatically calculates both modes (ellipsoidal and Cartesian); for projected CRS, respects the mode selected in preferences
+        - Fixed error in speed formatting
+        - New tool: RemoveKmlFieldsPlugin - removes specific fields from vector layers with one click
+        - Improvements in MRK file import:
+        - Drag and drop directly to import drone coordinates
+        - More intuitive layer names based on the source file
+        - Import respects user preferences (photos, QML styles)
+        - Existing files are loaded instead of being overwritten
     2.2.0
         - Toolbar now displays icons correctly
         - Dropdown buttons work as expected

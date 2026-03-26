@@ -43,12 +43,6 @@ class ProjectUtils:
             )
         return layer.isEditable()
 
-
-    """
-    Utilitários relacionados ao projeto QGIS (.qgz).
-    Não possui dependência de UI.
-    """
-
     @staticmethod
     def get_project_instance() -> QgsProject:
         """Retorna a instância do projeto QGIS aberto."""

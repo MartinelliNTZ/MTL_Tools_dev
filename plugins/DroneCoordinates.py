@@ -18,7 +18,6 @@ from ..utils.DependenciesManager import DependenciesManager
 from ..utils.QgisMessageUtil import QgisMessageUtil
 
 
-
 class DroneCordinates(BasePluginMTL):
 
     TOOL_KEY = ToolKey.DRONE_COORDINATES

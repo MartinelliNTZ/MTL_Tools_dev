@@ -13,7 +13,6 @@ from ...utils.vector.VectorLayerGeometry import VectorLayerGeometry
 from ...utils.vector.VectorLayerSource import VectorLayerSource
 from ...utils.Preferences import load_tool_prefs
 from ...utils.mrk.PhotoMetadata import PhotoMetadata
-from qgis.core import QgsProject
 
 
 class DroneCoordinatesRunner:
@@ -124,11 +123,7 @@ class DroneCoordinatesRunner:
 
         # Aplicar estilo QML nos pontos conforme preferência
         prefs = load_tool_prefs(self.tool_key)
-        if (
-            prefs.get("apply_style_points", False)
-            and points_layer
-            and points_layer.isValid()
-        ):
+        if (prefs.get("apply_style_points", False) and points_layer and points_layer.isValid()):
             qml_path = prefs.get("qml_path_points", "").strip()
             if qml_path and os.path.exists(qml_path):
                 ok = points_layer.loadNamedStyle(qml_path)
@@ -160,11 +155,7 @@ class DroneCoordinatesRunner:
             )
 
             # Aplicar estilo QML na trilha conforme preferência
-            if (
-                prefs.get("apply_style_track", False)
-                and track_layer
-                and track_layer.isValid()
-            ):
+            if (prefs.get("apply_style_track", False) and track_layer and track_layer.isValid()):
                 qml_path = prefs.get("qml_path_track", "").strip()
                 if qml_path and os.path.exists(qml_path):
                     ok = track_layer.loadNamedStyle(qml_path)

@@ -37,6 +37,7 @@ Traducao: 9
   - vetor para svg
  changelog=
   2.2.5
+    - 
   2.2.4
     - Correção crítica: VectorFieldPlugin agora detecta automaticamente CRS geográfico e calcula ambos os modos 
       (elipsoidal e cartesiano) por padrão, garantindo que os usuários obtenham resultados precisos sem precisar configurar 
