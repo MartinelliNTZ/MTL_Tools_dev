@@ -37,7 +37,28 @@ Traducao: 9
   - vetor para svg
  changelog=
   2.2.5
-    - 
+    - Reorganizada interface do SettingsPlugin: adicionados dois widgets colapsáveis - "Geral" 
+    - Corrigido bug de inicialização de log em LogUtils: anteriormente usava Path.cwd() 
+        (ex: C:\Windows\system32) quando não inicializado, causando PermissionError ao criar pasta log.
+    - Implementado fallback seguro para plugin_root via Path(__file__).resolve().parents[3] e, 
+        se necessário, Path.home()/Cadmus/log.
+    - Ajustado LogUtils._write_event para continuar sem arquivo de log e enviar mensagem por 
+        QgsMessageLog/stderr em casos de falha de criação de arquivo.
+    - Adicionados no SettingsPlugin, dentro de calc_collapsable, dois campos configuráveis 
+        inicialmente para nomes de área cartesiana e elipsoidal
+    - As preferências desses campos passaram a ser carregadas e salvas em ToolKey.VECTOR_FIELDS.
+    - Incluída validação para impedir salvamento quando os dois valores configurados forem iguais, 
+        exibindo alerta com QgisMessageUtil.
+    - Ajustados os dois campos do SettingsPlugin para representar sufixos, não nomes completos de 
+        campo: "Sufixo Cartesiano" com padrão "" e "Sufixo Elipsoidal" com padrão "_eli".
+    - As preferências em ToolKey.VECTOR_FIELDS passaram a usar as chaves cartesian_suffix e ellipsoidal_suffix.
+    - Mantida a validação para impedir salvamento quando os dois sufixos forem iguais, agora 
+        com mensagem alinhada ao novo comportamento.
+    - Implementada a leitura dos sufixos configurados em ToolKey.VECTOR_FIELDS no VectorFieldsCalculationPlugin.
+    - Os cálculos de length para linhas e area para polígonos agora usam os sufixos configuráveis ao resolver os nomes dos campos.
+    - O comportamento de pontos (x e y) foi mantido sem alterações.
+    - Corrigida chamada de leitura dos sufixos no SettingsPlugin para compatibilidade com InputFieldsWidget.get_value, evitando erro em runtime ao salvar as preferências.
+    
   2.2.4
     - Correção crítica: VectorFieldPlugin agora detecta automaticamente CRS geográfico e calcula ambos os modos 
       (elipsoidal e cartesiano) por padrão, garantindo que os usuários obtenham resultados precisos sem precisar configurar 
