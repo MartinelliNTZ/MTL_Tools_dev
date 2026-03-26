@@ -261,10 +261,10 @@ class SettingsPlugin(BasePluginMTL):
                 self.logger.debug("Idioma selecionado removido para auto-detectar")
 
         cartesian_suffix = (
-            self.area_fields_inputs.get_value("cartesian_suffix", "")
+            self.area_fields_inputs.get_value("cartesian_suffix") or ""
         ).strip()
         ellipsoidal_suffix = (
-            self.area_fields_inputs.get_value("ellipsoidal_suffix", "_eli")
+            self.area_fields_inputs.get_value("ellipsoidal_suffix") or "_eli"
         ).strip()
 
         if cartesian_suffix == ellipsoidal_suffix:

@@ -156,9 +156,14 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
             "calculation_method", STR.ELLIPSOIDAL
         )
         calc_mode, mode_altered = self._resolve_calculation_mode(layer, requested_mode)
+        cartesian_suffix, ellipsoidal_suffix = self._get_metric_suffixes()
 
         field_map = VectorLayerAttributes.resolve_field_names_for_calculation(
-            layer, "length", calc_mode
+            layer,
+            "length",
+            calc_mode,
+            cartesian_suffix=cartesian_suffix,
+            ellipsoidal_suffix=ellipsoidal_suffix,
         )
 
         resolved_fields = {}
@@ -177,9 +182,14 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
             "calculation_method", STR.ELLIPSOIDAL
         )
         calc_mode, mode_altered = self._resolve_calculation_mode(layer, requested_mode)
+        cartesian_suffix, ellipsoidal_suffix = self._get_metric_suffixes()
 
         field_map = VectorLayerAttributes.resolve_field_names_for_calculation(
-            layer, "area", calc_mode
+            layer,
+            "area",
+            calc_mode,
+            cartesian_suffix=cartesian_suffix,
+            ellipsoidal_suffix=ellipsoidal_suffix,
         )
 
         resolved_fields = {}
@@ -226,6 +236,18 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
         while layer.fields().lookupField(f"{base_name}_{i}") != -1:
             i += 1
         return f"{base_name}_{i}"
+
+    def _get_metric_suffixes(self):
+        """Lê sufixos configurados para campos de comprimento e área."""
+        cartesian_suffix = self.preferences.get("cartesian_suffix", "")
+        ellipsoidal_suffix = self.preferences.get("ellipsoidal_suffix", "_eli")
+
+        if cartesian_suffix is None:
+            cartesian_suffix = ""
+        if ellipsoidal_suffix is None:
+            ellipsoidal_suffix = "_eli"
+
+        return str(cartesian_suffix), str(ellipsoidal_suffix)
 
     # ==================== EXECUTION ====================
 

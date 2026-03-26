@@ -193,10 +193,7 @@ class BasePluginMTL(BaseDialog):
                     self.preferences["eta_files"] = 0
                 TAM = f"{self.preferences['current_files']} files"
                 msg = f"Iniciando: total files={self.preferences['current_files']}"
-                if modal_info == "YES":
-                    QgisMessageUtil.bar_info(
-                        self.iface, msg, "Estatisticas", duration=5
-                    )
+
                 self.logger.info(msg)
 
             else:
@@ -213,10 +210,7 @@ class BasePluginMTL(BaseDialog):
                         )
                     TAM = f"{self.preferences.get('current_features', 0)} feats"
                     msg = f"Iniciando: features={self.preferences.get('current_features', 0)}"
-                    if modal_info == "YES":
-                        QgisMessageUtil.bar_info(
-                            self.iface, msg, "Estatisticas", duration=5
-                        )
+
                     self.logger.info(msg)
                 else:
                     # treat as raster/file
@@ -230,10 +224,7 @@ class BasePluginMTL(BaseDialog):
                         )
                     TAM = FormatUtils.bytes(self.preferences.get("current_size", 0))
                     msg = f"Iniciando: size={TAM}"
-                    if modal_info == "YES":
-                        QgisMessageUtil.bar_info(
-                            self.iface, msg, "Estatisticas", duration=5
-                        )
+ 
                     self.logger.info(msg)
         except Exception as e:
             self.logger.error(e)
@@ -306,8 +297,6 @@ class BasePluginMTL(BaseDialog):
                     f"Velocidade média(files/s): {FormatUtils.pretty(self.preferences.get('avg_speed_files', 0))}\n"
                 )
                 self.logger.info(msg)
-                if modal_info == "YES":
-                    QgisMessageUtil.bar_success(self.iface, f"Estatistivas: {msg} ")
             except Exception as ex:
                 self.logger.error(f"Erro ao gerar resumo de estatísticas: {ex}")
 

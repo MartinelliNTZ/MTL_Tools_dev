@@ -33,11 +33,11 @@ class VectorLayerAttributes:
 
         if not field_indexes:
             if logger:
-                logger.debug("Nenhum campo encontrado para remoÃ§Ã£o")
+                logger.debug("Nenhum campo encontrado para remoção")
             return 0
 
         if logger:
-            logger.debug(f"Removendo campos nos Ã­ndices: {field_indexes}")
+            logger.debug(f"Removendo campos nos índices: {field_indexes}")
 
         if not layer.deleteAttributes(field_indexes):
             raise RuntimeError("Falha ao remover campos da camada")
@@ -91,7 +91,6 @@ class VectorLayerAttributes:
 
             idx = target_layer.fields().indexOf(field.name())
 
-            # campo não existe
             if idx == -1:
                 target_layer.addAttribute(
                     QgsField(
@@ -104,7 +103,6 @@ class VectorLayerAttributes:
                 )
                 continue
 
-            # conflito
             action = "skip"
             if conflict_resolver:
                 action = conflict_resolver(field.name())
@@ -307,13 +305,12 @@ class VectorLayerAttributes:
         Returns
         -------
         str
-            Nome do campo truncado se necessário (ex: 'len_eli' ao invés de 'length_eli')
+            Nome do campo truncado se necessário
         """
         full_name = f"{base_name}{suffix}"
         if len(full_name) <= max_length:
             return full_name
 
-        # Truncar nome base para caber sufixo
         available_for_base = max_length - len(suffix)
         if available_for_base < 1:
             return full_name[:max_length]
@@ -322,7 +319,11 @@ class VectorLayerAttributes:
 
     @staticmethod
     def resolve_field_names_for_calculation(
-        layer, base_name, calculation_mode="Elipsoidal"
+        layer,
+        base_name,
+        calculation_mode="Elipsoidal",
+        cartesian_suffix="_car",
+        ellipsoidal_suffix="_eli",
     ):
         """
         Resolve nomes de campo baseado no modo de cálculo.
@@ -340,23 +341,31 @@ class VectorLayerAttributes:
         -------
         dict
             Mapeamento de modo -> nome_do_campo
-            Exemplo: {'Elipsoidal': 'length_eli'} ou
-                    {'Elipsoidal': 'length_eli', 'Cartesiana': 'length_car'}
         """
         field_map = {}
 
         if calculation_mode == "Ambos":
-            # Criar campos para ambos os modos
             eli_name = VectorLayerAttributes.generate_field_name_with_suffix(
-                base_name, "_eli"
+                base_name, ellipsoidal_suffix
             )
             car_name = VectorLayerAttributes.generate_field_name_with_suffix(
-                base_name, "_car"
+                base_name, cartesian_suffix
             )
             field_map["Elipsoidal"] = eli_name
             field_map["Cartesiana"] = car_name
+        elif calculation_mode == "Elipsoidal":
+            field_map[calculation_mode] = (
+                VectorLayerAttributes.generate_field_name_with_suffix(
+                    base_name, ellipsoidal_suffix
+                )
+            )
+        elif calculation_mode == "Cartesiana":
+            field_map[calculation_mode] = (
+                VectorLayerAttributes.generate_field_name_with_suffix(
+                    base_name, cartesian_suffix
+                )
+            )
         else:
-            # Um único modo
             field_map[calculation_mode] = base_name
 
         return field_map
