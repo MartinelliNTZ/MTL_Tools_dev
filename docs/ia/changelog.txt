@@ -1,9 +1,15 @@
 2.2.1.6
 
 - Reorganizada interface do SettingsPlugin: adicionados dois widgets colapsáveis - "Geral" (botão de preferências, idioma, precisão de campos vetoriais, limiar assíncrono) e "Plugin de Calculos Vetoriais" (método de cálculo vetorial) para melhor organização da UI.
+
 2.2.5.1
 
 - Corrigido bug de inicialização de log em `LogUtils`: anteriormente usava `Path.cwd()` (ex: `C:\Windows\system32`) quando não inicializado, causando `PermissionError` ao criar pasta `log`.
 - Implementado fallback seguro para `plugin_root` via `Path(__file__).resolve().parents[3]` e, se necessário, `Path.home()/Cadmus/log`.
 - Ajustado `LogUtils._write_event` para continuar sem arquivo de log e enviar mensagem por `QgsMessageLog`/stderr em casos de falha de criação de arquivo.
 
+2.2.5.2
+
+- Adicionados no `SettingsPlugin`, dentro de `calc_collapsable`, dois campos configuráveis para nomes de área cartesiana e elipsoidal com `WidgetFactory.create_input_fields_widget`.
+- As preferências desses campos agora são carregadas e salvas em `ToolKey.VECTOR_FIELDS`, com padrões `area` e `area_eli`.
+- Incluída validação para impedir salvamento quando os dois nomes de campo forem iguais, exibindo alerta com `QgisMessageUtil`.

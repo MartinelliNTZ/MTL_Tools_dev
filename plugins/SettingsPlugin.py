@@ -23,8 +23,9 @@ class SettingsPlugin(BasePluginMTL):
         STR.CARTESIAN,
         STR.BOTH,
     ]
-    AUTO_SAVE_PREFS_ON_CLOSE = False  # Define se as preferências devem ser salvas automaticamente ao fechar o plugin
+    AUTO_SAVE_PREFS_ON_CLOSE = False
     prefer_System = {}
+    prefer_VectorFields = {}
 
     def __init__(self, iface):
         super().__init__(iface.mainWindow())
@@ -43,8 +44,6 @@ class SettingsPlugin(BasePluginMTL):
 
         self.logger.info("Construindo componentes de interface")
 
-        # ========== SEÇÃO 1: Preferências do App ==========
-
         pref_button_layout, self.pref_button = WidgetFactory.create_simple_button(
             text=STR.OPEN_PREFERENCES_FOLDER,
             parent=self,
@@ -54,7 +53,6 @@ class SettingsPlugin(BasePluginMTL):
 
         self.logger.debug("Botão de preferências adicionado")
 
-        # ========== SEÇÃO 2: Método de Cálculo Vetorial ==========
         calc_layout, self.radio_calc = WidgetFactory.create_radio_button_grid(
             items=self.CALCULATION_METHODS,
             columns=3,
@@ -64,8 +62,9 @@ class SettingsPlugin(BasePluginMTL):
             separator_top=False,
             separator_bottom=False,
             parent=self,
-        )  # 🇧🇷🇺🇸🇪🇸
+        )
         self.logger.debug("Widget de cálculo vetorial adicionado")
+
         langs = StringManager.AVAILABLE_LANGUAGES
         selected_lang = self.prefer_System.get("plugin_language", "none")
         lang_layout, self.lang_selector = WidgetFactory.create_dropdown_selector(
@@ -77,7 +76,6 @@ class SettingsPlugin(BasePluginMTL):
             parent=self,
         )
 
-        # ========== SEÇÃO 3: Precisão para campos vetoriais ==========
         prec_layout, self.spin_precision = WidgetFactory.create_double_spin_input(
             f"🎯 {STR.VECTOR_FIELDS_PRECISION}",
             decimals=0,
@@ -90,22 +88,18 @@ class SettingsPlugin(BasePluginMTL):
         )
         self.logger.debug("Widget de precisão de campos vetoriais adicionado")
 
-        # ========== SEÇÃO 4: Limiar de processamento assíncrono ==========
-        # Agora o valor é o número máximo de feições que podem ser processadas
-        # de forma síncrona; tudo acima irá disparar execução em segundo plano.
         thresh_layout, self.spin_threshold = WidgetFactory.create_double_spin_input(
             f"📦 {STR.ASYNC_THRESHOLD}",
             decimals=0,
             step=1,
             minimum=1,
-            maximum=100000000,  # valor alto para não limitar demais
+            maximum=100000000,
             value=1000,
             separator_top=False,
             separator_bottom=False,
         )
         self.logger.debug("Widget de limiar assíncrono por feições adicionado")
 
-        # ========== COLLAPSIBLE PARA GERAL ==========
         geral_layout, self.geral_collapsable = WidgetFactory.create_collapsible_parameters(
             parent=self,
             title="Geral",
@@ -118,7 +112,6 @@ class SettingsPlugin(BasePluginMTL):
         self.geral_collapsable.add_content_layout(prec_layout)
         self.geral_collapsable.add_content_layout(thresh_layout)
 
-        # ========== COLLAPSIBLE PARA PLUGIN DE CALCULOS VETORIAIS ==========
         calc_layout_collapsible, self.calc_collapsable = WidgetFactory.create_collapsible_parameters(
             parent=self,
             title="Plugin de Calculos Vetoriais",
@@ -128,7 +121,27 @@ class SettingsPlugin(BasePluginMTL):
         )
         self.calc_collapsable.add_content_layout(calc_layout)
 
-        # ========== BOTÕES DE AÇÃO ==========
+        field_names_layout, self.area_fields_inputs = (
+            WidgetFactory.create_input_fields_widget(
+                fields_dict={
+                    "cartesian_area_field": {
+                        "title": "Campo area cartesiana",
+                        "type": "text",
+                        "default": "area",
+                    },
+                    "ellipsoidal_area_field": {
+                        "title": "Campo area elipsoidal",
+                        "type": "text",
+                        "default": "area_eli",
+                    },
+                },
+                parent=self,
+                separator_top=False,
+                separator_bottom=False,
+            )
+        )
+        self.calc_collapsable.add_content_layout(field_names_layout)
+
         buttons_layout, self.action_buttons = (
             WidgetFactory.create_bottom_action_buttons(
                 parent=self,
@@ -140,9 +153,6 @@ class SettingsPlugin(BasePluginMTL):
             )
         )
 
-        # ========== ADICIONAR TODOS OS ITEMS DE UMA VEZ ==========
-        # Importante: adicionar items em uma ÚNICA chamada a add_items()
-        # para evitar reparentings repetidos que destroem widgets internos
         self.layout.add_items(
             [
                 geral_layout,
@@ -157,8 +167,8 @@ class SettingsPlugin(BasePluginMTL):
         self.logger.debug("Carregando preferências")
         self.preferences = load_tool_prefs(ToolKey.SETTINGS)
         self.prefer_System = load_tool_prefs(ToolKey.SYSTEM)
+        self.prefer_VectorFields = load_tool_prefs(ToolKey.VECTOR_FIELDS)
 
-        # Carregar método de cálculo selecionado
         calc_method = self.prefer_System.get("calculation_method", STR.ELLIPSOIDAL)
         try:
             idx = self.CALCULATION_METHODS.index(calc_method)
@@ -178,8 +188,6 @@ class SettingsPlugin(BasePluginMTL):
             self.logger.warning(f"Idioma inválido: {selected_language}, usando padrão")
             self.lang_selector.set_selected_key("pt_BR")
 
-        # Carregar limiar assíncrono (número de feições)
-        # suporte retrocompatível: se usuário ainda tiver threshold em bytes, avisar e usar padrão
         if "async_threshold_features" in self.prefer_System:
             thresh_feats = self.prefer_System.get("async_threshold_features", 1000)
         else:
@@ -189,13 +197,13 @@ class SettingsPlugin(BasePluginMTL):
                     "Preferência antiga 'async_threshold_bytes' encontrada, substituindo por limite de feições padrão"
                 )
             thresh_feats = 1000
+
         try:
             self.spin_threshold.setValue(int(thresh_feats))
             self.logger.debug(f"Limiar assíncrono carregado: {thresh_feats} feições")
         except Exception:
             self.logger.warning(f"Erro ao carregar limiar assíncrono: {thresh_feats}")
 
-        # Carregar precisão de campos vetoriais
         prec = self.prefer_System.get("vector_field_precision", 2)
         try:
             self.spin_precision.setValue(int(prec))
@@ -204,26 +212,35 @@ class SettingsPlugin(BasePluginMTL):
             self.logger.warning(
                 f"Erro ao carregar precisão de campos vetoriais: {prec}"
             )
+
+        self.area_fields_inputs.set_values(
+            {
+                "cartesian_area_field": self.prefer_VectorFields.get(
+                    "cartesian_area_field", "area"
+                ),
+                "ellipsoidal_area_field": self.prefer_VectorFields.get(
+                    "ellipsoidal_area_field", "area_eli"
+                ),
+            }
+        )
+
         self.calc_collapsable.set_expanded(self.preferences.get("calc_expanded", False))
         self.geral_collapsable.set_expanded(self.preferences.get("geral_expanded", True))
 
     def _save_prefs(self):
         """Salva preferências."""
         self.logger.debug("Salvando preferências")
-        self._persist_window_size()  # Salva largura e altura da janela
+        self._persist_window_size()
         self.preferences["calc_expanded"] = self.calc_collapsable.is_expanded()
         self.preferences["geral_expanded"] = self.geral_collapsable.is_expanded()
 
-        # Salvar método de cálculo selecionado
         selected_text = self.radio_calc.get_selected_text()
         self.prefer_System["calculation_method"] = selected_text
 
-        # Salvar limiar assíncrono (número de feições)
         feats_value = int(self.spin_threshold.value())
         self.prefer_System["async_threshold_features"] = feats_value
         self.logger.debug(f"Limiar assíncrono por feições salvo: {feats_value} feições")
 
-        # Salvar precisão de campos vetoriais
         precision_val = int(self.spin_precision.value())
         self.prefer_System["vector_field_precision"] = precision_val
         self.logger.debug(f"Precisão de campos vetoriais salva: {precision_val} casas")
@@ -237,14 +254,37 @@ class SettingsPlugin(BasePluginMTL):
                 del self.prefer_System["plugin_language"]
                 self.logger.debug("Idioma selecionado removido para auto-detectar")
 
+        cartesian_area_field = (
+            self.area_fields_inputs.get_value("cartesian_area_field") or "area"
+        ).strip()
+        ellipsoidal_area_field = (
+            self.area_fields_inputs.get_value("ellipsoidal_area_field") or "area_eli"
+        ).strip()
+
+        if cartesian_area_field == ellipsoidal_area_field:
+            QgisMessageUtil.modal_warning(
+                self.iface,
+                "Os nomes dos campos de area cartesiana e area elipsoidal nao podem ser iguais.",
+            )
+            self.logger.warning(
+                "Salvamento cancelado: nomes de campos de area duplicados"
+            )
+            return False
+
+        self.prefer_VectorFields["cartesian_area_field"] = cartesian_area_field
+        self.prefer_VectorFields["ellipsoidal_area_field"] = ellipsoidal_area_field
+
         save_tool_prefs(ToolKey.SYSTEM, self.prefer_System)
+        save_tool_prefs(ToolKey.VECTOR_FIELDS, self.prefer_VectorFields)
         save_tool_prefs(self.TOOL_KEY, self.preferences)
         self.logger.info(f"Preferências salvas:{self.prefer_System}==={self.preferences}")
+        return True
 
     def execute_tool(self):
         """Executa as configurações e fecha o diálogo."""
         self.logger.info("Aplicando configurações")
-        self._save_prefs()
+        if not self._save_prefs():
+            return
 
         selected_method = self.radio_calc.get_selected_text()
         QgisMessageUtil.modal_info(
