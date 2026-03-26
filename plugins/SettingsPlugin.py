@@ -210,6 +210,7 @@ class SettingsPlugin(BasePluginMTL):
     def _save_prefs(self):
         """Salva preferências."""
         self.logger.debug("Salvando preferências")
+        self._persist_window_size()  # Salva largura e altura da janela
         self.preferences["calc_expanded"] = self.calc_collapsable.is_expanded()
         self.preferences["geral_expanded"] = self.geral_collapsable.is_expanded()
 
