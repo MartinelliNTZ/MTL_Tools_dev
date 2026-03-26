@@ -61,8 +61,8 @@ class SettingsPlugin(BasePluginMTL):
             title=f"⚙️ {STR.VECTOR_CALCULATION_METHOD}",
             checked_index=0,
             tool_key=ToolKey.SETTINGS,
-            separator_top=True,
-            separator_bottom=True,
+            separator_top=False,
+            separator_bottom=False,
             parent=self,
         )  # 🇧🇷🇺🇸🇪🇸
         self.logger.debug("Widget de cálculo vetorial adicionado")
@@ -72,8 +72,8 @@ class SettingsPlugin(BasePluginMTL):
             title=f"⚙️ {STR.PLUGIN_LANGUAGE}",
             options_dict=langs,
             selected_key=selected_lang,
-            separator_top=True,
-            separator_bottom=True,
+            separator_top=False,
+            separator_bottom=False,
             parent=self,
         )
 
@@ -85,7 +85,7 @@ class SettingsPlugin(BasePluginMTL):
             minimum=0,
             maximum=10,
             value=2,
-            separator_top=True,
+            separator_top=False,
             separator_bottom=False,
         )
         self.logger.debug("Widget de precisão de campos vetoriais adicionado")
@@ -101,9 +101,32 @@ class SettingsPlugin(BasePluginMTL):
             maximum=100000000,  # valor alto para não limitar demais
             value=1000,
             separator_top=False,
-            separator_bottom=True,
+            separator_bottom=False,
         )
         self.logger.debug("Widget de limiar assíncrono por feições adicionado")
+
+        # ========== COLLAPSIBLE PARA GERAL ==========
+        geral_layout, self.geral_collapsable = WidgetFactory.create_collapsible_parameters(
+            parent=self,
+            title="Geral",
+            expanded_by_default=True,
+            separator_top=False,
+            separator_bottom=False,
+        )
+        self.geral_collapsable.add_content_layout(pref_button_layout)
+        self.geral_collapsable.add_content_layout(lang_layout)
+        self.geral_collapsable.add_content_layout(prec_layout)
+        self.geral_collapsable.add_content_layout(thresh_layout)
+
+        # ========== COLLAPSIBLE PARA PLUGIN DE CALCULOS VETORIAIS ==========
+        calc_layout_collapsible, self.calc_collapsable = WidgetFactory.create_collapsible_parameters(
+            parent=self,
+            title="Plugin de Calculos Vetoriais",
+            expanded_by_default=False,
+            separator_top=False,
+            separator_bottom=False,
+        )
+        self.calc_collapsable.add_content_layout(calc_layout)
 
         # ========== BOTÕES DE AÇÃO ==========
         buttons_layout, self.action_buttons = (
@@ -122,11 +145,8 @@ class SettingsPlugin(BasePluginMTL):
         # para evitar reparentings repetidos que destroem widgets internos
         self.layout.add_items(
             [
-                pref_button_layout,
-                lang_layout,
-                calc_layout,
-                prec_layout,
-                thresh_layout,
+                geral_layout,
+                calc_layout_collapsible,
                 buttons_layout,
             ]
         )
@@ -184,10 +204,14 @@ class SettingsPlugin(BasePluginMTL):
             self.logger.warning(
                 f"Erro ao carregar precisão de campos vetoriais: {prec}"
             )
+        self.calc_collapsable.set_expanded(self.preferences.get("calc_expanded", False))
+        self.geral_collapsable.set_expanded(self.preferences.get("geral_expanded", True))
 
     def _save_prefs(self):
         """Salva preferências."""
         self.logger.debug("Salvando preferências")
+        self.preferences["calc_expanded"] = self.calc_collapsable.is_expanded()
+        self.preferences["geral_expanded"] = self.geral_collapsable.is_expanded()
 
         # Salvar método de cálculo selecionado
         selected_text = self.radio_calc.get_selected_text()
@@ -214,7 +238,7 @@ class SettingsPlugin(BasePluginMTL):
 
         save_tool_prefs(ToolKey.SYSTEM, self.prefer_System)
         save_tool_prefs(self.TOOL_KEY, self.preferences)
-        self.logger.info(f"Preferências salvas: cálculo={selected_text}")
+        self.logger.info(f"Preferências salvas:{self.prefer_System}==={self.preferences}")
 
     def execute_tool(self):
         """Executa as configurações e fecha o diálogo."""

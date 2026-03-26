@@ -1,3 +1,6 @@
+2.2.1.6
+
+- Reorganizada interface do SettingsPlugin: adicionados dois widgets colapsáveis - "Geral" (botão de preferências, idioma, precisão de campos vetoriais, limiar assíncrono) e "Plugin de Calculos Vetoriais" (método de cálculo vetorial) para melhor organização da UI.
 2.2.5.1
 
 - Corrigido bug de inicialização de log em `LogUtils`: anteriormente usava `Path.cwd()` (ex: `C:\Windows\system32`) quando não inicializado, causando `PermissionError` ao criar pasta `log`.
