@@ -100,39 +100,43 @@ class SettingsPlugin(BasePluginMTL):
         )
         self.logger.debug("Widget de limiar assíncrono por feições adicionado")
 
-        geral_layout, self.geral_collapsable = WidgetFactory.create_collapsible_parameters(
-            parent=self,
-            title="Geral",
-            expanded_by_default=True,
-            separator_top=False,
-            separator_bottom=False,
+        geral_layout, self.geral_collapsable = (
+            WidgetFactory.create_collapsible_parameters(
+                parent=self,
+                title="Geral",
+                expanded_by_default=True,
+                separator_top=False,
+                separator_bottom=False,
+            )
         )
         self.geral_collapsable.add_content_layout(pref_button_layout)
         self.geral_collapsable.add_content_layout(lang_layout)
         self.geral_collapsable.add_content_layout(prec_layout)
         self.geral_collapsable.add_content_layout(thresh_layout)
 
-        calc_layout_collapsible, self.calc_collapsable = WidgetFactory.create_collapsible_parameters(
-            parent=self,
-            title="Plugin de Calculos Vetoriais",
-            expanded_by_default=False,
-            separator_top=False,
-            separator_bottom=False,
+        calc_layout_collapsible, self.calc_collapsable = (
+            WidgetFactory.create_collapsible_parameters(
+                parent=self,
+                title="Plugin de Calculos Vetoriais",
+                expanded_by_default=False,
+                separator_top=False,
+                separator_bottom=False,
+            )
         )
         self.calc_collapsable.add_content_layout(calc_layout)
 
         field_names_layout, self.area_fields_inputs = (
             WidgetFactory.create_input_fields_widget(
                 fields_dict={
-                    "cartesian_area_field": {
-                        "title": "Campo area cartesiana",
+                    "cartesian_suffix": {
+                        "title": "Sulfixo Cartesiano",
                         "type": "text",
-                        "default": "area",
+                        "default": "",
                     },
-                    "ellipsoidal_area_field": {
-                        "title": "Campo area elipsoidal",
+                    "ellipsoidal_suffix": {
+                        "title": "Sulfixo Elipsoidal",
                         "type": "text",
-                        "default": "area_eli",
+                        "default": "_eli",
                     },
                 },
                 parent=self,
@@ -215,17 +219,19 @@ class SettingsPlugin(BasePluginMTL):
 
         self.area_fields_inputs.set_values(
             {
-                "cartesian_area_field": self.prefer_VectorFields.get(
-                    "cartesian_area_field", "area"
+                "cartesian_suffix": self.prefer_VectorFields.get(
+                    "cartesian_suffix", ""
                 ),
-                "ellipsoidal_area_field": self.prefer_VectorFields.get(
-                    "ellipsoidal_area_field", "area_eli"
+                "ellipsoidal_suffix": self.prefer_VectorFields.get(
+                    "ellipsoidal_suffix", "_eli"
                 ),
             }
         )
 
         self.calc_collapsable.set_expanded(self.preferences.get("calc_expanded", False))
-        self.geral_collapsable.set_expanded(self.preferences.get("geral_expanded", True))
+        self.geral_collapsable.set_expanded(
+            self.preferences.get("geral_expanded", True)
+        )
 
     def _save_prefs(self):
         """Salva preferências."""
@@ -254,30 +260,30 @@ class SettingsPlugin(BasePluginMTL):
                 del self.prefer_System["plugin_language"]
                 self.logger.debug("Idioma selecionado removido para auto-detectar")
 
-        cartesian_area_field = (
-            self.area_fields_inputs.get_value("cartesian_area_field") or "area"
+        cartesian_suffix = (
+            self.area_fields_inputs.get_value("cartesian_suffix", "")
         ).strip()
-        ellipsoidal_area_field = (
-            self.area_fields_inputs.get_value("ellipsoidal_area_field") or "area_eli"
+        ellipsoidal_suffix = (
+            self.area_fields_inputs.get_value("ellipsoidal_suffix", "_eli")
         ).strip()
 
-        if cartesian_area_field == ellipsoidal_area_field:
+        if cartesian_suffix == ellipsoidal_suffix:
             QgisMessageUtil.modal_warning(
                 self.iface,
-                "Os nomes dos campos de area cartesiana e area elipsoidal nao podem ser iguais.",
+                "Os sulfixos cartesiano e elipsoidal nao podem ser iguais.",
             )
-            self.logger.warning(
-                "Salvamento cancelado: nomes de campos de area duplicados"
-            )
+            self.logger.warning("Salvamento cancelado: sulfixos de area duplicados")
             return False
 
-        self.prefer_VectorFields["cartesian_area_field"] = cartesian_area_field
-        self.prefer_VectorFields["ellipsoidal_area_field"] = ellipsoidal_area_field
+        self.prefer_VectorFields["cartesian_suffix"] = cartesian_suffix
+        self.prefer_VectorFields["ellipsoidal_suffix"] = ellipsoidal_suffix
 
         save_tool_prefs(ToolKey.SYSTEM, self.prefer_System)
         save_tool_prefs(ToolKey.VECTOR_FIELDS, self.prefer_VectorFields)
         save_tool_prefs(self.TOOL_KEY, self.preferences)
-        self.logger.info(f"Preferências salvas:{self.prefer_System}==={self.preferences}")
+        self.logger.info(
+            f"Preferências salvas:{self.prefer_System}==={self.preferences}"
+        )
         return True
 
     def execute_tool(self):

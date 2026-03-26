@@ -10,6 +10,12 @@
 
 2.2.5.2
 
-- Adicionados no `SettingsPlugin`, dentro de `calc_collapsable`, dois campos configuráveis para nomes de área cartesiana e elipsoidal com `WidgetFactory.create_input_fields_widget`.
-- As preferências desses campos agora são carregadas e salvas em `ToolKey.VECTOR_FIELDS`, com padrões `area` e `area_eli`.
-- Incluída validação para impedir salvamento quando os dois nomes de campo forem iguais, exibindo alerta com `QgisMessageUtil`.
+- Adicionados no `SettingsPlugin`, dentro de `calc_collapsable`, dois campos configuráveis inicialmente para nomes de área cartesiana e elipsoidal com `WidgetFactory.create_input_fields_widget`.
+- As preferências desses campos passaram a ser carregadas e salvas em `ToolKey.VECTOR_FIELDS`.
+- Incluída validação para impedir salvamento quando os dois valores configurados forem iguais, exibindo alerta com `QgisMessageUtil`.
+
+2.2.5.3
+
+- Ajustados os dois campos do `SettingsPlugin` para representar sufixos, não nomes completos de campo: `Sulfixo Cartesiano` com padrão `""` e `Sulfixo Elipsoidal` com padrão `"_eli"`.
+- As preferências em `ToolKey.VECTOR_FIELDS` passaram a usar as chaves `cartesian_suffix` e `ellipsoidal_suffix`.
+- Mantida a validação para impedir salvamento quando os dois sufixos forem iguais, agora com mensagem alinhada ao novo comportamento.
