@@ -36,6 +36,8 @@ Traducao: 9
   - Usar iconManager para carregar ícones de forma centralizada e eficiente
   - vetor para svg
  changelog=
+  2.2.6
+    - 
   2.2.5
     - 
   2.2.4
