@@ -39,6 +39,8 @@ Traducao: 9
   - Usar iconManager para carregar ícones de forma centralizada e eficiente
   - vetor para svg
  changelog=
+  2.2.6
+    - 
   2.2.5
     - Reorganizada interface do SettingsPlugin: adicionados dois widgets colapsáveis - "Geral" 
     - Corrigido bug de inicialização de log em LogUtils: anteriormente usava Path.cwd() 
