@@ -6,11 +6,14 @@ from .BaseDialog import BaseDialog
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..utils.ToolKeys import ToolKey
 from ..i18n.TranslationManager import STR
+from ..utils.QgisMessageUtil import QgisMessageUtil
+from ..resources.IconManager import IconManager as IM
 
 
 class AboutDialog(BaseDialog):
 
     def __init__(self, iface):
+        self.iface = iface
         try:
             super().__init__(iface.mainWindow())
 
@@ -84,7 +87,8 @@ class AboutDialog(BaseDialog):
                 separator_top=True,
                 separator_bottom=False,
             )
-            close_button.clicked.connect(self.close)
+            # close_button.clicked.connect(self.close)
+            close_button.clicked.connect(self.teste_ui)
             self.layout.addLayout(close_layout)
             self.logger.debug("Botão Fechar adicionado")
 
@@ -95,6 +99,14 @@ class AboutDialog(BaseDialog):
             else:
                 print(f"AboutDialog falhou na inicialização: {ex}")
             raise
+
+    def teste_ui(self):
+        QgisMessageUtil.show_icon_message_bar(
+            self.iface,
+            message="Processo finalizado!",
+            icon_path=IM.icon_path(IM.CADMUS_ICON),
+            background_color="#003cff",
+        )
 
 
 def run(iface):

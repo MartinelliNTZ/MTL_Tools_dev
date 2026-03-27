@@ -11,6 +11,7 @@ from qgis.PyQt.QtWidgets import (
     QPushButton,
     QMessageBox,
 )
+from ..resources.IconManager import IconManager as IM
 
 
 class QgisMessageUtil:
@@ -298,6 +299,88 @@ class QgisMessageUtil:
         widget.setStyleSheet(
             f"background-color: {background_color}; padding: 8px; border-radius: 5px;"
         )
+
+        iface.messageBar().pushWidget(widget, level=0, duration=duration)
+        
+        
+    @staticmethod
+    def show_icon_message_bar(
+        iface,
+        message="Concluído com sucesso",
+        icon_path=IM.icon_path(IM.CADMUS_ICON),
+        background_color="#202124",
+        text_color="#ffffff",
+        duration=4,
+        border_radius=8,
+        padding="8px 12px",
+        font_size=12,
+        bold=True
+    ):
+        """
+        Exibe uma message bar visualmente mais rica.
+
+        - Suporte a ícone via path
+        - Layout moderno (espaçamento + alinhamento)
+        - Gradiente leve no fundo
+        - Texto estilizado
+        - Cantos arredondados
+        """
+
+        from qgis.PyQt.QtWidgets import QWidget, QHBoxLayout, QLabel
+        from qgis.PyQt.QtGui import QPixmap
+        from qgis.PyQt.QtCore import Qt
+
+        widget = QWidget()
+        layout = QHBoxLayout()
+        layout.setContentsMargins(10, 6, 10, 6)
+        layout.setSpacing(10)
+
+        # -------------------------
+        # Ícone
+        # -------------------------
+        if icon_path:
+            icon_label = QLabel()
+
+            pix = QPixmap(icon_path).scaled(
+                18, 18,
+                Qt.KeepAspectRatio,
+                Qt.SmoothTransformation
+            )
+
+            icon_label.setPixmap(pix)
+            layout.addWidget(icon_label)
+
+        # -------------------------
+        # Texto
+        # -------------------------
+        weight = "bold" if bold else "normal"
+
+        label = QLabel(message)
+        label.setStyleSheet(f"""
+            color: {text_color};
+            font-size: {font_size}px;
+            font-weight: {weight};
+        """)
+
+        layout.addWidget(label)
+        layout.addStretch()
+
+        widget.setLayout(layout)
+
+        # -------------------------
+        # Estilo moderno (gradiente)
+        # -------------------------
+        widget.setStyleSheet(f"""
+            QWidget {{
+                background: qlineargradient(
+                    x1:0, y1:0, x2:1, y2:1,
+                    stop:0 {background_color},
+                    stop:1 #000000
+                );
+                border-radius: {border_radius}px;
+                padding: {padding};
+            }}
+        """)
 
         iface.messageBar().pushWidget(widget, level=0, duration=duration)
 
