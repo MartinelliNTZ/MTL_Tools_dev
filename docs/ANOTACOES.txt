@@ -39,9 +39,11 @@ Traducao: 9
   - Usar iconManager para carregar ícones de forma centralizada e eficiente
   - vetor para svg
  changelog=
-  2.2.6
-    - 
-  2.2.5
+  2.3.3
+    - Temporaridialog e qgismensagem util
+  2.3.2
+    - iniciado svg
+  2.3.1
     - Reorganizada interface do SettingsPlugin: adicionados dois widgets colapsáveis - "Geral" 
     - Corrigido bug de inicialização de log em LogUtils: anteriormente usava Path.cwd() 
         (ex: C:\Windows\system32) quando não inicializado, causando PermissionError ao criar pasta log.
@@ -63,7 +65,8 @@ Traducao: 9
     - Os cálculos de length para linhas e area para polígonos agora usam os sufixos configuráveis ao resolver os nomes dos campos.
     - O comportamento de pontos (x e y) foi mantido sem alterações.
     - Corrigida chamada de leitura dos sufixos no SettingsPlugin para compatibilidade com InputFieldsWidget.get_value, evitando erro em runtime ao salvar as preferências.
-    
+  2.3.0
+    - pep8  
   2.2.4
     - Correção crítica: VectorFieldPlugin agora detecta automaticamente CRS geográfico e calcula ambos os modos 
       (elipsoidal e cartesiano) por padrão, garantindo que os usuários obtenham resultados precisos sem precisar configurar 
