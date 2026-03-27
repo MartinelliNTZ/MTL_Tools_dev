@@ -2,8 +2,15 @@
 
 import traceback
 from qgis.core import Qgis, QgsMessageLog
-from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.PyQt.QtCore import Qt, QUrl
+from qgis.PyQt.QtWidgets import (
+    QLabel,
+    QHBoxLayout,
+    QWidget,
+    QProgressBar,
+    QPushButton,
+    QMessageBox,
+)
 
 
 class QgisMessageUtil:
@@ -230,6 +237,7 @@ class QgisMessageUtil:
             return "rename"
         return "cancel"
 
+    @staticmethod
     def ask_overwrite(iface, path: str = "") -> str:
         msg = QMessageBox(iface.mainWindow())
         msg.setIcon(QMessageBox.Warning)
@@ -263,5 +271,106 @@ class QgisMessageUtil:
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         return QgisMessageUtil._exec_dialog(msg) == QMessageBox.Yes
 
+    # -------------------------
+    # 2. Styled message
+    # -------------------------
+    @staticmethod
+    def show_styled_message_bar(
+        iface,
+        message="Concluído com sucesso",
+        background_color="#2ecc71",
+        text_color="white",
+        duration=4,
+    ):
+        """
+        Exibe uma mensagem customizada com cores e estilo visual.
+        Útil para destacar sucesso, erro ou estados importantes.
+        """
+        widget = QWidget()
+        layout = QHBoxLayout()
 
-# EOF
+        label = QLabel(message)
+        label.setStyleSheet(f"color: {text_color}; font-weight: bold;")
+
+        layout.addWidget(label)
+        widget.setLayout(layout)
+
+        widget.setStyleSheet(
+            f"background-color: {background_color}; padding: 8px; border-radius: 5px;"
+        )
+
+        iface.messageBar().pushWidget(widget, level=0, duration=duration)
+
+    # -------------------------
+    # 3. Progress message
+    # -------------------------
+    @staticmethod
+    def show_progress_message_bar(iface, message="Processando...", maximum=100):
+        """
+        Exibe uma mensagem com barra de progresso.
+        Retorna a barra para atualização manual durante o processamento.
+        """
+        progress = QProgressBar()
+        progress.setMaximum(maximum)
+
+        msg = iface.messageBar().createMessage(message)
+        msg.layout().addWidget(progress)
+
+        iface.messageBar().pushWidget(msg, level=0)
+
+        return progress, msg
+
+    @staticmethod
+    def update_progress(progress_bar, value):
+        """
+        Atualiza o valor da barra de progresso.
+        """
+        progress_bar.setValue(value)
+
+    @staticmethod
+    def clear_message_bar(iface):
+        """
+        Remove todas as mensagens da barra do QGIS.
+        Útil para finalizar processos com progresso.
+        """
+        iface.messageBar().clearWidgets()
+
+    # -------------------------
+    # 4. Level-based message
+    # -------------------------
+    @staticmethod
+    def show_level_message_bar(
+        iface, title="Status", message="Mensagem", level=0, duration=4
+    ):
+        """
+        Exibe mensagem usando os níveis padrão do QGIS (cores automáticas).
+        """
+        iface.messageBar().pushMessage(title, message, level=level, duration=duration)
+
+    # Níveis:
+    # 0 = Info (azul)
+    # 1 = Warning (amarelo)
+    # 2 = Critical (vermelho)
+    # 3 = Success (verde)
+
+    # -------------------------
+    # 5. Message with button
+    # -------------------------
+    @staticmethod
+    def show_message_bar_with_button(
+        iface, message="Ocorreu um erro", button_text="Detalhes", callback=None, level=2
+    ):
+        """
+        Exibe uma mensagem com botão interativo.
+        Pode ser usado para abrir logs, executar ações ou mostrar detalhes.
+        """
+        msg = iface.messageBar().createMessage(message)
+
+        button = QPushButton(button_text)
+
+        if callback:
+            button.clicked.connect(callback)
+
+        msg.layout().addWidget(button)
+
+        iface.messageBar().pushWidget(msg, level=level)

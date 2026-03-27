@@ -45,3 +45,7 @@
 - Refinado o layout do `ColorButtonWidget` para melhor alinhamento horizontal entre titulo, seletor de cor, input hexadecimal e botao de copiar.
 - Removida a largura fixa pequena do titulo na `WidgetFactory.create_color_button`, reduzida a altura visual do input hexadecimal e ajustado o botao de copiar para respeitar melhor os tamanhos configurados.
 - Simplificado o estilo de `Styles.color_button_widget()` para evitar que o QSS force alturas e tamanhos minimos conflitantes com a configuracao aplicada pela factory.
+
+2.2.5.9
+
+- Padronizados novos métodos de `QgisMessageUtil`: `ask_overwrite`, `show_styled_message_bar`, `show_progress_message_bar`, `update_progress`, `clear_message_bar`, `show_level_message_bar` e `show_message_bar_with_button` foram convertidos em métodos estáticos.
