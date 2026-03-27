@@ -838,8 +838,8 @@ class WidgetFactory:
         hex_min_width: int = 110,
         picker_width: int = None,
         picker_height: int = 24,
-        copy_button_width: int = 20,
-        copy_button_height: int = 20,
+        copy_button_width: int = 12,
+        copy_button_height: int = 12,
         copy_icon_size: int = 14,
         spacing: int = 6,
         hex_read_only: bool = False,
@@ -849,7 +849,7 @@ class WidgetFactory:
     ):
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(Styles.LAYOUT_V_SPACING)
+        layout.setSpacing(Styles.LAYOUT_V_SPACING*4)
 
         if separator_top:
             layout.addWidget(WidgetFactory.create_separator())

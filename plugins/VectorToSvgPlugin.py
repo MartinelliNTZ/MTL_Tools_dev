@@ -22,7 +22,7 @@ class VectorToSvgPlugin(BasePluginMTL):
 
     def _build_ui(self, **kwargs):
         super()._build_ui(
-            title="VectorToSvgPlugin",
+            title="Conversor de Vetor para SVG",
             icon_path="cadmus_icon.ico",
             enable_scroll=False,
         )
