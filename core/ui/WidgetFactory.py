@@ -23,6 +23,7 @@ from ...resources.widgets.SimpleButtonWidget import SimpleButtonWidget
 from ...resources.widgets.CheckboxGridWidget import CheckboxGridWidget
 from ...resources.widgets.ReadOnlyFieldWidget import ReadOnlyFieldWidget
 from ...resources.widgets.DropdownSelectorWidget import DropdownSelectorWidget
+from ...resources.widgets.ColorButtonWidget import ColorButtonWidget
 from ...i18n.TranslationManager import STR
 
 
@@ -821,6 +822,55 @@ class WidgetFactory:
         widget.setStyleSheet(Styles.simple_button_widget())
         layout.addWidget(widget)
         layout.addSpacing(spacing)
+        if separator_bottom:
+            layout.addWidget(WidgetFactory.create_separator())
+
+        return layout, widget
+
+    @staticmethod
+    def create_color_button(
+        *,
+        title: str = "Cor",
+        initial_color=None,
+        tooltip: str = "Escolha uma cor",
+        parent=None,
+        title_width: int = 40,
+        hex_min_width: int = 110,
+        picker_width: int = None,
+        picker_height: int = 24,
+        copy_button_width: int = 20,
+        copy_button_height: int = 20,
+        copy_icon_size: int = 14,
+        spacing: int = 6,
+        hex_read_only: bool = False,
+        hex_placeholder: str = "",
+        separator_top: bool = False,
+        separator_bottom: bool = True,
+    ):
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(Styles.LAYOUT_V_SPACING)
+
+        if separator_top:
+            layout.addWidget(WidgetFactory.create_separator())
+
+        widget = ColorButtonWidget(
+            title=title,
+            initial_color=initial_color,
+            tooltip=tooltip,
+            parent=parent,
+        )
+        widget.setStyleSheet(Styles.color_button_widget())
+        widget.set_title_width(title_width)
+        widget.set_hex_width(hex_min_width)
+        widget.set_spacing(spacing)
+        widget.set_hex_read_only(hex_read_only)
+        widget.set_hex_placeholder(hex_placeholder)
+        widget.set_picker_size(picker_width, picker_height)
+        widget.set_copy_button_size(copy_button_width, copy_button_height)
+        widget.set_copy_icon_size(copy_icon_size, copy_icon_size)
+        layout.addWidget(widget)
+
         if separator_bottom:
             layout.addWidget(WidgetFactory.create_separator())
 

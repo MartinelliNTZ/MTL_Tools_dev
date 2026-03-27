@@ -23,6 +23,9 @@ ferramentas = name                              tipo                            
     - 17: Recortador Massivo de Raster          Processing                      RasterMassClipper              manipulação de raster
     - 18: Gerador de Linhas entre Pontos        Processing                      GeometryLineFromPoints         manipulação de vetores
     - 19: Gerador de diferença entre rasters       Processing                      RasterDifferenceStats          manipulação de raster
+    - 20: Ferramenta de remoção de campos KML        instantânea                     RemoveKmlFieldsPlugin         manipulação de vetores
+
+
 
 Documentação de cenarios: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13
 Instrucoes: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18
