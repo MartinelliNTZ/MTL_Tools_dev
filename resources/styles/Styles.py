@@ -354,11 +354,11 @@ class Styles(BaseStyles):
             color: {Styles.COLOR_TEXT_PRIMARY};
             font-family: Consolas, 'Courier New', monospace;
             font-size: {Styles.FONT_SIZE_SMALL};
-            padding: 2px 6px;
+            padding: 1px 6px;
             background: {Styles.COLOR_BACKGROUND_PANEL};
             border: 1px solid {Styles.COLOR_BORDER};
             border-radius: {Styles.INPUT_BORDER_RADIUS}px;
-            min-height: {Styles.INPUT_HEIGHT + 10}px;
+            min-height: {Styles.INPUT_HEIGHT + 4}px;
         }}
 
         #color_button_widget QLineEdit#color_button_hex_input:focus {{
@@ -366,8 +366,7 @@ class Styles(BaseStyles):
         }}
 
         #color_button_widget QPushButton#color_button_copy {{
-            padding: 2px;
-            min-width: 24px;
-            min-height: 24px;
+            padding: 0px;
+            margin: 0px;
         }}
         """

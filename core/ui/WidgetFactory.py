@@ -834,14 +834,15 @@ class WidgetFactory:
         initial_color=None,
         tooltip: str = "Escolha uma cor",
         parent=None,
-        title_width: int = 40,
+        title_width: int = None,
         hex_min_width: int = 110,
+        hex_height: int = 18,
         picker_width: int = None,
-        picker_height: int = 24,
-        copy_button_width: int = 12,
-        copy_button_height: int = 12,
-        copy_icon_size: int = 14,
-        spacing: int = 6,
+        picker_height: int = 18,
+        copy_button_width: int = 24,#ta funcionado
+        copy_button_height: int = 24,#nao ta funcionado
+        copy_icon_size: int = 10,
+        spacing: int = 4,
         hex_read_only: bool = False,
         hex_placeholder: str = "",
         separator_top: bool = False,
@@ -863,6 +864,7 @@ class WidgetFactory:
         widget.setStyleSheet(Styles.color_button_widget())
         widget.set_title_width(title_width)
         widget.set_hex_width(hex_min_width)
+        widget.set_hex_height(hex_height)
         widget.set_spacing(spacing)
         widget.set_hex_read_only(hex_read_only)
         widget.set_hex_placeholder(hex_placeholder)

@@ -10,7 +10,7 @@ from qgis.PyQt.QtWidgets import (
     QSizePolicy,
     QStyle,
 )
-from qgis.PyQt.QtCore import pyqtSignal, QSize
+from qgis.PyQt.QtCore import pyqtSignal, QSize, Qt
 from qgis.PyQt.QtGui import QColor, QIcon
 from qgis.gui import QgsColorButton
 
@@ -50,6 +50,7 @@ class ColorButtonWidget(QWidget):
         self._title_label.setObjectName("color_button_title")
         self._title_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         layout.addWidget(self._title_label)
+        layout.setAlignment(self._title_label, Qt.AlignVCenter)
 
         self._button = QgsColorButton()
         self._button.setObjectName("color_button_picker")
@@ -58,19 +59,23 @@ class ColorButtonWidget(QWidget):
         self._button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self._button.colorChanged.connect(self._on_color_changed)
         layout.addWidget(self._button)
+        layout.setAlignment(self._button, Qt.AlignVCenter)
 
         self._value_input = QLineEdit("#ffffff")
         self._value_input.setObjectName("color_button_hex_input")
         self._value_input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self._value_input.editingFinished.connect(self._on_hex_edited)
         layout.addWidget(self._value_input, 1)
+        layout.setAlignment(self._value_input, Qt.AlignVCenter)
 
         self._copy_button = QPushButton()
         self._copy_button.setObjectName("color_button_copy")
         self._copy_button.setToolTip("Copiar valor hexadecimal")
+        self._copy_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self._copy_button.clicked.connect(self._copy_hex_value)
         self._copy_button.setIcon(self._resolve_copy_icon())
         layout.addWidget(self._copy_button)
+        layout.setAlignment(self._copy_button, Qt.AlignVCenter)
 
         layout.setStretch(2, 1)
 
@@ -132,17 +137,29 @@ class ColorButtonWidget(QWidget):
             return
         self._value_input.setMinimumWidth(max(1, int(minimum_width)))
 
+    def set_hex_height(self, height: int = None):
+        if height is None:
+            self._value_input.setMinimumHeight(0)
+            self._value_input.setMaximumHeight(16777215)
+            return
+        value = max(1, int(height))
+        self._value_input.setFixedHeight(value)
+
     def set_picker_size(self, width: int = None, height: int = None):
         if width is not None and height is not None:
             self._button.setFixedSize(int(width), int(height))
         elif height is not None:
             self._button.setFixedHeight(int(height))
+        elif width is not None:
+            self._button.setFixedWidth(int(width))
 
-    def set_copy_button_size(self, width: int = None, height: int = None):
+    def set_copy_button_size(self, width: int = 24, height: int = 24):
         if width is not None and height is not None:
             self._copy_button.setFixedSize(int(width), int(height))
         elif height is not None:
             self._copy_button.setFixedHeight(int(height))
+        elif width is not None:
+            self._copy_button.setFixedWidth(int(width))
 
     def set_copy_icon_size(self, width: int = 14, height: int = 14):
         self._copy_button.setIconSize(QSize(int(width), int(height)))
