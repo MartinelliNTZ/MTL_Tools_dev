@@ -3,7 +3,7 @@
 
 class ToolKey:
     # all
-    UNTRACEABLE = "untraceable"  # para logs genéricos sem tool específica
+    UNTRACEABLE = "untraceable"  # para logs genericos sem tool especifica
     # plugins/
     CADMUS_PLUGIN = "cadmus_plugin"
     EXPORT_ALL_LAYOUTS = "export_all_layouts"
@@ -17,9 +17,10 @@ class ToolKey:
     CONVERTER_MULTIPART = "converter_multipart"
     REMOVE_KML_FIELDS = "remove_kml_fields"
     SETTINGS = "settings"
-    SYSTEM = "SYSTEM"  # para logs genéricos do sistema, sem tool específica
+    SYSTEM = "SYSTEM"  # para logs genericos do sistema, sem tool especifica
     VECTOR_FIELDS = "vector_fields"
     ABOUT_DIALOG = "about_dialog"
+    VECTOR_TO_SVG = "vector_to_svg"
 
     # model3 / panel tool
     # processing/
@@ -32,27 +33,28 @@ class ToolKey:
     RASTER_MASS_CLIPPER = "raster_mass_clipper"
     GEOMETRY_LINE_FROM_POINTS = "geometry_line_from_points"
 
-    # Cores por tool_key (toolbar-first, semântica)
+    # Cores por tool_key (toolbar-first, semantica)
     TOOL_KEY_COLORS = {
-        # === Toolbar / ações principais ===
-        CADMUS_PLUGIN: "#804E0A",  # laranja claro → plugin principal
-        EXPORT_ALL_LAYOUTS: "#4ECDC4",  # turquesa → exportação / layout        1
-        DRONE_COORDINATES: "#45B7D1",  # azul → coordenadas / espacial
-        LOAD_FOLDER_LAYERS: "#96CEB4",  # verde → carga de dados
-        REPLACE_IN_LAYOUTS: "#F8C471",  # laranja → alteração / replace
-        RESTART_QGIS: "#FF6B6B",  # vermelho → ação crítica
-        GENERATE_TRAIL: "#82E0AA",  # verde limão → geração geométrica
-        COORD_CLICK_TOOL: "#85C1E9",  # azul céu → map tool
-        COPY_ATTRIBUTES: "#DDA0DD",  # plum → dados / atributos
-        CONVERTER_MULTIPART: "#F5A962",  # laranja-pêssego → conversão geométrica
-        REMOVE_KML_FIELDS: "#58D68D",  # verde → limpeza de atributos KML
-        SETTINGS: "#95A5A6",  # cinza → configurações / sistema
-        VECTOR_FIELDS: "#C39BD3",  # púrpura → cálculos vetoriais
-        # === Processing / análises ===
-        ATTRIBUTE_STATISTICS: "#F7DC6F",  # amarelo → estatística
-        DIFFERENCE_FIELDS: "#BB8FCE",  # roxo → comparação
-        MY_ALGORITHM: "#98D8C8",  # verde água → genérico
-        PROVIDER: "#BFC9CA",  # cinza → infraestrutura
-        RASTER_MASS_SAMPLER: "#F1948A",  # coral → raster pesado
-        ELEVATION_ANALISYS: "#5DADE2",  # azul médio → relevo
+        # === Toolbar / acoes principais ===
+        CADMUS_PLUGIN: "#804E0A",  # laranja claro -> plugin principal
+        EXPORT_ALL_LAYOUTS: "#4ECDC4",  # turquesa -> exportacao / layout
+        DRONE_COORDINATES: "#45B7D1",  # azul -> coordenadas / espacial
+        LOAD_FOLDER_LAYERS: "#96CEB4",  # verde -> carga de dados
+        REPLACE_IN_LAYOUTS: "#F8C471",  # laranja -> alteracao / replace
+        RESTART_QGIS: "#FF6B6B",  # vermelho -> acao critica
+        GENERATE_TRAIL: "#82E0AA",  # verde limao -> geracao geometrica
+        COORD_CLICK_TOOL: "#85C1E9",  # azul ceu -> map tool
+        COPY_ATTRIBUTES: "#DDA0DD",  # plum -> dados / atributos
+        CONVERTER_MULTIPART: "#F5A962",  # laranja-pessego -> conversao geometrica
+        REMOVE_KML_FIELDS: "#58D68D",  # verde -> limpeza de atributos KML
+        SETTINGS: "#95A5A6",  # cinza -> configuracoes / sistema
+        VECTOR_FIELDS: "#C39BD3",  # purpura -> calculos vetoriais
+        VECTOR_TO_SVG: "#7FB3D5",  # azul suave -> exportacao vetorial
+        # === Processing / analises ===
+        ATTRIBUTE_STATISTICS: "#F7DC6F",  # amarelo -> estatistica
+        DIFFERENCE_FIELDS: "#BB8FCE",  # roxo -> comparacao
+        MY_ALGORITHM: "#98D8C8",  # verde agua -> generico
+        PROVIDER: "#BFC9CA",  # cinza -> infraestrutura
+        RASTER_MASS_SAMPLER: "#F1948A",  # coral -> raster pesado
+        ELEVATION_ANALISYS: "#5DADE2",  # azul medio -> relevo
     }

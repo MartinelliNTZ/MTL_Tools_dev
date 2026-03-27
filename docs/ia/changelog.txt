@@ -1,31 +1,41 @@
 2.2.1.6
 
-- Reorganizada interface do SettingsPlugin: adicionados dois widgets colapsáveis - "Geral" (botão de preferências, idioma, precisão de campos vetoriais, limiar assíncrono) e "Plugin de Calculos Vetoriais" (método de cálculo vetorial) para melhor organização da UI.
+- Reorganizada interface do SettingsPlugin: adicionados dois widgets colapsaveis - "Geral" (botao de preferencias, idioma, precisao de campos vetoriais, limiar assincrono) e "Plugin de Calculos Vetoriais" (metodo de calculo vetorial) para melhor organizacao da UI.
 
 2.2.5.1
 
-- Corrigido bug de inicialização de log em `LogUtils`: anteriormente usava `Path.cwd()` (ex: `C:\Windows\system32`) quando não inicializado, causando `PermissionError` ao criar pasta `log`.
-- Implementado fallback seguro para `plugin_root` via `Path(__file__).resolve().parents[3]` e, se necessário, `Path.home()/Cadmus/log`.
-- Ajustado `LogUtils._write_event` para continuar sem arquivo de log e enviar mensagem por `QgsMessageLog`/stderr em casos de falha de criação de arquivo.
+- Corrigido bug de inicializacao de log em `LogUtils`: anteriormente usava `Path.cwd()` (ex: `C:\Windows\system32`) quando nao inicializado, causando `PermissionError` ao criar pasta `log`.
+- Implementado fallback seguro para `plugin_root` via `Path(__file__).resolve().parents[3]` e, se necessario, `Path.home()/Cadmus/log`.
+- Ajustado `LogUtils._write_event` para continuar sem arquivo de log e enviar mensagem por `QgsMessageLog`/stderr em casos de falha de criacao de arquivo.
 
 2.2.5.2
 
-- Adicionados no `SettingsPlugin`, dentro de `calc_collapsable`, dois campos configuráveis inicialmente para nomes de área cartesiana e elipsoidal com `WidgetFactory.create_input_fields_widget`.
-- As preferências desses campos passaram a ser carregadas e salvas em `ToolKey.VECTOR_FIELDS`.
-- Incluída validação para impedir salvamento quando os dois valores configurados forem iguais, exibindo alerta com `QgisMessageUtil`.
+- Adicionados no `SettingsPlugin`, dentro de `calc_collapsable`, dois campos configuraveis inicialmente para nomes de area cartesiana e elipsoidal com `WidgetFactory.create_input_fields_widget`.
+- As preferencias desses campos passaram a ser carregadas e salvas em `ToolKey.VECTOR_FIELDS`.
+- Incluida validacao para impedir salvamento quando os dois valores configurados forem iguais, exibindo alerta com `QgisMessageUtil`.
 
 2.2.5.3
 
-- Ajustados os dois campos do `SettingsPlugin` para representar sufixos, não nomes completos de campo: `Sulfixo Cartesiano` com padrão `""` e `Sulfixo Elipsoidal` com padrão `"_eli"`.
-- As preferências em `ToolKey.VECTOR_FIELDS` passaram a usar as chaves `cartesian_suffix` e `ellipsoidal_suffix`.
-- Mantida a validação para impedir salvamento quando os dois sufixos forem iguais, agora com mensagem alinhada ao novo comportamento.
+- Ajustados os dois campos do `SettingsPlugin` para representar sufixos, nao nomes completos de campo: `Sulfixo Cartesiano` com padrao `""` e `Sulfixo Elipsoidal` com padrao `"_eli"`.
+- As preferencias em `ToolKey.VECTOR_FIELDS` passaram a usar as chaves `cartesian_suffix` e `ellipsoidal_suffix`.
+- Mantida a validacao para impedir salvamento quando os dois sufixos forem iguais, agora com mensagem alinhada ao novo comportamento.
 
 2.2.5.4
 
 - Implementada a leitura dos sufixos configurados em `ToolKey.VECTOR_FIELDS` no `VectorFieldsCalculationPlugin`.
-- Os cálculos de `length` para linhas e `area` para polígonos agora usam os sufixos configuráveis ao resolver os nomes dos campos.
-- O comportamento de pontos (`x` e `y`) foi mantido sem alterações.
+- Os calculos de `length` para linhas e `area` para poligonos agora usam os sufixos configuraveis ao resolver os nomes dos campos.
+- O comportamento de pontos (`x` e `y`) foi mantido sem alteracoes.
 
 2.2.5.5
 
-- Corrigida chamada de leitura dos sufixos no `SettingsPlugin` para compatibilidade com `InputFieldsWidget.get_value`, evitando erro em runtime ao salvar as preferências.
+- Corrigida chamada de leitura dos sufixos no `SettingsPlugin` para compatibilidade com `InputFieldsWidget.get_value`, evitando erro em runtime ao salvar as preferencias.
+
+2.2.5.6
+
+- Adicionada nova ferramenta de dialogo `VectorToSvgPlugin` na categoria `FOLDER`, registrada no `ToolRegistry` com `cadmus_icon` e exibicao em toolbar e menus.
+- Implementada a UI inicial do `VectorToSvgPlugin` herdando de `BasePluginMTL`, composta apenas no `_build_ui()` com `WidgetFactory.create_layer_input`, tres `create_color_button` e um `create_checkbox_grid`.
+- Registrado novo `ToolKey.VECTOR_TO_SVG` para logging e identificacao da ferramenta.
+
+2.2.5.7
+
+- Corrigido import de `QgsMapLayerProxyModel` no `VectorToSvgPlugin`, trocando `qgis.gui` por `qgis.core` para compatibilidade com QGIS 3.16.

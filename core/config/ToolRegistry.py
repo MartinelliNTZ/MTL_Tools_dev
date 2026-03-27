@@ -130,6 +130,18 @@ class ToolRegistry:
             f"ToolRegistry: added {load_folder.name} category {load_folder.category} main {load_folder.main_action}"
         )
 
+        vector_to_svg = Tool(
+            name="VectorToSvgPlugin",
+            icon=im.icon(im.CADMUS_ICON),
+            category=self.FOLDER,
+            tool_type=ToolTypeEnum.DIALOG,
+            executor=self.run_vector_to_svg,
+            tooltip="Interface inicial para converter camada vetorial em SVG",
+            order=20,
+            show_in_toolbar=True,
+        )
+        tools.append(vector_to_svg)
+
         # =====================================================
         # VECTOR (Ordem: Fields=10, Coords=20, Pasta=30, Multipart=40, Copy=50)
         # =====================================================
@@ -463,6 +475,22 @@ class ToolRegistry:
             self.logger.error(f"Erro ao executar Carregar pasta de arquivos: {str(e)}")
             QgisMessageUtil.bar_critical(
                 self.iface, f"Erro no plugin Carregar pasta:\n{str(e)}"
+            )
+
+    # =====================================================
+    # EXECUTAR: Vector To SVG
+    # =====================================================
+    def run_vector_to_svg(self):
+        try:
+            from ...plugins.VectorToSvgPlugin import run
+
+            self.logger.info("Abrindo diálogo: VectorToSvgPlugin")
+            self.vector_to_svg_dlg = run(self.iface)
+            self.logger.info("Diálogo VectorToSvgPlugin aberto com sucesso")
+        except Exception as e:
+            self.logger.error(f"Erro ao executar VectorToSvgPlugin: {str(e)}")
+            QgisMessageUtil.bar_critical(
+                self.iface, f"Erro no plugin VectorToSvgPlugin:\n{str(e)}"
             )
 
     # =====================================================
