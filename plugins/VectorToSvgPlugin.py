@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+import os
+import re
+
+from qgis.PyQt.QtCore import QCoreApplication
+from qgis.core import QgsLayoutExporter, QgsProject
 from qgis.PyQt.QtGui import QColor
 from qgis.core import QgsMapLayerProxyModel
 
@@ -87,6 +92,21 @@ class VectorToSvgPlugin(BasePluginMTL):
                 tool_key=self.TOOL_KEY,
             )
         )
+        folder_layout, self.folder_selector = WidgetFactory.create_path_selector(
+            parent=self,
+            title="STR.OUTPUT_FOLDER",
+            mode="folder",
+            separator_top=False,
+            separator_bottom=False,
+        )
+        self.logger.debug("Path Selector de pasta de saída criado")
+
+        btn_project_layout, self.btn_project = WidgetFactory.create_simple_button(
+            text="STR.USE_PROJECT_FOLDER",
+            parent=self,
+        )
+        self.btn_project.clicked.connect(self._set_folder_to_project)
+        self.logger.debug("Botão 'Usar pasta do projeto' criado")
 
         self.layout.add_items(
             [
@@ -95,6 +115,8 @@ class VectorToSvgPlugin(BasePluginMTL):
                 border_layout,
                 label_layout,
                 options_layout,
+                folder_layout,
+                btn_project_layout,
                 buttons_layout,
             ]
         )
@@ -103,6 +125,12 @@ class VectorToSvgPlugin(BasePluginMTL):
         self.logger.debug(
             "VectorToSvgPlugin inicializado apenas com interface. Execucao ainda nao implementada."
         )
+    def _set_folder_to_project(self):
+        self.logger.debug("Definindo pasta para pasta do projeto")
+        project_folder = QgsProject.instance().homePath()
+        export_folder = os.path.join(project_folder, "svgs")
+        self.folder_selector.set_paths([export_folder])
+        self.logger.debug(f"Pasta definida para: {export_folder}")
 
 
 def run(iface):
