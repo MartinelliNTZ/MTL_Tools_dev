@@ -37,7 +37,7 @@ class VectorToSvgPlugin(BasePluginMTL):
             "Camada Vetorial",
             QgsMapLayerProxyModel.VectorLayer,
             allow_empty=False,
-            enable_selected_checkbox=False,
+            enable_selected_checkbox=True,
             parent=self,
             separator_top=False,
             separator_bottom=True,
@@ -74,6 +74,7 @@ class VectorToSvgPlugin(BasePluginMTL):
             "transparent_background": "Fundo transparente",
             "show_border": "Mostrar Borda",
             "show_label": "Mostrar Rotulo",
+            "for_each_feature": "Gerar SVG para cada feição",
         }
         options_layout, self.options_map = WidgetFactory.create_checkbox_grid(
             options,
