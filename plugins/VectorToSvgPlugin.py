@@ -77,6 +77,16 @@ class VectorToSvgPlugin(BasePluginMTL):
             separator_top=False,
             separator_bottom=True,
         )
+                # ====== BOTOES ======
+        buttons_layout, self.action_buttons = (
+            WidgetFactory.create_bottom_action_buttons(
+                parent=self,
+                run_callback=self.execute_tool,
+                close_callback=self.close,
+                info_callback=self.show_info_dialog,
+                tool_key=self.TOOL_KEY,
+            )
+        )
 
         self.layout.add_items(
             [
@@ -85,6 +95,7 @@ class VectorToSvgPlugin(BasePluginMTL):
                 border_layout,
                 label_layout,
                 options_layout,
+                buttons_layout,
             ]
         )
 
