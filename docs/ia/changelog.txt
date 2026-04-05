@@ -90,3 +90,13 @@
 
 - Adicionado ao `VectorToSvgPlugin` um controle de `Tamanho Rotulo` na interface, com persistencia nas preferencias da ferramenta.
 - Ajustado o `SVGUtils` para priorizar o tamanho de rotulo configurado pelo usuario no plugin sobre o tamanho vindo da configuracao de labeling da camada.
+
+2.2.5.17
+
+- Substituidas no `VectorToSvgPlugin` as principais strings hardcoded por `STR`, reaproveitando termos existentes quando o significado era equivalente.
+- Adicionadas ao `Strings_pt_BR.py` apenas as chaves especificas do `VectorToSvgPlugin` que nao possuíam equivalente claro no catalogo atual.
+
+2.2.5.18
+
+- Generalizadas as mensagens de exportacao do `VectorToSvgPlugin`, reaproveitando ao maximo strings ja existentes do catalogo `STR`.
+- Removidas do `Strings_pt_BR.py` as chaves especificas de erro/sucesso de SVG que podiam ser substituidas por termos mais amplos como `ERROR`, `EXPORT` e `LAYER_HAS_NO_FEATURES`.

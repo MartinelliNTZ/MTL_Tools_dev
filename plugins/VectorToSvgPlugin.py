@@ -16,7 +16,6 @@ from ..utils.SVGUtils import SVGUtils
 from ..utils.ToolKeys import ToolKey
 from ..utils.vector.VectorLayerAttributes import VectorLayerAttributes
 from ..utils.vector.VectorLayerGeometry import VectorLayerGeometry
-from ..i18n.TranslationManager import STR
 
 
 class VectorToSvgPlugin(BasePluginMTL):
@@ -34,13 +33,13 @@ class VectorToSvgPlugin(BasePluginMTL):
 
     def _build_ui(self, **kwargs):
         super()._build_ui(
-            title="Conversor de Vetor para SVG",
+            title=STR.VECTOR_TO_SVG_TITLE,
             icon_path="cadmus_icon.ico",
             enable_scroll=True,
         )
 
         layer_layout, self.layer_input = WidgetFactory.create_layer_input(
-            "Camada Vetorial",
+            STR.VECTOR_LAYER_LABEL,
             QgsMapLayerProxyModel.VectorLayer,
             allow_empty=False,
             enable_selected_checkbox=True,
@@ -50,18 +49,18 @@ class VectorToSvgPlugin(BasePluginMTL):
         )
 
         fill_layout, self.fill_color_widget = WidgetFactory.create_color_button(
-            title="Cor Fundo",
+            title=STR.BACKGROUND_COLOR,
             initial_color=QColor("#ffffff"),
-            tooltip="Selecione a cor de preenchimento",
+            tooltip=STR.SELECT_FILL_COLOR,
             parent=self,
             separator_top=False,
             separator_bottom=False,
         )
 
         border_layout, self.border_color_widget = WidgetFactory.create_color_button(
-            title="Cor Borda",
+            title=STR.BORDER_COLOR,
             initial_color=QColor("#000000"),
-            tooltip="Selecione a cor da borda",
+            tooltip=STR.SELECT_BORDER_COLOR,
             parent=self,
             separator_top=False,
             separator_bottom=False,
@@ -69,7 +68,7 @@ class VectorToSvgPlugin(BasePluginMTL):
 
         border_width_layout, self.border_width_spin = (
             WidgetFactory.create_double_spin_input(
-                "Espessura Borda",
+                STR.BORDER_WIDTH,
                 decimals=2,
                 step=0.2,
                 minimum=0.0,
@@ -81,9 +80,9 @@ class VectorToSvgPlugin(BasePluginMTL):
         )
 
         label_layout, self.label_color_widget = WidgetFactory.create_color_button(
-            title="Cor Rotulo",
+            title=STR.LABEL_COLOR,
             initial_color=QColor("#000000"),
-            tooltip="Selecione a cor do rotulo",
+            tooltip=STR.SELECT_LABEL_COLOR,
             parent=self,
             separator_top=False,
             separator_bottom=True,
@@ -91,7 +90,7 @@ class VectorToSvgPlugin(BasePluginMTL):
 
         label_size_layout, self.label_size_spin = (
             WidgetFactory.create_double_spin_input(
-                "Tamanho Rotulo",
+                STR.LABEL_SIZE,
                 decimals=1,
                 step=1.0,
                 minimum=1.0,
@@ -103,10 +102,10 @@ class VectorToSvgPlugin(BasePluginMTL):
         )
 
         options = {
-            "transparent_background": "Fundo transparente",
-            "show_border": "Mostrar Borda",
-            "show_label": "Mostrar Rotulo",
-            "for_each_feature": "Gerar SVG para cada feicao",
+            "transparent_background": STR.TRANSPARENT_BACKGROUND,
+            "show_border": STR.SHOW_BORDER,
+            "show_label": STR.SHOW_LABEL,
+            "for_each_feature": STR.GENERATE_SVG_FOR_EACH_FEATURE,
         }
         options_layout, self.options_map = WidgetFactory.create_checkbox_grid(
             options,
@@ -241,11 +240,11 @@ class VectorToSvgPlugin(BasePluginMTL):
         self.start_stats(layer)
 
         if not layer:
-            QgisMessageUtil.bar_critical(self.iface, "Selecione uma camada vetorial.")
+            QgisMessageUtil.bar_critical(self.iface, STR.SELECT_VECTOR_LAYER)
             return
 
         if not VectorLayerAttributes.ensure_has_features(layer, self.logger):
-            QgisMessageUtil.bar_warning(self.iface, "A camada nao possui feicoes.")
+            QgisMessageUtil.bar_warning(self.iface, STR.LAYER_HAS_NO_FEATURES)
             return
 
         output_folder = self._resolve_output_folder()
@@ -261,9 +260,7 @@ class VectorToSvgPlugin(BasePluginMTL):
             export_layer, tool_key=self.TOOL_KEY
         )
         if not features:
-            QgisMessageUtil.bar_warning(
-                self.iface, "Nenhuma feicao valida foi encontrada para exportacao."
-            )
+            QgisMessageUtil.bar_warning(self.iface, STR.LAYER_HAS_NO_FEATURES)
             return
 
         style = self._build_style()
@@ -280,21 +277,21 @@ class VectorToSvgPlugin(BasePluginMTL):
                 ]
         except Exception as e:
             self.logger.error(f"Erro ao gerar SVG: {e}")
-            QgisMessageUtil.modal_error(self.iface, f"Erro ao gerar SVG:\n{e}")
-            return
-
-        if not generated:
-            QgisMessageUtil.bar_warning(
-                self.iface, "Nenhum SVG foi gerado a partir da camada selecionada."
+            QgisMessageUtil.modal_error(
+                self.iface, f"{STR.ERROR}\n{e}"
             )
             return
 
+        if not generated:
+            QgisMessageUtil.bar_warning(self.iface, STR.ERROR)
+            return
+
         self.finish_stats(input_obj=export_layer)
-        message = f"{len(generated)} SVG(s) gerado(s) com sucesso."
+        message = f"{len(generated)} {STR.SVGS_GENERATED_SUCCESS}"
         self.logger.info(message)
         QgisMessageUtil.modal_result_with_folder(
             self.iface,
-            "Exportacao concluida",
+            STR.EXPORT,
             message,
             output_folder,
             parent=self,
@@ -305,7 +302,7 @@ class VectorToSvgPlugin(BasePluginMTL):
         output_folder = paths[0].strip() if paths else ""
 
         if not output_folder:
-            QgisMessageUtil.bar_warning(self.iface, "Selecione a pasta de saida.")
+            QgisMessageUtil.bar_warning(self.iface, STR.OUTPUT_FOLDER)
             return None
 
         try:
@@ -315,7 +312,7 @@ class VectorToSvgPlugin(BasePluginMTL):
         except Exception as e:
             self.logger.error(f"Erro ao preparar pasta de saida '{output_folder}': {e}")
             QgisMessageUtil.modal_error(
-                self.iface, f"Nao foi possivel criar/acessar a pasta de saida.\n{e}"
+                self.iface, f"{STR.ERROR}\n{e}"
             )
             return None
 

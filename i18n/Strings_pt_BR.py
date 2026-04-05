@@ -465,3 +465,20 @@ class Strings_pt_BR:
         "A ferramenta so executa se a camada estiver em edicao\n"
         "e nao salva nem encerra o modo de edicao."
     )
+
+    # plugins/VectorToSvgPlugin.py
+    VECTOR_TO_SVG_TITLE = "Conversor de Vetor para SVG"
+    VECTOR_LAYER_LABEL = "Camada Vetorial"
+    BACKGROUND_COLOR = "Cor Fundo"
+    BORDER_COLOR = "Cor Borda"
+    BORDER_WIDTH = "Espessura Borda"
+    LABEL_COLOR = "Cor Rotulo"
+    LABEL_SIZE = "Tamanho Rotulo"
+    SELECT_FILL_COLOR = "Selecione a cor de preenchimento"
+    SELECT_BORDER_COLOR = "Selecione a cor da borda"
+    SELECT_LABEL_COLOR = "Selecione a cor do rotulo"
+    TRANSPARENT_BACKGROUND = "Fundo transparente"
+    SHOW_BORDER = "Mostrar Borda"
+    SHOW_LABEL = "Mostrar Rotulo"
+    GENERATE_SVG_FOR_EACH_FEATURE = "Gerar SVG para cada feicao"
+    SVGS_GENERATED_SUCCESS = "SVG(s) gerado(s) com sucesso."
