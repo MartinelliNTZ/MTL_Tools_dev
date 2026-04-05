@@ -234,6 +234,12 @@ class Strings_en(Strings_pt_BR):
     )
     RASTER_DIFFERENCE_STATISTICS_TITLE = "Process Raster Difference"
     VECTOR_TO_SVG_TITLE = "Vector to SVG Converter"
+    VECTOR_TO_SVG_TOOLTIP = (
+        "Exports a project vector layer to SVG.\n"
+        "Lets you configure background, border, and label,\n"
+        "and can generate either a single file or one SVG\n"
+        "per feature."
+    )
     VECTOR_LAYER_LABEL = "Vector Layer"
     BACKGROUND_COLOR = "Background Color"
     BORDER_COLOR = "Border Color"

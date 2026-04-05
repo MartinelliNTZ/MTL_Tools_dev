@@ -125,12 +125,12 @@ class ToolRegistry:
         tools.append(load_folder)
 
         vector_to_svg = Tool(
-            name="VectorToSvgPlugin",
+            name=STR.VECTOR_TO_SVG_TITLE,
             icon=im.icon(im.CADMUS_ICON),
             category=self.FOLDER,
             tool_type=ToolTypeEnum.DIALOG,
             executor=self.run_vector_to_svg,
-            tooltip="Interface inicial para converter camada vetorial em SVG",
+            tooltip=STR.VECTOR_TO_SVG_TOOLTIP,
             order=20,
             show_in_toolbar=True,
         )

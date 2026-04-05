@@ -480,6 +480,12 @@ class Strings_de(Strings_pt_BR):
         "und speichert nicht und beendet den Bearbeitungsmodus nicht."
     )
     VECTOR_TO_SVG_TITLE = "Vektor-zu-SVG-Konverter"
+    VECTOR_TO_SVG_TOOLTIP = (
+        "Exportiert einen Vektorlayer des Projekts nach SVG.\n"
+        "Erlaubt die Konfiguration von Hintergrund, Rand und Beschriftung\n"
+        "und kann entweder eine einzelne Datei oder ein separates SVG\n"
+        "pro Feature erzeugen."
+    )
     VECTOR_LAYER_LABEL = "Vektorlayer"
     BACKGROUND_COLOR = "Hintergrundfarbe"
     BORDER_COLOR = "Randfarbe"

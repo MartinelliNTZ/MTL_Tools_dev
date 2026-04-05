@@ -483,6 +483,12 @@ class Strings_es(Strings_pt_BR):
         "y no guarda ni cierra el modo de edicion."
     )
     VECTOR_TO_SVG_TITLE = "Conversor de Vector a SVG"
+    VECTOR_TO_SVG_TOOLTIP = (
+        "Exporta una capa vectorial del proyecto a SVG.\n"
+        "Permite configurar fondo, borde y etiqueta,\n"
+        "además de generar un único archivo o un SVG\n"
+        "separado por cada entidad."
+    )
     VECTOR_LAYER_LABEL = "Capa Vectorial"
     BACKGROUND_COLOR = "Color de Fondo"
     BORDER_COLOR = "Color del Borde"

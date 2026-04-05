@@ -41,6 +41,7 @@ class StringManager:
         "es": "ES Español",
         "en": "EN English",
         "pt_BR": "BR Português",
+        "de": "DE Deutsch",
     }
     VECTOR_EXTS = {
         ".shp",

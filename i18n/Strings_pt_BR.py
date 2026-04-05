@@ -479,6 +479,12 @@ class Strings_pt_BR:
 
     # plugins/VectorToSvgPlugin.py
     VECTOR_TO_SVG_TITLE = "Conversor de Vetor para SVG"
+    VECTOR_TO_SVG_TOOLTIP = (
+        "Exporta uma camada vetorial do projeto para SVG.\n"
+        "Permite configurar fundo, borda e rótulo,\n"
+        "além de gerar um único arquivo ou um SVG\n"
+        "separado para cada feição."
+    )
     VECTOR_LAYER_LABEL = "Camada Vetorial"
     BACKGROUND_COLOR = "Cor Fundo"
     BORDER_COLOR = "Cor Borda"
