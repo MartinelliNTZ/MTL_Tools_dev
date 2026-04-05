@@ -100,3 +100,12 @@
 
 - Generalizadas as mensagens de exportacao do `VectorToSvgPlugin`, reaproveitando ao maximo strings ja existentes do catalogo `STR`.
 - Removidas do `Strings_pt_BR.py` as chaves especificas de erro/sucesso de SVG que podiam ser substituidas por termos mais amplos como `ERROR`, `EXPORT` e `LAYER_HAS_NO_FEATURES`.
+
+2.2.5.19
+
+- Criados os arquivos de instrucoes do `VectorToSvgPlugin` seguindo o padrao do `ToolKey.VECTOR_TO_SVG`: `resources/instructions/pt_BR/vector_to_svg_help.md`, `resources/instructions/en/vector_to_svg_help.md` e `resources/instructions/es/vector_to_svg_help.md`.
+- Criado o documento de analise de cenario `docs/analise_de_cenario/vector_to_svg_analise_cenario.MD`, alinhado ao comportamento atual da ferramenta.
+
+2.2.5.20
+
+- Adicionados os arquivos faltantes de instrucoes para `ja` e `de`, mantendo o padrao `vector_to_svg_help.md` alinhado ao `ToolKey.VECTOR_TO_SVG`.
