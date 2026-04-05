@@ -79,3 +79,9 @@
 - Tornada mais robusta a exportacao de borda no `SVGUtils`: a largura do contorno agora e definida explicitamente por tipo de geometria, evitando depender de propriedades de `symbolLayer` que variam entre simbolizadores.
 - Adicionado fallback de rotulos por `customProperty` da camada (`labeling/fieldName`, `labeling/isExpression`, `labeling/fontFamily`, `labeling/fontSize`) para aumentar compatibilidade entre versoes e implementacoes de labeling do QGIS.
 - Implementado fallback de leitura de settings de labeling para assinaturas diferentes de `settings(...)`, cobrindo cenarios em que a API exige apenas `providerId` ou `layer, providerId`.
+
+2.2.5.15
+
+- Adicionado ao `VectorToSvgPlugin` um controle de `Espessura Borda` via `WidgetFactory.create_double_spin_input`, com persistencia nas preferencias da ferramenta.
+- Conectada a espessura configurada pelo usuario ao `stroke-width` final das geometrias no `SVGUtils`.
+- Expandido o fallback de rotulos no `SVGUtils` para tentar `displayExpression()` e, por ultimo, o campo `Name`, com logs de debug para facilitar diagnostico quando o rotulo continuar vazio.

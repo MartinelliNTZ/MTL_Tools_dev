@@ -413,7 +413,12 @@ class SVGUtils:
 
         show_border = True if style is None else style.get("show_border", True)
         configured_border_color = None if style is None else style.get("border_color")
-        border_width = SVGUtils.default_border_width_for_geometry(geometry)
+        configured_border_width = None if style is None else style.get("border_width")
+        border_width = configured_border_width
+        if border_width is None or float(border_width) < 0:
+            border_width = SVGUtils.default_border_width_for_geometry(geometry)
+        else:
+            border_width = float(border_width)
 
         return {
             "fill": fill_color or SVGUtils.DEFAULT_FILL_COLOR,
@@ -535,6 +540,33 @@ class SVGUtils:
     def _read_label_settings_from_custom_properties(layer, logger):
         field_name = str(layer.customProperty("labeling/fieldName", "") or "").strip()
         if not field_name:
+            try:
+                display_expression = str(layer.displayExpression() or "").strip()
+            except Exception:
+                display_expression = ""
+
+            if display_expression:
+                logger.debug(
+                    f"Usando fallback displayExpression para rotulo: {display_expression}"
+                )
+                return {
+                    "fieldName": display_expression,
+                    "isExpression": True,
+                    "fontFamily": SVGUtils.DEFAULT_LABEL_FONT_FAMILY,
+                    "fontSize": SVGUtils.DEFAULT_LABEL_FONT_SIZE,
+                }
+
+            name_index = layer.fields().lookupField("Name")
+            if name_index != -1:
+                logger.debug("Usando fallback do campo 'Name' para rotulo")
+                return {
+                    "fieldName": "Name",
+                    "isExpression": False,
+                    "fontFamily": SVGUtils.DEFAULT_LABEL_FONT_FAMILY,
+                    "fontSize": SVGUtils.DEFAULT_LABEL_FONT_SIZE,
+                }
+
+            logger.debug("Nenhum fallback de rotulo encontrado em customProperty/displayExpression/Name")
             return None
 
         is_expression = str(
@@ -605,9 +637,16 @@ class SVGUtils:
                 return None
 
             if value is None:
+                logger.debug(
+                    f"Rotulo vazio para feicao {feature.id()} apos avaliar expressao: {expression_text}"
+                )
                 return None
 
             text = str(value).strip()
+            if not text:
+                logger.debug(
+                    f"Rotulo em branco para feicao {feature.id()} apos avaliar expressao: {expression_text}"
+                )
             return text or None
         except Exception as e:
             logger.warning(
@@ -685,6 +724,9 @@ class SVGUtils:
 
     @staticmethod
     def default_border_width_for_geometry(geometry: QgsGeometry) -> float:
+        if geometry is None:
+            return SVGUtils.DEFAULT_POLYGON_STROKE_WIDTH
+
         if geometry.type() == QgsWkbTypes.PointGeometry:
             return 1.0
         if geometry.type() == QgsWkbTypes.LineGeometry:

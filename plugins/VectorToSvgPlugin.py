@@ -66,6 +66,19 @@ class VectorToSvgPlugin(BasePluginMTL):
             separator_bottom=False,
         )
 
+        border_width_layout, self.border_width_spin = (
+            WidgetFactory.create_double_spin_input(
+                "Espessura Borda",
+                decimals=2,
+                step=0.2,
+                minimum=0.0,
+                maximum=50.0,
+                value=1.2,
+                separator_top=False,
+                separator_bottom=False,
+            )
+        )
+
         label_layout, self.label_color_widget = WidgetFactory.create_color_button(
             title="Cor Rotulo",
             initial_color=QColor("#000000"),
@@ -120,6 +133,7 @@ class VectorToSvgPlugin(BasePluginMTL):
                 layer_layout,
                 fill_layout,
                 border_layout,
+                border_width_layout,
                 label_layout,
                 options_layout,
                 folder_layout,
@@ -140,6 +154,9 @@ class VectorToSvgPlugin(BasePluginMTL):
         )
         self.label_color_widget.set_color(
             QColor(self.preferences.get("label_color", "#000000"))
+        )
+        self.border_width_spin.setValue(
+            float(self.preferences.get("border_width", 1.2))
         )
 
         self.options_map["transparent_background"].setChecked(
@@ -174,6 +191,7 @@ class VectorToSvgPlugin(BasePluginMTL):
         self.preferences["label_color"] = self.label_color_widget.get_color().name(
             QColor.HexArgb
         )
+        self.preferences["border_width"] = float(self.border_width_spin.value())
         self.preferences["transparent_background"] = self.options_map[
             "transparent_background"
         ].isChecked()
@@ -307,6 +325,7 @@ class VectorToSvgPlugin(BasePluginMTL):
             "background_color": self.fill_color_widget.get_color().name(QColor.HexRgb),
             "border_color": self.border_color_widget.get_color().name(QColor.HexRgb),
             "label_color": self.label_color_widget.get_color().name(QColor.HexRgb),
+            "border_width": float(self.border_width_spin.value()),
             "transparent_background": self.options_map[
                 "transparent_background"
             ].isChecked(),
