@@ -55,3 +55,9 @@
 - A exportacao agora usa `ProjectUtils` para resolver pasta do projeto e validar a camada, `VectorLayerGeometry.get_selected_features()` para materializar apenas a selecao quando o checkbox estiver ativo e mantem o renderer da camada original para desenhar as geometrias no SVG.
 - Adicionada a regra de nomeacao para multiplos SVGs: usa o campo `Name` quando existir e tiver valor; caso contrario, usa o nome da camada do QGIS com sufixo incremental `_1`, `_2`, `_3`...
 - Incluida persistencia da opcao `Gerar SVG para cada feicao` e ajuste do plugin para salvar os arquivos na pasta escolhida com nomes sanitizados e sem sobrescrever arquivos existentes.
+
+2.2.5.11
+
+- Criado o utilitario generico `SVGUtils` em `utils/SVGUtils.py` para concentrar responsabilidades reutilizaveis de SVG: preparacao de feicoes, montagem do documento SVG, conversao de geometrias em elementos SVG, extracao de estilo do renderer, sanitizacao de nomes e escrita de arquivos.
+- Refatorado o `VectorToSvgPlugin` para manter apenas a orquestracao da ferramenta e delegar ao `SVGUtils` as responsabilidades genericas de geracao de SVG.
+- Mantido o comportamento funcional da exportacao anterior, reduzindo acoplamento do plugin e facilitando reutilizacao futura por outras ferramentas do projeto.
