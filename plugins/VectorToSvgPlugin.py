@@ -85,7 +85,20 @@ class VectorToSvgPlugin(BasePluginMTL):
             tooltip="Selecione a cor do rotulo",
             parent=self,
             separator_top=False,
-            separator_bottom=True,
+            separator_bottom=False,
+        )
+
+        label_size_layout, self.label_size_spin = (
+            WidgetFactory.create_double_spin_input(
+                "Tamanho Rotulo",
+                decimals=1,
+                step=1.0,
+                minimum=1.0,
+                maximum=200.0,
+                value=14.0,
+                separator_top=False,
+                separator_bottom=True,
+            )
         )
 
         options = {
@@ -135,6 +148,7 @@ class VectorToSvgPlugin(BasePluginMTL):
                 border_layout,
                 border_width_layout,
                 label_layout,
+                label_size_layout,
                 options_layout,
                 folder_layout,
                 btn_project_layout,
@@ -154,6 +168,9 @@ class VectorToSvgPlugin(BasePluginMTL):
         )
         self.label_color_widget.set_color(
             QColor(self.preferences.get("label_color", "#000000"))
+        )
+        self.label_size_spin.setValue(
+            float(self.preferences.get("label_size", 14.0))
         )
         self.border_width_spin.setValue(
             float(self.preferences.get("border_width", 1.2))
@@ -191,6 +208,7 @@ class VectorToSvgPlugin(BasePluginMTL):
         self.preferences["label_color"] = self.label_color_widget.get_color().name(
             QColor.HexArgb
         )
+        self.preferences["label_size"] = float(self.label_size_spin.value())
         self.preferences["border_width"] = float(self.border_width_spin.value())
         self.preferences["transparent_background"] = self.options_map[
             "transparent_background"
@@ -325,6 +343,7 @@ class VectorToSvgPlugin(BasePluginMTL):
             "background_color": self.fill_color_widget.get_color().name(QColor.HexRgb),
             "border_color": self.border_color_widget.get_color().name(QColor.HexRgb),
             "label_color": self.label_color_widget.get_color().name(QColor.HexRgb),
+            "label_size": float(self.label_size_spin.value()),
             "border_width": float(self.border_width_spin.value()),
             "transparent_background": self.options_map[
                 "transparent_background"

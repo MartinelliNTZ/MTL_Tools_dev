@@ -85,3 +85,8 @@
 - Adicionado ao `VectorToSvgPlugin` um controle de `Espessura Borda` via `WidgetFactory.create_double_spin_input`, com persistencia nas preferencias da ferramenta.
 - Conectada a espessura configurada pelo usuario ao `stroke-width` final das geometrias no `SVGUtils`.
 - Expandido o fallback de rotulos no `SVGUtils` para tentar `displayExpression()` e, por ultimo, o campo `Name`, com logs de debug para facilitar diagnostico quando o rotulo continuar vazio.
+
+2.2.5.16
+
+- Adicionado ao `VectorToSvgPlugin` um controle de `Tamanho Rotulo` na interface, com persistencia nas preferencias da ferramenta.
+- Ajustado o `SVGUtils` para priorizar o tamanho de rotulo configurado pelo usuario no plugin sobre o tamanho vindo da configuracao de labeling da camada.

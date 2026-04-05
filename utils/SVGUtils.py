@@ -471,7 +471,7 @@ class SVGUtils:
             elements.append(
                 f'<text x="{pixel_x:.3f}" y="{pixel_y:.3f}" '
                 f'font-family="{SVGUtils.label_font_family(label_settings)}" '
-                f'font-size="{SVGUtils.label_font_size(label_settings):.3f}" '
+                f'font-size="{SVGUtils.label_font_size(label_settings, style):.3f}" '
                 f'fill="{style.get("label_color", "#000000")}" '
                 'text-anchor="middle" dominant-baseline="middle">'
                 f"{escaped}</text>"
@@ -695,7 +695,16 @@ class SVGUtils:
             return SVGUtils.DEFAULT_LABEL_FONT_FAMILY
 
     @staticmethod
-    def label_font_size(label_settings) -> float:
+    def label_font_size(label_settings, style: Optional[dict] = None) -> float:
+        if style is not None:
+            configured_size = style.get("label_size")
+            try:
+                configured_size = float(configured_size)
+                if configured_size > 0:
+                    return configured_size
+            except Exception:
+                pass
+
         size = SVGUtils._label_setting_value(
             label_settings, "fontSize", SVGUtils.DEFAULT_LABEL_FONT_SIZE
         )
