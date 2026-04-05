@@ -15,6 +15,7 @@ from qgis.PyQt.QtGui import QColor, QIcon
 from qgis.gui import QgsColorButton
 
 from ...utils.ProjectUtils import ProjectUtils
+from ..IconManager import IconManager as IM
 
 
 class ColorButtonWidget(QWidget):
@@ -110,6 +111,7 @@ class ColorButtonWidget(QWidget):
         icon_path = os.path.normpath(
             os.path.join(os.path.dirname(__file__), "..", "icons", "copy_attributes.ico")
         )
+        icon_path = IM.icon_path(IM.COPY_BUTTON)
 
         if os.path.exists(icon_path):
             return QIcon(icon_path)

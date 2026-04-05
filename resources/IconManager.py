@@ -13,6 +13,7 @@ class IconManager:
     MTL_AGRO = "mtl_agro.ico"
     CADMUS_ICON = "cadmus_icon.ico"
     CADMUS_PNG = "cadmus_icon.png"
+    COPY_BUTTON = "copy.png"
 
     # Menus
     AGRICULTURE = "agriculture.ico"
