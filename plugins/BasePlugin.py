@@ -363,7 +363,7 @@ class BasePluginMTL(BaseDialog):
         self.iface.addPluginToMenu(self.MENU_NAME, action)
         self.actions.append(action)
 
-    def show_info_dialog(self, title="📘 Instruções"):
+    def show_info_dialog(self, title=f"📘 {STR.INSTRUCTIONS}"):
         """Mostra diálogo de instruções do plugin.
 
         Recebe: title (str opcional).
@@ -372,7 +372,7 @@ class BasePluginMTL(BaseDialog):
         """
         self.logger.debug("Exibindo diálogo de informações")
         if hasattr(self, "instructions_file"):
-            title = f"📘 Instruções – {self.PLUGIN_NAME}"
+            title = f"📘 {STR.INSTRUCTIONS} – {self.PLUGIN_NAME}"
             InfoDialog(self.instructions_file, self, title).exec()
 
     def apply_qml_style(self, layer: QgsVectorLayer, qml_path: str) -> bool:

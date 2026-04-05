@@ -31,6 +31,7 @@ class Strings_en(Strings_pt_BR):
     INVERT = "Invert"
     ENABLE = "Enable"
     INFO = "Info"
+    INSTRUCTIONS = "Instructions"
     AUTO_DETECT = "Auto-detect"
 
     # Common labels

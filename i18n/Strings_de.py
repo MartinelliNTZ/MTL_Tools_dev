@@ -33,6 +33,7 @@ class Strings_de(Strings_pt_BR):
     INVERT = "Umkehren"
     ENABLE = "Aktivieren"
     INFO = "Info"
+    INSTRUCTIONS = "Anleitungen"
     AUTO_DETECT = "Automatisch erkennen"
 
     # Common labels
