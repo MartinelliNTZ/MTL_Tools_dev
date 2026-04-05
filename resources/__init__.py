@@ -19,11 +19,9 @@ from .widgets.AttributeSelectorWidget import AttributeSelectorWidget
 from .widgets.BottomActionButtonsWidget import BottomActionButtonsWidget
 from .widgets.CheckboxGridWidget import CheckboxGridWidget, DependentCheckBox
 from .widgets.CollapsibleParametersWidget import CollapsibleParametersWidget
-from .widgets.FileSelectorWidget import FileSelectorWidget
 from .widgets.InputFieldsWidget import InputFieldsWidget
 from .widgets.LayerInputWidget import LayerInputWidget
 from .widgets.MainLayout import MainLayout
-from .widgets.PathSelectorWidget import PathSelectorWidget
 from .widgets.RadioButtonGridWidget import RadioButtonGridWidget
 from .widgets.ReadOnlyFieldWidget import ReadOnlyFieldWidget
 from .widgets.ScrollWidget import ScrollWidget
@@ -42,11 +40,9 @@ __all__ = [
     "CheckboxGridWidget",
     "DependentCheckBox",
     "CollapsibleParametersWidget",
-    "FileSelectorWidget",
     "InputFieldsWidget",
     "LayerInputWidget",
     "MainLayout",
-    "PathSelectorWidget",
     "RadioButtonGridWidget",
     "ReadOnlyFieldWidget",
     "ScrollWidget",
