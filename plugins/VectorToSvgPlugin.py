@@ -129,17 +129,11 @@ class VectorToSvgPlugin(BasePluginMTL):
             parent=self,
             title=STR.OUTPUT_FOLDER,
             mode="folder",
+            path_button="svgs",
             separator_top=False,
             separator_bottom=False,
         )
         self.logger.debug("Path selector de pasta de saida criado")
-
-        btn_project_layout, self.btn_project = WidgetFactory.create_simple_button(
-            text=STR.USE_PROJECT_FOLDER,
-            parent=self,
-        )
-        self.btn_project.clicked.connect(self._set_folder_to_project)
-        self.logger.debug("Botao 'Usar pasta do projeto' criado")
 
         self.layout.add_items(
             [
@@ -151,7 +145,6 @@ class VectorToSvgPlugin(BasePluginMTL):
                 label_size_layout,
                 options_layout,
                 folder_layout,
-                btn_project_layout,
                 buttons_layout,
             ]
         )
@@ -392,15 +385,6 @@ class VectorToSvgPlugin(BasePluginMTL):
             if value is not None and str(value).strip():
                 return str(value).strip()
         return f"{layer.name()}_{index}"
-
-    def _set_folder_to_project(self):
-        self.logger.debug("Definindo pasta para pasta do projeto")
-        project_folder = ProjectUtils.get_project_dir(
-            ProjectUtils.get_project_instance()
-        )
-        export_folder = os.path.join(project_folder, "svgs")
-        self.folder_selector.set_paths([export_folder])
-        self.logger.debug(f"Pasta definida para: {export_folder}")
 
 
 def run(iface):

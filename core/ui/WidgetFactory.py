@@ -664,6 +664,7 @@ class WidgetFactory:
         title: str = STR.SELECT_PATH,
         file_filter: str = StringManager.FILTER_ALL,
         mode: str = "radio",
+        path_button=None,
         separator_top: bool = False,
         separator_bottom: bool = True,
     ) -> tuple:
@@ -685,6 +686,7 @@ class WidgetFactory:
             title=title,
             file_filter=file_filter,
             mode=mode,
+            path_button=path_button,
             parent=parent,
         )
 

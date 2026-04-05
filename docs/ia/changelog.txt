@@ -113,3 +113,8 @@
 2.2.5.21
 
 - Corrigido o arquivo `resources/instructions/ja/vector_to_svg_help.md`, que estava em ingles, substituindo o conteudo por uma versao efetivamente traduzida para japones.
+
+2.2.5.22
+
+- Refatorado o `SelectorWidget` para encapsular o botao "Usar pasta do projeto", agora habilitado via parametro generico `path_button` em `WidgetFactory.create_path_selector`.
+- Atualizado o `VectorToSvgPlugin` para usar `create_path_selector(..., path_button="svgs")`, removendo o botao manual e o metodo local que montavam a pasta do projeto fora do widget.

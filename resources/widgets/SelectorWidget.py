@@ -14,6 +14,7 @@ from qgis.PyQt.QtWidgets import (
 from qgis.PyQt.QtCore import pyqtSignal
 from ...core.config.LogUtils import LogUtils
 from ...i18n.TranslationManager import STR
+from ...utils.ProjectUtils import ProjectUtils
 from ...utils.StringManager import StringManager
 
 # Logger do widget
@@ -50,6 +51,7 @@ class SelectorWidget(QWidget):
         title: str = STR.SELECT,
         file_filter: str = StringManager.FILTER_ALL,
         mode: str = MODE_FOLDER,
+        path_button=None,
         checkbox: bool = False,
         checkbox_text: str = STR.ENABLE,
         parent=None,
@@ -69,6 +71,7 @@ class SelectorWidget(QWidget):
         self._title = title
         self._file_filter = file_filter
         self._mode = mode
+        self._path_button = path_button
         self._last_path = None
         self._paths = []
         self._checkbox_enabled = not checkbox  # Se sem checkbox, sempre habilitado
@@ -125,11 +128,24 @@ class SelectorWidget(QWidget):
         input_layout.addWidget(btn)
         main_layout.addLayout(input_layout)
 
+        if self._path_button is not None:
+            self._project_btn = QPushButton(STR.USE_PROJECT_FOLDER)
+            self._project_btn.clicked.connect(self._set_path_from_project_button)
+
+            if checkbox:
+                self._project_btn.setEnabled(False)
+
+            main_layout.addWidget(self._project_btn)
+        else:
+            self._project_btn = None
+
     def _on_checkbox_toggled(self, checked: bool):
         """Checkbox foi alternado."""
         self._checkbox_enabled = checked
         self._input.setEnabled(checked)
         self._browse_btn.setEnabled(checked)
+        if self._project_btn:
+            self._project_btn.setEnabled(checked)
 
         if not checked:
             self._paths = []
@@ -272,6 +288,42 @@ class SelectorWidget(QWidget):
             self._last_path = os.path.dirname(file_path)
             self._input.setText(file_path)
             self.pathsChanged.emit([file_path])
+
+    def _set_path_from_project_button(self):
+        """Define caminho com base na pasta do projeto e no path_button configurado."""
+        try:
+            project_folder = ProjectUtils.get_project_dir(
+                ProjectUtils.get_project_instance()
+            )
+            relative_path = self._normalize_project_relative_path(self._path_button)
+
+            if relative_path:
+                resolved_path = os.path.normpath(
+                    os.path.join(project_folder, relative_path)
+                )
+            else:
+                resolved_path = os.path.normpath(project_folder)
+
+            self.set_paths([resolved_path])
+            self._last_path = (
+                resolved_path
+                if os.path.isdir(resolved_path)
+                else os.path.dirname(resolved_path)
+            )
+        except Exception as e:
+            logger.exception(e)
+
+    def _normalize_project_relative_path(self, path_button) -> str:
+        """Normaliza o caminho relativo informado para o botao do projeto."""
+        if path_button is None:
+            return ""
+
+        raw_path = str(path_button).strip()
+        if not raw_path:
+            return ""
+
+        normalized = raw_path.replace("\\", os.sep).replace("/", os.sep)
+        return os.path.normpath(normalized)
 
     def get_paths(self) -> list:
         """
