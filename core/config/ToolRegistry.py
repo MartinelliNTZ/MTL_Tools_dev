@@ -236,6 +236,35 @@ class ToolRegistry:
         )
         tools.append(gerar_rastro)
 
+        # =====================================================
+        # RASTER (Ordem: Mass Clipper=10)
+        # =====================================================
+
+        raster_mass_clipper = Tool(
+            name=STR.RASTER_MASS_CLIPPER_TITLE,
+            icon=im.icon(im.RASTER_MASS_CLIPPER),
+            category=self.RASTER,
+            tool_type=ToolTypeEnum.PROCESSING,
+            main_action=True,
+            executor=self.run_raster_mass_clipper,
+            tooltip=STR.RASTER_MASS_CLIPPER_TITLE,
+            order=10,
+            show_in_toolbar=True,
+        )
+        tools.append(raster_mass_clipper)
+
+        raster_mass_sampler = Tool(
+            name=STR.RASTER_MASS_SAMPLER_TITLE,
+            icon=im.icon(im.RASTER_MASS_SAMPLER),
+            category=self.RASTER,
+            tool_type=ToolTypeEnum.PROCESSING,
+            executor=self.run_raster_mass_sampler,
+            tooltip=STR.RASTER_MASS_SAMPLER_TITLE,
+            order=20,
+            show_in_toolbar=True,
+        )
+        tools.append(raster_mass_sampler)
+
         return tools
 
     def get_tools(self):
@@ -491,6 +520,50 @@ class ToolRegistry:
             self.logger.error(f"Erro ao executar VectorToSvgPlugin: {str(e)}")
             QgisMessageUtil.bar_critical(
                 self.iface, f"Erro no plugin VectorToSvgPlugin:\n{str(e)}"
+            )
+
+    # =====================================================
+    # EXECUTAR: Raster Mass Clipper (Processing)
+    # =====================================================
+    def run_raster_mass_clipper(self):
+        try:
+            import processing
+
+            algorithm_id = "cadmus:raster_mass_clipper"
+            self.logger.info(
+                f"Abrindo dialogo do Processing para algoritmo: {algorithm_id}"
+            )
+            processing.execAlgorithmDialog(algorithm_id, {})
+            self.logger.info(
+                "Dialogo do Raster Mass Clipper aberto com sucesso pelo provider"
+            )
+        except Exception as e:
+            self.logger.error(f"Erro ao executar Raster Mass Clipper: {str(e)}")
+            QgisMessageUtil.bar_critical(
+                self.iface,
+                f"Erro ao abrir Raster Mass Clipper no Processing:\n{str(e)}",
+            )
+
+    # =====================================================
+    # EXECUTAR: Raster Mass Sampler (Processing)
+    # =====================================================
+    def run_raster_mass_sampler(self):
+        try:
+            import processing
+
+            algorithm_id = "cadmus:raster_mass_sampler"
+            self.logger.info(
+                f"Abrindo dialogo do Processing para algoritmo: {algorithm_id}"
+            )
+            processing.execAlgorithmDialog(algorithm_id, {})
+            self.logger.info(
+                "Dialogo do Raster Mass Sampler aberto com sucesso pelo provider"
+            )
+        except Exception as e:
+            self.logger.error(f"Erro ao executar Raster Mass Sampler: {str(e)}")
+            QgisMessageUtil.bar_critical(
+                self.iface,
+                f"Erro ao abrir Raster Mass Sampler no Processing:\n{str(e)}",
             )
 
     # =====================================================

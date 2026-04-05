@@ -6,3 +6,4 @@ class ToolTypeEnum(str, Enum):
     DIALOG = "DIALOG"
     MAP_TOOL = "MAP_TOOL"
     BACKGROUND = "BACKGROUND"
+    PROCESSING = "PROCESSING"

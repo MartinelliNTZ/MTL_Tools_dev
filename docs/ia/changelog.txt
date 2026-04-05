@@ -133,3 +133,13 @@
 - Investigado e ajustado o `ColorButtonWidget` para o botao de copiar permanecer realmente quadrado, evitando disputa entre tamanho via codigo e estilos globais de `QPushButton`.
 - Centralizados no tema visual (`CoffeTheme`/`Styles`) os tamanhos padrao do controle de cor: altura do campo hexadecimal, altura do seletor de cor, tamanho do botao de copiar e tamanho do icone.
 - Atualizado o `WidgetFactory.create_color_button` para consumir esses valores centralizados por padrao, mantendo override explicito quando necessario.
+
+2.2.5.26
+
+- Analisado o fluxo entre provider de processamento, `ToolRegistry` e toolbar, e adicionado um atalho para o `RasterMassClipper` no grupo `RASTER` com `ToolTypeEnum.PROCESSING`.
+- O novo botao da toolbar abre o dialogo nativo do algoritmo do provider via `cadmus:raster_mass_clipper`, funcionando apenas como atalho para o sistema normal do Processing.
+
+2.2.5.27
+
+- Aplicado o mesmo padrao de atalho de provider para o `RasterMassSampler`, adicionando-o ao grupo `RASTER` com `ToolTypeEnum.PROCESSING` no `ToolRegistry`.
+- O atalho abre o dialogo nativo do algoritmo do provider via `cadmus:raster_mass_sampler`, sem duplicar interface nem alterar o fluxo normal do Processing.
