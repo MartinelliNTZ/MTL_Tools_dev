@@ -11,6 +11,7 @@ from .BasePlugin import BasePluginMTL
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.ToolKeys import ToolKey
+from ..i18n.TranslationManager import STR
 
 
 class VectorToSvgPlugin(BasePluginMTL):
@@ -96,7 +97,7 @@ class VectorToSvgPlugin(BasePluginMTL):
         )
         folder_layout, self.folder_selector = WidgetFactory.create_path_selector(
             parent=self,
-            title="STR.OUTPUT_FOLDER",
+            title=STR.OUTPUT_FOLDER,
             mode="folder",
             separator_top=False,
             separator_bottom=False,
@@ -104,7 +105,7 @@ class VectorToSvgPlugin(BasePluginMTL):
         self.logger.debug("Path Selector de pasta de saída criado")
 
         btn_project_layout, self.btn_project = WidgetFactory.create_simple_button(
-            text="STR.USE_PROJECT_FOLDER",
+            text=STR.USE_PROJECT_FOLDER,
             parent=self,
         )
         self.btn_project.clicked.connect(self._set_folder_to_project)

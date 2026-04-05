@@ -19,6 +19,5 @@
     },
     "chat.agent.maxRequests": 150,
     "chat.agent.enabled": true,
-    "python-envs.defaultEnvManager": "ms-python.python:conda",
     "python-envs.defaultPackageManager": "ms-python.python:conda"
 }
