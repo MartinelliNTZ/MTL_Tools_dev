@@ -16,6 +16,7 @@ from ..utils.SVGUtils import SVGUtils
 from ..utils.ToolKeys import ToolKey
 from ..utils.vector.VectorLayerAttributes import VectorLayerAttributes
 from ..utils.vector.VectorLayerGeometry import VectorLayerGeometry
+from ..i18n.TranslationManager import STR
 
 
 class VectorToSvgPlugin(BasePluginMTL):
@@ -35,7 +36,7 @@ class VectorToSvgPlugin(BasePluginMTL):
         super()._build_ui(
             title="Conversor de Vetor para SVG",
             icon_path="cadmus_icon.ico",
-            enable_scroll=False,
+            enable_scroll=True,
         )
 
         layer_layout, self.layer_input = WidgetFactory.create_layer_input(
@@ -85,7 +86,7 @@ class VectorToSvgPlugin(BasePluginMTL):
             tooltip="Selecione a cor do rotulo",
             parent=self,
             separator_top=False,
-            separator_bottom=False,
+            separator_bottom=True,
         )
 
         label_size_layout, self.label_size_spin = (
@@ -146,8 +147,8 @@ class VectorToSvgPlugin(BasePluginMTL):
                 layer_layout,
                 fill_layout,
                 border_layout,
-                border_width_layout,
                 label_layout,
+                border_width_layout,
                 label_size_layout,
                 options_layout,
                 folder_layout,
