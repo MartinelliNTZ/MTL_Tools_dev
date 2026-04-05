@@ -358,7 +358,8 @@ class Styles(BaseStyles):
             background: {Styles.COLOR_BACKGROUND_PANEL};
             border: 1px solid {Styles.COLOR_BORDER};
             border-radius: {Styles.INPUT_BORDER_RADIUS}px;
-            min-height: {Styles.INPUT_HEIGHT + 4}px;
+            min-height: {Styles.COLOR_BUTTON_HEX_HEIGHT}px;
+            max-height: {Styles.COLOR_BUTTON_HEX_HEIGHT}px;
         }}
 
         #color_button_widget QLineEdit#color_button_hex_input:focus {{
@@ -368,5 +369,10 @@ class Styles(BaseStyles):
         #color_button_widget QPushButton#color_button_copy {{
             padding: 0px;
             margin: 0px;
+            min-width: {Styles.COLOR_BUTTON_COPY_SIZE}px;
+            max-width: {Styles.COLOR_BUTTON_COPY_SIZE}px;
+            min-height: {Styles.COLOR_BUTTON_COPY_SIZE}px;
+            max-height: {Styles.COLOR_BUTTON_COPY_SIZE}px;
+            border-radius: 4px;
         }}
         """

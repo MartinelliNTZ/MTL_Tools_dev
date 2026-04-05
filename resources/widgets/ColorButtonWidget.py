@@ -155,11 +155,21 @@ class ColorButtonWidget(QWidget):
 
     def set_copy_button_size(self, width: int = 24, height: int = 24):
         if width is not None and height is not None:
-            self._copy_button.setFixedSize(int(width), int(height))
+            value_w = max(1, int(width))
+            value_h = max(1, int(height))
+            self._copy_button.setMinimumSize(value_w, value_h)
+            self._copy_button.setMaximumSize(value_w, value_h)
+            self._copy_button.setFixedSize(value_w, value_h)
         elif height is not None:
-            self._copy_button.setFixedHeight(int(height))
+            value = max(1, int(height))
+            self._copy_button.setMinimumHeight(value)
+            self._copy_button.setMaximumHeight(value)
+            self._copy_button.setFixedHeight(value)
         elif width is not None:
-            self._copy_button.setFixedWidth(int(width))
+            value = max(1, int(width))
+            self._copy_button.setMinimumWidth(value)
+            self._copy_button.setMaximumWidth(value)
+            self._copy_button.setFixedWidth(value)
 
     def set_copy_icon_size(self, width: int = 14, height: int = 14):
         self._copy_button.setIconSize(QSize(int(width), int(height)))

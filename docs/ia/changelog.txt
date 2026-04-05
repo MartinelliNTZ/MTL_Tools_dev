@@ -127,3 +127,9 @@
 
 - Adicionado suporte ao parametro `path_button` em `WidgetFactory.create_save_file_selector`, reutilizando o botao encapsulado do `SelectorWidget` tambem para seletores de salvamento.
 - Atualizado o `GenerateTrailPlugin` para preencher automaticamente `vetores/Rastro_implemento.gpkg` na pasta do projeto ao usar o botao do seletor de saida.
+
+2.2.5.25
+
+- Investigado e ajustado o `ColorButtonWidget` para o botao de copiar permanecer realmente quadrado, evitando disputa entre tamanho via codigo e estilos globais de `QPushButton`.
+- Centralizados no tema visual (`CoffeTheme`/`Styles`) os tamanhos padrao do controle de cor: altura do campo hexadecimal, altura do seletor de cor, tamanho do botao de copiar e tamanho do icone.
+- Atualizado o `WidgetFactory.create_color_button` para consumir esses valores centralizados por padrao, mantendo override explicito quando necessario.

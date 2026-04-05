@@ -840,12 +840,12 @@ class WidgetFactory:
         parent=None,
         title_width: int = None,
         hex_min_width: int = 110,
-        hex_height: int = 18,
+        hex_height: int = None,
         picker_width: int = None,
-        picker_height: int = 18,
-        copy_button_width: int = 24,#ta funcionado
-        copy_button_height: int = 24,#nao ta funcionado
-        copy_icon_size: int = 10,
+        picker_height: int = None,
+        copy_button_width: int = None,
+        copy_button_height: int = None,
+        copy_icon_size: int = None,
         spacing: int = 4,
         hex_read_only: bool = False,
         hex_placeholder: str = "",
@@ -868,13 +868,29 @@ class WidgetFactory:
         widget.setStyleSheet(Styles.color_button_widget())
         widget.set_title_width(title_width)
         widget.set_hex_width(hex_min_width)
-        widget.set_hex_height(hex_height)
+        widget.set_hex_height(
+            Styles.COLOR_BUTTON_HEX_HEIGHT if hex_height is None else hex_height
+        )
         widget.set_spacing(spacing)
         widget.set_hex_read_only(hex_read_only)
         widget.set_hex_placeholder(hex_placeholder)
-        widget.set_picker_size(picker_width, picker_height)
-        widget.set_copy_button_size(copy_button_width, copy_button_height)
-        widget.set_copy_icon_size(copy_icon_size, copy_icon_size)
+        widget.set_picker_size(
+            picker_width,
+            Styles.COLOR_BUTTON_PICKER_HEIGHT
+            if picker_height is None
+            else picker_height,
+        )
+        default_copy_size = Styles.COLOR_BUTTON_COPY_SIZE
+        widget.set_copy_button_size(
+            default_copy_size if copy_button_width is None else copy_button_width,
+            default_copy_size if copy_button_height is None else copy_button_height,
+        )
+        icon_size = (
+            Styles.COLOR_BUTTON_COPY_ICON_SIZE
+            if copy_icon_size is None
+            else copy_icon_size
+        )
+        widget.set_copy_icon_size(icon_size, icon_size)
         layout.addWidget(widget)
 
         if separator_bottom:
