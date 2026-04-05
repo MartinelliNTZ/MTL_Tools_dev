@@ -31,7 +31,8 @@ class AboutDialog(BaseDialog):
             self.logger.debug("AboutDialog _build_ui concluído")
 
             logo_path = os.path.join(
-                os.path.dirname(__file__), "..", "resources", "icons", "mtl_agro.png"
+                os.path.dirname(
+                    __file__), "..", "resources", "icons", "mtl_agro.png"
             )
 
             if os.path.exists(logo_path):
@@ -87,8 +88,7 @@ class AboutDialog(BaseDialog):
                 separator_top=True,
                 separator_bottom=False,
             )
-            # close_button.clicked.connect(self.close)
-            close_button.clicked.connect(self.teste_ui)
+            close_button.clicked.connect(self.close)
             self.layout.addLayout(close_layout)
             self.logger.debug("Botão Fechar adicionado")
 
@@ -99,14 +99,6 @@ class AboutDialog(BaseDialog):
             else:
                 print(f"AboutDialog falhou na inicialização: {ex}")
             raise
-
-    def teste_ui(self):
-        QgisMessageUtil.show_icon_message_bar(
-            self.iface,
-            message="Processo finalizado!",
-            icon_path=IM.icon_path(IM.CADMUS_ICON),
-            background_color="#003cff",
-        )
 
 
 def run(iface):

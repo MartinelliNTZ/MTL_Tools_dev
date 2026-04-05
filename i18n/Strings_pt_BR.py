@@ -221,6 +221,16 @@ class Strings_pt_BR:
     FILE_SAVED_IN = "Arquivo salvo em:"
     RASTER_MASS_SAMPLER_TITLE = "Amostragem Massiva de Rasters"
     RASTER_MASS_CLIPPER_TITLE = "Recorte Massivo de Rasters"
+    RASTER_MASS_SAMPLER_TOOLTIP = (
+        "Executa amostragem em lote de varios rasters sobre uma camada vetorial.\n"
+        "Abre o algoritmo do provider do Cadmus no Processing,\n"
+        "permitindo configurar entradas, campos e saidas pela interface padrao."
+    )
+    RASTER_MASS_CLIPPER_TOOLTIP = (
+        "Recorta em lote varios rasters usando uma camada poligonal como mascara.\n"
+        "Abre o algoritmo do provider do Cadmus no Processing,\n"
+        "com suporte a recorte por feicao, buffer de correcao e pasta de saida."
+    )
     RASTER_DIFFERENCE_STATISTICS_TITLE = "Processar Diferença de Rasters"
     INPUT_MASK_POLYGON_LAYER = "Camada máscara (polígono)"
     CLIP_PER_EACH_POLYGON = "Recortar por cada polígono"

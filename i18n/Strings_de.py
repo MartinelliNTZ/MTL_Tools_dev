@@ -216,6 +216,16 @@ class Strings_de(Strings_pt_BR):
     FILE_SAVED_IN = "Datei gespeichert in:"
     RASTER_MASS_SAMPLER_TITLE = "Massen-Rasterbeprobung"
     RASTER_MASS_CLIPPER_TITLE = "Massenzuschnitt von Rastern"
+    RASTER_MASS_SAMPLER_TOOLTIP = (
+        "Fuhrt eine Stapel-Beprobung mehrerer Raster uber einem Vektorlayer aus.\n"
+        "Offnet den Cadmus-Provider-Algorithmus im Processing,\n"
+        "sodass Eingaben, Felder und Ausgaben in der Standardoberflache konfiguriert werden konnen."
+    )
+    RASTER_MASS_CLIPPER_TOOLTIP = (
+        "Schneidet mehrere Raster stapelweise mit einem Polygonlayer als Maske zu.\n"
+        "Offnet den Cadmus-Provider-Algorithmus im Processing,\n"
+        "mit Unterstutzung fur Zuschnitt pro Feature, Korrekturpuffer und Ausgabeordner."
+    )
     RASTER_DIFFERENCE_STATISTICS_TITLE = "Rasterdifferenz verarbeiten"
     INPUT_MASK_POLYGON_LAYER = "Maskenlayer (Polygon)"
 
@@ -468,3 +478,18 @@ class Strings_de(Strings_pt_BR):
         "Das Werkzeug lauft nur, wenn der Layer bereits im Bearbeitungsmodus ist,\n"
         "und speichert nicht und beendet den Bearbeitungsmodus nicht."
     )
+    VECTOR_TO_SVG_TITLE = "Vektor-zu-SVG-Konverter"
+    VECTOR_LAYER_LABEL = "Vektorlayer"
+    BACKGROUND_COLOR = "Hintergrundfarbe"
+    BORDER_COLOR = "Randfarbe"
+    BORDER_WIDTH = "Randstarke"
+    LABEL_COLOR = "Beschriftungsfarbe"
+    LABEL_SIZE = "Beschriftungsgrosse"
+    SELECT_FILL_COLOR = "Fullfarbe auswahlen"
+    SELECT_BORDER_COLOR = "Randfarbe auswahlen"
+    SELECT_LABEL_COLOR = "Beschriftungsfarbe auswahlen"
+    TRANSPARENT_BACKGROUND = "Transparenter Hintergrund"
+    SHOW_BORDER = "Rand anzeigen"
+    SHOW_LABEL = "Beschriftung anzeigen"
+    GENERATE_SVG_FOR_EACH_FEATURE = "SVG fur jedes Feature erzeugen"
+    SVGS_GENERATED_SUCCESS = "SVG(s) erfolgreich erzeugt."

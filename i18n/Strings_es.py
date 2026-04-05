@@ -225,6 +225,16 @@ class Strings_es(Strings_pt_BR):
     FILE_SAVED_IN = "Archivo guardado en:"
     RASTER_MASS_SAMPLER_TITLE = "Muestreo Masivo de Rasters"
     RASTER_MASS_CLIPPER_TITLE = "Recorte Masivo de Rasters"
+    RASTER_MASS_SAMPLER_TOOLTIP = (
+        "Ejecuta el muestreo por lotes de varios rasters sobre una capa vectorial.\n"
+        "Abre el algoritmo del provider de Cadmus en Processing,\n"
+        "permitiendo configurar entradas, campos y salidas en la interfaz estandar."
+    )
+    RASTER_MASS_CLIPPER_TOOLTIP = (
+        "Recorta por lotes varios rasters usando una capa poligonal como mascara.\n"
+        "Abre el algoritmo del provider de Cadmus en Processing,\n"
+        "con soporte para recorte por entidad, buffer de correccion y carpeta de salida."
+    )
     RASTER_DIFFERENCE_STATISTICS_TITLE = "Procesar Diferencia de Rasters"
     INPUT_MASK_POLYGON_LAYER = "Capa máscara (polígono)"
     CLIP_PER_EACH_POLYGON = "Recortar por cada polígono"
@@ -471,3 +481,18 @@ class Strings_es(Strings_pt_BR):
         "La herramienta solo se ejecuta si la capa ya esta en edicion\n"
         "y no guarda ni cierra el modo de edicion."
     )
+    VECTOR_TO_SVG_TITLE = "Conversor de Vector a SVG"
+    VECTOR_LAYER_LABEL = "Capa Vectorial"
+    BACKGROUND_COLOR = "Color de Fondo"
+    BORDER_COLOR = "Color del Borde"
+    BORDER_WIDTH = "Grosor del Borde"
+    LABEL_COLOR = "Color de la Etiqueta"
+    LABEL_SIZE = "Tamano de la Etiqueta"
+    SELECT_FILL_COLOR = "Seleccione el color de relleno"
+    SELECT_BORDER_COLOR = "Seleccione el color del borde"
+    SELECT_LABEL_COLOR = "Seleccione el color de la etiqueta"
+    TRANSPARENT_BACKGROUND = "Fondo transparente"
+    SHOW_BORDER = "Mostrar borde"
+    SHOW_LABEL = "Mostrar etiqueta"
+    GENERATE_SVG_FOR_EACH_FEATURE = "Generar SVG para cada entidad"
+    SVGS_GENERATED_SUCCESS = "SVG(s) generado(s) con exito."

@@ -143,3 +143,14 @@
 
 - Aplicado o mesmo padrao de atalho de provider para o `RasterMassSampler`, adicionando-o ao grupo `RASTER` com `ToolTypeEnum.PROCESSING` no `ToolRegistry`.
 - O atalho abre o dialogo nativo do algoritmo do provider via `cadmus:raster_mass_sampler`, sem duplicar interface nem alterar o fluxo normal do Processing.
+
+2.2.5.28
+
+- Adicionados em `Strings_pt_BR.py` tooltips descritivos para `RasterMassClipper` e `RasterMassSampler`, seguindo o padrao das demais ferramentas.
+- Atualizado o `ToolRegistry` para usar as novas chaves `RASTER_MASS_CLIPPER_TOOLTIP` e `RASTER_MASS_SAMPLER_TOOLTIP` na toolbar e nos menus.
+
+2.2.5.29
+
+- Realizada auditoria completa das classes de traducao em `i18n`, comparando `pt_BR`, `en`, `es` e `de` para identificar chaves ausentes.
+- Adicionadas e traduzidas corretamente nas classes `Strings_en.py`, `Strings_es.py` e `Strings_de.py` todas as variaveis que existiam apenas em `Strings_pt_BR.py`, incluindo textos do `VectorToSvg` e os tooltips de raster.
+- Validada a cobertura final: os quatro arquivos de strings agora possuem exatamente o mesmo conjunto de 342 chaves.

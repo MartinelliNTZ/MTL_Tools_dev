@@ -247,7 +247,7 @@ class ToolRegistry:
             tool_type=ToolTypeEnum.PROCESSING,
             main_action=True,
             executor=self.run_raster_mass_clipper,
-            tooltip=STR.RASTER_MASS_CLIPPER_TITLE,
+            tooltip=STR.RASTER_MASS_CLIPPER_TOOLTIP,
             order=10,
             show_in_toolbar=True,
         )
@@ -259,7 +259,7 @@ class ToolRegistry:
             category=self.RASTER,
             tool_type=ToolTypeEnum.PROCESSING,
             executor=self.run_raster_mass_sampler,
-            tooltip=STR.RASTER_MASS_SAMPLER_TITLE,
+            tooltip=STR.RASTER_MASS_SAMPLER_TOOLTIP,
             order=20,
             show_in_toolbar=True,
         )
