@@ -1,1 +1,3 @@
-2.3.5 2026/04/05
+2.3.5.2 2026/04/05
+    - Refatoracao da visibilidade da toolbar por categoria: responsabilidade removida de StringManager e ToolRegistry e concentrada no MenuManager, mantendo show_in_toolbar no nivel da ferramenta e o filtro global no nivel da toolbar.
+    - SettingsPlugin ajustado para montar e persistir o grid de categorias usando a API do MenuManager, reduzindo acoplamento e simplificando a manutencao.

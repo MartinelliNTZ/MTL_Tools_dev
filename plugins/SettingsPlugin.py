@@ -7,6 +7,7 @@ from ..utils.ExplorerUtils import ExplorerUtils
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..i18n.TranslationManager import STR
 from ..utils.QgisMessageUtil import QgisMessageUtil
+from ..core.config.MenuManager import MenuManager
 
 
 class SettingsPlugin(BasePluginMTL):
@@ -26,6 +27,7 @@ class SettingsPlugin(BasePluginMTL):
     AUTO_SAVE_PREFS_ON_CLOSE = False
     prefer_System = {}
     prefer_VectorFields = {}
+    toolbar_category_checks = {}
 
     def __init__(self, iface):
         super().__init__(iface.mainWindow())
@@ -100,6 +102,18 @@ class SettingsPlugin(BasePluginMTL):
         )
         self.logger.debug("Widget de limiar assíncrono por feições adicionado")
 
+        toolbar_layout, self.toolbar_category_checks = (
+            WidgetFactory.create_checkbox_grid(
+                options_dict=MenuManager.toolbar_category_options(),
+                items_per_row=3,
+                checked_by_default=True,
+                title="Toolbar - Categorias Visiveis",
+                separator_top=False,
+                separator_bottom=False,
+            )
+        )
+        self.logger.debug("Grid de categorias visiveis da toolbar adicionado")
+
         geral_layout, self.geral_collapsable = (
             WidgetFactory.create_collapsible_parameters(
                 parent=self,
@@ -113,6 +127,7 @@ class SettingsPlugin(BasePluginMTL):
         self.geral_collapsable.add_content_layout(lang_layout)
         self.geral_collapsable.add_content_layout(prec_layout)
         self.geral_collapsable.add_content_layout(thresh_layout)
+        self.geral_collapsable.add_content_layout(toolbar_layout)
 
         calc_layout_collapsible, self.calc_collapsable = (
             WidgetFactory.create_collapsible_parameters(
@@ -228,6 +243,12 @@ class SettingsPlugin(BasePluginMTL):
             }
         )
 
+        toolbar_visibility = MenuManager.normalize_toolbar_category_visibility(
+            self.prefer_System.get(MenuManager.TOOLBAR_VISIBILITY_PREF_KEY)
+        )
+        for category, checkbox in self.toolbar_category_checks.items():
+            checkbox.setChecked(toolbar_visibility.get(category, True))
+
         self.calc_collapsable.set_expanded(self.preferences.get("calc_expanded", False))
         self.geral_collapsable.set_expanded(
             self.preferences.get("geral_expanded", True)
@@ -259,6 +280,17 @@ class SettingsPlugin(BasePluginMTL):
             if "plugin_language" in self.prefer_System:
                 del self.prefer_System["plugin_language"]
                 self.logger.debug("Idioma selecionado removido para auto-detectar")
+
+        toolbar_visibility = {
+            category: bool(checkbox.isChecked())
+            for category, checkbox in self.toolbar_category_checks.items()
+        }
+        self.prefer_System[MenuManager.TOOLBAR_VISIBILITY_PREF_KEY] = (
+            toolbar_visibility
+        )
+        self.logger.debug(
+            f"Categorias visiveis na toolbar salvas: {toolbar_visibility}"
+        )
 
         cartesian_suffix = (
             self.area_fields_inputs.get_value("cartesian_suffix") or ""

@@ -41,9 +41,6 @@ class ToolRegistry:
             show_in_toolbar=True,
         )
         tools.append(export_layouts)
-        print(
-            f"ToolRegistry: added {export_layouts.name} category {export_layouts.category} main {export_layouts.main_action}"
-        )
 
         replace_layouts = Tool(
             name=STR.REPLACE_IN_LAYOUTS_TITLE,
@@ -126,9 +123,6 @@ class ToolRegistry:
             show_in_toolbar=True,
         )
         tools.append(load_folder)
-        print(
-            f"ToolRegistry: added {load_folder.name} category {load_folder.category} main {load_folder.main_action}"
-        )
 
         vector_to_svg = Tool(
             name="VectorToSvgPlugin",

@@ -9,6 +9,31 @@ from ...utils.StringManager import StringManager
 
 
 class MenuManager:
+    TOOLBAR_VISIBILITY_PREF_KEY = "toolbar_category_visibility"
+
+    @classmethod
+    def toolbar_category_options(cls):
+        """Retorna as categorias configuráveis da toolbar."""
+        return dict(StringManager.MENU_CATEGORIES)
+
+    @classmethod
+    def default_toolbar_category_visibility(cls):
+        """Retorna o estado padrão da toolbar por categoria."""
+        return {category: True for category in cls.toolbar_category_options()}
+
+    @classmethod
+    def normalize_toolbar_category_visibility(cls, visibility):
+        """Normaliza o estado salvo para o conjunto atual de categorias."""
+        merged = cls.default_toolbar_category_visibility()
+        if not isinstance(visibility, dict):
+            return merged
+
+        for category in merged:
+            if category in visibility:
+                merged[category] = bool(visibility.get(category))
+
+        return merged
+
     def __init__(self, iface, tools=None, logger=None):
         self.iface = iface
         self.menu = None
@@ -19,9 +44,13 @@ class MenuManager:
         self.logger = LogUtils(tool=self.TOOLKEY, class_name="MenuManager")
         self._create_actions_for_tools()
         self.prefs = Preferences.load_tool_prefs(self.TOOLKEY)
+        self.toolbar_category_visibility = self.normalize_toolbar_category_visibility(
+            self.prefs.get(self.TOOLBAR_VISIBILITY_PREF_KEY)
+        )
         self.logger.debug(
             f"MenuManager: {self.menu}. Tools: {self.tools}. "
-            f"Toolbar: {self.toolbar}."
+            f"Toolbar: {self.toolbar}. "
+            f"Toolbar categories: {self.toolbar_category_visibility}."
         )
 
     def _create_actions_for_tools(self):
@@ -85,6 +114,12 @@ class MenuManager:
 
         for category in StringManager.MENU_CATEGORIES:
             self.logger.debug(f"Verificando categoria {category}")
+            if not self.toolbar_category_visibility.get(category, True):
+                self.logger.debug(
+                    f"Categoria {category} desabilitada nas preferências da toolbar"
+                )
+                continue
+
             all_tools_in_category = [t for t in self.tools if t.category == category]
             self.logger.debug(
                 f"Total de ferramentas na categoria {category}: {len(all_tools_in_category)}"
@@ -150,12 +185,9 @@ class MenuManager:
             self.logger.warning(
                 "Nenhum botão dropdown criado, tentando adicionar main_actions diretamente"
             )
-            for category in (
-                "SYSTEM",
-                "LAYOUTS",
-                "VECTOR",
-                "AGRICULTURE",
-            ):
+            for category in StringManager.MENU_CATEGORIES:
+                if not self.toolbar_category_visibility.get(category, True):
+                    continue
                 main_tools = [
                     t
                     for t in self.tools
