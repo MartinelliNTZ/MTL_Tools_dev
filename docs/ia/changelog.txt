@@ -109,3 +109,7 @@
 2.2.5.20
 
 - Adicionados os arquivos faltantes de instrucoes para `ja` e `de`, mantendo o padrao `vector_to_svg_help.md` alinhado ao `ToolKey.VECTOR_TO_SVG`.
+
+2.2.5.21
+
+- Corrigido o arquivo `resources/instructions/ja/vector_to_svg_help.md`, que estava em ingles, substituindo o conteudo por uma versao efetivamente traduzida para japones.

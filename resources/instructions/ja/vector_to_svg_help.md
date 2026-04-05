@@ -1,53 +1,53 @@
-# Vector to SVG Converter - Quick Guide
+# ベクターからSVGへの変換 - クイックガイド
 
-This tool exports a QGIS vector layer to SVG, honoring background, border, label, and per-feature export options.
+このツールは、QGIS のベクターレイヤーを SVG に書き出します。背景、境界線、ラベル、フィーチャごとの出力オプションに対応しています。
 
-## How to use
+## 使い方
 
-1. Open `Cadmus > Vector to SVG Converter`.
-2. Select the input vector layer.
-3. If needed, enable `Only selected features`.
-4. Configure background color, border color/width, and label color/size.
-5. Enable or disable transparent background, border, label, and one-SVG-per-feature options.
-6. Choose the output folder or use the project folder.
-7. Run the tool.
+1. `Cadmus > ベクターからSVGへの変換` を開きます。
+2. 入力ベクターレイヤーを選択します。
+3. 必要に応じて `選択フィーチャのみ` を有効にします。
+4. 背景色、境界線の色と太さ、ラベルの色とサイズを設定します。
+5. 透明背景、境界線表示、ラベル表示、フィーチャごとに SVG を生成するかを切り替えます。
+6. 出力フォルダーを選択するか、プロジェクトフォルダーを使用します。
+7. ツールを実行します。
 
-## What the plugin actually does
+## プラグインが実際に行うこと
 
-- Validates that the input is a valid vector layer with features.
-- Uses only selected features when that option is enabled.
-- Reprojects geometries to WGS84 before building the SVG.
-- Exports either a single SVG for the whole layer or one SVG per feature.
-- Applies either a transparent background or a solid background color.
-- Controls geometry borders using the user-defined color and width.
-- Tries to draw real layer labels from QGIS labeling settings, with fallback to `displayExpression()` and the `Name` field.
+- 入力が有効なベクターレイヤーであり、フィーチャを持つことを確認します。
+- このオプションが有効な場合、選択されたフィーチャのみを使用します。
+- SVG を生成する前にジオメトリを WGS84 に再投影します。
+- レイヤー全体を 1 つの SVG として出力するか、フィーチャごとに 1 つの SVG を出力します。
+- 透明背景または単色背景を適用します。
+- ユーザーが指定した色と太さでジオメトリの境界線を制御します。
+- QGIS のラベリング設定から実際のラベルを描画しようとし、必要に応じて `displayExpression()` と `Name` フィールドをフォールバックとして使います。
 
-## File naming
+## ファイル名のルール
 
-- Single SVG export uses the QGIS layer name.
-- Per-feature export:
-  - uses the `Name` field when it exists and has a value;
-  - otherwise uses `LayerName_1`, `LayerName_2`, `LayerName_3`...
-- If a file already exists, the plugin creates an incremental name instead of overwriting it.
+- 単一 SVG の出力では、QGIS レイヤー名を使用します。
+- フィーチャごとの出力では:
+  - `Name` フィールドが存在し、値がある場合はそれを使用します。
+  - そうでない場合は `LayerName_1`、`LayerName_2`、`LayerName_3`... を使用します。
+- 既に同名ファイルがある場合、上書きせずに連番付きの名前を作成します。
 
-## Important behavior
+## 重要な挙動
 
-- When `Transparent background` is enabled, no fill background is written to the SVG.
-- When `Show border` is disabled, geometry outlines are not drawn.
-- When `Show label` is disabled, no text is exported.
-- Label size can be controlled directly in the tool.
-- The final result is always written to disk in the selected folder.
+- `背景を透明にする` が有効な場合、SVG に背景塗りは書き込まれません。
+- `境界線を表示` が無効な場合、ジオメトリの輪郭は描画されません。
+- `ラベルを表示` が無効な場合、文字は出力されません。
+- ラベルサイズはツール上で直接制御できます。
+- 最終結果は必ず選択したフォルダーにファイルとして保存されます。
 
-## When to use it
+## どんなときに使うか
 
-Use this tool when you want to:
+次のような場合に便利です:
 
-- generate SVG icons or figures from project vectors;
-- export features individually for layout, web, or automation usage;
-- reuse basic layer symbology in a lightweight vector output.
+- プロジェクトのベクターデータから SVG アイコンや図形を作成したいとき
+- レイアウト、Web、または自動処理のためにフィーチャを個別に書き出したいとき
+- レイヤーの基本的なシンボル表現を軽量なベクター出力として再利用したいとき
 
-## Notes
+## 注意点
 
-- Review the layer labeling setup if you expect labels to appear.
-- Layers with many features may generate many files when per-feature export is enabled.
-- For cleaner filenames, it is recommended to populate the `Name` field before exporting one SVG per feature.
+- ラベルを表示したい場合は、レイヤーのラベリング設定を確認してください。
+- フィーチャごとの出力を有効にすると、多数のフィーチャを持つレイヤーでは大量のファイルが生成される可能性があります。
+- より分かりやすいファイル名にしたい場合は、フィーチャごとに SVG を出力する前に `Name` フィールドを設定することをおすすめします。
