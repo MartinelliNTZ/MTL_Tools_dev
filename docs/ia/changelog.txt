@@ -49,3 +49,9 @@
 2.2.5.9
 
 - Padronizados novos métodos de `QgisMessageUtil`: `ask_overwrite`, `show_styled_message_bar`, `show_progress_message_bar`, `update_progress`, `clear_message_bar`, `show_level_message_bar` e `show_message_bar_with_button` foram convertidos em métodos estáticos.
+2.2.5.10
+
+- Implementada a execucao completa do `VectorToSvgPlugin`, com exportacao de SVG unico ou um SVG por feicao, respeitando `somente feicoes selecionadas`, fundo transparente, exibicao opcional de borda e rotulo, e abertura do resultado na pasta de saida.
+- A exportacao agora usa `ProjectUtils` para resolver pasta do projeto e validar a camada, `VectorLayerGeometry.get_selected_features()` para materializar apenas a selecao quando o checkbox estiver ativo e mantem o renderer da camada original para desenhar as geometrias no SVG.
+- Adicionada a regra de nomeacao para multiplos SVGs: usa o campo `Name` quando existir e tiver valor; caso contrario, usa o nome da camada do QGIS com sufixo incremental `_1`, `_2`, `_3`...
+- Incluida persistencia da opcao `Gerar SVG para cada feicao` e ajuste do plugin para salvar os arquivos na pasta escolhida com nomes sanitizados e sem sobrescrever arquivos existentes.
