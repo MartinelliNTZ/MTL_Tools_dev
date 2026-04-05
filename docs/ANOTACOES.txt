@@ -1,4 +1,3 @@
-BUGS CONHECIDOS
 bandit -r . -f html -o bandit-report.html
 flake8 . --exclude=.git,__pycache__,build,dist,docs,.vscode,.idea > erros_plugin.txt
 flake8 . --ignore=E501 --exclude=.git,__pycache__,build,dist,docs,.vscode,.idea > erros_plugin.txt
@@ -9,7 +8,7 @@ ferramentas = name                              tipo                            
     - 03: Salvar, Fechar e Reabrir Projeto      instantânea                     RestartQGISPlugin           crítico/alteração QGZ
     - 04: Carregar Pasta de Arquivos            janela                          LoadFolderLayersPlugin      alteração QGZ
     - 05: Gerar Rastro de Implemento            janela                          GenerateTrailPlugin         nenhum
-    - 06: Sobre o Cadmus                    janela                          AboutDialog                 nenhum
+    - 06: Sobre o Cadmus                        janela                          AboutDialog                 nenhum
     - 07: Capturar Coordenadas                  instantânea+resultado           CoordClickTool              travamento da task
     - 08: Calcular Campos Vetoriais             instantânea                     VectorFieldPlugin          manipulação de vetores
     - 09: Obter Coordenadas de Drone            janela                          DroneCoordinatesPlugin      travamento por excesso de dados
@@ -22,9 +21,9 @@ ferramentas = name                              tipo                            
     - 16: Estatisticas de atributos             Processing
     - 17: Recortador Massivo de Raster          Processing                      RasterMassClipper              manipulação de raster
     - 18: Gerador de Linhas entre Pontos        Processing                      GeometryLineFromPoints         manipulação de vetores
-    - 19: Gerador de diferença entre rasters       Processing                      RasterDifferenceStats          manipulação de raster
-    - 20: Ferramenta de remoção de campos KML        instantânea                     RemoveKmlFieldsPlugin         manipulação de vetores
-
+    - 19: Gerador de diferença entre rasters    Processing                      RasterDifferenceStats          manipulação de raster
+    - 20: Ferramenta de remoção de campos KML   instantânea                     RemoveKmlFieldsPlugin         manipulação de vetores
+    - 21: Vetor para SVG                        Janela
 
 
 Documentação de cenarios: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13
@@ -33,17 +32,23 @@ Traducao: 9
   - Geral: Impedir múltiplas instâncias de plugins rodando simultaneamente
   - criar gerador de indices ndvi, ndre, e gli automaticos
   - multpart nao ta em task e pode bugar
-  - criar 2 ico de plugins 
-  - tentar usar o visualizador de resultados do processing para mostrar o resultado do processing
+  - criar 3 ico de plugins 
   - eLIMIAR TODOS OS untraceable exceptions e garantir que tudo seja logado
   - Usar iconManager para carregar ícones de forma centralizada e eficiente
-  - vetor para svg
  changelog=
-  2.3.3
+ 2.3.4 2026/04/05
+    - Reorganização do SettingsPlugin com seções colapsáveis e ajustes nas configurações de campos vetoriais (agora baseadas em sufixos configuráveis com validação e persistência).
+    - Correções e robustez no sistema de logging (LogUtils), garantindo funcionamento seguro mesmo sem acesso a diretórios de escrita.
+    - Criação da ferramenta VectorToSvgPlugin:
+    - Implementação do SVGUtils para centralizar a geração de SVG (geometrias, estilos, labeling e escrita), reduzindo acoplamento.
+    - Padronização de mensagens (QgisMessageUtil) e uso de STR.
+    - Encapsulamento de botao de pasta do projeto no SelectorWidget.
+    - Atalhos na toolbar para ferramentas de raster via Processing.
+  2.3.3 2026/03/28
     - Temporaridialog e qgismensagem util
-  2.3.2
+  2.3.2 2026/03/27
     - iniciado svg
-  2.3.1
+  2.3.1 2026/03/26
     - Reorganizada interface do SettingsPlugin: adicionados dois widgets colapsáveis - "Geral" 
     - Corrigido bug de inicialização de log em LogUtils: anteriormente usava Path.cwd() 
         (ex: C:\Windows\system32) quando não inicializado, causando PermissionError ao criar pasta log.
@@ -65,9 +70,9 @@ Traducao: 9
     - Os cálculos de length para linhas e area para polígonos agora usam os sufixos configuráveis ao resolver os nomes dos campos.
     - O comportamento de pontos (x e y) foi mantido sem alterações.
     - Corrigida chamada de leitura dos sufixos no SettingsPlugin para compatibilidade com InputFieldsWidget.get_value, evitando erro em runtime ao salvar as preferências.
-  2.3.0
+  2.3.0 2026/03/25
     - pep8  
-  2.2.4
+  2.2.4 2026/03/24
     - Correção crítica: VectorFieldPlugin agora detecta automaticamente CRS geográfico e calcula ambos os modos 
       (elipsoidal e cartesiano) por padrão, garantindo que os usuários obtenham resultados precisos sem precisar configurar 
       manualmente. Para CRS projetado, o plugin respeita o modo selecionado nas preferências, proporcionando flexibilidade
