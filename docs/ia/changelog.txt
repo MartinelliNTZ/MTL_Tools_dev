@@ -61,3 +61,21 @@
 - Criado o utilitario generico `SVGUtils` em `utils/SVGUtils.py` para concentrar responsabilidades reutilizaveis de SVG: preparacao de feicoes, montagem do documento SVG, conversao de geometrias em elementos SVG, extracao de estilo do renderer, sanitizacao de nomes e escrita de arquivos.
 - Refatorado o `VectorToSvgPlugin` para manter apenas a orquestracao da ferramenta e delegar ao `SVGUtils` as responsabilidades genericas de geracao de SVG.
 - Mantido o comportamento funcional da exportacao anterior, reduzindo acoplamento do plugin e facilitando reutilizacao futura por outras ferramentas do projeto.
+
+2.2.5.12
+
+- Corrigida a semantica de `Mostrar Borda` na exportacao SVG: a opcao agora controla o contorno real das geometrias vetoriais e nao mais um retangulo ao redor da dimensao total do SVG.
+- Implementado suporte a rotulos reais da camada no `SVGUtils`: quando a camada tiver rotulagem habilitada no QGIS e `Mostrar Rotulo` estiver marcado, os textos das feicoes passam a ser desenhados no SVG nas respectivas geometrias.
+- Mantido o comportamento de ocultar completamente os rotulos quando o checkbox correspondente estiver desmarcado.
+
+2.2.5.13
+
+- Reimplementada a abordagem de borda e rotulo no `SVGUtils` com base na API de labeling do QGIS: os rotulos agora sao lidos a partir de `layer.labeling().settings()` e avaliados por expressao/campo com `QgsExpression`.
+- Ajustado `Mostrar Borda` para controlar diretamente o stroke das geometrias exportadas, usando a cor de borda configurada na ferramenta em vez de desenhar moldura externa.
+- Removidos do SVG o retangulo de contorno global e o rotulo de rodape generico, substituindo-os por rotulos posicionados nas proprias feicoes quando a camada tiver labeling ativo.
+
+2.2.5.14
+
+- Tornada mais robusta a exportacao de borda no `SVGUtils`: a largura do contorno agora e definida explicitamente por tipo de geometria, evitando depender de propriedades de `symbolLayer` que variam entre simbolizadores.
+- Adicionado fallback de rotulos por `customProperty` da camada (`labeling/fieldName`, `labeling/isExpression`, `labeling/fontFamily`, `labeling/fontSize`) para aumentar compatibilidade entre versoes e implementacoes de labeling do QGIS.
+- Implementado fallback de leitura de settings de labeling para assinaturas diferentes de `settings(...)`, cobrindo cenarios em que a API exige apenas `providerId` ou `layer, providerId`.

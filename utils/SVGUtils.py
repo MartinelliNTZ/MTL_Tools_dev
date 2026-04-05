@@ -8,6 +8,9 @@ from qgis.PyQt.QtGui import QColor
 from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
+    QgsExpression,
+    QgsExpressionContext,
+    QgsExpressionContextUtils,
     QgsFeature,
     QgsGeometry,
     QgsPointXY,
@@ -30,6 +33,8 @@ class SVGUtils:
     DEFAULT_POINT_RADIUS = 5.0
     DEFAULT_LINE_WIDTH = 2.0
     DEFAULT_POLYGON_STROKE_WIDTH = 1.2
+    DEFAULT_LABEL_FONT_FAMILY = "Arial"
+    DEFAULT_LABEL_FONT_SIZE = 14.0
 
     @staticmethod
     def _get_logger(tool_key: str = ToolKey.UNTRACEABLE) -> LogUtils:
@@ -119,8 +124,6 @@ class SVGUtils:
             ),
             SVGUtils.background_svg(style),
         ]
-        if style.get("show_border", False):
-            svg.append(SVGUtils.border_svg(style))
 
         svg.append('  <g id="features">')
         render_context = QgsRenderContext()
@@ -128,7 +131,12 @@ class SVGUtils:
             feature = item["feature"]
             geometry = item["geometry"]
             symbol_style = SVGUtils.symbol_style_for_feature(
-                layer, feature, geometry, render_context, tool_key=tool_key
+                layer,
+                feature,
+                geometry,
+                render_context,
+                style=style,
+                tool_key=tool_key,
             )
             elements = SVGUtils.geometry_to_svg_elements(
                 geometry, offset_x, offset_y, scale, symbol_style
@@ -137,7 +145,19 @@ class SVGUtils:
         svg.append("  </g>")
 
         if style.get("show_label", False):
-            svg.append(SVGUtils.label_svg(label_text, style))
+            label_elements = SVGUtils.feature_label_svgs(
+                layer=layer,
+                features=features,
+                offset_x=offset_x,
+                offset_y=offset_y,
+                scale=scale,
+                style=style,
+                tool_key=tool_key,
+            )
+            if label_elements:
+                svg.append('  <g id="labels">')
+                svg.extend(f"    {element}" for element in label_elements)
+                svg.append("  </g>")
 
         svg.append("</svg>")
         logger.debug(
@@ -155,23 +175,6 @@ class SVGUtils:
         return (
             f'  <rect width="{SVGUtils.SVG_SIZE}" height="{SVGUtils.SVG_SIZE}" '
             f'fill="{style.get("background_color", "#ffffff")}"/>'
-        )
-
-    @staticmethod
-    def border_svg(style: dict) -> str:
-        return (
-            f'  <rect x="8" y="8" width="{SVGUtils.SVG_SIZE - 16}" '
-            f'height="{SVGUtils.SVG_SIZE - 16}" fill="none" '
-            f'stroke="{style.get("border_color", "#000000")}" stroke-width="1.5" rx="6"/>'
-        )
-
-    @staticmethod
-    def label_svg(label_text: str, style: dict) -> str:
-        escaped = escape(label_text or "")
-        return (
-            f'  <text x="{SVGUtils.SVG_SIZE // 2}" y="{SVGUtils.SVG_SIZE - 16}" '
-            f'font-family="monospace" font-size="14" '
-            f'fill="{style.get("label_color", "#000000")}" text-anchor="middle">{escaped}</text>'
         )
 
     @staticmethod
@@ -323,6 +326,7 @@ class SVGUtils:
         feature: QgsFeature,
         geometry: QgsGeometry,
         render_context: QgsRenderContext,
+        style: Optional[dict] = None,
         tool_key: str = ToolKey.UNTRACEABLE,
     ) -> dict:
         logger = SVGUtils._get_logger(tool_key)
@@ -407,14 +411,285 @@ class SVGUtils:
             if fill_color in (None, "", "none"):
                 fill_color = SVGUtils.DEFAULT_FILL_COLOR
 
+        show_border = True if style is None else style.get("show_border", True)
+        configured_border_color = None if style is None else style.get("border_color")
+        border_width = SVGUtils.default_border_width_for_geometry(geometry)
+
         return {
             "fill": fill_color or SVGUtils.DEFAULT_FILL_COLOR,
             "fill_opacity": opacity if fill_color != "none" else 0.0,
-            "stroke": stroke_color or SVGUtils.DEFAULT_STROKE_COLOR,
-            "stroke_width": stroke_width,
-            "stroke_opacity": stroke_opacity,
+            "stroke": (
+                configured_border_color
+                or stroke_color
+                or SVGUtils.DEFAULT_STROKE_COLOR
+            )
+            if show_border
+            else "none",
+            "stroke_width": border_width if show_border else 0.0,
+            "stroke_opacity": stroke_opacity if show_border else 0.0,
             "point_radius": point_radius,
         }
+
+    @staticmethod
+    def feature_label_svgs(
+        layer: QgsVectorLayer,
+        features: List[dict],
+        offset_x: float,
+        offset_y: float,
+        scale: float,
+        style: dict,
+        tool_key: str = ToolKey.UNTRACEABLE,
+    ) -> List[str]:
+        logger = SVGUtils._get_logger(tool_key)
+        label_settings = SVGUtils.resolve_label_settings(layer, tool_key=tool_key)
+        if not label_settings:
+            return []
+
+        elements = []
+        for item in features:
+            feature = item["feature"]
+            geometry = item["geometry"]
+            label_text = SVGUtils.evaluate_label_expression(
+                layer, feature, label_settings, tool_key=tool_key
+            )
+            if not label_text:
+                continue
+
+            anchor_point = SVGUtils.label_anchor_point(geometry)
+            if anchor_point is None:
+                continue
+
+            pixel_x, pixel_y = SVGUtils.to_svg_xy(
+                anchor_point, offset_x, offset_y, scale
+            )
+            escaped = escape(str(label_text))
+            elements.append(
+                f'<text x="{pixel_x:.3f}" y="{pixel_y:.3f}" '
+                f'font-family="{SVGUtils.label_font_family(label_settings)}" '
+                f'font-size="{SVGUtils.label_font_size(label_settings):.3f}" '
+                f'fill="{style.get("label_color", "#000000")}" '
+                'text-anchor="middle" dominant-baseline="middle">'
+                f"{escaped}</text>"
+            )
+
+        logger.debug(
+            f"feature_label_svgs gerou {len(elements)} rotulo(s) para '{layer.name()}'"
+        )
+        return elements
+
+    @staticmethod
+    def resolve_label_settings(
+        layer: QgsVectorLayer, tool_key: str = ToolKey.UNTRACEABLE
+    ):
+        logger = SVGUtils._get_logger(tool_key)
+        if not layer or not layer.isValid():
+            return None
+
+        try:
+            labels_enabled = layer.labelsEnabled()
+        except Exception as e:
+            logger.warning(f"Falha ao verificar labelsEnabled da camada: {e}")
+            labels_enabled = False
+
+        labeling = layer.labeling() if hasattr(layer, "labeling") else None
+        if labeling is not None and labels_enabled:
+            try:
+                provider_ids = (
+                    labeling.subProviders() if hasattr(labeling, "subProviders") else []
+                )
+            except Exception:
+                provider_ids = []
+
+            provider_id = provider_ids[0] if provider_ids else ""
+
+            settings = SVGUtils._read_label_settings_from_labeling(
+                layer, labeling, provider_id, logger
+            )
+            if settings is not None and getattr(settings, "fieldName", ""):
+                return settings
+
+        fallback = SVGUtils._read_label_settings_from_custom_properties(layer, logger)
+        if fallback is not None:
+            return fallback
+
+        logger.debug("Nao foi possivel resolver configuracao de rotulo da camada")
+        return None
+
+    @staticmethod
+    def _read_label_settings_from_labeling(layer, labeling, provider_id, logger):
+        try:
+            return labeling.settings(provider_id)
+        except TypeError:
+            try:
+                return labeling.settings(layer, provider_id)
+            except Exception as e:
+                logger.warning(
+                    f"Falha ao obter settings(layer, provider_id) do labeling: {e}"
+                )
+                return None
+        except Exception as e:
+            logger.warning(f"Falha ao obter settings(provider_id) do labeling: {e}")
+            return None
+
+    @staticmethod
+    def _read_label_settings_from_custom_properties(layer, logger):
+        field_name = str(layer.customProperty("labeling/fieldName", "") or "").strip()
+        if not field_name:
+            return None
+
+        is_expression = str(
+            layer.customProperty("labeling/isExpression", "false") or "false"
+        ).lower() in ("1", "true", "yes")
+        family = str(
+            layer.customProperty("labeling/fontFamily", SVGUtils.DEFAULT_LABEL_FONT_FAMILY)
+            or SVGUtils.DEFAULT_LABEL_FONT_FAMILY
+        ).strip() or SVGUtils.DEFAULT_LABEL_FONT_FAMILY
+
+        try:
+            size = float(
+                layer.customProperty(
+                    "labeling/fontSize", SVGUtils.DEFAULT_LABEL_FONT_SIZE
+                )
+                or SVGUtils.DEFAULT_LABEL_FONT_SIZE
+            )
+        except Exception:
+            size = SVGUtils.DEFAULT_LABEL_FONT_SIZE
+
+        logger.debug(
+            f"Usando fallback de customProperty para rotulo. fieldName={field_name}, is_expression={is_expression}"
+        )
+        return {
+            "fieldName": field_name,
+            "isExpression": is_expression,
+            "fontFamily": family,
+            "fontSize": size,
+        }
+
+    @staticmethod
+    def evaluate_label_expression(
+        layer: QgsVectorLayer,
+        feature: QgsFeature,
+        label_settings,
+        tool_key: str = ToolKey.UNTRACEABLE,
+    ) -> Optional[str]:
+        logger = SVGUtils._get_logger(tool_key)
+        if label_settings is None:
+            return None
+
+        try:
+            expression_text = SVGUtils._label_setting_value(
+                label_settings, "fieldName", ""
+            ) or ""
+            is_expression = bool(
+                SVGUtils._label_setting_value(label_settings, "isExpression", False)
+            )
+            if not expression_text:
+                return None
+
+            if not is_expression:
+                escaped_field = expression_text.replace('"', '""')
+                expression_text = f'"{escaped_field}"'
+
+            expression = QgsExpression(expression_text)
+            context = QgsExpressionContext()
+            context.appendScopes(
+                QgsExpressionContextUtils.globalProjectLayerScopes(layer)
+            )
+            context.setFeature(feature)
+            value = expression.evaluate(context)
+
+            if expression.hasEvalError():
+                logger.warning(
+                    f"Erro ao avaliar rotulo da feicao {feature.id()}: {expression.evalErrorString()}"
+                )
+                return None
+
+            if value is None:
+                return None
+
+            text = str(value).strip()
+            return text or None
+        except Exception as e:
+            logger.warning(
+                f"Falha ao avaliar configuracao de rotulo da feicao {feature.id()}: {e}"
+            )
+            return None
+
+    @staticmethod
+    def label_anchor_point(geometry: QgsGeometry):
+        if not geometry or geometry.isEmpty():
+            return None
+
+        try:
+            geom_type = geometry.type()
+            if geom_type == QgsWkbTypes.PointGeometry:
+                if geometry.isMultipart():
+                    multi_points = geometry.asMultiPoint()
+                    return multi_points[0] if multi_points else None
+                return geometry.asPoint()
+
+            point_on_surface = geometry.pointOnSurface()
+            if point_on_surface and not point_on_surface.isEmpty():
+                return point_on_surface.asPoint()
+
+            centroid = geometry.centroid()
+            if centroid and not centroid.isEmpty():
+                return centroid.asPoint()
+        except Exception:
+            return None
+
+        return None
+
+    @staticmethod
+    def label_font_family(label_settings) -> str:
+        family = SVGUtils._label_setting_value(
+            label_settings, "fontFamily", SVGUtils.DEFAULT_LABEL_FONT_FAMILY
+        )
+        if family:
+            return str(family)
+
+        try:
+            text_format = label_settings.format()
+            family = text_format.font().family()
+            return family or SVGUtils.DEFAULT_LABEL_FONT_FAMILY
+        except Exception:
+            return SVGUtils.DEFAULT_LABEL_FONT_FAMILY
+
+    @staticmethod
+    def label_font_size(label_settings) -> float:
+        size = SVGUtils._label_setting_value(
+            label_settings, "fontSize", SVGUtils.DEFAULT_LABEL_FONT_SIZE
+        )
+        try:
+            size = float(size)
+            if size > 0:
+                return size
+        except Exception:
+            pass
+
+        try:
+            text_format = label_settings.format()
+            font = text_format.font()
+            point_size = float(font.pointSizeF())
+            if point_size > 0:
+                return point_size
+        except Exception:
+            pass
+        return SVGUtils.DEFAULT_LABEL_FONT_SIZE
+
+    @staticmethod
+    def _label_setting_value(label_settings, key, default=None):
+        if isinstance(label_settings, dict):
+            return label_settings.get(key, default)
+        return getattr(label_settings, key, default)
+
+    @staticmethod
+    def default_border_width_for_geometry(geometry: QgsGeometry) -> float:
+        if geometry.type() == QgsWkbTypes.PointGeometry:
+            return 1.0
+        if geometry.type() == QgsWkbTypes.LineGeometry:
+            return 2.0
+        return SVGUtils.DEFAULT_POLYGON_STROKE_WIDTH
 
     @staticmethod
     def default_symbol_style(geometry: QgsGeometry) -> dict:
