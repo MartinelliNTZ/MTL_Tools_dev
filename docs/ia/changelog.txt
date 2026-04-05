@@ -122,3 +122,8 @@
 2.2.5.23
 
 - Aplicada a mesma refatoracao no `ExportAllLayouts`, agora usando `create_path_selector(..., path_button="exports")` em vez de manter um botao manual e um metodo local para preencher a pasta do projeto.
+
+2.2.5.24
+
+- Adicionado suporte ao parametro `path_button` em `WidgetFactory.create_save_file_selector`, reutilizando o botao encapsulado do `SelectorWidget` tambem para seletores de salvamento.
+- Atualizado o `GenerateTrailPlugin` para preencher automaticamente `vetores/Rastro_implemento.gpkg` na pasta do projeto ao usar o botao do seletor de saida.

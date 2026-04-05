@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes, QgsMapLayerProxyModel
 from typing import Optional, Tuple
 from ..plugins.BasePlugin import BasePluginMTL
@@ -58,7 +59,10 @@ class GenerateTrailPlugin(BasePluginMTL):
         self.logger.debug("Componente de tamanho de implemento adicionado")
 
         save_layout, self.save_selector = WidgetFactory.create_save_file_selector(
-            parent=self, file_filter=StringManager.FILTER_VECTOR, separator_top=False
+            parent=self,
+            file_filter=StringManager.FILTER_VECTOR,
+            path_button=os.path.join("vetores", "Rastro_implemento.gpkg"),
+            separator_top=False,
         )
         self.logger.debug("Componente de salvamento de arquivo adicionado")
 
