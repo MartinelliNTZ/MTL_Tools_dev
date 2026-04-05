@@ -98,17 +98,11 @@ class ExportAllLayoutsDialog(BasePluginMTL):
             parent=self,
             title=STR.OUTPUT_FOLDER,
             mode="folder",
+            path_button="exports",
             separator_top=False,
             separator_bottom=False,
         )
         self.logger.debug("Path Selector de pasta de saída criado")
-
-        btn_project_layout, self.btn_project = WidgetFactory.create_simple_button(
-            text=STR.USE_PROJECT_FOLDER,
-            parent=self,
-        )
-        self.btn_project.clicked.connect(self._set_folder_to_project)
-        self.logger.debug("Botão 'Usar pasta do projeto' criado")
 
         buttons_layout, self.action_buttons = (
             WidgetFactory.create_bottom_action_buttons(
@@ -127,7 +121,6 @@ class ExportAllLayoutsDialog(BasePluginMTL):
                 checkboxes_layout,
                 max_width_layout,
                 folder_layout,
-                btn_project_layout,
                 buttons_layout,
             ]
         )
@@ -260,13 +253,6 @@ class ExportAllLayoutsDialog(BasePluginMTL):
         self.logger.info(
             f"Preferências salvas: PDF={self.preferences['export_pdf']}, PNG={self.preferences['export_png']}"
         )
-
-    def _set_folder_to_project(self):
-        self.logger.debug("Definindo pasta para pasta do projeto")
-        project_folder = QgsProject.instance().homePath()
-        export_folder = os.path.join(project_folder, "exports")
-        self.folder_selector.set_paths([export_folder])
-        self.logger.debug(f"Pasta definida para: {export_folder}")
 
     def execute_tool(self):
         self.logger.info("Iniciando exportação de layouts")

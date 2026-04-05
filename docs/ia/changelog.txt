@@ -118,3 +118,7 @@
 
 - Refatorado o `SelectorWidget` para encapsular o botao "Usar pasta do projeto", agora habilitado via parametro generico `path_button` em `WidgetFactory.create_path_selector`.
 - Atualizado o `VectorToSvgPlugin` para usar `create_path_selector(..., path_button="svgs")`, removendo o botao manual e o metodo local que montavam a pasta do projeto fora do widget.
+
+2.2.5.23
+
+- Aplicada a mesma refatoracao no `ExportAllLayouts`, agora usando `create_path_selector(..., path_button="exports")` em vez de manter um botao manual e um metodo local para preencher a pasta do projeto.
