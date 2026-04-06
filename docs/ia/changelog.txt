@@ -1,1 +1,2 @@
-2.3.6 2026/04/05
+2.3.6.1 2026/04/05
+[2.3.6.1] SettingsPlugin: Added "Pasta de projetos" path selector (mode=folder) with save/load from preferences (projects_folder key).
