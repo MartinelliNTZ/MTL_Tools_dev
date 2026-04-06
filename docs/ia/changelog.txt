@@ -1,6 +1,1 @@
-2.3.5.2 2026/04/05
-    - Refatoracao da visibilidade da toolbar por categoria: responsabilidade removida de StringManager e ToolRegistry e concentrada no MenuManager, mantendo show_in_toolbar no nivel da ferramenta e o filtro global no nivel da toolbar.
-    - SettingsPlugin ajustado para montar e persistir o grid de categorias usando a API do MenuManager, reduzindo acoplamento e simplificando a manutencao.
-    - Traducoes em alemao adicionadas para o sistema de instrucoes em resources/instructions/de e para o HTML em resources/instructions/html/HtmlInstructions_de.py, completando a mesma quantidade de arquivos e metodos da referencia pt_BR.
-    - BasePlugin ajustado para usar STR.INSTRUCTIONS no titulo do dialogo de instrucoes, com a nova chave adicionada nas classes de strings de pt_BR, en, es e de.
-    - ToolRegistry atualizado para usar STR.VECTOR_TO_SVG_TITLE e STR.VECTOR_TO_SVG_TOOLTIP no registro do VectorToSvgPlugin, com tooltip internacionalizada revisada com base no comportamento real do plugin.
+2.3.6 2026/04/05

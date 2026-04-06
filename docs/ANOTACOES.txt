@@ -36,6 +36,12 @@ Traducao: 9
   - eLIMIAR TODOS OS untraceable exceptions e garantir que tudo seja logado
   - Usar iconManager para carregar ícones de forma centralizada e eficiente
  changelog=
+ 2.3.5 2026/04/05
+    - Refatoracao da visibilidade da toolbar por categoria
+    - SettingsPlugin ajustado para montar e persistir o grid de categorias usando a API do MenuManager, reduzindo acoplamento e simplificando a manutencao.
+    - Traducoes em alemao adicionadas para o sistema de instrucoes 
+    - BasePlugin ajustado para usar STR.INSTRUCTIONS no titulo do dialogo de instrucoes, com a nova chave adicionada nas classes de strings de pt_BR, en, es e de.
+
  2.3.4 2026/04/05
     - Reorganização do SettingsPlugin com seções colapsáveis e ajustes nas configurações de campos vetoriais (agora baseadas em sufixos configuráveis com validação e persistência).
     - Correções e robustez no sistema de logging (LogUtils), garantindo funcionamento seguro mesmo sem acesso a diretórios de escrita.
