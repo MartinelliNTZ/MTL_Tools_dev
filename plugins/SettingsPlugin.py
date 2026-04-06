@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from qgis.core import QgsCoordinateReferenceSystem
+
 from ..utils.StringManager import StringManager
 from ..plugins.BasePlugin import BasePluginMTL
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
@@ -24,6 +26,7 @@ class SettingsPlugin(BasePluginMTL):
         STR.CARTESIAN,
         STR.BOTH,
     ]
+    DEFAULT_CRS_AUTHID = "EPSG:4674"
     AUTO_SAVE_PREFS_ON_CLOSE = False
     prefer_System = {}
     prefer_VectorFields = {}
@@ -77,6 +80,18 @@ class SettingsPlugin(BasePluginMTL):
             separator_bottom=False,
             parent=self,
         )
+
+        crs_layout, self.crs_selector = WidgetFactory.create_crs_selector(
+            title="SRC padrao",
+            tool_key=ToolKey.SETTINGS,
+            default_auth_id=self.prefer_System.get(
+                "default_crs_authid", self.DEFAULT_CRS_AUTHID
+            ),
+            separator_top=False,
+            separator_bottom=False,
+            parent=self,
+        )
+        self.logger.debug("Widget exclusivo de selecao de SRC adicionado")
 
         prec_layout, self.spin_precision = WidgetFactory.create_double_spin_input(
             f"🎯 {STR.VECTOR_FIELDS_PRECISION}",
@@ -133,6 +148,7 @@ class SettingsPlugin(BasePluginMTL):
             separator_bottom=False,
         )
         self.geral_collapsable.add_content_layout(projects_layout)
+        self.geral_collapsable.add_content_layout(crs_layout)
         self.geral_collapsable.add_content_layout(lang_layout)
         self.geral_collapsable.add_content_layout(prec_layout)
         self.geral_collapsable.add_content_layout(thresh_layout)
@@ -216,6 +232,18 @@ class SettingsPlugin(BasePluginMTL):
             self.logger.warning(f"Idioma inválido: {selected_language}, usando padrão")
             self.lang_selector.set_selected_key("pt_BR")
 
+        selected_crs_authid = self.prefer_System.get(
+            "default_crs_authid", self.DEFAULT_CRS_AUTHID
+        )
+        if not self.crs_selector.set_crs_authid(selected_crs_authid):
+            self.logger.warning(
+                f"SRC invalido: {selected_crs_authid}, usando padrao"
+            )
+            self.crs_selector.set_crs_authid(self.DEFAULT_CRS_AUTHID)
+        self.logger.debug(
+            f"SRC padrao carregado: {self.crs_selector.get_crs_authid()}"
+        )
+
         if "async_threshold_features" in self.prefer_System:
             thresh_feats = self.prefer_System.get("async_threshold_features", 1000)
         else:
@@ -276,6 +304,12 @@ class SettingsPlugin(BasePluginMTL):
 
         selected_text = self.radio_calc.get_selected_text()
         self.prefer_System["calculation_method"] = selected_text
+        selected_crs = self.crs_selector.get_crs()
+        if not selected_crs or not selected_crs.isValid():
+            selected_crs = QgsCoordinateReferenceSystem(self.DEFAULT_CRS_AUTHID)
+            self.crs_selector.set_crs(selected_crs)
+        self.prefer_System["default_crs_authid"] = selected_crs.authid()
+        self.logger.debug(f"SRC padrao salvo: {selected_crs.authid()}")
 
         feats_value = int(self.spin_threshold.value())
         self.prefer_System["async_threshold_features"] = feats_value
@@ -343,7 +377,11 @@ class SettingsPlugin(BasePluginMTL):
         selected_method = self.radio_calc.get_selected_text()
         QgisMessageUtil.modal_info(
             self.iface,
-            message=f"{STR.CALCULATION_METHOD_LABEL} {selected_method}. {STR.SETTINGS_SAVED_MESSAGE}",
+            message=(
+                f"{STR.CALCULATION_METHOD_LABEL} {selected_method}. "
+                f"SRC padrao: {self.crs_selector.get_crs_authid()}. "
+                f"{STR.SETTINGS_SAVED_MESSAGE}"
+            ),
         )
 
         self.logger.info("Configurações aplicadas e salvas")

@@ -24,6 +24,7 @@ from ...resources.widgets.CheckboxGridWidget import CheckboxGridWidget
 from ...resources.widgets.ReadOnlyFieldWidget import ReadOnlyFieldWidget
 from ...resources.widgets.DropdownSelectorWidget import DropdownSelectorWidget
 from ...resources.widgets.ColorButtonWidget import ColorButtonWidget
+from ...resources.widgets.CrsSelectorWidget import CrsSelectorWidget
 from ...i18n.TranslationManager import STR
 
 
@@ -778,6 +779,37 @@ class WidgetFactory:
             allow_empty=allow_empty,
             empty_text=empty_text,
             parent=parent,
+        )
+        widget.setStyleSheet(Styles.dropdown_selector_widget())
+        layout.addWidget(widget)
+
+        if separator_bottom:
+            layout.addWidget(WidgetFactory.create_separator())
+
+        return layout, widget
+
+    @staticmethod
+    def create_crs_selector(
+        *,
+        title: str,
+        tool_key=None,
+        parent=None,
+        default_auth_id: str = "",
+        separator_top: bool = False,
+        separator_bottom: bool = True,
+    ):
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(Styles.LAYOUT_V_SPACING)
+
+        if separator_top:
+            layout.addWidget(WidgetFactory.create_separator())
+
+        widget = CrsSelectorWidget(
+            title=title,
+            parent=parent,
+            tool_key=tool_key,
+            default_auth_id=default_auth_id,
         )
         widget.setStyleSheet(Styles.dropdown_selector_widget())
         layout.addWidget(widget)
