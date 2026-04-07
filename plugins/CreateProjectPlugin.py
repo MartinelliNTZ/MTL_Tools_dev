@@ -3,10 +3,6 @@ import os
 import re
 from pathlib import Path
 
-from qgis.core import (
-    QgsCoordinateReferenceSystem,
-)
-
 from ..core.config.LogUtils import LogUtils
 from ..core.ui.dialogs.DefaultProjectsFolderDialog import DefaultProjectsFolderDialog
 from ..core.ui.dialogs.ProjectNameDialog import ProjectNameDialog
@@ -28,11 +24,6 @@ class CreateProjectPlugin:
     GENERIC_PROJECT_PATTERN = re.compile(r"^NovoProjeto_(\d+)$")
     DEFAULT_CRS_AUTHID = "EPSG:4326"
     DEFAULT_CRS_PREF_KEY = "default_crs_authid"
-    GOOGLE_HYBRID_LAYER_NAME = "Google Hybrid"
-    GOOGLE_HYBRID_URI = (
-        "type=xyz&zmin=0&zmax=21&"
-        "url=https://mt1.google.com/vt/lyrs=y%26x=%7Bx%7D%26y=%7By%7D%26z=%7Bz%7D"
-    )
     SCENARIO_UNSAVED_WITH_CONTENT = 1
     SCENARIO_SAVED_CURRENT_PROJECT = 2
     SCENARIO_UNSAVED_EMPTY_PROJECT = 3
@@ -132,25 +123,6 @@ class CreateProjectPlugin:
         )
         return project_name or suggested_name
 
-    def _add_google_basemap(self, project):
-        existing_names = ProjectUtils.project_layer_names(project)
-        if self.GOOGLE_HYBRID_LAYER_NAME in existing_names:
-            self.logger.debug("Camada base Google ja existe no projeto; ignorando")
-            return
-
-        layer = RasterLayerSource().load_raster_from_url(
-            self.GOOGLE_HYBRID_URI,
-            layer_name=self.GOOGLE_HYBRID_LAYER_NAME,
-            provider_key="wms",
-            external_tool_key=self.TOOL_KEY,
-        )
-        if not layer or not layer.isValid():
-            self.logger.warning("Falha ao criar camada base Google Hybrid (XYZ)")
-            return
-
-        ProjectUtils.add_layer(layer, add_to_root=True, project=project)
-        self.logger.info("Camada base Google Hybrid adicionada ao projeto")
-
     def _detect_creation_scenario(self, current_project) -> int:
         if ProjectUtils.is_project_saved(current_project):
             return self.SCENARIO_SAVED_CURRENT_PROJECT
@@ -212,19 +184,12 @@ class CreateProjectPlugin:
         )
         return line_layer, copied_line_path
 
-    def _resolve_valid_crs(self, authid: str) -> QgsCoordinateReferenceSystem:
-        crs = QgsCoordinateReferenceSystem(authid or self.DEFAULT_CRS_AUTHID)
-        if crs.isValid():
-            return crs
-
-        self.logger.warning(
-            f"SRC padrao invalido nas preferencias: '{authid}'. "
-            f"Usando fallback {self.DEFAULT_CRS_AUTHID}"
-        )
-        return QgsCoordinateReferenceSystem(self.DEFAULT_CRS_AUTHID)
-
     def _apply_project_crs(self, project, authid: str):
-        crs = self._resolve_valid_crs(authid)
+        crs = ProjectUtils.resolve_valid_crs(
+            authid=authid,
+            fallback_authid=self.DEFAULT_CRS_AUTHID,
+            tool_key=self.TOOL_KEY,
+        )
         ProjectUtils.set_project_crs(project, crs)
         self.logger.info(f"SRC aplicado ao projeto: {crs.authid()}")
 
@@ -266,7 +231,9 @@ class CreateProjectPlugin:
         try:
             if not current_project_path:
                 self._apply_project_crs(current_project, default_crs_authid)
-                self._add_google_basemap(current_project)
+                RasterLayerSource().add_google_hybrid_basemap(
+                    current_project, external_tool_key=self.TOOL_KEY
+                )
                 line_layer = None
                 line_path_in_project = ""
                 if should_load_line:
@@ -295,7 +262,9 @@ class CreateProjectPlugin:
             else:
                 new_project = ProjectUtils.create_project_instance()
                 self._apply_project_crs(new_project, default_crs_authid)
-                self._add_google_basemap(new_project)
+                RasterLayerSource().add_google_hybrid_basemap(
+                    new_project, external_tool_key=self.TOOL_KEY
+                )
                 line_layer = None
                 if should_load_line:
                     line_layer, _ = (

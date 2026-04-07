@@ -4,6 +4,8 @@ from qgis.core import QgsRasterLayer
 from pathlib import Path
 import os
 
+from ..ProjectUtils import ProjectUtils
+
 
 class RasterLayerSource:
     """
@@ -27,6 +29,11 @@ class RasterLayerSource:
     - Calcular estatÃ­sticas (use RasterLayerMetrics)
     - Alterar visualizaÃ§Ã£o (use RasterLayerRendering)
     """
+    GOOGLE_HYBRID_LAYER_NAME = "Google Hybrid"
+    GOOGLE_HYBRID_URI = (
+        "type=xyz&zmin=0&zmax=21&"
+        "url=https://mt1.google.com/vt/lyrs=y%26x=%7Bx%7D%26y=%7By%7D%26z=%7Bz%7D"
+    )
 
     def load_raster_from_file(self, file_path, external_tool_key="untraceable"):
         """Carrega um raster de um arquivo GeoTIFF, IMG, ou outro formato suportado."""
@@ -73,6 +80,37 @@ class RasterLayerSource:
             return layer
         except Exception as e:
             logger.error(f"Erro ao carregar raster remoto: {e}")
+            return None
+
+    def add_google_hybrid_basemap(
+        self,
+        project,
+        external_tool_key="untraceable",
+        layer_name: str = GOOGLE_HYBRID_LAYER_NAME,
+    ):
+        """Adiciona camada base Google Hybrid em projeto, evitando duplicidades."""
+        logger = LogUtils(tool=external_tool_key, class_name="RasterLayerSource")
+        try:
+            existing_names = ProjectUtils.project_layer_names(project)
+            if layer_name in existing_names:
+                logger.debug("Camada base Google Hybrid ja existe no projeto")
+                return None
+
+            layer = self.load_raster_from_url(
+                self.GOOGLE_HYBRID_URI,
+                external_tool_key=external_tool_key,
+                layer_name=layer_name,
+                provider_key="wms",
+            )
+            if not layer or not layer.isValid():
+                logger.warning("Falha ao criar camada base Google Hybrid (XYZ)")
+                return None
+
+            ProjectUtils.add_layer(layer, add_to_root=True, project=project)
+            logger.info("Camada base Google Hybrid adicionada ao projeto")
+            return layer
+        except Exception as e:
+            logger.error(f"Erro ao adicionar basemap Google Hybrid: {e}")
             return None
 
     def create_empty_raster(

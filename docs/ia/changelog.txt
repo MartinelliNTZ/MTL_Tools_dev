@@ -28,3 +28,5 @@
 [2.3.6.1.13] CreateProjectPlugin/Utils refactor: moved generic folder/name preparation to ExplorerUtils, moved project/window orchestration helpers to ProjectUtils, removed direct `QgsProject` dependency from CreateProjectPlugin and VectorLayerSource, and added remote raster loading implementation in RasterLayerSource for basemap creation.
 2.3.6.1.14 2026/04/07
 [2.3.6.1.14] ProjectUtils/CreateProjectPlugin cleanup: consolidated layer insertion responsibility into `ProjectUtils.add_layer(...)` (now accepts optional `project`), removed duplicated `add_layer_to_project` usage, and kept project-layer helpers reusable with optional project context.
+2.3.6.1.15 2026/04/07
+[2.3.6.1.15] ProjectUtils/RasterLayerSource/CreateProjectPlugin: moved generic CRS validation/resolution to `ProjectUtils.resolve_valid_crs(...)` and transferred Google Hybrid basemap creation/insert logic to `RasterLayerSource.add_google_hybrid_basemap(...)`, simplifying CreateProjectPlugin responsibilities.

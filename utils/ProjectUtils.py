@@ -4,7 +4,12 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 from qgis.PyQt.QtCore import QCoreApplication, QProcess
-from qgis.core import QgsProject, QgsMapLayer, QgsVectorLayer
+from qgis.core import (
+    QgsCoordinateReferenceSystem,
+    QgsProject,
+    QgsMapLayer,
+    QgsVectorLayer,
+)
 
 from ..core.config.LogUtils import LogUtils
 from typing import Union, Optional
@@ -78,6 +83,23 @@ class ProjectUtils:
     @staticmethod
     def set_project_crs(project: QgsProject, crs):
         project.setCrs(crs)
+
+    @staticmethod
+    def resolve_valid_crs(
+        authid: str,
+        fallback_authid: str = "EPSG:4326",
+        tool_key: str = "untraceable",
+    ) -> QgsCoordinateReferenceSystem:
+        """Resolve CRS válido a partir de authid com fallback seguro."""
+        logger = LogUtils(tool=tool_key, class_name="ProjectUtils")
+        crs = QgsCoordinateReferenceSystem(authid or fallback_authid)
+        if crs.isValid():
+            return crs
+
+        logger.warning(
+            f"SRC invalido: '{authid}'. Usando fallback {fallback_authid}"
+        )
+        return QgsCoordinateReferenceSystem(fallback_authid)
 
     @staticmethod
     def project_layers(project: Optional[QgsProject] = None) -> dict:
