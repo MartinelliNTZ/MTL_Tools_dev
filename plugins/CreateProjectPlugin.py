@@ -12,7 +12,7 @@ from qgis.PyQt.QtWidgets import (
     QLineEdit,
     QVBoxLayout,
 )
-from qgis.core import QgsProject, QgsRasterLayer
+from qgis.core import QgsCoordinateReferenceSystem, QgsProject, QgsRasterLayer
 
 from ..core.config.LogUtils import LogUtils
 from ..i18n.TranslationManager import STR
@@ -95,6 +95,8 @@ class CreateProjectPlugin:
     PROJECTS_FOLDER_PREF_KEY = "projects_folder"
     TOOL_KEY = ToolKey.CREATE_PROJECT
     GENERIC_PROJECT_PATTERN = re.compile(r"^NovoProjeto_(\d+)$")
+    DEFAULT_CRS_AUTHID = "EPSG:4326"
+    DEFAULT_CRS_PREF_KEY = "default_crs_authid"
     GOOGLE_SATELLITE_LAYER_NAME = "Google Satellite"
     GOOGLE_SATELLITE_URI = (
         "type=xyz&zmin=0&zmax=21&"
@@ -166,7 +168,10 @@ class CreateProjectPlugin:
         if not project_name:
             project_name = suggested_name
 
-        self._create_project_structure(base_folder, project_name)
+        default_crs_authid = (
+            system_prefs.get(self.DEFAULT_CRS_PREF_KEY) or self.DEFAULT_CRS_AUTHID
+        )
+        self._create_project_structure(base_folder, project_name, default_crs_authid)
 
     def _sanitize_project_name(self, raw_name: str) -> str:
         cleaned = re.sub(r'[<>:"/\\\\|?*]+', " ", raw_name or "")
@@ -226,7 +231,25 @@ class CreateProjectPlugin:
         project.addMapLayer(layer, True)
         self.logger.info("Camada base Google adicionada ao projeto")
 
-    def _create_project_structure(self, base_folder: str, project_name: str):
+    def _resolve_valid_crs(self, authid: str) -> QgsCoordinateReferenceSystem:
+        crs = QgsCoordinateReferenceSystem(authid or self.DEFAULT_CRS_AUTHID)
+        if crs.isValid():
+            return crs
+
+        self.logger.warning(
+            f"SRC padrao invalido nas preferencias: '{authid}'. "
+            f"Usando fallback {self.DEFAULT_CRS_AUTHID}"
+        )
+        return QgsCoordinateReferenceSystem(self.DEFAULT_CRS_AUTHID)
+
+    def _apply_project_crs(self, project: QgsProject, authid: str):
+        crs = self._resolve_valid_crs(authid)
+        project.setCrs(crs)
+        self.logger.info(f"SRC aplicado ao projeto: {crs.authid()}")
+
+    def _create_project_structure(
+        self, base_folder: str, project_name: str, default_crs_authid: str
+    ):
         project_folder = Path(base_folder) / project_name
         project_file = project_folder / f"{project_name}.qgz"
         vectors_folder = project_folder / "vectors"
@@ -257,6 +280,7 @@ class CreateProjectPlugin:
 
         try:
             if not current_project_path:
+                self._apply_project_crs(current_project, default_crs_authid)
                 self._add_google_basemap(current_project)
                 if hasattr(current_project, "setPresetHomePath"):
                     current_project.setPresetHomePath(str(project_folder))
@@ -270,6 +294,7 @@ class CreateProjectPlugin:
                 )
             else:
                 new_project = QgsProject()
+                self._apply_project_crs(new_project, default_crs_authid)
                 self._add_google_basemap(new_project)
                 if hasattr(new_project, "setPresetHomePath"):
                     new_project.setPresetHomePath(str(project_folder))
