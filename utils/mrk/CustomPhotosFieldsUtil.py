@@ -626,9 +626,9 @@ class CustomPhotosFieldsUtil:
 
         return result
 
-
+#ELIMINAR ISSO UTIL NAO TEM MAIN
 if __name__ == "__main__":
-    from Manager import Manager
+    from utils.mrk.OBSOLETManager import Manager
 
     manager = Manager()
     raw_data = manager.collect_metadata(r"G:\np\IMAGENS")

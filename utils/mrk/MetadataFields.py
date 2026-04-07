@@ -1,5 +1,8 @@
-[
-    {
+# -*- coding: utf-8 -*-
+
+
+class MetadataFields:
+    REQUIRED_FIELDS = {
         "file": {
             "normalized": "file",
             "core": "os",
@@ -461,6 +464,323 @@
             "label": "Lens Temperature",
             "attribute": "LensTemp",
             "description": "Temperatura da lente no momento da captura. [LensTemp]",
-        }
+        },
     }
-]
+
+    CUSTOM_FIELDS = {
+        "GimbalOffset": {
+            "normalized": "xmp_bloco_1:drone-dji:GimbalOffset",
+            "core": "custom",
+            "label": "Gimbal Offset",
+            "attribute": "GimOffset",
+            "description": "Deslocamento angular mínimo do gimbal em relação à aeronave em graus (GimbalYawDegree - FlightYawDegree - 180, normalizado para menor ângulo). Valores: 0-180°. Valor referência: <1°. [GimOffset]",
+        },
+        "3DSpeed": {
+            "normalized": "Custom:3DSpeed",
+            "core": "custom",
+            "label": "3 D Speed",
+            "attribute": "3DSpeed",
+            "description": "Velocidade total 3D da aeronave em m/s, calculada como sqrt(FlightXSpeed² + FlightYSpeed² + FlightZSpeed²). Valores: 0-50 m/s. Valor referência: <10 m/s para voos estáveis. [3DSpeed]",
+        },
+        "time_since_previous": {
+            "normalized": "Custom:time_since_previous",
+            "core": "custom",
+            "label": "Time Since Previous",
+            "attribute": "TimePrv",
+            "description": "Tempo em segundos desde a foto anterior. Valores: 0-120 s. Valor referência: 2-5 s para cadência ideal. [TimePrv]",
+        },
+        "geodesic_distance_previous": {
+            "normalized": "Custom:geodesic_distance_previous",
+            "core": "custom",
+            "label": "Geodesic Distance Previous",
+            "attribute": "GeoDstP",
+            "description": "Distância horizontal em metros entre posições GPS consecutivas (fórmula Haversine). Valores: 0-100 m. Valor referência: 20-50 m para sobreposição adequada. [GeoDstP]",
+        },
+        "distance_3d_previous": {
+            "normalized": "Custom:distance_3d_previous",
+            "core": "custom",
+            "label": "Distance 3 D Previous",
+            "attribute": "Dist3DP",
+            "description": "Distância 3D em metros entre posições consecutivas (horizontal + altitude). Valores: 0-100 m. Valor referência: 20-50 m. [Dist3DP]",
+        },
+        "avg_velocity_between_photos": {
+            "normalized": "Custom:avg_velocity_between_photos",
+            "core": "custom",
+            "label": "Avg Velocity Between Photos",
+            "attribute": "AvgVelB",
+            "description": "Velocidade média em m/s entre fotos consecutivas. Valores: 0-20 m/s. Valor referência: 5-10 m/s. [AvgVelB]",
+        },
+        "linear_velocity_instant": {
+            "normalized": "Custom:linear_velocity_instant",
+            "core": "custom",
+            "label": "Linear Velocity Instant",
+            "attribute": "LinVelI",
+            "description": "Velocidade instantânea 3D em m/s. Valores: 0-50 m/s. Valor referência: <10 m/s. [LinVelI]",
+        },
+        "displacement_direction": {
+            "normalized": "Custom:displacement_direction",
+            "core": "custom",
+            "label": "Displacement Direction",
+            "attribute": "DirDispl",
+            "description": "Azimute do deslocamento em graus (0=Norte). Valores: 0-360°. Valor referência: varia por missão. [DirDispl]",
+        },
+        "incidence_angle": {
+            "normalized": "Custom:incidence_angle",
+            "core": "custom",
+            "label": "Incidence Angle",
+            "attribute": "IncAngle",
+            "description": "Ângulo de incidência em graus (ângulo entre câmera e vertical). Valores: 0-180°. Valor referência: <5° para nadir. [IncAngle]",
+        },
+        "estimated_coverage": {
+            "normalized": "Custom:estimated_coverage",
+            "core": "custom",
+            "label": "Estimated Coverage",
+            "attribute": "EstCover",
+            "description": "Tupla (largura, altura) em metros da cobertura estimada no solo. Valores: (0-200, 0-150) m. Valor referência: depende altitude. [EstCover]",
+        },
+        "predicted_overlap": {
+            "normalized": "Custom:predicted_overlap",
+            "core": "custom",
+            "label": "Predicted Overlap",
+            "attribute": "PredOver",
+            "description": "Percentual de sobreposição longitudinal com foto anterior. Valores: 0-100%. Valor referência: >60%. [PredOver]",
+        },
+        "rtk_effective_precision": {
+            "normalized": "Custom:rtk_effective_precision",
+            "core": "custom",
+            "label": "RTK Effective Precision",
+            "attribute": "RTKPrec",
+            "description": "Classificação textual da precisão RTK. Valores: Alta, Média, Baixa, Sem RTK. Valor referência: Alta. [RTKPrec]",
+        },
+        "is_ideal_overlap": {
+            "normalized": "Custom:is_ideal_overlap",
+            "core": "custom",
+            "label": "Is Ideal Overlap",
+            "attribute": "IdealOvl",
+            "description": "Booleano indicando se sobreposição >=60%. Valores: True/False. Valor referência: True. [IdealOvl]",
+        },
+        "abrupt_change_flag": {
+            "normalized": "Custom:abrupt_change_flag",
+            "core": "custom",
+            "label": "Abrupt Change Flag",
+            "attribute": "AbrChgF",
+            "description": "Flag de mudança brusca (tempo ou distância >2x mediana). Valores: True/False. Valor referência: False. [AbrChgF]",
+        },
+        "gimbal_angular_velocity": {
+            "normalized": "Custom:gimbal_angular_velocity",
+            "core": "custom",
+            "label": "Gimbal Angular Velocity",
+            "attribute": "GimAngV",
+            "description": "Variação angular do gimbal em °/s. Valores: 0-100 °/s. Valor referência: <1 °/s. [GimAngV]",
+        },
+        "orthorectification_potential": {
+            "normalized": "Custom:orthorectification_potential",
+            "core": "custom",
+            "label": "Orthorectification Potential",
+            "attribute": "OrtoPot",
+            "description": "Score de potencial para ortorretificação (0-100). Valores: 0-100. Valor referência: >80. [OrtoPot]",
+        },
+        "shutter_life_pct": {
+            "normalized": "Custom:shutter_life_pct",
+            "core": "custom",
+            "label": "Shutter Life Pct",
+            "attribute": "ShutPct",
+            "description": "% de vida útil do obturador. Valores: 0-100%. Valor referência: <50%. [ShutPct]",
+        },
+        "ground_sample_distance_cm": {
+            "normalized": "Custom:ground_sample_distance_cm",
+            "core": "custom",
+            "label": "Ground Sample Distance Cm",
+            "attribute": "GsdCmPx",
+            "description": "GSD em cm/pixel. Valores: 0-10 cm. Valor referência: <2 cm. [GsdCmPx]",
+        },
+        "total_heat_index": {
+            "normalized": "Custom:total_heat_index",
+            "core": "custom",
+            "label": "Total Heat Index",
+            "attribute": "HeatIdx",
+            "description": "Índice térmico médio em °C. Valores: 20-60 °C. Valor referência: <40 °C. [HeatIdx]",
+        },
+        "speed_3d_kmh": {
+            "normalized": "Custom:speed_3d_kmh",
+            "core": "custom",
+            "label": "Speed 3 D Kmh",
+            "attribute": "SpdKmH",
+            "description": "Velocidade 3D do drone em km/h. Valores: 0-180 km/h. Valor referência: <36 km/h. [SpdKmH]",
+        },
+        "yaw_alignment_error": {
+            "normalized": "Custom:yaw_alignment_error",
+            "core": "custom",
+            "label": "Yaw Alignment Error",
+            "attribute": "YawErr",
+            "description": "Erro de alinhamento yaw em graus. Valores: 0-180°. Valor referência: <5°. [YawErr]",
+        },
+        "motion_blur_risk": {
+            "normalized": "Custom:motion_blur_risk",
+            "core": "custom",
+            "label": "Motion Blur Risk",
+            "attribute": "BlurRisk",
+            "description": "Risco de motion blur em pixels. Valores: 0-5. Valor referência: <0.5. [BlurRisk]",
+        },
+        "exposure_value_ev": {
+            "normalized": "Custom:exposure_value_ev",
+            "core": "custom",
+            "label": "Exposure Value EV",
+            "attribute": "EV",
+            "description": "Valor de exposição EV. Valores: 8-16. Valor referência: 12-14. [EV]",
+        },
+        "light_source_classification": {
+            "normalized": "Custom:light_source_classification",
+            "core": "custom",
+            "label": "Light Source Classification",
+            "attribute": "LSrcClass",
+            "description": "Classificação textual da fonte de luz EXIF. Valores: Daylight, Fluorescent, etc. Valor referência: Daylight. [LSrcClass]",
+        },
+        "light_consistency": {
+            "normalized": "Custom:light_consistency",
+            "core": "custom",
+            "label": "Light Consistency",
+            "attribute": "LightCons",
+            "description": "Consistência entre LightSource e CCT. Valores: Consistent, Inconsistent, Unknown. Valor referência: Consistent. [LightCons]",
+        },
+        "vertical_stability": {
+            "normalized": "Custom:vertical_stability",
+            "core": "custom",
+            "label": "Vertical Stability",
+            "attribute": "VertStb",
+            "description": "Variação vertical em metros. Valores: 0-10 m. Valor referência: <1 m. [VertStb]",
+        },
+        "trajectory_smoothness": {
+            "normalized": "Custom:trajectory_smoothness",
+            "core": "custom",
+            "label": "Trajectory Smoothness",
+            "attribute": "TrajSmt",
+            "description": "Diferença angular de direção em graus. Valores: 0-180°. Valor referência: <10°. [TrajSmt]",
+        },
+        "speed_variation_index": {
+            "normalized": "Custom:speed_variation_index",
+            "core": "custom",
+            "label": "Speed Variation Index",
+            "attribute": "SpdVar",
+            "description": "Índice de variação de velocidade (coeficiente de variação). Valores: 0-1. Valor referência: <0.1. [SpdVar]",
+        },
+        "rtk_stability_score": {
+            "normalized": "Custom:rtk_stability_score",
+            "core": "custom",
+            "label": "RTK Stability Score",
+            "attribute": "RtkStab",
+            "description": "Score de estabilidade RTK (0-100). Valores: 0-100. Valor referência: >90. [RtkStab]",
+        },
+        "capture_efficiency": {
+            "normalized": "Custom:capture_efficiency",
+            "core": "custom",
+            "label": "Capture Efficiency",
+            "attribute": "CapEff",
+            "description": "Eficiência de captura (distância/cobertura). Valores: 0-1. Valor referência: 0.5-0.8. [CapEff]",
+        },
+        "photogrammetry_quality_index": {
+            "normalized": "Custom:photogrammetry_quality_index",
+            "core": "custom",
+            "label": "Photogrammetry Quality Index",
+            "attribute": "PQI",
+            "description": "Índice de qualidade fotogramétrica (0-100). Valores: 0-100. Valor referência: >80. [PQI]",
+        },
+        "strip_id": {
+            "normalized": "Custom:strip_id",
+            "core": "custom",
+            "label": "Strip ID",
+            "attribute": "StripID",
+            "description": "ID da faixa de voo. Valores: 1+. Valor referência: incremental. [StripID]",
+        },
+    }
+
+    LIGHT_SOURCE_VALUES = {
+        0: {
+            "value": "Unknown",
+            "description": "Fonte de luz desconhecida ou não especificada. Este valor é frequentemente usado quando o dado não foi registrado ou é inválido.",
+        },
+        1: {
+            "value": "Daylight",
+            "description": "Luz do dia, referente à iluminação solar natural. Corresponde ao balanço de branco para condições diurnas, com temperatura de cor por volta de 5200K-6500K.",
+        },
+        2: {
+            "value": "Fluorescent",
+            "description": "Iluminação fluorescente, típica de lâmpadas de luz do dia. Apresenta uma temperatura de cor variando geralmente entre 3000K e 6500K, dependendo do tipo da lâmpada.",
+        },
+        3: {
+            "value": "Tungsten",
+            "description": "Iluminação de tungstênio (lâmpada incandescente), com tom amarelado característico. A temperatura de cor normalmente fica na faixa dos 2800K a 3200K.",
+        },
+        4: {
+            "value": "Flash",
+            "description": "Iluminação fornecida pelo flash da câmera. Este valor é registrado quando o flash é disparado e atua como fonte de luz principal ou de preenchimento.",
+        },
+        9: {
+            "value": "Fine Weather",
+            "description": "Tempo claro, condição de luz do dia sem nuvens. Representa uma iluminação de alta intensidade e com temperatura de cor bem definida.",
+        },
+        10: {
+            "value": "Cloudy Weather",
+            "description": "Tempo nublado, onde a luz do sol é difusa devido à cobertura de nuvens. Geralmente resulta em uma temperatura de cor mais alta, por volta de 6500K-7500K.",
+        },
+        11: {
+            "value": "Shade",
+            "description": "Área de sombra, onde a iluminação solar é bloqueada por obstáculos. A luz refletida do céu tende a ser mais azulada, com temperatura de cor superior a 7000K.",
+        },
+        12: {
+            "value": "Daylight Fluorescent",
+            "description": "Luz fluorescente do tipo Daylight, que emula a cor da luz do dia. Apresenta uma temperatura de cor típica entre 5700K e 7100K, indicada para ambientes internos.",
+        },
+        13: {
+            "value": "Day White Fluorescent",
+            "description": "Luz fluorescente branca diurna, com uma tonalidade neutra. A temperatura de cor dessa fonte varia de 4600K a 5400K.",
+        },
+        14: {
+            "value": "Cool White Fluorescent",
+            "description": "Luz fluorescente branca fria, com uma aparência mais azulada. Este tipo de iluminação opera com uma temperatura de cor na faixa de 3800K a 4500K.",
+        },
+        15: {
+            "value": "White Fluorescent",
+            "description": "Luz fluorescente branca, oferecendo um equilíbrio entre tons quentes e frios. Sua temperatura de cor geralmente está entre 3250K e 3800K.",
+        },
+        16: {
+            "value": "Warm White Fluorescent",
+            "description": "Luz fluorescente branca quente, com tonalidade mais amarelada. É comum em lâmpadas do tipo WW, operando com temperatura de cor de 2600K a 3250K.",
+        },
+        17: {
+            "value": "Standard Light A",
+            "description": "Luz padrão do tipo A, que representa uma fonte de luz incandescente. É utilizada como referência para simular iluminação residencial comum.",
+        },
+        18: {
+            "value": "Standard Light B",
+            "description": "Luz padrão do tipo B, usada para representar a luz solar direta. Faz parte das referências padronizadas para avaliação de reprodução de cores.",
+        },
+        19: {
+            "value": "Standard Light C",
+            "description": "Luz padrão do tipo C, que simula a luz do dia média. É outra referência importante em estudos de temperatura de cor e fidelidade tonal.",
+        },
+        20: {
+            "value": "D55",
+            "description": "Iluminante D55, com temperatura de cor de 5500 Kelvin. É utilizado como padrão na indústria gráfica e fotográfica para condições de luz do dia.",
+        },
+        21: {
+            "value": "D65",
+            "description": "Iluminante D65, com temperatura de cor de 6500 Kelvin. Representa a luz do dia média na Europa e é o padrão mais comum para monitores e softwares de edição.",
+        },
+        22: {
+            "value": "D75",
+            "description": "Iluminante D75, com temperatura de cor de 7500 Kelvin. Simula uma luz do dia com maior componente azul, típica de céus muito claros.",
+        },
+        23: {
+            "value": "D50",
+            "description": "Iluminante D50, com temperatura de cor de 5000 Kelvin. É um padrão amplamente utilizado nas artes gráficas e na indústria de impressão.",
+        },
+        24: {
+            "value": "ISO Studio Tungsten",
+            "description": "Iluminação de tungstênio para estúdio, conforme padrão ISO. Utilizada em ambientes profissionais para obter uma luz contínua e de alta intensidade.",
+        },
+        255: {
+            "value": "Other Light Source",
+            "description": "Outra fonte de luz não listada nas categorias padrão do EXIF. Este valor é utilizado para indicar uma condição de iluminação fora do comum.",
+        },
+    }
