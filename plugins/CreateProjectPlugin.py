@@ -3,6 +3,7 @@ import os
 import re
 from pathlib import Path
 
+from qgis.PyQt.QtCore import QCoreApplication, QProcess
 from qgis.PyQt.QtWidgets import (
     QDialog,
     QDialogButtonBox,
@@ -96,7 +97,7 @@ class CreateProjectPlugin:
     DEFAULT_PROJECTS_FOLDER = "C:/QgisProjects"
     PROJECTS_FOLDER_PREF_KEY = "projects_folder"
     TOOL_KEY = ToolKey.CREATE_PROJECT
-    GENERIC_PROJECT_PATTERN = re.compile(r"^Novo Projeto (\d+)$")
+    GENERIC_PROJECT_PATTERN = re.compile(r"^NovoProjeto_(\d+)$")
 
     def __init__(self, iface):
         self.iface = iface
@@ -185,23 +186,36 @@ class CreateProjectPlugin:
                 if match:
                     highest = max(highest, int(match.group(1)))
 
-        return f"Novo Projeto {highest + 1}"
+        return f"NovoProjeto_{highest + 1}"
 
-    def _prepare_blank_project(self):
-        if hasattr(self.iface, "actionNewProject") and self.iface.actionNewProject():
-            self.iface.actionNewProject().trigger()
-            self.logger.debug("Novo projeto em branco acionado via QGIS")
-            return
+    def _get_qgis_executable(self) -> str:
+        executable = QCoreApplication.applicationFilePath()
+        if executable and os.path.exists(executable):
+            return executable
+        return ""
 
-        project = QgsProject.instance()
-        project.clear()
-        self.logger.debug("Projeto limpo via QgsProject.clear()")
+    def _open_project_in_new_window(self, project_file: Path) -> bool:
+        executable = self._get_qgis_executable()
+        if not executable:
+            self.logger.error("Executavel do QGIS nao encontrado para nova janela")
+            return False
+
+        started = QProcess.startDetached(executable, [str(project_file)])
+        if isinstance(started, tuple):
+            started = started[0]
+
+        self.logger.debug(
+            f"Abertura de nova janela para projeto '{project_file}': {started}"
+        )
+        return bool(started)
 
     def _create_project_structure(self, base_folder: str, project_name: str):
         project_folder = Path(base_folder) / project_name
         project_file = project_folder / f"{project_name}.qgz"
         vectors_folder = project_folder / "vectors"
         rasters_folder = project_folder / "rasters"
+        current_project = QgsProject.instance()
+        current_project_path = current_project.fileName()
 
         if project_folder.exists():
             self.logger.warning(f"Pasta de projeto ja existe: {project_folder}")
@@ -225,14 +239,32 @@ class CreateProjectPlugin:
             return
 
         try:
-            self._prepare_blank_project()
-            project = QgsProject.instance()
-            if hasattr(project, "setPresetHomePath"):
-                project.setPresetHomePath(str(project_folder))
-            project.setFileName(str(project_file))
+            if not current_project_path:
+                if hasattr(current_project, "setPresetHomePath"):
+                    current_project.setPresetHomePath(str(project_folder))
+                current_project.setFileName(str(project_file))
 
-            if not project.write(str(project_file)):
-                raise RuntimeError("O QGIS nao conseguiu gravar o arquivo .qgz.")
+                if not current_project.write(str(project_file)):
+                    raise RuntimeError(
+                        "O QGIS nao conseguiu salvar o projeto atual no novo destino."
+                    )
+
+                self.logger.info(
+                    f"Projeto atual sem arquivo salvo em: {project_file}"
+                )
+            else:
+                new_project = QgsProject()
+                if hasattr(new_project, "setPresetHomePath"):
+                    new_project.setPresetHomePath(str(project_folder))
+                new_project.setFileName(str(project_file))
+
+                if not new_project.write(str(project_file)):
+                    raise RuntimeError("O QGIS nao conseguiu gravar o novo arquivo .qgz.")
+
+                if not self._open_project_in_new_window(project_file):
+                    raise RuntimeError(
+                        "O projeto foi criado, mas nao foi possivel abrir outra janela do QGIS."
+                    )
         except Exception as e:
             self.logger.error(f"Erro ao criar projeto QGIS '{project_file}': {e}")
             QgisMessageUtil.modal_error(
@@ -245,7 +277,11 @@ class CreateProjectPlugin:
         QgisMessageUtil.modal_result_with_folder(
             self.iface,
             title="Projeto criado",
-            message=f"Projeto '{project_name}' criado com sucesso",
+            message=(
+                f"Projeto '{project_name}' criado com sucesso"
+                if not current_project_path
+                else f"Projeto '{project_name}' criado e aberto em outra janela"
+            ),
             folder_path=str(project_folder),
             parent=self.iface.mainWindow(),
         )
