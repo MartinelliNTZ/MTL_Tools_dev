@@ -24,6 +24,7 @@ ferramentas = name                              tipo                            
     - 19: Gerador de diferença entre rasters    Processing                      RasterDifferenceStats          manipulação de raster
     - 20: Ferramenta de remoção de campos KML   instantânea                     RemoveKmlFieldsPlugin         manipulação de vetores
     - 21: Vetor para SVG                        Janela
+    - 22: Criador de Projeto                    Instantânea
 
 
 Documentação de cenarios: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13
@@ -36,6 +37,29 @@ Traducao: 9
   - eLIMIAR TODOS OS untraceable exceptions e garantir que tudo seja logado
   - Usar iconManager para carregar ícones de forma centralizada e eficiente
  changelog=
+2.3.7 — 07/04/2026
+    - Adicionado basemap Google (Hybrid) automaticamente ao criar novos projetos.
+    - Corrigido problema na URL do basemap que impedia o carregamento correto.
+    - Aplicação automática do CRS padrão definido nas preferências, com fallback para EPSG:4326.
+    - Ajustes na estrutura do projeto:
+      - Arquivo `line.gpkg` agora é copiado para a pasta do projeto antes de ser carregado.
+      - Centralização automática do mapa com base na camada de referência.
+    - Refatoração geral do código:
+      - Separação de responsabilidades entre utilitários (ExplorerUtils, ProjectUtils, RasterLayerSource).
+      - Simplificação do CreateProjectPlugin.
+      - Centralização da lógica de adição de camadas.
+    - Generalização da criação de basemaps Google (satélite, híbrido e mapa), mantendo compatibilidade com versões anteriores.
+    
+2.3.6 — 05/04/2026
+    - Adicionado seletor de “Pasta de projetos” nas configurações, com salvamento nas preferências.
+    - Implementado seletor de CRS padrão usando o widget nativo do QGIS, com persistência da escolha.
+    - Nova ferramenta para criação de estrutura de projetos, com definição automática da pasta padrão quando necessário.
+    - Ajustado comportamento de criação de projeto:
+      - Se o projeto atual não estiver salvo, ele é salvo na nova pasta com suas camadas.
+      - Se já estiver salvo, um novo projeto em branco é criado em outra janela.
+    - Padronização de textos usando o TranslationManager (pt-BR).
+    - Remoção de duplicações e melhorias na organização das configurações.
+
  2.3.5 2026/04/05
     - Refatoracao da visibilidade da toolbar por categoria
     - SettingsPlugin ajustado para montar e persistir o grid de categorias usando a API do MenuManager, reduzindo acoplamento e simplificando a manutencao.
@@ -585,27 +609,20 @@ Traducao: 9
 
 
 IMPLEMENTACOES
-  - projeto padrao (defini uma pasta em, configuracoes cria projeto la 
+ 
   - transformar ponto pos em linha atraves de gps time
-    ja carrega algumas camdas e web services pergunta nome se nao cria 
-      nome padrrao)
     -acrescentar centralizar tela de todos os layouts 
     -Atribuir bandas 0 a todos raster 
     -Todos scripts de colheita 
     - matriz de linhas paralelas 
     -Classificador de declividade 
     -Amostrador de raster cálculo gerador de dif e gerador de estatística 
-    -Projeto padrão 
-    - Escolhe uma pasta ja salva um QGZ já cria pastas e carrega camadas base como UTM, google satélite, 
+
     -Botão de adicionar estilos salvos no qgis meus como gradiente entre outros. 
     - melhoria no buffer de vector util verificar se a camada e 4326 reprojetar, 
     - melhoria no drone cordinates gerar a area concave hull 0,025000
     - nova ferramenta que aplica buffer negativo e positivo
 
-    NOVASS FUNCOES
-    Ferramenta para processamento de arquivos MRK e fotos associadas. Recebe a pasta dos arquivos, com opção de processar somente a pasta selecionada ou vasculhar 
-    também as subpastas. Permite salvar o resultado temporariamente (em memória) ou em arquivo. Possui opção de unir todos os MRK em um único arquivo ou gerar um 
-    shapefile para cada arquivo MRK. Inclui opção de cruzar os metadados com as fotos correspondentes, trazendo informações como a hora batida entre MRK e imagem.
 
 Ferramenta de buffer, permitindo aplicação de buffer positivo ou negativo sobre camadas vetoriais.
 

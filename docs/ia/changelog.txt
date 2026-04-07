@@ -1,34 +1,17 @@
+2.3.8 2026/04/07
+[2.3.8.1]#começe aqui
+
+
+
+
+
+
+
+
+
+
+#antigo exemplo de como deve ser
 2.3.6.1 2026/04/05
 [2.3.6.1] SettingsPlugin: Added "Pasta de projetos" path selector (mode=folder) with save/load from preferences (projects_folder key).
 2.3.6.1.1 2026/04/06
 [2.3.6.1.1] SettingsPlugin/WidgetFactory: Added an exclusive DatumSelectorWidget with descriptive metadata, integrated into SettingsPlugin and persisted via the default_datum preference.
-2.3.6.1.2 2026/04/06
-[2.3.6.1.2] SettingsPlugin/WidgetFactory: Replaced the Datum selector with a QGIS-standard CRS selector using QgsProjectionSelectionWidget, persisting the selected CRS in default_crs_authid.
-2.3.6.1.3 2026/04/06
-[2.3.6.1.3] ToolRegistry/CreateProjectPlugin: Added a new INSTANT tool in the FOLDER group to create project structures, prompting for a default projects folder in SYSTEM prefs when missing and generating a .qgz project with vectors/rasters subfolders.
-2.3.6.1.4 2026/04/06
-[2.3.6.1.4] CreateProjectPlugin: When the current project is unsaved, it is now saved with its current layers into the new project folder; when already saved, the new blank project is created and opened in a separate QGIS window, preserving the current window unchanged.
-2.3.6.1.5 2026/04/06
-[2.3.6.1.5] ToolRegistry/SettingsPlugin: Replaced local hard-coded UI strings with TranslationManager STR keys and added the required entries only in Strings_pt_BR.
-2.3.6.1.6 2026/04/06
-[2.3.6.1.6] SettingsPlugin/CreateProjectPlugin: Removed the duplicate default CRS label string by reusing DEFAULT_CRS directly and migrated CreateProjectPlugin user-facing texts to TranslationManager keys added only in Strings_pt_BR.
-2.3.6.1.7 2026/04/07
-[2.3.6.1.7] CreateProjectPlugin: Added automatic Google Satellite XYZ basemap insertion in newly created projects (both unsaved current project flow and new-window flow), with safe fallback when tile layer creation is invalid.
-2.3.6.1.8 2026/04/07
-[2.3.6.1.8] CreateProjectPlugin: Fixed Google Satellite XYZ source URI by percent-encoding nested URL parameters (`x/y/z`) to prevent tile source parsing issues that caused empty basemap layers.
-2.3.6.1.9 2026/04/07
-[2.3.6.1.9] CreateProjectPlugin: Applied default project CRS from SYSTEM preferences (`default_crs_authid`) during project creation, with validation and fallback to `EPSG:4326` when missing or invalid.
-2.3.6.1.10 2026/04/07
-[2.3.6.1.10] CreateProjectPlugin/ProjectUtils: Switched basemap to Google Hybrid (XYZ), added conditional auto-load of `line.gpkg` only for scenarios 2 and 3, and introduced file-extent canvas centering utility in ProjectUtils for automatic focus on the reference line.
-2.3.6.1.11 2026/04/07
-[2.3.6.1.11] CreateProjectPlugin/ExplorerUtils/VectorLayerSource: line.gpkg is now copied into each new project's `vectors` folder before loading, and the loaded reference layer now uses the copied file path via VectorLayerSource; extent centering also targets the copied file.
-2.3.6.1.12 2026/04/07
-[2.3.6.1.12] CreateProjectPlugin/core.ui.dialogs: Extracted default-folder and project-name dialogs into dedicated dialog classes under `core/ui/dialogs`, and refactored `execute()` into focused steps (resolve folder, resolve name, create structure) to reduce mixed responsibilities without changing creation behavior.
-2.3.6.1.13 2026/04/07
-[2.3.6.1.13] CreateProjectPlugin/Utils refactor: moved generic folder/name preparation to ExplorerUtils, moved project/window orchestration helpers to ProjectUtils, removed direct `QgsProject` dependency from CreateProjectPlugin and VectorLayerSource, and added remote raster loading implementation in RasterLayerSource for basemap creation.
-2.3.6.1.14 2026/04/07
-[2.3.6.1.14] ProjectUtils/CreateProjectPlugin cleanup: consolidated layer insertion responsibility into `ProjectUtils.add_layer(...)` (now accepts optional `project`), removed duplicated `add_layer_to_project` usage, and kept project-layer helpers reusable with optional project context.
-2.3.6.1.15 2026/04/07
-[2.3.6.1.15] ProjectUtils/RasterLayerSource/CreateProjectPlugin: moved generic CRS validation/resolution to `ProjectUtils.resolve_valid_crs(...)` and transferred Google Hybrid basemap creation/insert logic to `RasterLayerSource.add_google_hybrid_basemap(...)`, simplifying CreateProjectPlugin responsibilities.
-2.3.6.1.16 2026/04/07
-[2.3.6.1.16] RasterLayerSource/CreateProjectPlugin: generalized Google basemap insertion via `add_google_basemap(...)` with style parameter (`hybrid`, `satellite`, `road`), kept backward-compatible `add_google_hybrid_basemap(...)` wrapper, and updated CreateProjectPlugin to call the generic API.
