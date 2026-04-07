@@ -4,14 +4,6 @@ import re
 from pathlib import Path
 
 from qgis.PyQt.QtCore import QCoreApplication, QProcess
-from qgis.PyQt.QtWidgets import (
-    QDialog,
-    QDialogButtonBox,
-    QHBoxLayout,
-    QLabel,
-    QLineEdit,
-    QVBoxLayout,
-)
 from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsProject,
@@ -21,8 +13,9 @@ from qgis.core import (
 )
 
 from ..core.config.LogUtils import LogUtils
+from ..core.ui.dialogs.DefaultProjectsFolderDialog import DefaultProjectsFolderDialog
+from ..core.ui.dialogs.ProjectNameDialog import ProjectNameDialog
 from ..i18n.TranslationManager import STR
-from ..resources.widgets.SelectorWidget import SelectorWidget
 from ..resources.OtherFilesManager import OtherFilesManager
 from ..utils.ExplorerUtils import ExplorerUtils
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
@@ -30,74 +23,6 @@ from ..utils.ProjectUtils import ProjectUtils
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.ToolKeys import ToolKey
 from ..utils.vector.VectorLayerSource import VectorLayerSource
-
-
-class _DefaultFolderDialog(QDialog):
-    DEFAULT_FOLDER = "C:/QgisProjects"
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle(STR.DEFAULT_PROJECTS_FOLDER_TITLE)
-        self.setModal(True)
-        self.resize(620, 120)
-        self._build_ui()
-
-    def _build_ui(self):
-        layout = QVBoxLayout(self)
-
-        info = QLabel(STR.DEFAULT_PROJECTS_FOLDER_PROMPT)
-        info.setWordWrap(True)
-        layout.addWidget(info)
-
-        self.selector = SelectorWidget(
-            title=STR.PROJECTS_FOLDER,
-            mode=SelectorWidget.MODE_FOLDER,
-            parent=self,
-        )
-        self.selector.set_path(self.DEFAULT_FOLDER)
-        layout.addWidget(self.selector)
-
-        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        buttons.accepted.connect(self.accept)
-        buttons.rejected.connect(self.reject)
-        layout.addWidget(buttons)
-
-    def get_folder_path(self) -> str:
-        text = self.selector._input.text().strip()
-        return text or self.DEFAULT_FOLDER
-
-
-class _ProjectNameDialog(QDialog):
-    def __init__(self, suggested_name: str, parent=None):
-        super().__init__(parent)
-        self._suggested_name = suggested_name
-        self.setWindowTitle(STR.PROJECT_NAME_TITLE)
-        self.setModal(True)
-        self.resize(460, 110)
-        self._build_ui()
-
-    def _build_ui(self):
-        layout = QVBoxLayout(self)
-
-        info = QLabel(STR.PROJECT_NAME_PROMPT)
-        info.setWordWrap(True)
-        layout.addWidget(info)
-
-        row = QHBoxLayout()
-        row.addWidget(QLabel(STR.PROJECT_NAME_LABEL))
-
-        self.name_input = QLineEdit()
-        self.name_input.setPlaceholderText(self._suggested_name)
-        row.addWidget(self.name_input)
-        layout.addLayout(row)
-
-        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        buttons.accepted.connect(self.accept)
-        buttons.rejected.connect(self.reject)
-        layout.addWidget(buttons)
-
-    def get_project_name(self) -> str:
-        return self.name_input.text().strip()
 
 
 class CreateProjectPlugin:
@@ -125,66 +50,91 @@ class CreateProjectPlugin:
     def execute(self):
         self.logger.info("Iniciando fluxo de criacao de novo projeto")
         system_prefs = load_tool_prefs(ToolKey.SYSTEM)
-        base_folder = (system_prefs.get(self.PROJECTS_FOLDER_PREF_KEY) or "").strip()
-
+        base_folder = self._resolve_base_folder(system_prefs)
         if not base_folder:
-            should_define = QgisMessageUtil.confirm(
-                self.iface,
-                STR.PROJECTS_DEFAULT_FOLDER_MISSING,
-                title=STR.PROJECTS_DEFAULT_FOLDER_MISSING_TITLE,
-            )
-            if not should_define:
-                self.logger.info("Usuario cancelou definicao da pasta padrao")
-                return
-
-            folder_dialog = _DefaultFolderDialog(parent=self.iface.mainWindow())
-            if folder_dialog.exec() != QDialog.Accepted:
-                self.logger.info("Usuario cancelou o dialogo da pasta padrao")
-                return
-
-            base_folder = folder_dialog.get_folder_path()
-            try:
-                os.makedirs(base_folder, exist_ok=True)
-            except Exception as e:
-                self.logger.error(f"Erro ao criar pasta padrao '{base_folder}': {e}")
-                QgisMessageUtil.modal_error(
-                    self.iface,
-                    f"{STR.PROJECT_DEFAULT_FOLDER_PREPARE_ERROR}\n{base_folder}\n\n{e}",
-                )
-                return
-
-            system_prefs[self.PROJECTS_FOLDER_PREF_KEY] = base_folder
-            save_tool_prefs(ToolKey.SYSTEM, system_prefs)
-            self.logger.info(f"Pasta padrao salva nas system prefs: {base_folder}")
-        else:
-            try:
-                os.makedirs(base_folder, exist_ok=True)
-            except Exception as e:
-                self.logger.error(
-                    f"Erro ao preparar pasta padrao existente '{base_folder}': {e}"
-                )
-                QgisMessageUtil.modal_error(
-                    self.iface,
-                    f"{STR.PROJECT_DEFAULT_FOLDER_ACCESS_ERROR}\n{base_folder}\n\n{e}",
-                )
-                return
-
-        suggested_name = self._next_generic_project_name(base_folder)
-        name_dialog = _ProjectNameDialog(
-            suggested_name=suggested_name, parent=self.iface.mainWindow()
-        )
-        if name_dialog.exec() != QDialog.Accepted:
-            self.logger.info("Usuario cancelou o dialogo de nome do projeto")
             return
 
-        project_name = self._sanitize_project_name(name_dialog.get_project_name())
+        project_name = self._resolve_project_name(base_folder)
         if not project_name:
-            project_name = suggested_name
+            return
 
         default_crs_authid = (
             system_prefs.get(self.DEFAULT_CRS_PREF_KEY) or self.DEFAULT_CRS_AUTHID
         )
         self._create_project_structure(base_folder, project_name, default_crs_authid)
+
+    def _resolve_base_folder(self, system_prefs: dict) -> str:
+        base_folder = (system_prefs.get(self.PROJECTS_FOLDER_PREF_KEY) or "").strip()
+        if base_folder:
+            if self._prepare_existing_base_folder(base_folder):
+                return base_folder
+            return ""
+
+        base_folder = self._prompt_and_persist_base_folder(system_prefs)
+        if not base_folder:
+            return ""
+        if self._prepare_new_base_folder(base_folder):
+            return base_folder
+        return ""
+
+    def _prompt_and_persist_base_folder(self, system_prefs: dict) -> str:
+        should_define = QgisMessageUtil.confirm(
+            self.iface,
+            STR.PROJECTS_DEFAULT_FOLDER_MISSING,
+            title=STR.PROJECTS_DEFAULT_FOLDER_MISSING_TITLE,
+        )
+        if not should_define:
+            self.logger.info("Usuario cancelou definicao da pasta padrao")
+            return ""
+
+        folder_dialog = DefaultProjectsFolderDialog(parent=self.iface.mainWindow())
+        if not folder_dialog.exec():
+            self.logger.info("Usuario cancelou o dialogo da pasta padrao")
+            return ""
+
+        base_folder = folder_dialog.get_folder_path().strip()
+        system_prefs[self.PROJECTS_FOLDER_PREF_KEY] = base_folder
+        save_tool_prefs(ToolKey.SYSTEM, system_prefs)
+        self.logger.info(f"Pasta padrao salva nas system prefs: {base_folder}")
+        return base_folder
+
+    def _prepare_new_base_folder(self, base_folder: str) -> bool:
+        try:
+            os.makedirs(base_folder, exist_ok=True)
+            return True
+        except Exception as e:
+            self.logger.error(f"Erro ao criar pasta padrao '{base_folder}': {e}")
+            QgisMessageUtil.modal_error(
+                self.iface,
+                f"{STR.PROJECT_DEFAULT_FOLDER_PREPARE_ERROR}\n{base_folder}\n\n{e}",
+            )
+            return False
+
+    def _prepare_existing_base_folder(self, base_folder: str) -> bool:
+        try:
+            os.makedirs(base_folder, exist_ok=True)
+            return True
+        except Exception as e:
+            self.logger.error(
+                f"Erro ao preparar pasta padrao existente '{base_folder}': {e}"
+            )
+            QgisMessageUtil.modal_error(
+                self.iface,
+                f"{STR.PROJECT_DEFAULT_FOLDER_ACCESS_ERROR}\n{base_folder}\n\n{e}",
+            )
+            return False
+
+    def _resolve_project_name(self, base_folder: str) -> str:
+        suggested_name = self._next_generic_project_name(base_folder)
+        name_dialog = ProjectNameDialog(
+            suggested_name=suggested_name, parent=self.iface.mainWindow()
+        )
+        if not name_dialog.exec():
+            self.logger.info("Usuario cancelou o dialogo de nome do projeto")
+            return ""
+
+        project_name = self._sanitize_project_name(name_dialog.get_project_name())
+        return project_name or suggested_name
 
     def _sanitize_project_name(self, raw_name: str) -> str:
         cleaned = re.sub(r'[<>:"/\\\\|?*]+', " ", raw_name or "")
