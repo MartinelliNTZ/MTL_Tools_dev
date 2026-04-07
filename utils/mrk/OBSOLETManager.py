@@ -1,41 +1,40 @@
-# -*- coding: utf-8 -*-
-"""
-Manager que orquestra a extração de metadados Exif e XMP.
+﻿# -*- coding: utf-8 -*-
+"""Manager legado de metadata de fotos (mantido para compatibilidade)."""
 
-O objetivo é manter a lógica de coordenação separada das utilidades específicas
-(XmpUtil e ExifUtil), permitindo testabilidade e uso simples em um script.
-"""
 import os
 from typing import Dict, List, Union
 
-from ExifUtil import ExifUtil
-from Strings import Strings
-from XmpUtil import XmpUtil
+from ...core.config.LogUtils import LogUtils
+from ..ToolKeys import ToolKey
+from .CustomPhotosFieldsUtil import CustomPhotosFieldsUtil
+from .ExifUtil import ExifUtil
+from .XmpUtil import XmpUtil
 
 
 class Manager:
-    """Coordena as duas utilidades de metadados (EXIF e XMP)."""
+    """Coordena extração de metadados EXIF/XMP (legado)."""
 
     IMAGE_EXTENSIONS = (".jpg", ".jpeg", ".png", ".tif", ".tiff")
 
-    @staticmethod
-    def _is_image_file(path: str) -> bool:
-        """Verifica se um caminho corresponde a extensão de imagem conhecida."""
-        return os.path.isfile(path) and path.lower().endswith(Manager.IMAGE_EXTENSIONS)
+    def __init__(self, tool_key: str = ToolKey.DRONE_COORDINATES):
+        self.tool_key = tool_key
+        self.logger = LogUtils(tool=tool_key, class_name="OBSOLETManager")
 
-    @staticmethod
-    def _list_image_files(folder_path: str) -> List[str]:
-        """Retorna a lista de arquivos de imagem em um diretório (não-recursivo)."""
+    @classmethod
+    def _is_image_file(cls, path: str) -> bool:
+        return os.path.isfile(path) and path.lower().endswith(cls.IMAGE_EXTENSIONS)
+
+    @classmethod
+    def _list_image_files(cls, folder_path: str) -> List[str]:
         result = []
         for entry in sorted(os.listdir(folder_path)):
             full_path = os.path.join(folder_path, entry)
-            if os.path.isfile(full_path) and entry.lower().endswith(Manager.IMAGE_EXTENSIONS):
+            if os.path.isfile(full_path) and entry.lower().endswith(cls.IMAGE_EXTENSIONS):
                 result.append(full_path)
         return result
 
     @staticmethod
     def _get_exif_full_value(exif_data: Dict[str, object], normalized: str) -> object:
-        """Resolve valores EXIF, incluindo GPSInfo aninhado, usando o normalized path."""
         if not isinstance(exif_data, dict):
             return None
 
@@ -46,37 +45,36 @@ class Manager:
                 return gps_info.get(gps_key)
             return None
 
-        # Ex: EXIF:Model -> Model
         key = normalized.split(":")[-1]
         return exif_data.get(key)
 
     @staticmethod
     def _get_xmp_full_value(xmp_data: Dict[str, object], normalized: str) -> object:
-        """Resolve valores XMP a partir da chave normalizada."""
         if not isinstance(xmp_data, dict):
             return None
 
-        # A chave pode ser xmp_bloco_1:drone-dji:AltitudeType -> drone-dji:AltitudeType
         if normalized.startswith("xmp_bloco_1:"):
             key = normalized.split(":", 1)[-1]
             return xmp_data.get(key) or xmp_data.get(f"xmp_bloco_1:{key}")
 
-        # Também há casos diretos no XmpUtil (drone-dji:<campo>)
         if ":" in normalized and not normalized.startswith("EXIF:"):
-            key = normalized
-            return xmp_data.get(key)
+            return xmp_data.get(normalized)
 
         return xmp_data.get(normalized)
 
-    @staticmethod
-    def _collect_required_fields(os_data: Dict[str, object], image_data: Dict[str, object], exif_data: Dict[str, object], xmp_data: Dict[str, object]) -> Dict[str, object]:
-        """Retorna dicionário contendo apenas os campos de REQUIRED_FIELDS."""
+    def _collect_required_fields(
+        self,
+        os_data: Dict[str, object],
+        image_data: Dict[str, object],
+        exif_data: Dict[str, object],
+        xmp_data: Dict[str, object],
+        fields_dict: Dict[str, Dict[str, object]],
+    ) -> Dict[str, object]:
         output = {}
 
-        for key, meta in Strings.REQUIRED_FIELDS.items():
-            normalized = meta.get("normalized", "")
+        for key, meta in fields_dict.items():
+            normalized = str(meta.get("normalized", ""))
 
-            # prioridade de busca: os, image, exif, xmp
             value = os_data.get(key)
             if value is None:
                 value = image_data.get(key)
@@ -86,13 +84,12 @@ class Manager:
                 value = xmp_data.get(key)
 
             if value is None and normalized.startswith("EXIF:"):
-                value = Manager._get_exif_full_value(exif_data, normalized)
+                value = self._get_exif_full_value(exif_data, normalized)
 
             if value is None and normalized.startswith("xmp_bloco_1:"):
-                value = Manager._get_xmp_full_value(xmp_data, normalized)
+                value = self._get_xmp_full_value(xmp_data, normalized)
 
             if value is None:
-                # tenta encontrar no dicionário por nome de atributo completo
                 std_key = normalized.split(":")[-1]
                 value = exif_data.get(std_key, xmp_data.get(std_key))
 
@@ -100,68 +97,52 @@ class Manager:
 
         return output
 
-    @staticmethod
-    def collect_metadata_from_image(image_path: str) -> Dict[str, object]:
-        """Extrai metadados de imagem usando ExifUtil e XmpUtil e aplica filtro REQUIRED_FIELDS."""
-        os_data = ExifUtil.extract_metadata_os(image_path)
-        image_data = ExifUtil.extract_metadata_image(image_path)
-        exif_data = ExifUtil.extract_metadata_exif(image_path)
-        xmp_data = XmpUtil.extract_metadata(image_path)
+    def collect_metadata_from_image(
+        self, image_path: str, fields_dict: Dict[str, Dict[str, object]]
+    ) -> Dict[str, object]:
+        os_data = ExifUtil.extract_metadata_os(image_path, tool_key=self.tool_key)
+        image_data = ExifUtil.extract_metadata_image(image_path, tool_key=self.tool_key)
+        exif_data = ExifUtil.extract_metadata_exif(image_path, tool_key=self.tool_key)
+        xmp_data = XmpUtil.extract_metadata(image_path, tool_key=self.tool_key)
 
-        required = Manager._collect_required_fields(os_data, image_data, exif_data, xmp_data)
-
-        # inclui sempre o caminho de origem no retorno final
+        required = self._collect_required_fields(
+            os_data,
+            image_data,
+            exif_data,
+            xmp_data,
+            fields_dict,
+        )
         required["path"] = os_data.get("path", image_path)
-
         return required
 
-    @classmethod
-    def collect_metadata(cls, item_path: str, compute_custom: bool = False) -> Union[Dict[str, object], Dict[str, Dict[str, object]]]:
-        """\"\"\"Orquestra a extração de metadados por caminho de arquivo ou diretório.
-        
-        Args:
-            item_path: Caminho arquivo/pasta
-            compute_custom: Se True, chama CustomUtil após extração
-        \"\"\"''"""
-        from Strings import Strings
-        DECIMAL_PLACES = Strings.DECIMAL_PLACES
+    def collect_metadata(
+        self,
+        item_path: str,
+        fields_dict: Dict[str, Dict[str, object]],
+        compute_custom: bool = False,
+    ) -> Union[Dict[str, object], Dict[str, Dict[str, object]]]:
         if os.path.isdir(item_path):
-            images = cls._list_image_files(item_path)
+            images = self._list_image_files(item_path)
             result = {}
             for img_path in images:
-                metadata = cls.collect_metadata_from_image(img_path)
+                metadata = self.collect_metadata_from_image(img_path, fields_dict)
                 key = metadata.get("file")
                 if key:
                     result[key] = metadata
             if compute_custom:
-                from CustomPhotosFieldsUtil import CustomPhotosFieldsUtil
-                result = CustomPhotosFieldsUtil.calculate_all_custom_fields(result)
+                result = CustomPhotosFieldsUtil.calculate_all_custom_fields(
+                    result, tool_key=self.tool_key
+                )
             return result
 
-        if cls._is_image_file(item_path):
-            metadata = cls.collect_metadata_from_image(item_path)
+        if self._is_image_file(item_path):
+            metadata = self.collect_metadata_from_image(item_path, fields_dict)
             if compute_custom:
-                from CustomPhotosFieldsUtil import CustomPhotosFieldsUtil
-                # Single image: no sequence
-                metadata['voo_id'] = CustomPhotosFieldsUtil.get_voo_id(metadata)
-                individual = CustomPhotosFieldsUtil._calculate_individual_fields(metadata)
-                gimbal = CustomPhotosFieldsUtil._calculate_gimbal_3d(
-                    metadata,
-                    None,
+                return CustomPhotosFieldsUtil.calculate_all_custom_fields(
+                    {metadata.get("file", os.path.basename(item_path)): metadata},
+                    tool_key=self.tool_key,
                 )
-                quality = CustomPhotosFieldsUtil._calculate_quality_scores(
-                    metadata,
-                    None,
-                    False,
-                    None,
-                    individual.get("coverage_width", 0.0),
-                    gimbal.get("yaw_alignment_error", 0.0),
-                    individual.get("motion_blur_risk", 0.0),
-                )
-                metadata.update(individual)
-                metadata.update(gimbal)
-                metadata.update(quality)
             return metadata
 
-if __name__ == "__main__":
-    print("Manager disponível para uso via importação, execute pelo main.py")
+        self.logger.warning(f"Caminho invalido para coleta de metadata: {item_path}")
+        return {}

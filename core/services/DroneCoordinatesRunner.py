@@ -72,12 +72,18 @@ class DroneCoordinatesRunner:
         # Carregar preferências para configurar o pipeline automaticamente
         prefs = load_tool_prefs(self.tool_key)
         apply_photos = prefs.get("photos", False)
-        extra_fields = PhotoMetadata.FIELDS_PHOTO if apply_photos else None
+        selected_required_fields = prefs.get("required_fields_selected", [])
+        selected_custom_fields = prefs.get("custom_fields_selected", [])
+        selected_mrk_fields = prefs.get("mrk_fields_selected", [])
+        extra_fields = None
         base_name = os.path.splitext(os.path.basename(file_path))[0]
         context = ExecutionContext()
         context.set("paths", [file_path])
         context.set("recursive", False)
         context.set("extra_fields", extra_fields)
+        context.set("selected_required_fields", selected_required_fields)
+        context.set("selected_custom_fields", selected_custom_fields)
+        context.set("selected_mrk_fields", selected_mrk_fields)
         context.set("tool_key", self.tool_key)
         context.set("points_layer_name", f"{base_name}_{STR.POINTS}")
         context.set("track_layer_name", f"{base_name}_{STR.TRACK}")

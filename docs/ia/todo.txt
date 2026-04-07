@@ -3,50 +3,51 @@
     [x] Criar todo rastreavel por etapas
     [x] Registrar changelog da etapa
 
-[ ] E02 - Padronizar classes novas de metadata (ExifUtil, XmpUtil, CustomPhotosFieldsUtil, MetadataFields)
-    [ ] Ajustar imports para padrao de pacote Cadmus
-    [ ] Integrar LogUtils e remover prints
-    [ ] Remover blocos de execucao direta de utilitarios
-    [ ] Validar carga dos modulos sem erro
+[x] E02 - Padronizar classes novas de metadata (ExifUtil, XmpUtil, CustomPhotosFieldsUtil, MetadataFields)
+    [x] Ajustar imports para padrao de pacote Cadmus
+    [x] Integrar LogUtils e remover prints
+    [x] Remover blocos de execucao direta de utilitarios
+    [x] Validar carga dos modulos sem erro
 
-[ ] E03 - Consolidar modelo de campos (REQUIRED_FIELDS, CUSTOM_FIELDS, MRK_FIELDS)
-    [ ] Criar MRK_FIELDS em MetadataFields.py
-    [ ] Migrar dt_full, dt_date, dt_time e FileType para padrao novo
-    [ ] Definir nomes em ingles para numdovoo/nomedovoo/pasta1/pasta2
-    [ ] Garantir schema padrao (normalized/core/label/attribute/description)
+[x] E03 - Consolidar modelo de campos (REQUIRED_FIELDS, CUSTOM_FIELDS, MRK_FIELDS)
+    [x] Criar MRK_FIELDS em MetadataFields.py
+    [x] Migrar dt_full, dt_date, dt_time e FileType para padrao novo
+    [x] Definir nomes em ingles para numdovoo/nomedovoo/pasta1/pasta2
+    [x] Garantir schema padrao (normalized/core/label/attribute/description)
 
-[ ] E04 - Refatorar PhotoMetadata como manager e absorver OBSOLETManager
-    [ ] Migrar logica de coleta para PhotoMetadata
-    [ ] Extrair metadata completa (sem filtro) de todas as fotos
-    [ ] Salvar dataset completo em JSON temporario
-    [ ] Implementar filtro final por lista de campos selecionados
-    [ ] Tornar OBSOLETManager obsoleto/delegado
+[x] E04 - Refatorar PhotoMetadata como manager e absorver OBSOLETManager
+    [x] Migrar logica de coleta para PhotoMetadata
+    [x] Extrair metadata completa (sem filtro) de todas as fotos
+    [x] Salvar dataset completo em JSON temporario
+    [x] Implementar filtro final por lista de campos selecionados
+    [x] Tornar OBSOLETManager obsoleto/delegado
 
-[ ] E05 - Evoluir CheckboxGridWidget e WidgetFactory com retrocompatibilidade
-    [ ] CheckboxGridWidget aceitar formato antigo e novo
-    [ ] Exibir tooltip com description dos metacampos
-    [ ] Adicionar get_checked_keys/get_unchecked_keys/get_state_map
-    [ ] Manter comportamento antigo para plugins existentes
+[x] E05 - Evoluir CheckboxGridWidget e WidgetFactory com retrocompatibilidade
+    [x] CheckboxGridWidget aceitar formato antigo e novo
+    [x] Exibir tooltip com description dos metacampos
+    [x] Adicionar get_checked_keys/get_unchecked_keys/get_state_map
+    [x] Manter comportamento antigo para plugins existentes
 
-[ ] E06 - Atualizar UI do DroneCoordinates com 3 collapsibles
-    [ ] REQUIRED_FIELDS grid
-    [ ] CUSTOM_FIELDS grid
-    [ ] MRK_FIELDS grid
-    [ ] Salvar preferencias dos checks
-    [ ] Restaurar preferencias ao abrir plugin
+[x] E06 - Atualizar UI do DroneCoordinates com 3 collapsibles
+    [x] REQUIRED_FIELDS grid
+    [x] CUSTOM_FIELDS grid
+    [x] MRK_FIELDS grid
+    [x] Salvar preferencias dos checks
+    [x] Restaurar preferencias ao abrir plugin
 
-[ ] E07 - Integrar filtros selecionados ao pipeline (sem mudar steps)
-    [ ] Passar lista de campos selecionados no ExecutionContext
-    [ ] Ajustar PhotoMetadataTask para usar lista filtrada
-    [ ] Ajustar PhotoMetadataStep para aplicar apenas campos filtrados
+[x] E07 - Integrar filtros selecionados ao pipeline (sem mudar steps)
+    [x] Passar lista de campos selecionados no ExecutionContext
+    [x] Ajustar PhotoMetadataTask para usar lista filtrada
+    [x] Ajustar PhotoMetadataStep para aplicar apenas campos filtrados
 
-[ ] E08 - Integrar DroneCoordinatesRunner com preferencias
-    [ ] Runner ler preferencias de filtros de campos
-    [ ] Runner propagar filtros ao pipeline
-    [ ] Runner manter comportamento atual de output/style
+[x] E08 - Integrar DroneCoordinatesRunner com preferencias
+    [x] Runner ler preferencias de filtros de campos
+    [x] Runner propagar filtros ao pipeline
+    [x] Runner manter comportamento atual de output/style
 
 [ ] E09 - Validacao e hardening
-    [ ] Smoke test sintatico dos arquivos alterados
+    [x] Smoke test sintatico dos arquivos alterados
+    [x] Diagnostico CSV (resources/json/fotos.csv) com checklist de colunas faltantes/preenchimento
     [ ] Validar fluxo dialog + runner
     [ ] Validar JSON temporario + filtro final
     [ ] Atualizar changelog por etapa finalizada

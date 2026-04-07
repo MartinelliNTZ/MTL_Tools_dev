@@ -18,3 +18,52 @@
 [2.3.8.2] Planejamento inicial da reimplementacao completa do DroneCoordinates: criado plano tecnico detalhado em docs/ia/PLANO_REIMPLEMENTACAO_DRONE_COORDINATES_V4.md com fases, riscos, contratos e criterios de aceite.
 [2.3.8.2.1] Criado docs/ia/todo.txt com backlog operacional por etapas (E01-E09), checklist incremental e rastreabilidade da execucao.
 [2.3.8.2.2] Consolidado no plano o escopo de refatoracao: PhotoMetadata como manager, absorcao de OBSOLETManager, nova UI com 3 grids de campos (REQUIRED/CUSTOM/MRK), filtros persistidos e integracao do Runner por preferencias.
+2.3.8.3 2026/04/07
+[2.3.8.3] Etapa E02 concluida: padronizacao tecnica das classes de metadata em utils/mrk (ExifUtil, XmpUtil, CustomPhotosFieldsUtil, OBSOLETManager) com imports de pacote Cadmus e preparacao para integracao no PhotoMetadata.
+[2.3.8.3.1] ExifUtil e XmpUtil migrados para usar LogUtils/ToolKey, removidos prints de erro, mantido retorno estruturado para falhas de leitura sem interromper pipeline.
+[2.3.8.3.2] CustomPhotosFieldsUtil ajustado para remover dependencia de Strings legado, adotando MetadataFields para LIGHT_SOURCE_VALUES, adicionando logging base e removendo bloco de execucao direta (__main__).
+[2.3.8.3.3] OBSOLETManager reescrito em padrao de utilitario legaciado com imports relativos corretos, logging unificado, e acoplamento explicito com ExifUtil/XmpUtil/CustomPhotosFieldsUtil para compatibilidade transicional.
+[2.3.8.3.4] Validacao sintatica executada com sucesso via py_compile para os quatro modulos alterados.
+2.3.8.4 2026/04/07
+[2.3.8.4] Etapa E03 concluida: MetadataFields recebeu novo bloco MRK_FIELDS padronizado e expansao de CUSTOM_FIELDS com campos solicitados (FileType, dt_full, dt_date, dt_time, FlightNumber, FlightName, FolderLevel1, FolderLevel2).
+[2.3.8.4.1] Padrao de schema preservado em todos os novos campos: normalized/core/label/attribute/description.
+
+2.3.8.5 2026/04/07
+[2.3.8.5] Etapa E05 concluida: CheckboxGridWidget reimplementado com retrocompatibilidade de formatos (dict legado, dict expandido e lista key/label/description), suporte a tooltip por description e novos metodos de estado (checked/unchecked/state_map).
+[2.3.8.5.1] WidgetFactory.create_checkbox_grid atualizado para novo contrato sem quebrar chamadas antigas com options_dict, e com opcao return_widget=True para uso avançado.
+
+2.3.8.6 2026/04/07
+[2.3.8.6] Etapa E06 concluida: DroneCoordinates UI atualizada com 3 collapsibles de campos (Required, Custom, MRK), grids via StringAdapter e persistencia completa de selecao/expansao em preferencias.
+[2.3.8.6.1] Execute_tool passou a enviar listas selecionadas no ExecutionContext (selected_required_fields, selected_custom_fields, selected_mrk_fields).
+
+2.3.8.7 2026/04/07
+[2.3.8.7] Avanco E07/E08: cadeia de filtros propagada para PhotoMetadataStep/PhotoMetadataTask e DroneCoordinatesRunner, incluindo leitura de preferencias no runner.
+[2.3.8.7.1] PhotoMetadata.enrich passou a aceitar parametros de selecao de campos (ainda em modo preparatorio para etapa de filtro final).
+[2.3.8.7.2] Ajuste de robustez em PhotoMetadataStep: removido uso de self.logger inexistente, substituido por LogUtils contextual.
+[2.3.8.7.3] Validacao sintatica executada com sucesso via py_compile nos modulos alterados.
+2.3.8.8 2026/04/07
+[2.3.8.8] Etapa E04 concluida: PhotoMetadata reestruturado para papel de manager/orquestrador usando ExifUtil, XmpUtil, CustomPhotosFieldsUtil e contexto MRK, removendo responsabilidade de extracao antiga acoplada.
+[2.3.8.8.1] Implementado fluxo full-dump: todos os dados de fotos sao coletados sem filtro e persistidos em JSON temporario via ExplorerUtils.create_temp_json(...).
+[2.3.8.8.2] Implementado filtro final por selecao de campos (required/custom/mrk) antes de aplicar atributos nos pontos.
+[2.3.8.8.3] Introduzido mapeamento de contexto de voo em ingles (FlightNumber/FlightName/FolderLevel1/FolderLevel2) mantendo chaves legadas MRK para compatibilidade.
+
+2.3.8.9 2026/04/07
+[2.3.8.9] Etapas E07/E08 finalizadas: listas selecionadas de campos agora percorrem UI -> ExecutionContext -> PhotoMetadataTask -> PhotoMetadata.enrich e tambem o DroneCoordinatesRunner via preferencias persistidas.
+[2.3.8.9.1] DroneCoordinates e Runner passaram a usar extra_fields=None no parse inicial, deixando a criacao de atributos 100% dirigida pelo filtro aplicado no Step de metadata.
+
+2.3.8.10 2026/04/07
+[2.3.8.10] ExplorerUtils recebeu helper create_temp_json(...) para persistencia de arquivos temporarios de diagnostico/metadata com logging padronizado.
+[2.3.8.10.1] Validacao sintatica ampliada executada com sucesso via py_compile nos modulos alterados desta rodada.
+2.3.8.11 2026/04/07
+[2.3.8.11] Analise de log em runtime: identificado warning de falha no calculo de CUSTOM_FIELDS por ausencia de chave esperada ('AbsoluteAltitude') e erro de aplicacao de atributo no layer por tipo nao normalizado (PyQt_PyObject).
+[2.3.8.11.1] PhotoMetadata recebeu instrumentacao adicional de diagnostico (selected_keys_sample, resumo por grupo, campos ausentes pre-custom, pontos sem campos filtrados) para rastreabilidade fina da filtragem.
+[2.3.8.11.2] PhotoMetadata passou a mapear aliases criticos de chaves XMP (drone-dji:*) para nomes esperados pelo pipeline/custom calculators.
+[2.3.8.11.3] PhotoMetadataStep agora normaliza valores para string antes de changeAttributeValue e loga tipo/valor em caso de erro, reduzindo falhas de conversao do QGIS.
+[2.3.8.11.4] PhotoMetadataTask ganhou logs extras de selecao de campos e amostra de field_names retornados para facilitar auditoria do que entrou/ficou de fora.
+2.3.8.12 2026/04/07
+[2.3.8.12] Correcao de consistencia de campos no fluxo DroneCoordinates: PhotoMetadataTask passou a carregar todos os atributos da feicao MRK (nao apenas foto/mrk_folder), preservando lat/lon/alt/mrk_*/numdovoo/nomedovoo/pastas para enriquecimento e filtro final.
+[2.3.8.12.1] Garantia de schema completo: PhotoMetadataTask agora inclui todas as chaves selecionadas no field_names mesmo quando o valor estiver ausente, evitando perda de colunas no output.
+[2.3.8.12.2] Correcao de data custom: dt_full/dt_date/dt_time agora priorizam DateTimeOriginal e usam os_date apenas como fallback.
+[2.3.8.12.3] Expansao de normalizacao de metadados: PhotoMetadata recebeu novos aliases XMP/EXIF (AltitudeType, CaptureUUID, UTCAtExposure, PictureQuality, SensorFPS, LensPosition, LRFStatus, LRFTargetAbsAlt, GpsStatus e correlatos) e mapeamento dinamico por sufixo de normalized.
+[2.3.8.12.4] ExifUtil passou a expandir GPSInfo em chaves individuais (GPSLatitude, GPSLongitude, GPSMapDatum, GPSStatus etc.) para aumentar cobertura dos REQUIRED_FIELDS.
+[2.3.8.12.5] Validacao sintatica executada via py_compile para PhotoMetadata.py, PhotoMetadataTask.py e ExifUtil.py.

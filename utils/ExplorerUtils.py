@@ -2,6 +2,9 @@
 import os
 import shutil
 import re
+import json
+import tempfile
+from datetime import datetime
 from pathlib import Path
 from typing import List, Dict
 from qgis.PyQt.QtCore import QUrl
@@ -136,6 +139,27 @@ class ExplorerUtils:
             return destination_path
         except Exception as e:
             logger.error(f"copy_file_to_folder: erro ao copiar arquivo: {e}")
+            return ""
+
+    @staticmethod
+    def create_temp_json(
+        payload,
+        tool_key: str,
+        prefix: str = "cadmus_drone_metadata",
+    ) -> str:
+        """Cria arquivo JSON temporario e retorna caminho absoluto."""
+        logger = ExplorerUtils._get_logger(tool_key)
+        try:
+            temp_dir = tempfile.gettempdir()
+            stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            file_name = f"{prefix}_{stamp}.json"
+            output_path = os.path.join(temp_dir, file_name)
+            with open(output_path, "w", encoding="utf-8") as fh:
+                json.dump(payload, fh, ensure_ascii=False, indent=2, default=str)
+            logger.info(f"create_temp_json: arquivo gerado em {output_path}")
+            return output_path
+        except Exception as e:
+            logger.error(f"create_temp_json: erro ao criar json temporario: {e}")
             return ""
 
     @staticmethod

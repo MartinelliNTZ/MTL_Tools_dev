@@ -1,11 +1,13 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
+from typing import Dict, List, Tuple
+
 from qgis.PyQt.QtWidgets import QWidget, QVBoxLayout, QGridLayout, QCheckBox, QLabel
-from typing import List
+
 from ...resources.styles.Styles import Styles
 
 
 class DependentCheckBox(QCheckBox):
-    """QCheckBox que pode habilitar/desabilitar outros checkboxes."""
+    """QCheckBox que habilita/desabilita checkboxes dependentes."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -14,56 +16,77 @@ class DependentCheckBox(QCheckBox):
         self.stateChanged.connect(self._on_state_changed)
 
     def set_dependents(self, dependents: List[QCheckBox]):
-        """Define checkboxes que dependem deste checkbox.
-
-        Quando desmarcado, os dependentes são desabilitados e desmarcados.
-        Quando marcado, os dependentes são reativados e retornam ao estado anterior.
-        """
         self._dependents = dependents or []
-        current_checked = self.isChecked()
-        for d in self._dependents:
-            # guardar estado anterior (antes de alterar enable/checked)
-            self._previous_states.setdefault(d, d.isChecked())
-            d.setEnabled(current_checked)
-            if not current_checked:
-                # desmarcar quando controlador estiver off
-                d.setChecked(False)
+        enabled = self.isChecked()
+        for dep in self._dependents:
+            self._previous_states.setdefault(dep, dep.isChecked())
+            dep.setEnabled(enabled)
+            if not enabled:
+                dep.setChecked(False)
 
     def _on_state_changed(self, state):
         enabled = bool(state)
-        for d in self._dependents:
-            try:
-                if not enabled:
-                    # guarda o estado atual para restaurar depois
-                    self._previous_states[d] = d.isChecked()
-                    d.setChecked(False)
-                d.setEnabled(enabled)
-            except Exception as e:
-
-                self.logger.error(f"Erro em local: {e}")
+        for dep in self._dependents:
+            if not enabled:
+                self._previous_states[dep] = dep.isChecked()
+                dep.setChecked(False)
+            else:
+                dep.setChecked(self._previous_states.get(dep, dep.isChecked()))
+            dep.setEnabled(enabled)
 
 
 class CheckboxGridWidget(QWidget):
-    """
-    Widget exclusivo para grid de checkboxes com suporte a dicionário chave→label.
+    """Grid de checkboxes com suporte a formato legado e formato expandido.
+
+    Formatos aceitos:
+    - Legado: {"key": "Label"}
+    - Expandido por dict: {"key": {"label": "...", "description": "..."}}
+    - Expandido por lista: [{"key": "...", "label": "...", "description": "..."}]
     """
 
     def __init__(
         self,
-        options_dict,
+        options,
         *,
-        items_per_row=3,
-        checked_by_default=False,
-        title=None,
+        items_per_row: int = 3,
+        checked_by_default: bool = False,
+        title: str = None,
         parent=None,
     ):
         super().__init__(parent)
-        self.options_dict = options_dict
-        self.items_per_row = items_per_row
+        self.items_per_row = max(1, int(items_per_row))
         self.checked_by_default = checked_by_default
         self.title = title
-        self.checkbox_map = {}
+        self.checkbox_map: Dict[str, QCheckBox] = {}
+        self._options = self._normalize_options(options)
         self._build()
+
+    def _normalize_options(self, options) -> List[Tuple[str, str, str]]:
+        normalized = []
+
+        if isinstance(options, dict):
+            for key, value in options.items():
+                if isinstance(value, dict):
+                    label = value.get("label") or key
+                    description = value.get("description") or ""
+                else:
+                    label = value
+                    description = ""
+                normalized.append((str(key), str(label), str(description or "")))
+            return normalized
+
+        if isinstance(options, list):
+            for item in options:
+                if not isinstance(item, dict):
+                    continue
+                key = item.get("key")
+                if not key:
+                    continue
+                label = item.get("label") or key
+                description = item.get("description") or ""
+                normalized.append((str(key), str(label), str(description)))
+
+        return normalized
 
     def _build(self):
         layout = QVBoxLayout()
@@ -81,17 +104,22 @@ class CheckboxGridWidget(QWidget):
         grid.setHorizontalSpacing(Styles.LAYOUT_H_SPACING)
         grid.setVerticalSpacing(Styles.LAYOUT_V_SPACING)
 
-        for idx, (key, label) in enumerate(self.options_dict.items()):
+        for idx, (key, label, description) in enumerate(self._options):
             row = idx // self.items_per_row
             col = idx % self.items_per_row
+
             chk = DependentCheckBox(label)
             chk.setChecked(self.checked_by_default)
             chk.setFixedHeight(14)
+            if description:
+                chk.setToolTip(description)
+
             grid.addWidget(chk, row, col)
             self.checkbox_map[key] = chk
 
         for col in range(self.items_per_row):
             grid.setColumnStretch(col, 1)
+
         layout.addLayout(grid)
         self.setLayout(layout)
 
@@ -101,12 +129,27 @@ class CheckboxGridWidget(QWidget):
     def get_checkbox_map(self):
         return self.checkbox_map
 
-    def set_dependents(self, controller_key, dependent_keys):
-        """Configura dependências entre checkboxes.
+    def get_checked_keys(self) -> List[str]:
+        return [key for key, chk in self.checkbox_map.items() if chk.isChecked()]
 
-        controller_key: chave do checkbox que controla (enable/disable)
-        dependent_keys: lista de chaves que serão dependentes
-        """
+    def get_unchecked_keys(self) -> List[str]:
+        return [key for key, chk in self.checkbox_map.items() if not chk.isChecked()]
+
+    def get_state_map(self) -> Dict[str, bool]:
+        return {key: chk.isChecked() for key, chk in self.checkbox_map.items()}
+
+    def set_checked_keys(self, keys: List[str]):
+        keys_set = set(keys or [])
+        for key, chk in self.checkbox_map.items():
+            chk.setChecked(key in keys_set)
+
+    def set_state_map(self, state_map: Dict[str, bool]):
+        state_map = state_map or {}
+        for key, chk in self.checkbox_map.items():
+            if key in state_map:
+                chk.setChecked(bool(state_map.get(key)))
+
+    def set_dependents(self, controller_key, dependent_keys):
         controller = self.checkbox_map.get(controller_key)
         if not controller:
             return

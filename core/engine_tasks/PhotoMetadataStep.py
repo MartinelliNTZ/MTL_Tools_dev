@@ -13,6 +13,17 @@ class PhotoMetadataStep(BaseStep):
     def name(self) -> str:
         return "PhotoMetadataStep"
 
+    @staticmethod
+    def _normalize_attribute_value(value):
+        if value is None:
+            return None
+        if isinstance(value, (str, int, float, bool)):
+            return str(value)
+        try:
+            return str(value)
+        except Exception:
+            return None
+
     def create_task(self, context: ExecutionContext):
         context.require(["layer", "base_folder", "recursive", "tool_key"])
 
@@ -21,6 +32,9 @@ class PhotoMetadataStep(BaseStep):
             layer_id=layer.id() if layer else "",
             base_folder=context.get("base_folder"),
             recursive=context.get("recursive", True),
+            selected_required_fields=context.get("selected_required_fields", []),
+            selected_custom_fields=context.get("selected_custom_fields", []),
+            selected_mrk_fields=context.get("selected_mrk_fields", []),
             tool_key=context.get("tool_key"),
         )
 
@@ -85,7 +99,10 @@ class PhotoMetadataStep(BaseStep):
             try:
                 foto_int = int(foto_val)
             except Exception as e:
-                self.logger.debug(
+                LogUtils(
+                    tool=context.get("tool_key"),
+                    class_name=self.__class__.__name__,
+                ).debug(
                     f"PhotoMetadataStep: failed parsing foto value {foto_val}: {e}"
                 )
                 continue
@@ -97,6 +114,9 @@ class PhotoMetadataStep(BaseStep):
 
         # Aplicar valores por batch
         layer.blockSignals(True)
+        converted_values = 0
+        conversion_fallbacks = 0
+        apply_errors = 0
         try:
             for key, vals in updates.items():
                 fid = None
@@ -118,13 +138,20 @@ class PhotoMetadataStep(BaseStep):
                     if idx == -1:
                         continue
                     try:
-                        layer.changeAttributeValue(fid, idx, value)
+                        safe_value = self._normalize_attribute_value(value)
+                        if safe_value != value:
+                            converted_values += 1
+                            if safe_value is None and value is not None:
+                                conversion_fallbacks += 1
+                        layer.changeAttributeValue(fid, idx, safe_value)
                     except Exception as e:
+                        apply_errors += 1
                         LogUtils(
                             tool=context.get("tool_key"),
                             class_name=self.__class__.__name__,
                         ).error(
-                            f"Erro aplicando atributo foto={fid} field={field_name}: {e}"
+                            f"Erro aplicando atributo foto={fid} field={field_name} "
+                            f"type={type(value).__name__} value={repr(value)[:120]}: {e}"
                         )
 
             # Comentar commit para manter no buffer de edição caso o usuário queira revisar
@@ -148,4 +175,12 @@ class PhotoMetadataStep(BaseStep):
         LogUtils(
             tool=context.get("tool_key"),
             class_name=self.__class__.__name__,
-        ).info(f"Metadados de fotos aplicados em {len(updates)} feições")
+        ).info(
+            "Metadados de fotos aplicados",
+            data={
+                "updated_items": len(updates),
+                "converted_values": converted_values,
+                "conversion_fallbacks": conversion_fallbacks,
+                "apply_errors": apply_errors,
+            },
+        )

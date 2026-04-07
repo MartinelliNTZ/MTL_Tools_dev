@@ -1,4 +1,4 @@
-from qgis.PyQt.QtWidgets import (
+﻿from qgis.PyQt.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QLabel,
@@ -75,13 +75,13 @@ class WidgetFactory:
         Cria um widget de logo padronizado.
 
         :param image_path: Caminho absoluto para a imagem.
-        :param fixed_height: Altura fixa do widget (padrão 60px).
+        :param fixed_height: Altura fixa do widget (padrÃ£o 60px).
         :param clickable: Se True, o widget emite um sinal ao ser clicado.
-        :param clicked_callback: Função a ser chamada quando clicado (se clickable=True).
+        :param clicked_callback: FunÃ§Ã£o a ser chamada quando clicado (se clickable=True).
         :param separator_top: Adiciona separador acima do widget.
         :param separator_bottom: Adiciona separador abaixo do widget.
         :param parent: Widget pai.
-        :return: tuple (layout contendo o widget, instância do widget)
+        :return: tuple (layout contendo o widget, instÃ¢ncia do widget)
         """
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -97,7 +97,7 @@ class WidgetFactory:
         if clickable and clicked_callback:
             widget.clicked.connect(clicked_callback)
 
-        # Opcional: aplicar estilo específico se definido em Styles
+        # Opcional: aplicar estilo especÃ­fico se definido em Styles
         # widget.setStyleSheet(Styles.logo_widget())
 
         layout.addWidget(widget)
@@ -179,24 +179,36 @@ class WidgetFactory:
 
     @staticmethod
     def create_checkbox_grid(
-        options_dict,
+        options_data=None,
         *,
+        options_dict=None,
         items_per_row=3,
         checked_by_default=False,
         title=None,
+        return_widget=False,
         separator_top=False,
         separator_bottom=True,
     ):
         """
-        Cria um grid de checkboxes a partir de um dicionário chave→label.
-        Retorna (layout, checkbox_map) para integração fácil.
+        Cria um grid de checkboxes com suporte legado e novo formato.
+
+        Compatibilidade de entrada:
+        - dict: chave->label (legado)
+        - dict: chave->{label,description}
+        - list: [{key,label,description}]
+
+        Retorno padrao: (layout, checkbox_map).
+        Use return_widget=True para receber o widget completo.
         """
         layout = QVBoxLayout()
         if separator_top:
             layout.addWidget(WidgetFactory.create_separator())
 
+        if options_data is None:
+            options_data = options_dict
+
         widget = CheckboxGridWidget(
-            options_dict,
+            options_data,
             items_per_row=items_per_row,
             checked_by_default=checked_by_default,
             title=title,
@@ -207,6 +219,8 @@ class WidgetFactory:
         if separator_bottom:
             layout.addWidget(WidgetFactory.create_separator())
 
+        if return_widget:
+            return layout, widget
         return layout, widget.get_checkbox_map()
 
     @staticmethod
@@ -285,7 +299,7 @@ class WidgetFactory:
             icon_path=icon_path,
         )
 
-        # Adicionar app_bar ao INÍCIO do _inner_layout (fora do scroll)
+        # Adicionar app_bar ao INÃCIO do _inner_layout (fora do scroll)
         layout._inner_layout.insertWidget(0, app_bar)
 
         self.setStyleSheet(Styles.main_application())
@@ -380,7 +394,7 @@ class WidgetFactory:
         separator_bottom=True,
     ):
         """
-        Cria um input numérico com label (QDoubleSpinBox)
+        Cria um input numÃ©rico com label (QDoubleSpinBox)
 
         Parameters
         ----------
@@ -394,10 +408,10 @@ class WidgetFactory:
             Incremento do spin
 
         minimum : float
-            Valor mínimo
+            Valor mÃ­nimo
 
         maximum : float
-            Valor máximo
+            Valor mÃ¡ximo
 
         value : float
             Valor inicial
@@ -461,13 +475,13 @@ class WidgetFactory:
             Lista de textos para os radio buttons
 
         columns : int
-            Número de colunas no grid (padrão: 3)
+            NÃºmero de colunas no grid (padrÃ£o: 3)
 
         title : str
-            Título do grupo (opcional)
+            TÃ­tulo do grupo (opcional)
 
         checked_index : int
-            Índice do item pré-selecionado (-1 para nenhum)
+            Ãndice do item prÃ©-selecionado (-1 para nenhum)
 
         tool_key : str
             Chave da ferramenta para logging
@@ -476,7 +490,7 @@ class WidgetFactory:
             Adicionar separador no topo
 
         separator_bottom : bool
-            Adicionar separador no rodapé
+            Adicionar separador no rodapÃ©
 
         parent : QWidget
             Widget pai
@@ -530,14 +544,14 @@ class WidgetFactory:
         Parameters
         ----------
         fields : dict
-            Dicionário com chaves identificadoras e valores
+            DicionÃ¡rio com chaves identificadoras e valores
               { 'title': str, 'value': Any, 'value_type': str, 'titlebutton': str }
         num_columns : int
-            Número de colunas para layout
+            NÃºmero de colunas para layout
         copy_all_button_title : str|None
-            Texto do botão "Copiar tudo". Se None, não cria o botão.
+            Texto do botÃ£o "Copiar tudo". Se None, nÃ£o cria o botÃ£o.
         default_button_title : str
-            Texto padrão para botões individuais
+            Texto padrÃ£o para botÃµes individuais
         """
         layout = QVBoxLayout()
         if separator_top:
@@ -590,13 +604,13 @@ class WidgetFactory:
         separator_bottom: bool = True,
     ) -> tuple:
         """
-        Cria um widget para parâmetros avançados com suporte a expansão/recolhimento.
+        Cria um widget para parÃ¢metros avanÃ§ados com suporte a expansÃ£o/recolhimento.
 
         Arquitetura:
-        - Widget genérico e reutilizável (pode ser usado em múltiplos plugins)
+        - Widget genÃ©rico e reutilizÃ¡vel (pode ser usado em mÃºltiplos plugins)
         - Suporta adicionar widgets e layouts dinamicamente
-        - Animação suave na expansão/recolhimento
-        - Ícone dinâmico (→ recolhido | ↓ expandido)
+        - AnimaÃ§Ã£o suave na expansÃ£o/recolhimento
+        - Ãcone dinÃ¢mico (â†’ recolhido | â†“ expandido)
 
         Parameters
         ----------
@@ -604,16 +618,16 @@ class WidgetFactory:
             Widget pai
 
         title : str
-            Texto do título exibido no header
+            Texto do tÃ­tulo exibido no header
 
         expanded_by_default : bool
-            Se True, inicia expandido; caso contrário, recolhido
+            Se True, inicia expandido; caso contrÃ¡rio, recolhido
 
         separator_top : bool
             Adicionar separador no topo
 
         separator_bottom : bool
-            Adicionar separador no rodapé
+            Adicionar separador no rodapÃ©
 
         Returns
         -------
@@ -625,11 +639,11 @@ class WidgetFactory:
         # Criar o widget
         adv_layout, adv_widget = WidgetFactory.create_collapsible_parameters(
             parent=self,
-            title="Configurações Avançadas",
+            title="ConfiguraÃ§Ãµes AvanÃ§adas",
             expanded_by_default=False
         )
 
-        # Adicionar conteúdo
+        # Adicionar conteÃºdo
         qml_layout, qml_widget = WidgetFactory.create_qml_selector(parent=self)
         adv_widget.add_content_layout(qml_layout)
 
@@ -643,7 +657,7 @@ class WidgetFactory:
         if separator_top:
             layout.addWidget(WidgetFactory.create_separator())
 
-        # Criar widget colapsável
+        # Criar widget colapsÃ¡vel
         widget = CollapsibleParametersWidget(title=title, parent=parent)
 
         # Aplicar estilos
@@ -671,12 +685,12 @@ class WidgetFactory:
         separator_top: bool = False,
         separator_bottom: bool = True,
     ) -> tuple:
-        """Cria um widget de seleção de caminho.
+        """Cria um widget de seleÃ§Ã£o de caminho.
 
         O widget pode operar nos seguintes modos:
-        - "radio" (padrão): exibe rádios Pasta / Arquivos
-        - "folder": somente pasta (sem rádios)
-        - "files": somente arquivos (sem rádios)
+        - "radio" (padrÃ£o): exibe rÃ¡dios Pasta / Arquivos
+        - "folder": somente pasta (sem rÃ¡dios)
+        - "files": somente arquivos (sem rÃ¡dios)
         """
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -711,17 +725,17 @@ class WidgetFactory:
         separator_bottom=True,
     ):
         """
-        Cria widget com múltiplos campos de input baseados em dicionário.
+        Cria widget com mÃºltiplos campos de input baseados em dicionÃ¡rio.
 
         Parameters
         ----------
         fields_dict : dict
-            Dicionário com configuração dos campos
+            DicionÃ¡rio com configuraÃ§Ã£o dos campos
             {
                 'chave': {
-                    'title': 'Rótulo',
+                    'title': 'RÃ³tulo',
                     'type': 'text' | 'int' | 'float',
-                    'default': valor_padrão
+                    'default': valor_padrÃ£o
                 },
                 ...
             }
@@ -730,7 +744,7 @@ class WidgetFactory:
             Adicionar separador no topo
 
         separator_bottom : bool
-            Adicionar separador no rodapé
+            Adicionar separador no rodapÃ©
 
         Returns
         -------
@@ -829,18 +843,18 @@ class WidgetFactory:
         spacing: int = Styles.LAYOUT_V_SPACING * 10,
     ):
         """
-        Cria botão simples que ocupa espaço disponível.
+        Cria botÃ£o simples que ocupa espaÃ§o disponÃ­vel.
 
         Parameters
         ----------
         text : str
-            Texto exibido no botão
+            Texto exibido no botÃ£o
 
         separator_top : bool
             Adicionar separador no topo
 
         separator_bottom : bool
-            Adicionar separador no rodapé
+            Adicionar separador no rodapÃ©
 
         Returns
         -------
@@ -963,7 +977,7 @@ class WidgetFactory:
             Define o formato do texto (p.ex., Qt.RichText)
 
         text_interaction_flags : Qt.TextInteractionFlags | None
-            Flags de interação de texto para links
+            Flags de interaÃ§Ã£o de texto para links
 
         open_external_links : bool | None
             Se True, permite links externos

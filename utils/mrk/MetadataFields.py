@@ -468,6 +468,62 @@ class MetadataFields:
     }
 
     CUSTOM_FIELDS = {
+        "FileType": {
+            "normalized": "Custom:FileType",
+            "core": "custom",
+            "label": "File Type",
+            "attribute": "FileType",
+            "description": "Tipo/Extensao do arquivo de imagem (ex.: .JPG). [FileType]",
+        },
+        "dt_full": {
+            "normalized": "Custom:dt_full",
+            "core": "custom",
+            "label": "Date Time Full",
+            "attribute": "DateTimeFull",
+            "description": "Data/hora compacta no formato YYYYMMDDHHMM. [DateTimeFull]",
+        },
+        "dt_date": {
+            "normalized": "Custom:dt_date",
+            "core": "custom",
+            "label": "Date Only",
+            "attribute": "DateOnly",
+            "description": "Data compacta no formato YYYYMMDD. [DateOnly]",
+        },
+        "dt_time": {
+            "normalized": "Custom:dt_time",
+            "core": "custom",
+            "label": "Time Only",
+            "attribute": "TimeOnly",
+            "description": "Horario compacto no formato HHMM. [TimeOnly]",
+        },
+        "FlightNumber": {
+            "normalized": "Custom:FlightNumber",
+            "core": "custom",
+            "label": "Flight Number",
+            "attribute": "FlightNum",
+            "description": "Numero do voo derivado do MRK (numdovoo). [FlightNum]",
+        },
+        "FlightName": {
+            "normalized": "Custom:FlightName",
+            "core": "custom",
+            "label": "Flight Name",
+            "attribute": "FlightName",
+            "description": "Nome do voo derivado do MRK (nomedovoo). [FlightName]",
+        },
+        "FolderLevel1": {
+            "normalized": "Custom:FolderLevel1",
+            "core": "custom",
+            "label": "Folder Level 1",
+            "attribute": "FolderL1",
+            "description": "Primeiro nivel de pasta do voo (pasta1). [FolderL1]",
+        },
+        "FolderLevel2": {
+            "normalized": "Custom:FolderLevel2",
+            "core": "custom",
+            "label": "Folder Level 2",
+            "attribute": "FolderL2",
+            "description": "Segundo nivel de pasta do voo (pasta2). [FolderL2]",
+        },
         "GimbalOffset": {
             "normalized": "xmp_bloco_1:drone-dji:GimbalOffset",
             "core": "custom",
@@ -691,6 +747,93 @@ class MetadataFields:
             "label": "Strip ID",
             "attribute": "StripID",
             "description": "ID da faixa de voo. Valores: 1+. Valor referência: incremental. [StripID]",
+        },
+    }
+
+    MRK_FIELDS = {
+        "foto": {
+            "normalized": "MRK:foto",
+            "core": "mrk",
+            "label": "Photo Number",
+            "attribute": "PhotoNum",
+            "description": "Numero sequencial da foto vindo do MRK. [PhotoNum]",
+        },
+        "lat": {
+            "normalized": "MRK:lat",
+            "core": "mrk",
+            "label": "Latitude",
+            "attribute": "Latitude",
+            "description": "Latitude extraida do arquivo MRK. [Latitude]",
+        },
+        "lon": {
+            "normalized": "MRK:lon",
+            "core": "mrk",
+            "label": "Longitude",
+            "attribute": "Longitude",
+            "description": "Longitude extraida do arquivo MRK. [Longitude]",
+        },
+        "alt": {
+            "normalized": "MRK:alt",
+            "core": "mrk",
+            "label": "Altitude",
+            "attribute": "Altitude",
+            "description": "Altitude extraida do arquivo MRK. [Altitude]",
+        },
+        "data_name": {
+            "normalized": "MRK:data_name",
+            "core": "mrk",
+            "label": "Date Name",
+            "attribute": "DateName",
+            "description": "Data identificada a partir do nome do MRK. [DateName]",
+        },
+        "mrk_file": {
+            "normalized": "MRK:mrk_file",
+            "core": "mrk",
+            "label": "MRK File",
+            "attribute": "MrkFile",
+            "description": "Nome do arquivo MRK de origem. [MrkFile]",
+        },
+        "mrk_path": {
+            "normalized": "MRK:mrk_path",
+            "core": "mrk",
+            "label": "MRK Path",
+            "attribute": "MrkPath",
+            "description": "Caminho completo do arquivo MRK de origem. [MrkPath]",
+        },
+        "mrk_folder": {
+            "normalized": "MRK:mrk_folder",
+            "core": "mrk",
+            "label": "MRK Folder",
+            "attribute": "MrkFolder",
+            "description": "Pasta absoluta de origem do ponto MRK. [MrkFolder]",
+        },
+        "numdovoo": {
+            "normalized": "MRK:numdovoo",
+            "core": "mrk",
+            "label": "Flight Number (Legacy)",
+            "attribute": "NumDoVoo",
+            "description": "Numero do voo no padrao legado MRK. [NumDoVoo]",
+        },
+        "nomedovoo": {
+            "normalized": "MRK:nomedovoo",
+            "core": "mrk",
+            "label": "Flight Name (Legacy)",
+            "attribute": "NomeDoVoo",
+            "description": "Nome do voo no padrao legado MRK. [NomeDoVoo]",
+        },
+        "pasta1": {
+            "normalized": "MRK:pasta1",
+            "core": "mrk",
+            "label": "Folder 1 (Legacy)",
+            "attribute": "Pasta1",
+            "description": "Primeiro nivel de pasta no padrao legado MRK. [Pasta1]",
+        },
+        "pasta2": {
+            "normalized": "MRK:pasta2",
+            "core": "mrk",
+            "label": "Folder 2 (Legacy)",
+            "attribute": "Pasta2",
+            "description": "Segundo nivel de pasta no padrao legado MRK. [Pasta2]",
         },
     }
 

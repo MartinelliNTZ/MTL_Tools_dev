@@ -1,130 +1,87 @@
-    
+﻿# -*- coding: utf-8 -*-
 """
-Módulo para extração de metadados de imagens.
+Utilities para extracao de metadados EXIF/OS/PIL de imagens.
+"""
 
-Este módulo fornece utilitários para extrair informações de metadados de arquivos de imagem
-através de três abordagens: metadados do sistema operacional, propriedades da imagem e dados EXIF.
-"""
-from datetime import datetime
 import os
+from datetime import datetime
+
 from PIL import ExifTags, Image
+
+from ...core.config.LogUtils import LogUtils
+from ..ToolKeys import ToolKey
 
 
 class ExifUtil:
-    """Utilitário para extrair metadados de arquivos de imagem.
-    
-    Fornece métodos estáticos para extrair informações de metadados de imagens
-    de múltiplas fontes: sistema operacional, propriedades PIL e dados EXIF.
-    """
+    """Utilitario para extrair metadados de arquivo de imagem."""
+
     @staticmethod
-    def extract_metadata_os(image_path):
-        """Extrai metadados do sistema operacional do arquivo de imagem.
-        
-        Extrai informações como nome do arquivo, caminho, tamanho e data de criação
-        utilizando os atributos do sistema operacional.
-        
-        Args:
-            image_path (str): Caminho completo ou relativo do arquivo de imagem.
-        
-        Returns:
-            dict: Dicionário contendo os seguintes campos:
-                - file (str): Nome do arquivo
-                - path (str): Caminho completo do arquivo
-                - size_mb (float): Tamanho do arquivo em MB (arredondado para 2 casas decimais)
-                - os_date (str): Data de criação/modificação no formato "YYYY-MM-DD HH:MM:SS"
-        
-        Exemplo:
-            >>> metadata = ExifUtil.extract_metadata_os('/path/to/image.jpg')
-            >>> print(metadata['size_mb'])
-            2.45
-        """
+    def _get_logger(tool_key: str = ToolKey.UNTRACEABLE) -> LogUtils:
+        return LogUtils(tool=tool_key, class_name="ExifUtil")
+
+    @staticmethod
+    def extract_metadata_os(
+        image_path: str, tool_key: str = ToolKey.UNTRACEABLE
+    ) -> dict:
+        """Extrai metadados do sistema operacional."""
+        logger = ExifUtil._get_logger(tool_key)
         data = {}
-        try:            
-            stat = os.stat(image_path)            
+        try:
+            stat = os.stat(image_path)
             data["file"] = os.path.basename(image_path)
             data["path"] = image_path
             data["size_mb"] = round(stat.st_size / (1024 * 1024), 2)
-            data["os_date"] = datetime.fromtimestamp(stat.st_ctime).strftime("%Y-%m-%d %H:%M:%S")
-           #print(f"Processando: {stat}")
+            data["os_date"] = datetime.fromtimestamp(stat.st_ctime).strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
         except Exception as exc:
-            print(f"Erro ao extrair metadados do sistema para {image_path}: {exc}")            
-        return data 
+            logger.error(
+                f"Erro ao extrair metadados do sistema para {image_path}: {exc}"
+            )
+        return data
+
     @staticmethod
-    def extract_metadata_image(image_path):
-        """Extrai propriedades técnicas da imagem usando PIL.
-        
-        Utiliza a biblioteca PIL/Pillow para extrair informações sobre dimensões,
-        formato e resolução da imagem.
-        
-        Args:
-            image_path (str): Caminho completo ou relativo do arquivo de imagem.
-        
-        Returns:
-            dict: Dicionário contendo os seguintes campos:
-                - width_px (int): Largura da imagem em pixels
-                - height_px (int): Altura da imagem em pixels
-                - format (str): Formato da imagem com modo de cor (ex: "JPEG_RGB" ou "PNG_RGBA")
-                - dpi (str): Resolução em DPI no formato "dpi_x x dpi_y" (se disponível)
-        
-        Nota:
-            Se a imagem não contiver informações de DPI, este campo será omitido do dicionário.
-        
-        Exemplo:
-            >>> metadata = ExifUtil.extract_metadata_image('/path/to/image.jpg')
-            >>> print(metadata['width_px'], metadata['height_px'])
-            1920 1080
-        """
-        data = {}   
+    def extract_metadata_image(
+        image_path: str, tool_key: str = ToolKey.UNTRACEABLE
+    ) -> dict:
+        """Extrai metadados de dimensao/formato/dpi via PIL."""
+        logger = ExifUtil._get_logger(tool_key)
+        data = {}
         try:
             with Image.open(image_path) as img:
-                data["width_px"], data["height_px"] = img.size                
+                data["width_px"], data["height_px"] = img.size
                 data["format"] = f"{img.format}_{img.mode}"
                 dpi = img.info.get("dpi")
                 if dpi:
-                    d1, d2 = dpi
-                    data["dpi"]= f"{d1}x{d2}"                
-                #print(f"Processando: {img.info}")               
-                
-        except Exception as exc:      
-            print(f"Erro ao extrair metadados PIL para {image_path}: {exc}") 
-              
-        return data 
-    @staticmethod       
-    def extract_metadata_exif(image_path):
-        """Extrai dados EXIF da imagem.
-        
-        Extrai todos os metadados EXIF embutidos no arquivo de imagem, incluindo
-        informações de câmera, data de captura, GPS (se disponível) e outros dados técnicos.
-        
-        Args:
-            image_path (str): Caminho completo ou relativo do arquivo de imagem.
-        
-        Returns:
-            dict: Dicionário contendo pares chave-valor dos dados EXIF encontrados.
-                A chave é o nome do campo EXIF (ex: "DateTime", "Model", "GPSInfo")
-                e o valor contém o dado correspondente.
-                
-                Em caso de erro de leitura, retorna um dicionário com chave 'erro'
-                contendo a mensagem de erro.
-        
-        Nota:
-            - Imagens sem dados EXIF retornarão um dicionário vazio ou apenas com erro.
-            - Campos EXIF podem conter valores complexos (tuplas, dicionários).
-        
-        Exemplo:
-            >>> metadata = ExifUtil.extract_metadata_exif('/path/to/photo.jpg')
-            >>> print(metadata.get('DateTime'))
-            2024:03:15 14:30:45
-        """
+                    dpi_x, dpi_y = dpi
+                    data["dpi"] = f"{dpi_x}x{dpi_y}"
+        except Exception as exc:
+            logger.error(f"Erro ao extrair metadados PIL para {image_path}: {exc}")
+        return data
+
+    @staticmethod
+    def extract_metadata_exif(
+        image_path: str, tool_key: str = ToolKey.UNTRACEABLE
+    ) -> dict:
+        """Extrai todos os campos EXIF disponiveis."""
+        logger = ExifUtil._get_logger(tool_key)
         data = {}
-        try:    
+        try:
             with Image.open(image_path) as img:
                 exif_raw = img._getexif() or {}
-                exif = {ExifTags.TAGS.get(k, k): v for k, v in exif_raw.items()}        
+                exif = {ExifTags.TAGS.get(k, k): v for k, v in exif_raw.items()}
                 for key, value in exif.items():
                     data[key] = value
-                    
-                #print(f"Processando: {data}")
+
+                # Expande GPSInfo para chaves individuais (GPSLatitude, GPSLongitude, GPSMapDatum, etc.).
+                gps_info = exif.get("GPSInfo")
+                if isinstance(gps_info, dict):
+                    gps_named = {
+                        ExifTags.GPSTAGS.get(k, k): v for k, v in gps_info.items()
+                    }
+                    for gk, gv in gps_named.items():
+                        data[gk] = gv
         except Exception as exc:
+            logger.warning(f"Erro ao extrair EXIF de {image_path}: {exc}")
             data["erro"] = str(exc)
         return data

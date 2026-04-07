@@ -1,12 +1,12 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-CustomUtil - Calcula campos derivados CUSTOM_FIELDS do Strings.py
+CustomUtil - Calcula campos derivados CUSTOM_FIELDS.
 
-Recebe output do Manager.collect_metadata() → adiciona 23 campos custom calculados
+Recebe output do Manager.collect_metadata() â†’ adiciona 23 campos custom calculados
 
-Dependências:
-- Strings.REQUIRED_FIELDS, Strings.CUSTOM_FIELDS
+DependÃªncias:
+- MetadataFields.CUSTOM_FIELDS
 - math, datetime, numpy (haversine)
 """
 
@@ -14,13 +14,19 @@ import math
 import statistics
 from datetime import datetime
 from typing import Dict, List, Tuple, Optional
-from Strings import Strings
+from ...core.config.LogUtils import LogUtils
+from ..ToolKeys import ToolKey
+from .MetadataFields import MetadataFields
 
-DECIMAL_PLACES = Strings.DECIMAL_PLACES
+DECIMAL_PLACES = 4
 
 
 class CustomPhotosFieldsUtil:
-    """Calcula todos os campos CUSTOM_FIELDS para cada foto, validando sequências."""
+    """Calcula todos os campos CUSTOM_FIELDS para cada foto, validando sequÃªncias."""
+
+    @staticmethod
+    def _get_logger(tool_key: str = ToolKey.UNTRACEABLE) -> LogUtils:
+        return LogUtils(tool=tool_key, class_name="CustomPhotosFieldsUtil")
 
     # Constantes
     MAX_DT_DIFF = 120  # segundos
@@ -36,12 +42,12 @@ class CustomPhotosFieldsUtil:
     }
     
     BLUR_THRESHOLD = 0.5  # motion blur in pixels
-    COVERAGE_FACTOR = 1.45  # approx for 84° HFOV
+    COVERAGE_FACTOR = 1.45  # approx for 84Â° HFOV
     STRIP_CHANGE_THRESHOLD = 150  # degrees
 
     @staticmethod
     def safe_float(val: any, default: float = 0.0) -> float:
-        """Converte para float seguro (strings '+123.4' → 123.4)."""
+        """Converte para float seguro (strings '+123.4' â†’ 123.4)."""
         if val is None:
             return default
         return float(str(val).replace("+", ""))
@@ -72,7 +78,7 @@ class CustomPhotosFieldsUtil:
     def is_valid_sequence(
         curr_data: Dict, other_data: Dict, direction: str = "prev"
     ) -> bool:
-        """Valida se 2 fotos são sequência válida (mesmo voo)."""
+        """Valida se 2 fotos sÃ£o sequÃªncia vÃ¡lida (mesmo voo)."""
         if other_data is None:
             return False
 
@@ -107,7 +113,7 @@ class CustomPhotosFieldsUtil:
 
     @staticmethod
     def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-        """Distância Haversine entre 2 pontos GPS (metros)."""
+        """DistÃ¢ncia Haversine entre 2 pontos GPS (metros)."""
         R = 6371000  # Raio Terra
 
         phi1 = math.radians(lat1)
@@ -135,7 +141,7 @@ class CustomPhotosFieldsUtil:
 
     @staticmethod
     def angle_difference(a: float, b: float) -> float:
-        """Menor diferença angular entre dois azimutes (0-180)."""
+        """Menor diferenÃ§a angular entre dois azimutes (0-180)."""
         diff = abs((a - b) % 360)
         return diff if diff <= 180 else 360 - diff
 
@@ -164,7 +170,7 @@ class CustomPhotosFieldsUtil:
     def _calculate_sequence_fields(
         data: Dict, other_data: Optional[Dict], valid_seq: bool, direction: str
     ) -> Dict:
-        """Campos sequência (prev/next)."""
+        """Campos sequÃªncia (prev/next)."""
         if not valid_seq or other_data is None:
             prefix = f"{direction}_"
             return {
@@ -261,19 +267,19 @@ class CustomPhotosFieldsUtil:
 
     @staticmethod
     def _calculate_gimbal_offset(gim_yaw: float, flight_yaw: float) -> float:
-        """Calcula o offset do gimbal baseado na diferença mínima com flight yaw."""
-        # Normaliza ângulos para 0-360
+        """Calcula o offset do gimbal baseado na diferenÃ§a mÃ­nima com flight yaw."""
+        # Normaliza Ã¢ngulos para 0-360
         gim_yaw_norm = (gim_yaw % 360 + 360) % 360
         flight_yaw_norm = (flight_yaw % 360 + 360) % 360
         
-        # Diferença absoluta
+        # DiferenÃ§a absoluta
         diff = abs(gim_yaw_norm - flight_yaw_norm)
         diff_min = min(diff, 360 - diff)
         if diff > 150 and diff < 300:
             diff = abs(180 - diff)
         elif diff > 300:
             diff = abs(360 - diff)
-        # Ajuste para casos extremos (ex: 10° vs 190°)
+        # Ajuste para casos extremos (ex: 10Â° vs 190Â°)
         # Offset = |diff_min - 180|
         return abs(diff)
 
@@ -303,13 +309,13 @@ class CustomPhotosFieldsUtil:
 
     @staticmethod
     def _get_light_source_label(light_source: any) -> str:
-        """Retorna o texto da fonte de luz a partir do código LightSource EXIF."""
+        """Retorna o texto da fonte de luz a partir do cÃ³digo LightSource EXIF."""
         code = CustomPhotosFieldsUtil.safe_int(light_source, default=0)
-        return Strings.LIGHT_SOURCE_VALUES.get(code, {}).get("value", "Unknown")
+        return MetadataFields.LIGHT_SOURCE_VALUES.get(code, {}).get("value", "Unknown")
 
     @staticmethod
     def _check_light_consistency(light_source: any, cct: any) -> str:
-        """Verifica se o valor de CCT está coerente com a fonte de luz declarada."""
+        """Verifica se o valor de CCT estÃ¡ coerente com a fonte de luz declarada."""
         code = CustomPhotosFieldsUtil.safe_int(light_source, default=0)
         cct_value = CustomPhotosFieldsUtil.safe_float(cct, default=0.0)
         if cct_value <= 0:
@@ -367,7 +373,7 @@ class CustomPhotosFieldsUtil:
         yaw_alignment_error: float = 0.0,
         motion_blur_risk: float = 0.0,
     ) -> Dict:
-        """RTK precision, overlap, ortho score, estabilidade e índices."""
+        """RTK precision, overlap, ortho score, estabilidade e Ã­ndices."""
         if prev_seq is None:
             prev_seq = {
                 "prev_time_since": 0.0,
@@ -388,7 +394,7 @@ class CustomPhotosFieldsUtil:
         if rtk_flag == "50" and avg_std < 0.02:
             rtk_prec = "Alta"
         elif avg_std < 0.1:
-            rtk_prec = "Média"
+            rtk_prec = "MÃ©dia"
         elif avg_std < 1.0:
             rtk_prec = "Baixa"
         else:
@@ -507,9 +513,18 @@ class CustomPhotosFieldsUtil:
 
     @classmethod
     def calculate_all_custom_fields(
-        cls, metadata_dict: Dict[str, Dict]
+        cls,
+        metadata_dict: Dict[str, Dict],
+        tool_key: str = ToolKey.UNTRACEABLE,
     ) -> Dict[str, Dict]:
-        """Orquestra todos cálculos custom."""
+        """Orquestra todos calculos custom."""
+        logger = cls._get_logger(tool_key)
+        logger.debug(
+            f"Iniciando calculo de campos custom para {len(metadata_dict) if metadata_dict else 0} fotos"
+        )
+        if not metadata_dict:
+            return {}
+
         # Ordenar por datetime
         sorted_items = sorted(
             metadata_dict.items(),
@@ -531,11 +546,11 @@ class CustomPhotosFieldsUtil:
             prev_prev_data = prev_prev_item[1] if prev_prev_item else None
             next_data = next_item[1] if next_item else None
 
-            # Validações sequência
+            # ValidaÃ§Ãµes sequÃªncia
             valid_prev = cls.is_valid_sequence(data, prev_data)
             valid_next = cls.is_valid_sequence(next_data, data) if next_data else False
 
-            # Sequência campos
+            # SequÃªncia campos
             prev_seq = cls._calculate_sequence_fields(
                 data, prev_data, valid_prev, "prev"
             )
@@ -626,14 +641,3 @@ class CustomPhotosFieldsUtil:
 
         return result
 
-#ELIMINAR ISSO UTIL NAO TEM MAIN
-if __name__ == "__main__":
-    from utils.mrk.OBSOLETManager import Manager
-
-    manager = Manager()
-    raw_data = manager.collect_metadata(r"G:\np\IMAGENS")
-    custom_data = CustomPhotosFieldsUtil.calculate_all_custom_fields(raw_data)
-    print(f"Custom fields adicionados! Total fotos: {len(custom_data)}")
-    print(
-        list(custom_data[list(custom_data.keys())[0]].keys())[-20:]
-    )  # últimos 20 campos

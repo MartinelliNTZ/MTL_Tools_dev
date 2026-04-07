@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 import os
 from qgis.core import QgsProject
 from ..plugins.BasePlugin import BasePluginMTL
@@ -16,6 +16,8 @@ from ..core.ui.WidgetFactory import WidgetFactory
 from ..i18n.TranslationManager import STR
 from ..utils.DependenciesManager import DependenciesManager
 from ..utils.QgisMessageUtil import QgisMessageUtil
+from ..utils.adapter.StringAdapter import StringAdapter
+from ..utils.mrk.MetadataFields import MetadataFields
 
 
 class DroneCordinates(BasePluginMTL):
@@ -27,11 +29,15 @@ class DroneCordinates(BasePluginMTL):
         "photos": STR.PHOTOS_METADATA,
     }
 
+    PREF_REQUIRED_FIELDS = "required_fields_selected"
+    PREF_CUSTOM_FIELDS = "custom_fields_selected"
+    PREF_MRK_FIELDS = "mrk_fields_selected"
+
     def __init__(self, iface):
         super().__init__(iface.mainWindow())
         self.iface = iface
 
-        # Inicializa a UI e preferências via BasePluginMTL
+        # Inicializa a UI e preferÃªncias via BasePluginMTL
         self.init(
             self.TOOL_KEY,
             "Drone Coordinates",
@@ -54,7 +60,7 @@ class DroneCordinates(BasePluginMTL):
             separator_bottom=True,
         )
 
-        # ====== OPÇÕES (CollapsibleParametersWidget) ======
+        # ====== OPÃ‡Ã•ES (CollapsibleParametersWidget) ======
         opts_layout, self.opts_collapsible = (
             WidgetFactory.create_collapsible_parameters(
                 parent=self,
@@ -65,7 +71,7 @@ class DroneCordinates(BasePluginMTL):
 
         # Criar checkboxes
         opts_checkbox_layout, self.checkbox_map = WidgetFactory.create_checkbox_grid(
-            options_dict=self.CHECKBOX_OPTIONS,
+            options_data=self.CHECKBOX_OPTIONS,
             items_per_row=1,
             checked_by_default=False,
             separator_bottom=False,
@@ -76,6 +82,62 @@ class DroneCordinates(BasePluginMTL):
         self.chk_photos = self.checkbox_map.get("photos")
         if self.chk_photos:
             self.chk_photos.toggled.connect(self.on_photos_changed)
+
+        # ====== METADATA REQUIRED FIELDS ======
+        required_layout, self.required_fields_collapsible = (
+            WidgetFactory.create_collapsible_parameters(
+                parent=self,
+                title="Required Fields",
+                expanded_by_default=False,
+            )
+        )
+        required_items = StringAdapter.to_key_label_description(
+            MetadataFields.REQUIRED_FIELDS
+        )
+        req_grid_layout, self.required_fields_grid = WidgetFactory.create_checkbox_grid(
+            options_data=required_items,
+            items_per_row=2,
+            checked_by_default=True,
+            return_widget=True,
+            separator_bottom=False,
+        )
+        self.required_fields_collapsible.add_content_layout(req_grid_layout)
+
+        # ====== METADATA CUSTOM FIELDS ======
+        custom_layout, self.custom_fields_collapsible = (
+            WidgetFactory.create_collapsible_parameters(
+                parent=self,
+                title="Custom Fields",
+                expanded_by_default=False,
+            )
+        )
+        custom_items = StringAdapter.to_key_label_description(MetadataFields.CUSTOM_FIELDS)
+        custom_grid_layout, self.custom_fields_grid = WidgetFactory.create_checkbox_grid(
+            options_data=custom_items,
+            items_per_row=2,
+            checked_by_default=False,
+            return_widget=True,
+            separator_bottom=False,
+        )
+        self.custom_fields_collapsible.add_content_layout(custom_grid_layout)
+
+        # ====== METADATA MRK FIELDS ======
+        mrk_layout, self.mrk_fields_collapsible = (
+            WidgetFactory.create_collapsible_parameters(
+                parent=self,
+                title="MRK Fields",
+                expanded_by_default=False,
+            )
+        )
+        mrk_items = StringAdapter.to_key_label_description(MetadataFields.MRK_FIELDS)
+        mrk_grid_layout, self.mrk_fields_grid = WidgetFactory.create_checkbox_grid(
+            options_data=mrk_items,
+            items_per_row=2,
+            checked_by_default=True,
+            return_widget=True,
+            separator_bottom=False,
+        )
+        self.mrk_fields_collapsible.add_content_layout(mrk_grid_layout)
 
         # ====== SALVAMENTO (CollapsibleParametersWidget) ======
         save_layout, self.save_collapsible = (
@@ -150,11 +212,20 @@ class DroneCordinates(BasePluginMTL):
             )
         )
 
-        # ====== CONTEÚDO AO LAYOUT ======
+        # ====== CONTEÃšDO AO LAYOUT ======
         # MainLayout encapsula o scroll internamente
         # add_items() roteia automaticamente para scroll ou inner_layout
         self.layout.add_items(
-            [folder_layout, opts_layout, save_layout, styles_layout, buttons_layout]
+            [
+                folder_layout,
+                opts_layout,
+                required_layout,
+                custom_layout,
+                mrk_layout,
+                save_layout,
+                styles_layout,
+                buttons_layout,
+            ]
         )
 
     def _ensure_photos_dependency(self, checked: bool):
@@ -188,8 +259,18 @@ class DroneCordinates(BasePluginMTL):
     def on_photos_changed(self, checked: bool):
         self._ensure_photos_dependency(checked)
 
+
+    def _get_selected_required_fields(self):
+        return self.required_fields_grid.get_checked_keys()
+
+    def _get_selected_custom_fields(self):
+        return self.custom_fields_grid.get_checked_keys()
+
+    def _get_selected_mrk_fields(self):
+        return self.mrk_fields_grid.get_checked_keys()
+
     def _load_prefs(self):
-        self.logger.debug("Carregando preferências", code="PREFS_LOAD_START")
+        self.logger.debug("Carregando preferÃªncias", code="PREFS_LOAD_START")
         prefs = load_tool_prefs(self.TOOL_KEY)
 
         folder_path = prefs.get("folder", "")
@@ -202,6 +283,19 @@ class DroneCordinates(BasePluginMTL):
         # Checkboxes
         self.checkbox_map["recursive"].setChecked(prefs.get("recursive", True))
         self.checkbox_map["photos"].setChecked(prefs.get("photos", True))
+
+        # Filtros de campos de metadata
+        required_selected = prefs.get(self.PREF_REQUIRED_FIELDS)
+        custom_selected = prefs.get(self.PREF_CUSTOM_FIELDS)
+        mrk_selected = prefs.get(self.PREF_MRK_FIELDS)
+
+        if isinstance(required_selected, list):
+            self.required_fields_grid.set_checked_keys(required_selected)
+        if isinstance(custom_selected, list):
+            self.custom_fields_grid.set_checked_keys(custom_selected)
+        if isinstance(mrk_selected, list):
+            self.mrk_fields_grid.set_checked_keys(mrk_selected)
+
 
         # Salvamento
         self.save_points_selector.set_enabled(prefs.get("save_file_pts", False))
@@ -217,13 +311,22 @@ class DroneCordinates(BasePluginMTL):
 
         # Estados dos CollapsibleParametersWidget
         self.opts_collapsible.set_expanded(prefs.get("opts_expanded", True))
+        self.required_fields_collapsible.set_expanded(
+            prefs.get("required_expanded", False)
+        )
+        self.custom_fields_collapsible.set_expanded(
+            prefs.get("custom_expanded", False)
+        )
+        self.mrk_fields_collapsible.set_expanded(
+            prefs.get("mrk_expanded", False)
+        )
         self.save_collapsible.set_expanded(prefs.get("save_expanded", False))
         self.styles_collapsible.set_expanded(prefs.get("styles_expanded", False))
 
-        self.logger.debug("Preferências carregadas", code="PREFS_LOAD_COMPLETE")
+        self.logger.debug("PreferÃªncias carregadas", code="PREFS_LOAD_COMPLETE")
 
     def _save_prefs(self):
-        self.logger.debug("Salvando preferências", code="PREFS_SAVE_START")
+        self.logger.debug("Salvando preferÃªncias", code="PREFS_SAVE_START")
 
         paths = self.folder_selector.get_paths()
         folder_path = paths[0] if paths else ""
@@ -232,6 +335,9 @@ class DroneCordinates(BasePluginMTL):
             "folder": folder_path,
             "recursive": self.checkbox_map["recursive"].isChecked(),
             "photos": self.checkbox_map["photos"].isChecked(),
+            self.PREF_REQUIRED_FIELDS: self._get_selected_required_fields(),
+            self.PREF_CUSTOM_FIELDS: self._get_selected_custom_fields(),
+            self.PREF_MRK_FIELDS: self._get_selected_mrk_fields(),
             "save_file": self.save_track_selector.is_enabled(),
             "save_file_pts": self.save_points_selector.is_enabled(),
             "output_path": self.save_track_selector.get_file_path(),
@@ -242,6 +348,9 @@ class DroneCordinates(BasePluginMTL):
             "qml_path_points": self.qml_points_selector.get_file_path(),
             # Estados dos CollapsibleParametersWidget
             "opts_expanded": self.opts_collapsible.is_expanded(),
+            "required_expanded": self.required_fields_collapsible.is_expanded(),
+            "custom_expanded": self.custom_fields_collapsible.is_expanded(),
+            "mrk_expanded": self.mrk_fields_collapsible.is_expanded(),
             "save_expanded": self.save_collapsible.is_expanded(),
             "styles_expanded": self.styles_collapsible.is_expanded(),
             # Tamanho da janela (persistido automaticamente por BasePlugin.closeEvent)
@@ -250,7 +359,7 @@ class DroneCordinates(BasePluginMTL):
         }
         save_tool_prefs(self.TOOL_KEY, prefs_data)
 
-        self.logger.debug("Preferências salvas", code="PREFS_SAVE_COMPLETE")
+        self.logger.debug("PreferÃªncias salvas", code="PREFS_SAVE_COMPLETE")
 
     def execute_tool(self):
         self.logger.info(
@@ -259,7 +368,7 @@ class DroneCordinates(BasePluginMTL):
 
         paths = self.folder_selector.get_paths()
         if not paths:
-            self.logger.error("Nenhum diretório selecionado", code="NO_SELECTION")
+            self.logger.error("Nenhum diretÃ³rio selecionado", code="NO_SELECTION")
             return
 
         recursive = self.checkbox_map["recursive"].isChecked()
@@ -267,17 +376,20 @@ class DroneCordinates(BasePluginMTL):
 
         if apply_photos and not DependenciesManager.check_dependency("Pillow", self.TOOL_KEY):
             self.logger.warning(
-                "Cruzamento com metadados solicitado sem Pillow disponível; será ignorado"
+                "Cruzamento com metadados solicitado sem Pillow disponÃ­vel; serÃ¡ ignorado"
             )
             apply_photos = False
             self.checkbox_map["photos"].setChecked(False)
 
-        extra_fields = PhotoMetadata.FIELDS_PHOTO if apply_photos else None
+        extra_fields = None
 
         context = ExecutionContext()
         context.set("paths", paths)
         context.set("recursive", recursive)
         context.set("extra_fields", extra_fields)
+        context.set("selected_required_fields", self._get_selected_required_fields())
+        context.set("selected_custom_fields", self._get_selected_custom_fields())
+        context.set("selected_mrk_fields", self._get_selected_mrk_fields())
         context.set("tool_key", self.TOOL_KEY)
         context.set("points_layer_name", "MRK_Pontos")
 
@@ -333,7 +445,7 @@ class DroneCordinates(BasePluginMTL):
                 if ok:
                     layer.triggerRepaint()
 
-        # ===== TRAÇO =====
+        # ===== TRAÃ‡O =====
         points = context.get("points", []) or []
         vl_line = VectorLayerGeometry.create_line_layer_from_points(
             points,
