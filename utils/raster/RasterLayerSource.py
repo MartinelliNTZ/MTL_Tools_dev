@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 from ...core.config.LogUtils import LogUtils
 from qgis.core import QgsRasterLayer
 from pathlib import Path
@@ -7,25 +7,25 @@ import os
 
 class RasterLayerSource:
     """
-    Responsável pelo carregamento, salvamento e criação de camadas raster.
+    ResponsÃ¡vel pelo carregamento, salvamento e criaÃ§Ã£o de camadas raster.
 
     Escopo:
     - Carregar rasters de diferentes fontes
-    - Criar rasters novos em memória
+    - Criar rasters novos em memÃ³ria
     - Salvar rasters em diferentes formatos
     - Validar arquivos raster
     - Gerenciar bandas e nodata
 
     Responsabilidade Principal:
-    - Orquestrar operações de I/O de rasters
+    - Orquestrar operaÃ§Ãµes de I/O de rasters
     - Garantir integridade de dados raster
     - Validar bandas e valores nodata
 
-    NÃO é Responsabilidade:
+    NÃƒO Ã© Responsabilidade:
     - Reprojetar rasters (use RasterLayerProjection)
     - Processar pixels (use RasterLayerProcessing)
-    - Calcular estatísticas (use RasterLayerMetrics)
-    - Alterar visualização (use RasterLayerRendering)
+    - Calcular estatÃ­sticas (use RasterLayerMetrics)
+    - Alterar visualizaÃ§Ã£o (use RasterLayerRendering)
     """
 
     def load_raster_from_file(self, file_path, external_tool_key="untraceable"):
@@ -34,7 +34,7 @@ class RasterLayerSource:
         logger = LogUtils(tool=external_tool_key, class_name="RasterLayerSource")
         try:
             if not file_path or not os.path.exists(file_path):
-                logger.error(f"Raster não encontrado: {file_path}")
+                logger.error(f"Raster nÃ£o encontrado: {file_path}")
                 return None
 
             name = Path(file_path).stem
@@ -49,35 +49,56 @@ class RasterLayerSource:
             return None
 
     def load_raster_from_url(
-        self, url, cache_directory, external_tool_key="untraceable"
+        self,
+        url,
+        cache_directory=None,
+        external_tool_key="untraceable",
+        layer_name=None,
+        provider_key="wms",
     ):
-        """Carrega um raster de uma URL remota com opção de cache local."""
-        pass
+        """Carrega raster remoto (ex.: XYZ/WMS) a partir de URL/URI."""
+        logger = LogUtils(tool=external_tool_key, class_name="RasterLayerSource")
+        try:
+            if not url:
+                logger.error("URL/URI raster vazia")
+                return None
+
+            resolved_name = layer_name or "Remote Raster"
+            layer = QgsRasterLayer(url, resolved_name, provider_key)
+            if not layer or not layer.isValid():
+                logger.error(f"Falha ao carregar raster remoto: {resolved_name}")
+                return None
+
+            logger.info(f"Raster remoto carregado: {resolved_name}")
+            return layer
+        except Exception as e:
+            logger.error(f"Erro ao carregar raster remoto: {e}")
+            return None
 
     def create_empty_raster(
         self, width, height, crs, extent, pixel_size, external_tool_key="untraceable"
     ):
-        """Cria um raster vazio em memória com dimensões e CRS especificados."""
+        """Cria um raster vazio em memÃ³ria com dimensÃµes e CRS especificados."""
         pass
 
     def save_raster_to_file(
         self, raster, output_path, format, compression, external_tool_key="untraceable"
     ):
-        """Salva um raster em arquivo com formato e compressão especificados."""
+        """Salva um raster em arquivo com formato e compressÃ£o especificados."""
         pass
 
     def get_raster_bands_info(self, raster, external_tool_key="untraceable"):
-        """Retorna informações sobre as bandas do raster (quantidade, tipo)."""
+        """Retorna informaÃ§Ãµes sobre as bandas do raster (quantidade, tipo)."""
         pass
 
     def validate_raster_file(self, file_path, external_tool_key="untraceable"):
-        """Valida se um arquivo raster está corrompido ou inacessível."""
+        """Valida se um arquivo raster estÃ¡ corrompido ou inacessÃ­vel."""
         pass
 
     def get_raster_nodata_value(
         self, raster, band_index, external_tool_key="untraceable"
     ):
-        """Obtém o valor de nodata de uma banda raster específica."""
+        """ObtÃ©m o valor de nodata de uma banda raster especÃ­fica."""
         pass
 
     def set_raster_nodata_value(
@@ -93,15 +114,16 @@ class RasterLayerSource:
         pass
 
     def clone_raster(self, source_raster, external_tool_key="untraceable"):
-        """Cria uma cópia completa de um raster em memória."""
+        """Cria uma cÃ³pia completa de um raster em memÃ³ria."""
         pass
 
     def get_raster_file_size(self, file_path, external_tool_key="untraceable"):
-        """Obtém o tamanho do arquivo raster em bytes."""
+        """ObtÃ©m o tamanho do arquivo raster em bytes."""
         pass
 
     def export_raster_metadata(
         self, raster, output_path, external_tool_key="untraceable"
     ):
-        """Exporta metadados do raster para arquivo de documentação."""
+        """Exporta metadados do raster para arquivo de documentaÃ§Ã£o."""
         pass
+

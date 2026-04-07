@@ -4,7 +4,6 @@ from qgis.core import (
     QgsVectorFileWriter,
     QgsWkbTypes,
     QgsVectorLayer,
-    QgsProject,
 )
 from typing import Optional, Tuple
 import os
@@ -13,6 +12,7 @@ import time
 from ..StringManager import StringManager
 from ...core.config.LogUtils import LogUtils
 from ..ToolKeys import ToolKey
+from ..ProjectUtils import ProjectUtils
 
 
 class VectorLayerSource:
@@ -145,7 +145,7 @@ class VectorLayerSource:
 
         options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteFile
 
-        transform_context = QgsProject.instance().transformContext()
+        transform_context = ProjectUtils.get_project_instance().transformContext()
 
         result, error_message = QgsVectorFileWriter.writeAsVectorFormatV2(
             layer, final_path, transform_context, options

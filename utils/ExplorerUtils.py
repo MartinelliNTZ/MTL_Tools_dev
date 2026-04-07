@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import shutil
+import re
 from pathlib import Path
 from typing import List, Dict
 from qgis.PyQt.QtCore import QUrl
@@ -39,6 +40,47 @@ class ExplorerUtils:
         """Gera caminho ao lado do arquivo original com sufixo e nova extensao."""
         p = Path(file_path)
         return str(p.with_name(f"{p.stem}_{suffix}{extension}"))
+
+    @staticmethod
+    def sanitize_path_component(raw_name: str) -> str:
+        """Sanitiza nome para uso como pasta/arquivo."""
+        cleaned = re.sub(r'[<>:"/\\\\|?*]+', " ", raw_name or "")
+        cleaned = re.sub(r"\s+", " ", cleaned).strip().rstrip(".")
+        return cleaned
+
+    @staticmethod
+    def next_indexed_folder_name(
+        base_folder: str,
+        prefix: str,
+        pattern: re.Pattern,
+    ) -> str:
+        """Retorna próximo nome incremental de pasta usando pattern informado."""
+        folder = Path(base_folder)
+        highest = 0
+
+        if folder.exists():
+            for child in folder.iterdir():
+                if not child.is_dir():
+                    continue
+                match = pattern.match(child.name)
+                if match:
+                    highest = max(highest, int(match.group(1)))
+
+        return f"{prefix}{highest + 1}"
+
+    @staticmethod
+    def ensure_folder_exists(folder_path: str, tool_key: str) -> bool:
+        """Garante que a pasta existe; retorna False em erro."""
+        logger = ExplorerUtils._get_logger(tool_key)
+        try:
+            if not folder_path:
+                logger.error("ensure_folder_exists: caminho vazio")
+                return False
+            os.makedirs(folder_path, exist_ok=True)
+            return True
+        except Exception as e:
+            logger.error(f"ensure_folder_exists: erro ao preparar pasta: {e}")
+            return False
 
     @staticmethod
     def is_file(path: str) -> bool:

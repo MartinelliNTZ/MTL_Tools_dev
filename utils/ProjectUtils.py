@@ -1,8 +1,9 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 import os
 import shutil
 from datetime import datetime
 from pathlib import Path
+from qgis.PyQt.QtCore import QCoreApplication, QProcess
 from qgis.core import QgsProject, QgsMapLayer, QgsVectorLayer
 
 from ..core.config.LogUtils import LogUtils
@@ -15,7 +16,7 @@ class ProjectUtils:
         """Valida camada vetorial ativa.
         Recebe: layer, logger, require_editable (bool).
         Retorna: QgsVectorLayer ou None.
-        Não acessa iface nem exibe mensagens.
+        NÃ£o acessa iface nem exibe mensagens.
         """
 
         if logger:
@@ -24,7 +25,7 @@ class ProjectUtils:
             )
         if not layer or not isinstance(layer, QgsVectorLayer):
             if logger:
-                logger.debug("Camada ativa inválida ou não é vetorial")
+                logger.debug("Camada ativa invÃ¡lida ou nÃ£o Ã© vetorial")
             return None
         if require_editable and not ProjectUtils.ensure_editable(layer, logger):
             return None
@@ -32,21 +33,85 @@ class ProjectUtils:
 
     @staticmethod
     def ensure_editable(layer, logger=None):
-        """Verifica se a camada está em modo edição.
+        """Verifica se a camada estÃ¡ em modo ediÃ§Ã£o.
         Recebe: layer (QgsVectorLayer), logger.
         Retorna: bool.
-        Não acessa iface nem exibe mensagens.
+        NÃ£o acessa iface nem exibe mensagens.
         """
         if logger:
             logger.debug(
-                f"Verificando se camada está em edição: {layer.name()}. Editável: {layer.isEditable()}"
+                f"Verificando se camada estÃ¡ em ediÃ§Ã£o: {layer.name()}. EditÃ¡vel: {layer.isEditable()}"
             )
         return layer.isEditable()
 
     @staticmethod
     def get_project_instance() -> QgsProject:
-        """Retorna a instância do projeto QGIS aberto."""
+        """Retorna a instÃ¢ncia do projeto QGIS aberto."""
         return QgsProject.instance()
+
+    @staticmethod
+    def create_project_instance() -> QgsProject:
+        """Cria uma nova instância de projeto QGIS."""
+        return QgsProject()
+
+    @staticmethod
+    def is_project_empty(project: QgsProject) -> bool:
+        return len(project.mapLayers()) == 0
+
+    @staticmethod
+    def get_project_file_name(project: QgsProject) -> str:
+        return project.fileName() or ""
+
+    @staticmethod
+    def set_project_home_path(project: QgsProject, folder_path: str):
+        if hasattr(project, "setPresetHomePath"):
+            project.setPresetHomePath(folder_path)
+
+    @staticmethod
+    def set_project_file_name(project: QgsProject, file_path: str):
+        project.setFileName(file_path)
+
+    @staticmethod
+    def write_project(project: QgsProject, file_path: str) -> bool:
+        return bool(project.write(file_path))
+
+    @staticmethod
+    def set_project_crs(project: QgsProject, crs):
+        project.setCrs(crs)
+
+    @staticmethod
+    def project_layers(project: Optional[QgsProject] = None) -> dict:
+        resolved_project = project or QgsProject.instance()
+        return resolved_project.mapLayers()
+
+    @staticmethod
+    def project_layer_names(project: Optional[QgsProject] = None) -> list:
+        return [layer.name() for layer in ProjectUtils.project_layers(project).values()]
+
+    @staticmethod
+    def get_qgis_executable_path() -> str:
+        executable = QCoreApplication.applicationFilePath()
+        if executable and os.path.exists(executable):
+            return executable
+        return ""
+
+    @staticmethod
+    def open_project_in_new_window(
+        project_file: str, extent: Optional[tuple] = None
+    ) -> bool:
+        executable = ProjectUtils.get_qgis_executable_path()
+        if not executable:
+            return False
+
+        args = []
+        if extent is not None and len(extent) == 4:
+            args.extend(["--extent", ",".join(str(v) for v in extent)])
+        args.append(str(project_file))
+
+        started = QProcess.startDetached(executable, args)
+        if isinstance(started, tuple):
+            started = started[0]
+        return bool(started)
 
     @staticmethod
     def is_project_saved(project: QgsProject) -> bool:
@@ -55,7 +120,7 @@ class ProjectUtils:
     @staticmethod
     def get_project_dir(project: QgsProject) -> str:
         """
-        Retorna diretório do projeto salvo ou homePath como fallback.
+        Retorna diretÃ³rio do projeto salvo ou homePath como fallback.
         """
         if project.fileName():
             return str(Path(project.fileName()).parent)
@@ -79,11 +144,11 @@ class ProjectUtils:
         """
         Cria backup do .qgz em subpasta 'backup'.
         Retorna caminho do arquivo criado.
-        Lança exceção se projeto não estiver salvo.
+        LanÃ§a exceÃ§Ã£o se projeto nÃ£o estiver salvo.
         """
         project_file = project.fileName()
         if not project_file:
-            raise RuntimeError("Projeto não está salvo. Backup impossível.")
+            raise RuntimeError("Projeto nÃ£o estÃ¡ salvo. Backup impossÃ­vel.")
 
         project_path = Path(project_file)
         project_dir = project_path.parent
@@ -109,7 +174,7 @@ class ProjectUtils:
         if isinstance(obj, QgsMapLayer):
             src = obj.source() or ""
 
-            # memory layer → estimar
+            # memory layer â†’ estimar
             if src.startswith("memory:"):
                 try:
                     feat_count = obj.featureCount()
@@ -117,7 +182,7 @@ class ProjectUtils:
                     return feat_count * 200
                 except Exception as e:
                     logger = LogUtils(tool="project_utils", class_name="ProjectUtils")
-                    logger.error(f"Erro estimando tamanho de memória: {e}")
+                    logger.error(f"Erro estimando tamanho de memÃ³ria: {e}")
                     return 0
 
             # arquivo real
@@ -156,10 +221,10 @@ class ProjectUtils:
     @staticmethod
     def is_layer_in_project(layer: QgsMapLayer) -> bool:
         """
-        Verifica se a camada informada está presente no projeto QGIS aberto.
+        Verifica se a camada informada estÃ¡ presente no projeto QGIS aberto.
 
         :param layer: QgsMapLayer selecionada (ex: cmb_layers.currentLayer())
-        :return: True se estiver no projeto, False caso contrário
+        :return: True se estiver no projeto, False caso contrÃ¡rio
         """
         try:
             if layer is None:
@@ -263,7 +328,7 @@ class ProjectUtils:
     # ------------------------------------------------------------------
     @staticmethod
     def normalize_layer_source(src: str) -> str:
-        """Normaliza a source de uma layer (remove parâmetros e resolve path)."""
+        """Normaliza a source de uma layer (remove parÃ¢metros e resolve path)."""
         if not src:
             return ""
         if "|" in src:
@@ -277,7 +342,7 @@ class ProjectUtils:
 
     @staticmethod
     def ensure_group(rel_path: str):
-        """Garante a existência de um grupo aninhado a partir de um caminho relativo.
+        """Garante a existÃªncia de um grupo aninhado a partir de um caminho relativo.
 
         Retorna o QgsLayerTreeGroup criado/encontrado.
         """
@@ -296,14 +361,16 @@ class ProjectUtils:
         return current
 
     @staticmethod
-    def add_layer(layer, add_to_root: bool = True):
+    def add_layer(
+        layer, add_to_root: bool = True, project: Optional[QgsProject] = None
+    ):
         """Adiciona uma layer ao projeto; retorna a layer adicionada ou None."""
         try:
-            project = QgsProject.instance()
+            resolved_project = project or QgsProject.instance()
             if add_to_root:
-                project.addMapLayer(layer, True)
+                resolved_project.addMapLayer(layer, True)
             else:
-                project.addMapLayer(layer, False)
+                resolved_project.addMapLayer(layer, False)
             return layer
         except Exception as e:
             logger = LogUtils(tool="project_utils", class_name="ProjectUtils")
@@ -328,10 +395,10 @@ class ProjectUtils:
 
     @staticmethod
     def add_layer_to_group(layer, group):
-        """Adiciona uma camada já registrada no projeto dentro de um grupo (QgsLayerTreeGroup)."""
+        """Adiciona uma camada jÃ¡ registrada no projeto dentro de um grupo (QgsLayerTreeGroup)."""
         try:
             project = QgsProject.instance()
-            # garante que layer está no projeto sem inserir na root
+            # garante que layer estÃ¡ no projeto sem inserir na root
             project.addMapLayer(layer, False)
             group.insertLayer(0, layer)
             return layer
@@ -402,3 +469,4 @@ class ProjectUtils:
         except Exception as e:
             logger.error(f"Erro ao centralizar canvas na extensao do arquivo: {e}")
             return False
+

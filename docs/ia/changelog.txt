@@ -24,3 +24,7 @@
 [2.3.6.1.11] CreateProjectPlugin/ExplorerUtils/VectorLayerSource: line.gpkg is now copied into each new project's `vectors` folder before loading, and the loaded reference layer now uses the copied file path via VectorLayerSource; extent centering also targets the copied file.
 2.3.6.1.12 2026/04/07
 [2.3.6.1.12] CreateProjectPlugin/core.ui.dialogs: Extracted default-folder and project-name dialogs into dedicated dialog classes under `core/ui/dialogs`, and refactored `execute()` into focused steps (resolve folder, resolve name, create structure) to reduce mixed responsibilities without changing creation behavior.
+2.3.6.1.13 2026/04/07
+[2.3.6.1.13] CreateProjectPlugin/Utils refactor: moved generic folder/name preparation to ExplorerUtils, moved project/window orchestration helpers to ProjectUtils, removed direct `QgsProject` dependency from CreateProjectPlugin and VectorLayerSource, and added remote raster loading implementation in RasterLayerSource for basemap creation.
+2.3.6.1.14 2026/04/07
+[2.3.6.1.14] ProjectUtils/CreateProjectPlugin cleanup: consolidated layer insertion responsibility into `ProjectUtils.add_layer(...)` (now accepts optional `project`), removed duplicated `add_layer_to_project` usage, and kept project-layer helpers reusable with optional project context.
