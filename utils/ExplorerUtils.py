@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import shutil
 from pathlib import Path
 from typing import List, Dict
 from qgis.PyQt.QtCore import QUrl
@@ -56,6 +57,44 @@ class ExplorerUtils:
         QDesktopServices.openUrl(QUrl.fromLocalFile(folder))
         logger.info(f"open_folder: pasta aberta: {folder}")
         return True
+
+    @staticmethod
+    def copy_file_to_folder(
+        source_file: str,
+        destination_folder: str,
+        tool_key: str,
+        overwrite: bool = True,
+    ) -> str:
+        """Copia arquivo para uma pasta destino e retorna o caminho final."""
+        logger = ExplorerUtils._get_logger(tool_key)
+        try:
+            if not source_file or not os.path.isfile(source_file):
+                logger.error(f"copy_file_to_folder: arquivo origem invalido: {source_file}")
+                return ""
+
+            if not destination_folder:
+                logger.error("copy_file_to_folder: pasta destino vazia")
+                return ""
+
+            os.makedirs(destination_folder, exist_ok=True)
+            destination_path = os.path.join(
+                destination_folder, os.path.basename(source_file)
+            )
+
+            if os.path.exists(destination_path) and not overwrite:
+                logger.info(
+                    f"copy_file_to_folder: arquivo ja existe (sem overwrite): {destination_path}"
+                )
+                return destination_path
+
+            shutil.copy2(source_file, destination_path)
+            logger.info(
+                f"copy_file_to_folder: arquivo copiado de '{source_file}' para '{destination_path}'"
+            )
+            return destination_path
+        except Exception as e:
+            logger.error(f"copy_file_to_folder: erro ao copiar arquivo: {e}")
+            return ""
 
     @staticmethod
     def scan_folder(folder: str, extensions: List[str], tool_key: str) -> List[Dict]:

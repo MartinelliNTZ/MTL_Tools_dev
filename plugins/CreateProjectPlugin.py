@@ -24,10 +24,12 @@ from ..core.config.LogUtils import LogUtils
 from ..i18n.TranslationManager import STR
 from ..resources.widgets.SelectorWidget import SelectorWidget
 from ..resources.OtherFilesManager import OtherFilesManager
+from ..utils.ExplorerUtils import ExplorerUtils
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.ProjectUtils import ProjectUtils
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.ToolKeys import ToolKey
+from ..utils.vector.VectorLayerSource import VectorLayerSource
 
 
 class _DefaultFolderDialog(QDialog):
@@ -271,33 +273,53 @@ class CreateProjectPlugin:
             self.SCENARIO_UNSAVED_EMPTY_PROJECT,
         )
 
-    def _add_line_reference_layer(self, project: QgsProject):
+    def _copy_and_load_line_reference_layer(
+        self, project: QgsProject, project_vectors_folder: Path
+    ):
         line_path = OtherFilesManager.vector_path(OtherFilesManager.LINE_VECTOR)
         if not os.path.exists(line_path):
             self.logger.warning(
                 f"Arquivo de referencia nao encontrado para carga automatica: {line_path}"
             )
-            return None
+            return None, ""
 
-        normalized_target = ProjectUtils.normalize_layer_source(line_path)
+        copied_line_path = ExplorerUtils.copy_file_to_folder(
+            source_file=line_path,
+            destination_folder=str(project_vectors_folder),
+            tool_key=self.TOOL_KEY,
+            overwrite=True,
+        )
+        if not copied_line_path:
+            self.logger.warning(
+                f"Falha ao copiar line.gpkg para pasta do projeto: {project_vectors_folder}"
+            )
+            return None, ""
+
+        normalized_target = ProjectUtils.normalize_layer_source(copied_line_path)
         for layer in project.mapLayers().values():
             source_normalized = ProjectUtils.normalize_layer_source(layer.source())
             if source_normalized == normalized_target:
                 self.logger.debug(
-                    f"Camada de referencia ja carregada no projeto: {line_path}"
+                    f"Camada de referencia ja carregada no projeto: {copied_line_path}"
                 )
-                return layer if isinstance(layer, QgsVectorLayer) else None
+                if isinstance(layer, QgsVectorLayer):
+                    return layer, copied_line_path
+                return None, copied_line_path
 
-        line_layer = QgsVectorLayer(line_path, Path(line_path).stem, "ogr")
-        if not line_layer.isValid():
+        line_layer = VectorLayerSource.load_existing_vector_layer(
+            copied_line_path, tool_key=self.TOOL_KEY
+        )
+        if not line_layer or not line_layer.isValid():
             self.logger.warning(
-                f"Falha ao carregar camada de referencia line.gpkg: {line_path}"
+                f"Falha ao carregar camada de referencia line.gpkg copiada: {copied_line_path}"
             )
-            return None
+            return None, copied_line_path
 
         project.addMapLayer(line_layer, True)
-        self.logger.info(f"Camada de referencia carregada: {line_path}")
-        return line_layer
+        self.logger.info(
+            f"Camada de referencia carregada a partir da copia: {copied_line_path}"
+        )
+        return line_layer, copied_line_path
 
     def _resolve_valid_crs(self, authid: str) -> QgsCoordinateReferenceSystem:
         crs = QgsCoordinateReferenceSystem(authid or self.DEFAULT_CRS_AUTHID)
@@ -353,14 +375,17 @@ class CreateProjectPlugin:
                 self._apply_project_crs(current_project, default_crs_authid)
                 self._add_google_basemap(current_project)
                 line_layer = None
+                line_path_in_project = ""
                 if should_load_line:
-                    line_layer = self._add_line_reference_layer(current_project)
+                    line_layer, line_path_in_project = (
+                        self._copy_and_load_line_reference_layer(
+                            current_project, vectors_folder
+                        )
+                    )
                     if line_layer:
                         ProjectUtils.center_canvas_on_file_extent(
                             iface=self.iface,
-                            file_path=OtherFilesManager.vector_path(
-                                OtherFilesManager.LINE_VECTOR
-                            ),
+                            file_path=line_path_in_project,
                             project=current_project,
                             layer_name=line_layer.name(),
                             tool_key=self.TOOL_KEY,
@@ -381,7 +406,11 @@ class CreateProjectPlugin:
                 self._add_google_basemap(new_project)
                 line_layer = None
                 if should_load_line:
-                    line_layer = self._add_line_reference_layer(new_project)
+                    line_layer, _ = (
+                        self._copy_and_load_line_reference_layer(
+                            new_project, vectors_folder
+                        )
+                    )
                 if hasattr(new_project, "setPresetHomePath"):
                     new_project.setPresetHomePath(str(project_folder))
                 new_project.setFileName(str(project_file))
