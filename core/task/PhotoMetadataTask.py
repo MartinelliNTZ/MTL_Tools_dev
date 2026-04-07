@@ -14,6 +14,7 @@ class PhotoMetadataTask(BaseTask):
         layer_id: str,
         base_folder: str,
         recursive: bool,
+        source_points: list,
         selected_required_fields: list,
         selected_custom_fields: list,
         selected_mrk_fields: list,
@@ -23,6 +24,7 @@ class PhotoMetadataTask(BaseTask):
         self.layer_id = layer_id
         self.base_folder = base_folder
         self.recursive = recursive
+        self.source_points = source_points or []
         self.selected_required_fields = selected_required_fields or []
         self.selected_custom_fields = selected_custom_fields or []
         self.selected_mrk_fields = selected_mrk_fields or []
@@ -82,17 +84,42 @@ class PhotoMetadataTask(BaseTask):
             },
         )
 
+        # Completa atributos faltantes usando os pontos originais do parser (fonte com MRK completo).
+        source_by_key = {}
+        source_by_foto = {}
+        for p in self.source_points:
+            try:
+                foto_src = int(p.get("foto"))
+            except Exception:
+                continue
+            mrk_src = str(p.get("mrk_folder") or "").strip()
+            source_by_key[(mrk_src, foto_src)] = p
+            source_by_foto.setdefault(foto_src, p)
+
+        for p in pontos:
+            foto_src = p.get("foto")
+            mrk_src = str(p.get("mrk_folder") or "").strip()
+            src = source_by_key.get((mrk_src, foto_src)) or source_by_foto.get(foto_src)
+            if not src:
+                continue
+            for k, v in src.items():
+                if k not in p or p.get(k) in (None, ""):
+                    p[k] = v
+
         # Cruzar metadados
         # ðŸ”´ O mÃ©todo enrich() agora processa cada grupo de pontos separadamente
         # baseado em seu mrk_folder, evitando conflito de numeraÃ§Ã£o entre voos
-        enriched = PhotoMetadata.enrich(
+        enrich_result = PhotoMetadata.enrich(
             pontos,
             base_folder=self.base_folder,
             recursive=self.recursive,
             selected_required_fields=self.selected_required_fields,
             selected_custom_fields=self.selected_custom_fields,
             selected_mrk_fields=self.selected_mrk_fields,
+            return_report=True,
         )
+        enriched = enrich_result.get("points", pontos) if isinstance(enrich_result, dict) else pontos
+        json_dump_path = enrich_result.get("json_dump_path") if isinstance(enrich_result, dict) else None
 
         updates = {}
         field_names = set()
@@ -137,9 +164,16 @@ class PhotoMetadataTask(BaseTask):
         not_found = len(pontos) - len(updates)
         if not_found > 0:
             logger.debug(f"Fotos sem metadados encontrados: {not_found}")
+        if json_dump_path:
+            logger.info(
+                "JSON temporario de metadados gerado",
+                code="PHOTO_METADATA_JSON_PATH",
+                data={"json_dump_path": json_dump_path},
+            )
 
         self.result = {
             "updates": updates,
             "field_names": list(field_names),
+            "json_dump_path": json_dump_path,
         }
         return True

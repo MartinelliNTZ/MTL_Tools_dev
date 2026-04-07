@@ -67,3 +67,14 @@
 [2.3.8.12.3] Expansao de normalizacao de metadados: PhotoMetadata recebeu novos aliases XMP/EXIF (AltitudeType, CaptureUUID, UTCAtExposure, PictureQuality, SensorFPS, LensPosition, LRFStatus, LRFTargetAbsAlt, GpsStatus e correlatos) e mapeamento dinamico por sufixo de normalized.
 [2.3.8.12.4] ExifUtil passou a expandir GPSInfo em chaves individuais (GPSLatitude, GPSLongitude, GPSMapDatum, GPSStatus etc.) para aumentar cobertura dos REQUIRED_FIELDS.
 [2.3.8.12.5] Validacao sintatica executada via py_compile para PhotoMetadata.py, PhotoMetadataTask.py e ExifUtil.py.
+2.3.8.13 2026/04/07
+[2.3.8.13] PhotoMetadataStep atualizado para suporte a tipagem String/Double: campos novos agora sao criados com inferencia por conteudo (numerico => QVariant.Double, textual => QVariant.String), removendo padrao anterior de tudo String.
+[2.3.8.13.1] Normalizacao de valor agora respeita tipo do campo no layer (Double recebe float real; String preserva texto), mantendo datas como string e evitando tipos Date/DateTime.
+[2.3.8.13.2] Inferencia ignora vazios/None para nao desclassificar campos numericos por causa de linhas em branco.
+[2.3.8.13.3] Validacao sintatica executada via py_compile para core/engine_tasks/PhotoMetadataStep.py.
+2.3.8.14 2026/04/07
+[2.3.8.14] PhotoMetadataTask agora recebe source_points do ExecutionContext (pontos originais do MRK) e usa essa fonte para completar atributos ausentes do layer antes do enrich, reduzindo null em lat/lon/mrk_* quando a camada nao materializa todos os campos.
+[2.3.8.14.1] PhotoMetadata.enrich ganhou opcao return_report=True e passou a expor json_dump_path/matched/not_found sem quebrar compatibilidade do retorno legado.
+[2.3.8.14.2] Novo log explicito no PhotoMetadataTask com code=PHOTO_METADATA_JSON_PATH para mostrar o caminho do JSON temporario no mesmo contexto da task.
+[2.3.8.14.3] PhotoMetadataStep passou source_points=context.get('points') para a task.
+[2.3.8.14.4] Validacao sintatica executada via py_compile para PhotoMetadata.py, PhotoMetadataTask.py e PhotoMetadataStep.py.

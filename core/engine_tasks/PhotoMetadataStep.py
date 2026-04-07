@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import re
+
 from .BaseStep import BaseStep
 from .ExecutionContext import ExecutionContext
 from ..task.PhotoMetadataTask import PhotoMetadataTask
@@ -10,14 +12,93 @@ from qgis.PyQt.QtCore import QVariant
 class PhotoMetadataStep(BaseStep):
     """Step para aplicar metadados de fotos diretamente na camada."""
 
+    _NUMERIC_RE = re.compile(r"^[+-]?\d+(?:\.\d+)?$")
+    _FORCE_STRING_FIELDS = {
+        "file",
+        "path",
+        "format",
+        "FileType",
+        "DateTimeOriginal",
+        "dt_full",
+        "dt_date",
+        "dt_time",
+        "mrk_file",
+        "mrk_path",
+        "mrk_folder",
+        "FlightName",
+        "FolderLevel1",
+        "FolderLevel2",
+        "nomedovoo",
+        "pasta1",
+        "pasta2",
+        "CaptureUUID",
+        "AltitudeType",
+        "GpsStatus",
+        "LRFStatus",
+        "UTCAtExposure",
+        "light_source_classification",
+        "light_consistency",
+        "rtk_effective_precision",
+        "estimated_coverage",
+    }
+
     def name(self) -> str:
         return "PhotoMetadataStep"
 
-    @staticmethod
-    def _normalize_attribute_value(value):
+    @classmethod
+    def _is_numeric_candidate(cls, field_name, value):
+        if field_name in cls._FORCE_STRING_FIELDS:
+            return False
+        if value is None or isinstance(value, bool):
+            return False
+        if isinstance(value, (int, float)):
+            return True
+        if isinstance(value, str):
+            s = value.strip()
+            if s in ("", "None", "null"):
+                return False
+            return bool(cls._NUMERIC_RE.match(s))
+        return False
+
+    @classmethod
+    def _infer_field_type(cls, field_name, sample_values):
+        if field_name in cls._FORCE_STRING_FIELDS:
+            return QVariant.String
+        numeric_count = 0
+        total = 0
+        for value in sample_values:
+            if value is None:
+                continue
+            if isinstance(value, str) and value.strip() in ("", "None", "null"):
+                continue
+            total += 1
+            if cls._is_numeric_candidate(field_name, value):
+                numeric_count += 1
+        if total > 0 and numeric_count == total:
+            return QVariant.Double
+        return QVariant.String
+
+    @classmethod
+    def _normalize_attribute_value(cls, field_name, value, qvariant_type):
         if value is None:
             return None
-        if isinstance(value, (str, int, float, bool)):
+        if isinstance(value, bool):
+            return "True" if value else "False"
+
+        if qvariant_type == QVariant.Double:
+            if isinstance(value, (int, float)):
+                return float(value)
+            if isinstance(value, str):
+                s = value.strip()
+                if s == "" or s in ("None", "null"):
+                    return None
+                try:
+                    return float(s)
+                except Exception:
+                    return None
+            return None
+
+        if isinstance(value, (str, int, float)):
             return str(value)
         try:
             return str(value)
@@ -32,6 +113,7 @@ class PhotoMetadataStep(BaseStep):
             layer_id=layer.id() if layer else "",
             base_folder=context.get("base_folder"),
             recursive=context.get("recursive", True),
+            source_points=context.get("points", []),
             selected_required_fields=context.get("selected_required_fields", []),
             selected_custom_fields=context.get("selected_custom_fields", []),
             selected_mrk_fields=context.get("selected_mrk_fields", []),
@@ -67,6 +149,18 @@ class PhotoMetadataStep(BaseStep):
             f"Aplicando metadados em {len(updates)} itens. Campos esperados: {field_names}"
         )
 
+        # Inferir tipo (String/Double) para campos novos a partir dos valores.
+        values_by_field = {}
+        for _, vals in updates.items():
+            for k, v in (vals or {}).items():
+                values_by_field.setdefault(k, []).append(v)
+
+        inferred_types = {}
+        for field in field_names:
+            inferred_types[field] = self._infer_field_type(
+                field, values_by_field.get(field, [])
+            )
+
         # Adicionar campos faltantes
         missing_fields = [f for f in field_names if layer.fields().indexOf(f) == -1]
         started_editing = False
@@ -80,7 +174,9 @@ class PhotoMetadataStep(BaseStep):
                 layer.startEditing()
                 started_editing = True
             for field in missing_fields:
-                layer.addAttribute(QgsField(field, QVariant.String))
+                layer.addAttribute(
+                    QgsField(field, inferred_types.get(field, QVariant.String))
+                )
             layer.updateFields()
 
         # Garantir modo de edição para aplicar valores
@@ -138,7 +234,10 @@ class PhotoMetadataStep(BaseStep):
                     if idx == -1:
                         continue
                     try:
-                        safe_value = self._normalize_attribute_value(value)
+                        qvariant_type = layer.fields().field(idx).type()
+                        safe_value = self._normalize_attribute_value(
+                            field_name, value, qvariant_type
+                        )
                         if safe_value != value:
                             converted_values += 1
                             if safe_value is None and value is not None:

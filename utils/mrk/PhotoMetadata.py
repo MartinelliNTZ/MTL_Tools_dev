@@ -18,6 +18,7 @@ TOOL_KEY = ToolKey.DRONE_COORDINATES
 
 class PhotoMetadata:
     """Manager de metadata de fotos para o fluxo DroneCoordinates."""
+    LAST_JSON_DUMP_PATH = None
 
     # Mantido para compatibilidade com chamadas existentes.
     FIELDS_PHOTO = {
@@ -286,6 +287,7 @@ class PhotoMetadata:
         selected_required_fields=None,
         selected_custom_fields=None,
         selected_mrk_fields=None,
+        return_report=False,
     ):
         logger = PhotoMetadata._get_logger(TOOL_KEY)
         selected_keys = PhotoMetadata._build_selected_keys(
@@ -388,6 +390,7 @@ class PhotoMetadata:
             tool_key=TOOL_KEY,
             prefix="drone_photo_metadata_full",
         )
+        PhotoMetadata.LAST_JSON_DUMP_PATH = dump_path
 
         logger.info(
             "Enriquecimento concluido",
@@ -400,4 +403,12 @@ class PhotoMetadata:
             },
         )
 
+        if return_report:
+            return {
+                "points": points,
+                "json_dump_path": dump_path,
+                "matched": total_found,
+                "not_found": total_missing,
+                "total_points": len(points),
+            }
         return points
