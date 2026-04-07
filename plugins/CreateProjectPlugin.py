@@ -15,6 +15,7 @@ from qgis.PyQt.QtWidgets import (
 from qgis.core import QgsProject
 
 from ..core.config.LogUtils import LogUtils
+from ..i18n.TranslationManager import STR
 from ..resources.widgets.SelectorWidget import SelectorWidget
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.QgisMessageUtil import QgisMessageUtil
@@ -26,7 +27,7 @@ class _DefaultFolderDialog(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Pasta padrao dos projetos")
+        self.setWindowTitle(STR.DEFAULT_PROJECTS_FOLDER_TITLE)
         self.setModal(True)
         self.resize(620, 120)
         self._build_ui()
@@ -34,14 +35,12 @@ class _DefaultFolderDialog(QDialog):
     def _build_ui(self):
         layout = QVBoxLayout(self)
 
-        info = QLabel(
-            "Defina a pasta padrao onde os novos projetos do Cadmus serao criados."
-        )
+        info = QLabel(STR.DEFAULT_PROJECTS_FOLDER_PROMPT)
         info.setWordWrap(True)
         layout.addWidget(info)
 
         self.selector = SelectorWidget(
-            title="Pasta",
+            title=STR.PROJECTS_FOLDER,
             mode=SelectorWidget.MODE_FOLDER,
             parent=self,
         )
@@ -62,7 +61,7 @@ class _ProjectNameDialog(QDialog):
     def __init__(self, suggested_name: str, parent=None):
         super().__init__(parent)
         self._suggested_name = suggested_name
-        self.setWindowTitle("Novo projeto")
+        self.setWindowTitle(STR.PROJECT_NAME_TITLE)
         self.setModal(True)
         self.resize(460, 110)
         self._build_ui()
@@ -70,14 +69,12 @@ class _ProjectNameDialog(QDialog):
     def _build_ui(self):
         layout = QVBoxLayout(self)
 
-        info = QLabel(
-            "Informe o nome do projeto. Se deixar em branco, sera usado o nome sugerido."
-        )
+        info = QLabel(STR.PROJECT_NAME_PROMPT)
         info.setWordWrap(True)
         layout.addWidget(info)
 
         row = QHBoxLayout()
-        row.addWidget(QLabel("Nome do projeto"))
+        row.addWidget(QLabel(STR.PROJECT_NAME_LABEL))
 
         self.name_input = QLineEdit()
         self.name_input.setPlaceholderText(self._suggested_name)
@@ -113,11 +110,8 @@ class CreateProjectPlugin:
         if not base_folder:
             should_define = QgisMessageUtil.confirm(
                 self.iface,
-                (
-                    "Nenhuma pasta padrao para projetos foi definida.\n\n"
-                    "Deseja definir uma pasta padrao agora?"
-                ),
-                title="Pasta padrao nao definida",
+                STR.PROJECTS_DEFAULT_FOLDER_MISSING,
+                title=STR.PROJECTS_DEFAULT_FOLDER_MISSING_TITLE,
             )
             if not should_define:
                 self.logger.info("Usuario cancelou definicao da pasta padrao")
@@ -135,7 +129,7 @@ class CreateProjectPlugin:
                 self.logger.error(f"Erro ao criar pasta padrao '{base_folder}': {e}")
                 QgisMessageUtil.modal_error(
                     self.iface,
-                    f"Nao foi possivel preparar a pasta padrao:\n{base_folder}\n\n{e}",
+                    f"{STR.PROJECT_DEFAULT_FOLDER_PREPARE_ERROR}\n{base_folder}\n\n{e}",
                 )
                 return
 
@@ -151,7 +145,7 @@ class CreateProjectPlugin:
                 )
                 QgisMessageUtil.modal_error(
                     self.iface,
-                    f"Nao foi possivel acessar a pasta padrao:\n{base_folder}\n\n{e}",
+                    f"{STR.PROJECT_DEFAULT_FOLDER_ACCESS_ERROR}\n{base_folder}\n\n{e}",
                 )
                 return
 
@@ -221,7 +215,7 @@ class CreateProjectPlugin:
             self.logger.warning(f"Pasta de projeto ja existe: {project_folder}")
             QgisMessageUtil.modal_warning(
                 self.iface,
-                f"A pasta do projeto ja existe:\n{project_folder}",
+                f"{STR.PROJECT_FOLDER_ALREADY_EXISTS}\n{project_folder}",
             )
             return
 
@@ -234,7 +228,7 @@ class CreateProjectPlugin:
             )
             QgisMessageUtil.modal_error(
                 self.iface,
-                f"Nao foi possivel criar a estrutura do projeto:\n{project_folder}\n\n{e}",
+                f"{STR.PROJECT_FOLDER_CREATE_ERROR}\n{project_folder}\n\n{e}",
             )
             return
 
@@ -245,9 +239,7 @@ class CreateProjectPlugin:
                 current_project.setFileName(str(project_file))
 
                 if not current_project.write(str(project_file)):
-                    raise RuntimeError(
-                        "O QGIS nao conseguiu salvar o projeto atual no novo destino."
-                    )
+                    raise RuntimeError(STR.CURRENT_PROJECT_SAVE_TO_NEW_DESTINATION_ERROR)
 
                 self.logger.info(
                     f"Projeto atual sem arquivo salvo em: {project_file}"
@@ -259,28 +251,28 @@ class CreateProjectPlugin:
                 new_project.setFileName(str(project_file))
 
                 if not new_project.write(str(project_file)):
-                    raise RuntimeError("O QGIS nao conseguiu gravar o novo arquivo .qgz.")
+                    raise RuntimeError(STR.NEW_PROJECT_FILE_WRITE_ERROR)
 
                 if not self._open_project_in_new_window(project_file):
-                    raise RuntimeError(
-                        "O projeto foi criado, mas nao foi possivel abrir outra janela do QGIS."
-                    )
+                    raise RuntimeError(STR.OPEN_NEW_QGIS_WINDOW_ERROR)
         except Exception as e:
             self.logger.error(f"Erro ao criar projeto QGIS '{project_file}': {e}")
             QgisMessageUtil.modal_error(
                 self.iface,
-                f"Nao foi possivel criar o projeto QGIS:\n{project_file}\n\n{e}",
+                f"{STR.PROJECT_FILE_CREATE_ERROR}\n{project_file}\n\n{e}",
             )
             return
 
         self.logger.info(f"Projeto criado com sucesso em: {project_folder}")
         QgisMessageUtil.modal_result_with_folder(
             self.iface,
-            title="Projeto criado",
+            title=STR.PROJECT_CREATED_TITLE,
             message=(
-                f"Projeto '{project_name}' criado com sucesso"
+                STR.PROJECT_CREATED_SUCCESS.format(project_name=project_name)
                 if not current_project_path
-                else f"Projeto '{project_name}' criado e aberto em outra janela"
+                else STR.PROJECT_CREATED_OPENED_NEW_WINDOW.format(
+                    project_name=project_name
+                )
             ),
             folder_path=str(project_folder),
             parent=self.iface.mainWindow(),

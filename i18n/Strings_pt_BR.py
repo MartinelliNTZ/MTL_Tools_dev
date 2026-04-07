@@ -377,6 +377,16 @@ class Strings_pt_BR:
         "a precisão dos campos vetoriais e o limiar de feições\n"
         "usado para processamento assíncrono."
     )
+    GENERAL = "Geral"
+    DEFAULT_CRS = "SRC padrao"
+    PROJECTS_FOLDER = "Pasta de projetos"
+    TOOLBAR_VISIBLE_CATEGORIES = "Toolbar - Categorias Visiveis"
+    VECTOR_CALCULATIONS_PLUGIN = "Plugin de Calculos Vetoriais"
+    CARTESIAN_SUFFIX = "Sulfixo Cartesiano"
+    ELLIPSOIDAL_SUFFIX = "Sulfixo Elipsoidal"
+    AREA_SUFFIXES_CANNOT_MATCH = (
+        "Os sulfixos cartesiano e elipsoidal nao podem ser iguais."
+    )
     ELLIPSOIDAL = "Elipsoidal"
     CARTESIAN = "Cartesiana"
     BOTH = "Ambos"
@@ -394,6 +404,48 @@ class Strings_pt_BR:
 
     # plugins/LoadFolderLayers.py
     LOAD_FOLDER_LAYERS_TITLE = "Carregar Pasta de Arquivos"
+    CREATE_PROJECT_TITLE = "Novo Projeto"
+    CREATE_PROJECT_TOOLTIP = (
+        "Cria uma nova estrutura de projeto em uma pasta dedicada.\n"
+        "Se ainda nao houver pasta padrao definida, solicita esse caminho,\n"
+        "depois cria a pasta do projeto, o arquivo .qgz\n"
+        "e as subpastas vectors e rasters."
+    )
+    DEFAULT_PROJECTS_FOLDER_TITLE = "Pasta padrao dos projetos"
+    DEFAULT_PROJECTS_FOLDER_PROMPT = (
+        "Defina a pasta padrao onde os novos projetos do Cadmus serao criados."
+    )
+    PROJECT_NAME_TITLE = "Novo projeto"
+    PROJECT_NAME_PROMPT = (
+        "Informe o nome do projeto. Se deixar em branco, sera usado o nome sugerido."
+    )
+    PROJECT_NAME_LABEL = "Nome do projeto"
+    PROJECTS_DEFAULT_FOLDER_MISSING = (
+        "Nenhuma pasta padrao para projetos foi definida.\n\n"
+        "Deseja definir uma pasta padrao agora?"
+    )
+    PROJECTS_DEFAULT_FOLDER_MISSING_TITLE = "Pasta padrao nao definida"
+    PROJECT_FOLDER_ALREADY_EXISTS = "A pasta do projeto ja existe:"
+    PROJECT_FOLDER_CREATE_ERROR = "Nao foi possivel criar a estrutura do projeto:"
+    PROJECT_FILE_CREATE_ERROR = "Nao foi possivel criar o projeto QGIS:"
+    PROJECT_DEFAULT_FOLDER_PREPARE_ERROR = (
+        "Nao foi possivel preparar a pasta padrao:"
+    )
+    PROJECT_DEFAULT_FOLDER_ACCESS_ERROR = (
+        "Nao foi possivel acessar a pasta padrao:"
+    )
+    CURRENT_PROJECT_SAVE_TO_NEW_DESTINATION_ERROR = (
+        "O QGIS nao conseguiu salvar o projeto atual no novo destino."
+    )
+    NEW_PROJECT_FILE_WRITE_ERROR = "O QGIS nao conseguiu gravar o novo arquivo .qgz."
+    OPEN_NEW_QGIS_WINDOW_ERROR = (
+        "O projeto foi criado, mas nao foi possivel abrir outra janela do QGIS."
+    )
+    PROJECT_CREATED_TITLE = "Projeto criado"
+    PROJECT_CREATED_SUCCESS = "Projeto '{project_name}' criado com sucesso"
+    PROJECT_CREATED_OPENED_NEW_WINDOW = (
+        "Projeto '{project_name}' criado e aberto em outra janela"
+    )
     LOAD_FOLDER_LAYERS_TOOLTIP = (
         "Carrega em lote arquivos vetoriais e raster de uma pasta\n"
         "e de suas subpastas para o projeto QGIS.\n"

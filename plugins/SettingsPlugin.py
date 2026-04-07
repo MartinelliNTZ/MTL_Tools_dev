@@ -82,7 +82,7 @@ class SettingsPlugin(BasePluginMTL):
         )
 
         crs_layout, self.crs_selector = WidgetFactory.create_crs_selector(
-            title="SRC padrao",
+            title=STR.DEFAULT_CRS,
             tool_key=ToolKey.SETTINGS,
             default_auth_id=self.prefer_System.get(
                 "default_crs_authid", self.DEFAULT_CRS_AUTHID
@@ -122,7 +122,7 @@ class SettingsPlugin(BasePluginMTL):
                 options_dict=MenuManager.toolbar_category_options(),
                 items_per_row=3,
                 checked_by_default=True,
-                title="Toolbar - Categorias Visiveis",
+                title=STR.TOOLBAR_VISIBLE_CATEGORIES,
                 separator_top=False,
                 separator_bottom=False,
             )
@@ -132,7 +132,7 @@ class SettingsPlugin(BasePluginMTL):
         geral_layout, self.geral_collapsable = (
             WidgetFactory.create_collapsible_parameters(
                 parent=self,
-                title="Geral",
+                title=STR.GENERAL,
                 expanded_by_default=True,
                 separator_top=False,
                 separator_bottom=False,
@@ -141,7 +141,7 @@ class SettingsPlugin(BasePluginMTL):
         self.geral_collapsable.add_content_layout(pref_button_layout)
 
         projects_layout, self.project_folder_selector = WidgetFactory.create_path_selector(
-            title="Pasta de projetos",
+            title=STR.PROJECTS_FOLDER,
             mode="folder",
             parent=self,
             separator_top=False,
@@ -157,7 +157,7 @@ class SettingsPlugin(BasePluginMTL):
         calc_layout_collapsible, self.calc_collapsable = (
             WidgetFactory.create_collapsible_parameters(
                 parent=self,
-                title="Plugin de Calculos Vetoriais",
+                title=STR.VECTOR_CALCULATIONS_PLUGIN,
                 expanded_by_default=False,
                 separator_top=False,
                 separator_bottom=False,
@@ -169,12 +169,12 @@ class SettingsPlugin(BasePluginMTL):
             WidgetFactory.create_input_fields_widget(
                 fields_dict={
                     "cartesian_suffix": {
-                        "title": "Sulfixo Cartesiano",
+                        "title": STR.CARTESIAN_SUFFIX,
                         "type": "text",
                         "default": "",
                     },
                     "ellipsoidal_suffix": {
-                        "title": "Sulfixo Elipsoidal",
+                        "title": STR.ELLIPSOIDAL_SUFFIX,
                         "type": "text",
                         "default": "_eli",
                     },
@@ -352,7 +352,7 @@ class SettingsPlugin(BasePluginMTL):
         if cartesian_suffix == ellipsoidal_suffix:
             QgisMessageUtil.modal_warning(
                 self.iface,
-                "Os sulfixos cartesiano e elipsoidal nao podem ser iguais.",
+                STR.AREA_SUFFIXES_CANNOT_MATCH,
             )
             self.logger.warning("Salvamento cancelado: sulfixos de area duplicados")
             return False
@@ -379,7 +379,7 @@ class SettingsPlugin(BasePluginMTL):
             self.iface,
             message=(
                 f"{STR.CALCULATION_METHOD_LABEL} {selected_method}. "
-                f"SRC padrao: {self.crs_selector.get_crs_authid()}. "
+                f"{STR.DEFAULT_CRS}: {self.crs_selector.get_crs_authid()}. "
                 f"{STR.SETTINGS_SAVED_MESSAGE}"
             ),
         )

@@ -125,12 +125,12 @@ class ToolRegistry:
         tools.append(load_folder)
 
         create_project = Tool(
-            name="Novo Projeto",
+            name=STR.CREATE_PROJECT_TITLE,
             icon=im.icon(im.LOAD_FOLDER_LAYER),
             category=self.FOLDER,
             tool_type=ToolTypeEnum.INSTANT,
             executor=self.run_create_project,
-            tooltip="Cria uma estrutura de projeto com pasta, arquivo .qgz, vectors e rasters.",
+            tooltip=STR.CREATE_PROJECT_TOOLTIP,
             order=15,
             show_in_toolbar=True,
         )
