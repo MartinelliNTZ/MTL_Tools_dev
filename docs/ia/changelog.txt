@@ -15,3 +15,6 @@
 [2.3.6.1] SettingsPlugin: Added "Pasta de projetos" path selector (mode=folder) with save/load from preferences (projects_folder key).
 2.3.6.1.1 2026/04/06
 [2.3.6.1.1] SettingsPlugin/WidgetFactory: Added an exclusive DatumSelectorWidget with descriptive metadata, integrated into SettingsPlugin and persisted via the default_datum preference.
+[2.3.8.2] Planejamento inicial da reimplementacao completa do DroneCoordinates: criado plano tecnico detalhado em docs/ia/PLANO_REIMPLEMENTACAO_DRONE_COORDINATES_V4.md com fases, riscos, contratos e criterios de aceite.
+[2.3.8.2.1] Criado docs/ia/todo.txt com backlog operacional por etapas (E01-E09), checklist incremental e rastreabilidade da execucao.
+[2.3.8.2.2] Consolidado no plano o escopo de refatoracao: PhotoMetadata como manager, absorcao de OBSOLETManager, nova UI com 3 grids de campos (REQUIRED/CUSTOM/MRK), filtros persistidos e integracao do Runner por preferencias.

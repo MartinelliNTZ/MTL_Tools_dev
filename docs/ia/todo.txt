@@ -1,0 +1,56 @@
+[x] E01 - Planejamento inicial e trilha de execucao
+    [x] Criar plano detalhado em docs/ia/PLANO_REIMPLEMENTACAO_DRONE_COORDINATES_V4.md
+    [x] Criar todo rastreavel por etapas
+    [x] Registrar changelog da etapa
+
+[ ] E02 - Padronizar classes novas de metadata (ExifUtil, XmpUtil, CustomPhotosFieldsUtil, MetadataFields)
+    [ ] Ajustar imports para padrao de pacote Cadmus
+    [ ] Integrar LogUtils e remover prints
+    [ ] Remover blocos de execucao direta de utilitarios
+    [ ] Validar carga dos modulos sem erro
+
+[ ] E03 - Consolidar modelo de campos (REQUIRED_FIELDS, CUSTOM_FIELDS, MRK_FIELDS)
+    [ ] Criar MRK_FIELDS em MetadataFields.py
+    [ ] Migrar dt_full, dt_date, dt_time e FileType para padrao novo
+    [ ] Definir nomes em ingles para numdovoo/nomedovoo/pasta1/pasta2
+    [ ] Garantir schema padrao (normalized/core/label/attribute/description)
+
+[ ] E04 - Refatorar PhotoMetadata como manager e absorver OBSOLETManager
+    [ ] Migrar logica de coleta para PhotoMetadata
+    [ ] Extrair metadata completa (sem filtro) de todas as fotos
+    [ ] Salvar dataset completo em JSON temporario
+    [ ] Implementar filtro final por lista de campos selecionados
+    [ ] Tornar OBSOLETManager obsoleto/delegado
+
+[ ] E05 - Evoluir CheckboxGridWidget e WidgetFactory com retrocompatibilidade
+    [ ] CheckboxGridWidget aceitar formato antigo e novo
+    [ ] Exibir tooltip com description dos metacampos
+    [ ] Adicionar get_checked_keys/get_unchecked_keys/get_state_map
+    [ ] Manter comportamento antigo para plugins existentes
+
+[ ] E06 - Atualizar UI do DroneCoordinates com 3 collapsibles
+    [ ] REQUIRED_FIELDS grid
+    [ ] CUSTOM_FIELDS grid
+    [ ] MRK_FIELDS grid
+    [ ] Salvar preferencias dos checks
+    [ ] Restaurar preferencias ao abrir plugin
+
+[ ] E07 - Integrar filtros selecionados ao pipeline (sem mudar steps)
+    [ ] Passar lista de campos selecionados no ExecutionContext
+    [ ] Ajustar PhotoMetadataTask para usar lista filtrada
+    [ ] Ajustar PhotoMetadataStep para aplicar apenas campos filtrados
+
+[ ] E08 - Integrar DroneCoordinatesRunner com preferencias
+    [ ] Runner ler preferencias de filtros de campos
+    [ ] Runner propagar filtros ao pipeline
+    [ ] Runner manter comportamento atual de output/style
+
+[ ] E09 - Validacao e hardening
+    [ ] Smoke test sintatico dos arquivos alterados
+    [ ] Validar fluxo dialog + runner
+    [ ] Validar JSON temporario + filtro final
+    [ ] Atualizar changelog por etapa finalizada
+
+Observacao operacional:
+- Sempre que uma etapa for concluida, marcar com [x] e atualizar docs/ia/changelog.txt.
+- Nao pular etapas de compatibilidade para evitar regressao nos outros plugins.
