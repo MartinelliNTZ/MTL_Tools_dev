@@ -18,3 +18,5 @@
 [2.3.6.1.8] CreateProjectPlugin: Fixed Google Satellite XYZ source URI by percent-encoding nested URL parameters (`x/y/z`) to prevent tile source parsing issues that caused empty basemap layers.
 2.3.6.1.9 2026/04/07
 [2.3.6.1.9] CreateProjectPlugin: Applied default project CRS from SYSTEM preferences (`default_crs_authid`) during project creation, with validation and fallback to `EPSG:4326` when missing or invalid.
+2.3.6.1.10 2026/04/07
+[2.3.6.1.10] CreateProjectPlugin/ProjectUtils: Switched basemap to Google Hybrid (XYZ), added conditional auto-load of `line.gpkg` only for scenarios 2 and 3, and introduced file-extent canvas centering utility in ProjectUtils for automatic focus on the reference line.

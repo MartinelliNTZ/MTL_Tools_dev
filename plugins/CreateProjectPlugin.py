@@ -12,12 +12,20 @@ from qgis.PyQt.QtWidgets import (
     QLineEdit,
     QVBoxLayout,
 )
-from qgis.core import QgsCoordinateReferenceSystem, QgsProject, QgsRasterLayer
+from qgis.core import (
+    QgsCoordinateReferenceSystem,
+    QgsProject,
+    QgsRasterLayer,
+    QgsRectangle,
+    QgsVectorLayer,
+)
 
 from ..core.config.LogUtils import LogUtils
 from ..i18n.TranslationManager import STR
 from ..resources.widgets.SelectorWidget import SelectorWidget
+from ..resources.OtherFilesManager import OtherFilesManager
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
+from ..utils.ProjectUtils import ProjectUtils
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.ToolKeys import ToolKey
 
@@ -97,11 +105,14 @@ class CreateProjectPlugin:
     GENERIC_PROJECT_PATTERN = re.compile(r"^NovoProjeto_(\d+)$")
     DEFAULT_CRS_AUTHID = "EPSG:4326"
     DEFAULT_CRS_PREF_KEY = "default_crs_authid"
-    GOOGLE_SATELLITE_LAYER_NAME = "Google Satellite"
-    GOOGLE_SATELLITE_URI = (
+    GOOGLE_HYBRID_LAYER_NAME = "Google Hybrid"
+    GOOGLE_HYBRID_URI = (
         "type=xyz&zmin=0&zmax=21&"
-        "url=https://mt1.google.com/vt/lyrs=s%26x=%7Bx%7D%26y=%7By%7D%26z=%7Bz%7D"
+        "url=https://mt1.google.com/vt/lyrs=y%26x=%7Bx%7D%26y=%7By%7D%26z=%7Bz%7D"
     )
+    SCENARIO_UNSAVED_WITH_CONTENT = 1
+    SCENARIO_SAVED_CURRENT_PROJECT = 2
+    SCENARIO_UNSAVED_EMPTY_PROJECT = 3
 
     def __init__(self, iface):
         self.iface = iface
@@ -198,38 +209,95 @@ class CreateProjectPlugin:
             return executable
         return ""
 
-    def _open_project_in_new_window(self, project_file: Path) -> bool:
+    def _open_project_in_new_window(
+        self, project_file: Path, focus_extent: QgsRectangle = None
+    ) -> bool:
         executable = self._get_qgis_executable()
         if not executable:
             self.logger.error("Executavel do QGIS nao encontrado para nova janela")
             return False
 
-        started = QProcess.startDetached(executable, [str(project_file)])
+        args = []
+        if (
+            focus_extent is not None
+            and hasattr(focus_extent, "isEmpty")
+            and not focus_extent.isEmpty()
+        ):
+            extent_str = (
+                f"{focus_extent.xMinimum()},{focus_extent.yMinimum()},"
+                f"{focus_extent.xMaximum()},{focus_extent.yMaximum()}"
+            )
+            args.extend(["--extent", extent_str])
+        args.append(str(project_file))
+
+        started = QProcess.startDetached(executable, args)
         if isinstance(started, tuple):
             started = started[0]
 
         self.logger.debug(
-            f"Abertura de nova janela para projeto '{project_file}': {started}"
+            f"Abertura de nova janela para projeto '{project_file}' "
+            f"com args {args}: {started}"
         )
         return bool(started)
 
     def _add_google_basemap(self, project: QgsProject):
         existing_names = [layer.name() for layer in project.mapLayers().values()]
-        if self.GOOGLE_SATELLITE_LAYER_NAME in existing_names:
+        if self.GOOGLE_HYBRID_LAYER_NAME in existing_names:
             self.logger.debug("Camada base Google ja existe no projeto; ignorando")
             return
 
         layer = QgsRasterLayer(
-            self.GOOGLE_SATELLITE_URI,
-            self.GOOGLE_SATELLITE_LAYER_NAME,
+            self.GOOGLE_HYBRID_URI,
+            self.GOOGLE_HYBRID_LAYER_NAME,
             "wms",
         )
         if not layer.isValid():
-            self.logger.warning("Falha ao criar camada base Google (XYZ)")
+            self.logger.warning("Falha ao criar camada base Google Hybrid (XYZ)")
             return
 
         project.addMapLayer(layer, True)
-        self.logger.info("Camada base Google adicionada ao projeto")
+        self.logger.info("Camada base Google Hybrid adicionada ao projeto")
+
+    def _detect_creation_scenario(self, current_project: QgsProject) -> int:
+        if current_project.fileName():
+            return self.SCENARIO_SAVED_CURRENT_PROJECT
+        if current_project.mapLayers():
+            return self.SCENARIO_UNSAVED_WITH_CONTENT
+        return self.SCENARIO_UNSAVED_EMPTY_PROJECT
+
+    def _should_load_line_for_scenario(self, scenario: int) -> bool:
+        return scenario in (
+            self.SCENARIO_SAVED_CURRENT_PROJECT,
+            self.SCENARIO_UNSAVED_EMPTY_PROJECT,
+        )
+
+    def _add_line_reference_layer(self, project: QgsProject):
+        line_path = OtherFilesManager.vector_path(OtherFilesManager.LINE_VECTOR)
+        if not os.path.exists(line_path):
+            self.logger.warning(
+                f"Arquivo de referencia nao encontrado para carga automatica: {line_path}"
+            )
+            return None
+
+        normalized_target = ProjectUtils.normalize_layer_source(line_path)
+        for layer in project.mapLayers().values():
+            source_normalized = ProjectUtils.normalize_layer_source(layer.source())
+            if source_normalized == normalized_target:
+                self.logger.debug(
+                    f"Camada de referencia ja carregada no projeto: {line_path}"
+                )
+                return layer if isinstance(layer, QgsVectorLayer) else None
+
+        line_layer = QgsVectorLayer(line_path, Path(line_path).stem, "ogr")
+        if not line_layer.isValid():
+            self.logger.warning(
+                f"Falha ao carregar camada de referencia line.gpkg: {line_path}"
+            )
+            return None
+
+        project.addMapLayer(line_layer, True)
+        self.logger.info(f"Camada de referencia carregada: {line_path}")
+        return line_layer
 
     def _resolve_valid_crs(self, authid: str) -> QgsCoordinateReferenceSystem:
         crs = QgsCoordinateReferenceSystem(authid or self.DEFAULT_CRS_AUTHID)
@@ -256,6 +324,8 @@ class CreateProjectPlugin:
         rasters_folder = project_folder / "rasters"
         current_project = QgsProject.instance()
         current_project_path = current_project.fileName()
+        scenario = self._detect_creation_scenario(current_project)
+        should_load_line = self._should_load_line_for_scenario(scenario)
 
         if project_folder.exists():
             self.logger.warning(f"Pasta de projeto ja existe: {project_folder}")
@@ -282,6 +352,19 @@ class CreateProjectPlugin:
             if not current_project_path:
                 self._apply_project_crs(current_project, default_crs_authid)
                 self._add_google_basemap(current_project)
+                line_layer = None
+                if should_load_line:
+                    line_layer = self._add_line_reference_layer(current_project)
+                    if line_layer:
+                        ProjectUtils.center_canvas_on_file_extent(
+                            iface=self.iface,
+                            file_path=OtherFilesManager.vector_path(
+                                OtherFilesManager.LINE_VECTOR
+                            ),
+                            project=current_project,
+                            layer_name=line_layer.name(),
+                            tool_key=self.TOOL_KEY,
+                        )
                 if hasattr(current_project, "setPresetHomePath"):
                     current_project.setPresetHomePath(str(project_folder))
                 current_project.setFileName(str(project_file))
@@ -296,6 +379,9 @@ class CreateProjectPlugin:
                 new_project = QgsProject()
                 self._apply_project_crs(new_project, default_crs_authid)
                 self._add_google_basemap(new_project)
+                line_layer = None
+                if should_load_line:
+                    line_layer = self._add_line_reference_layer(new_project)
                 if hasattr(new_project, "setPresetHomePath"):
                     new_project.setPresetHomePath(str(project_folder))
                 new_project.setFileName(str(project_file))
@@ -303,7 +389,13 @@ class CreateProjectPlugin:
                 if not new_project.write(str(project_file)):
                     raise RuntimeError(STR.NEW_PROJECT_FILE_WRITE_ERROR)
 
-                if not self._open_project_in_new_window(project_file):
+                line_extent = None
+                if line_layer and line_layer.isValid():
+                    layer_extent = line_layer.extent()
+                    if not layer_extent.isEmpty():
+                        line_extent = layer_extent
+
+                if not self._open_project_in_new_window(project_file, line_extent):
                     raise RuntimeError(STR.OPEN_NEW_QGIS_WINDOW_ERROR)
         except Exception as e:
             self.logger.error(f"Erro ao criar projeto QGIS '{project_file}': {e}")

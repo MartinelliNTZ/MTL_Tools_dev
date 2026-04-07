@@ -339,3 +339,66 @@ class ProjectUtils:
             logger = LogUtils(tool="project_utils", class_name="ProjectUtils")
             logger.error(f"Erro ao inserir layer no grupo: {e}")
             return None
+
+    @staticmethod
+    def center_canvas_on_file_extent(
+        iface,
+        file_path: str,
+        project: Optional[QgsProject] = None,
+        layer_name: str = "",
+        tool_key: str = "untraceable",
+    ) -> bool:
+        """Centraliza o map canvas na extensao da camada vinculada ao arquivo informado."""
+        logger = LogUtils(tool=tool_key, class_name="ProjectUtils")
+        try:
+            if iface is None:
+                logger.warning("Iface ausente ao tentar centralizar canvas por arquivo")
+                return False
+
+            if not file_path:
+                logger.warning("file_path vazio ao tentar centralizar canvas")
+                return False
+
+            project = project or QgsProject.instance()
+            target = ProjectUtils.normalize_layer_source(file_path)
+
+            target_layer = None
+            for layer in project.mapLayers().values():
+                source = ProjectUtils.normalize_layer_source(layer.source())
+                if source != target:
+                    continue
+                if layer_name and layer.name() != layer_name:
+                    continue
+                target_layer = layer
+                break
+
+            if target_layer is None:
+                logger.warning(
+                    f"Nenhuma camada correspondente ao arquivo foi encontrada: {file_path}"
+                )
+                return False
+
+            extent = target_layer.extent()
+            if extent is None or extent.isEmpty():
+                logger.warning(
+                    f"Extent vazio para camada associada ao arquivo: {file_path}"
+                )
+                return False
+
+            canvas = iface.mapCanvas() if hasattr(iface, "mapCanvas") else None
+            if canvas is None:
+                logger.warning("Map canvas indisponivel para centralizacao")
+                return False
+
+            canvas.setExtent(extent)
+            canvas.refresh()
+            logger.debug(
+                f"Canvas centralizado no extent do arquivo: {file_path} "
+                f"({extent.xMinimum()}, {extent.yMinimum()}, "
+                f"{extent.xMaximum()}, {extent.yMaximum()})"
+            )
+            return True
+
+        except Exception as e:
+            logger.error(f"Erro ao centralizar canvas na extensao do arquivo: {e}")
+            return False
