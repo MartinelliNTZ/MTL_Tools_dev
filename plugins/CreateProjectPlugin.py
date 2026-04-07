@@ -24,6 +24,7 @@ class CreateProjectPlugin:
     GENERIC_PROJECT_PATTERN = re.compile(r"^NovoProjeto_(\d+)$")
     DEFAULT_CRS_AUTHID = "EPSG:4326"
     DEFAULT_CRS_PREF_KEY = "default_crs_authid"
+    DEFAULT_GOOGLE_BASEMAP_STYLE = "hybrid"
     SCENARIO_UNSAVED_WITH_CONTENT = 1
     SCENARIO_SAVED_CURRENT_PROJECT = 2
     SCENARIO_UNSAVED_EMPTY_PROJECT = 3
@@ -214,9 +215,13 @@ class CreateProjectPlugin:
             return
 
         try:
-            if not ExplorerUtils.ensure_folder_exists(str(vectors_folder), self.TOOL_KEY):
+            if not ExplorerUtils.ensure_folder_exists(
+                str(vectors_folder), self.TOOL_KEY
+            ):
                 raise RuntimeError("Falha ao criar pasta vectors")
-            if not ExplorerUtils.ensure_folder_exists(str(rasters_folder), self.TOOL_KEY):
+            if not ExplorerUtils.ensure_folder_exists(
+                str(rasters_folder), self.TOOL_KEY
+            ):
                 raise RuntimeError("Falha ao criar pasta rasters")
         except Exception as e:
             self.logger.error(
@@ -231,8 +236,10 @@ class CreateProjectPlugin:
         try:
             if not current_project_path:
                 self._apply_project_crs(current_project, default_crs_authid)
-                RasterLayerSource().add_google_hybrid_basemap(
-                    current_project, external_tool_key=self.TOOL_KEY
+                RasterLayerSource().add_google_basemap(
+                    current_project,
+                    basemap_style=self.DEFAULT_GOOGLE_BASEMAP_STYLE,
+                    external_tool_key=self.TOOL_KEY,
                 )
                 line_layer = None
                 line_path_in_project = ""
@@ -254,23 +261,23 @@ class CreateProjectPlugin:
                 ProjectUtils.set_project_file_name(current_project, str(project_file))
 
                 if not ProjectUtils.write_project(current_project, str(project_file)):
-                    raise RuntimeError(STR.CURRENT_PROJECT_SAVE_TO_NEW_DESTINATION_ERROR)
+                    raise RuntimeError(
+                        STR.CURRENT_PROJECT_SAVE_TO_NEW_DESTINATION_ERROR
+                    )
 
-                self.logger.info(
-                    f"Projeto atual sem arquivo salvo em: {project_file}"
-                )
+                self.logger.info(f"Projeto atual sem arquivo salvo em: {project_file}")
             else:
                 new_project = ProjectUtils.create_project_instance()
                 self._apply_project_crs(new_project, default_crs_authid)
-                RasterLayerSource().add_google_hybrid_basemap(
-                    new_project, external_tool_key=self.TOOL_KEY
+                RasterLayerSource().add_google_basemap(
+                    new_project,
+                    basemap_style=self.DEFAULT_GOOGLE_BASEMAP_STYLE,
+                    external_tool_key=self.TOOL_KEY,
                 )
                 line_layer = None
                 if should_load_line:
-                    line_layer, _ = (
-                        self._copy_and_load_line_reference_layer(
-                            new_project, vectors_folder
-                        )
+                    line_layer, _ = self._copy_and_load_line_reference_layer(
+                        new_project, vectors_folder
                     )
                 ProjectUtils.set_project_home_path(new_project, str(project_folder))
                 ProjectUtils.set_project_file_name(new_project, str(project_file))

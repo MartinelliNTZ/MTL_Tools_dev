@@ -29,11 +29,12 @@ class RasterLayerSource:
     - Calcular estatÃ­sticas (use RasterLayerMetrics)
     - Alterar visualizaÃ§Ã£o (use RasterLayerRendering)
     """
-    GOOGLE_HYBRID_LAYER_NAME = "Google Hybrid"
-    GOOGLE_HYBRID_URI = (
-        "type=xyz&zmin=0&zmax=21&"
-        "url=https://mt1.google.com/vt/lyrs=y%26x=%7Bx%7D%26y=%7By%7D%26z=%7Bz%7D"
-    )
+
+    GOOGLE_BASEMAP_VARIANTS = {
+        "hybrid": {"lyrs": "y", "label": "Google Hybrid"},
+        "satellite": {"lyrs": "s", "label": "Google Satellite"},
+        "road": {"lyrs": "m", "label": "Google Road"},
+    }
 
     def load_raster_from_file(self, file_path, external_tool_key="untraceable"):
         """Carrega um raster de um arquivo GeoTIFF, IMG, ou outro formato suportado."""
@@ -82,35 +83,57 @@ class RasterLayerSource:
             logger.error(f"Erro ao carregar raster remoto: {e}")
             return None
 
-    def add_google_hybrid_basemap(
+    def _build_google_xyz_uri(self, basemap_style: str) -> str:
+        style_key = (basemap_style or "hybrid").strip().lower()
+        variant = self.GOOGLE_BASEMAP_VARIANTS.get(
+            style_key, self.GOOGLE_BASEMAP_VARIANTS["hybrid"]
+        )
+        return (
+            "type=xyz&zmin=0&zmax=21&"
+            f"url=https://mt1.google.com/vt/lyrs={variant['lyrs']}"
+            "%26x=%7Bx%7D%26y=%7By%7D%26z=%7Bz%7D"
+        )
+
+    def add_google_basemap(
         self,
         project,
+        basemap_style: str = "hybrid",
         external_tool_key="untraceable",
-        layer_name: str = GOOGLE_HYBRID_LAYER_NAME,
+        layer_name: str = None,
     ):
-        """Adiciona camada base Google Hybrid em projeto, evitando duplicidades."""
+        """Adiciona camada base Google (hybrid/satellite/road) evitando duplicidade."""
         logger = LogUtils(tool=external_tool_key, class_name="RasterLayerSource")
         try:
+            style_key = (basemap_style or "hybrid").strip().lower()
+            variant = self.GOOGLE_BASEMAP_VARIANTS.get(
+                style_key, self.GOOGLE_BASEMAP_VARIANTS["hybrid"]
+            )
+            resolved_name = layer_name or variant["label"]
+
             existing_names = ProjectUtils.project_layer_names(project)
-            if layer_name in existing_names:
-                logger.debug("Camada base Google Hybrid ja existe no projeto")
+            if resolved_name in existing_names:
+                logger.debug(
+                    f"Camada base Google ja existe no projeto: {resolved_name}"
+                )
                 return None
 
             layer = self.load_raster_from_url(
-                self.GOOGLE_HYBRID_URI,
+                self._build_google_xyz_uri(style_key),
                 external_tool_key=external_tool_key,
-                layer_name=layer_name,
+                layer_name=resolved_name,
                 provider_key="wms",
             )
             if not layer or not layer.isValid():
-                logger.warning("Falha ao criar camada base Google Hybrid (XYZ)")
+                logger.warning(
+                    f"Falha ao criar camada base Google ({style_key}) via XYZ"
+                )
                 return None
 
             ProjectUtils.add_layer(layer, add_to_root=True, project=project)
-            logger.info("Camada base Google Hybrid adicionada ao projeto")
+            logger.info(f"Camada base Google adicionada ao projeto: {resolved_name}")
             return layer
         except Exception as e:
-            logger.error(f"Erro ao adicionar basemap Google Hybrid: {e}")
+            logger.error(f"Erro ao adicionar basemap Google: {e}")
             return None
 
     def create_empty_raster(
@@ -164,4 +187,3 @@ class RasterLayerSource:
     ):
         """Exporta metadados do raster para arquivo de documentaÃ§Ã£o."""
         pass
-
