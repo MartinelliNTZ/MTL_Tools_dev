@@ -24,7 +24,7 @@ class RasterDifferenceStatiscs(BaseProcessingAlgorithm):
     ALGORITHM_NAME = "raster_difference_statistics"
     ALGORITHM_DISPLAY_NAME = STR.RASTER_DIFFERENCE_STATISTICS_TITLE
     ALGORITHM_GROUP = BaseProcessingAlgorithm.GROUP_RASTER
-    ICON = "cadmus_icon.ico"
+    ICON = "raster_diference_statistics.ico"
     logger = LogUtils(
         tool="raster_diff_task", class_name="RasterDiffTask", level="DEBUG"
     )

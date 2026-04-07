@@ -33,6 +33,7 @@ class ToolKey:
     ELEVATION_ANALISYS = "elevation_analisys"
     RASTER_MASS_CLIPPER = "raster_mass_clipper"
     GEOMETRY_LINE_FROM_POINTS = "geometry_line_from_points"
+    RASTER_DIFERENCE_STATISTICS = "raster_diference_statistics"
 
     # Cores por tool_key (toolbar-first, semantica)
     TOOL_KEY_COLORS = {
