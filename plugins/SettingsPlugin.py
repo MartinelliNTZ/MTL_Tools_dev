@@ -26,7 +26,7 @@ class SettingsPlugin(BasePluginMTL):
         STR.CARTESIAN,
         STR.BOTH,
     ]
-    DEFAULT_CRS_AUTHID = "EPSG:4674"
+    DEFAULT_CRS_AUTHID = "EPSG:4326"
     AUTO_SAVE_PREFS_ON_CLOSE = False
     prefer_System = {}
     prefer_VectorFields = {}

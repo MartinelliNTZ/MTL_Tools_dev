@@ -124,6 +124,18 @@ class ToolRegistry:
         )
         tools.append(load_folder)
 
+        create_project = Tool(
+            name="Novo Projeto",
+            icon=im.icon(im.LOAD_FOLDER_LAYER),
+            category=self.FOLDER,
+            tool_type=ToolTypeEnum.INSTANT,
+            executor=self.run_create_project,
+            tooltip="Cria uma estrutura de projeto com pasta, arquivo .qgz, vectors e rasters.",
+            order=15,
+            show_in_toolbar=True,
+        )
+        tools.append(create_project)
+
         vector_to_svg = Tool(
             name=STR.VECTOR_TO_SVG_TITLE,
             icon=im.icon(im.CADMUS_ICON),
@@ -498,6 +510,22 @@ class ToolRegistry:
             self.logger.error(f"Erro ao executar Carregar pasta de arquivos: {str(e)}")
             QgisMessageUtil.bar_critical(
                 self.iface, f"Erro no plugin Carregar pasta:\n{str(e)}"
+            )
+
+    # =====================================================
+    # EXECUTAR: Novo Projeto
+    # =====================================================
+    def run_create_project(self):
+        try:
+            from ...plugins.CreateProjectPlugin import run
+
+            self.logger.info("Iniciando plugin: Novo Projeto")
+            self.create_project_plugin = run(self.iface)
+            self.logger.info("Plugin Novo Projeto executado com sucesso")
+        except Exception as e:
+            self.logger.error(f"Erro ao executar Novo Projeto: {str(e)}")
+            QgisMessageUtil.bar_critical(
+                self.iface, f"Erro no plugin Novo Projeto:\n{str(e)}"
             )
 
     # =====================================================

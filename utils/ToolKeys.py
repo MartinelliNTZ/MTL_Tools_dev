@@ -21,6 +21,7 @@ class ToolKey:
     VECTOR_FIELDS = "vector_fields"
     ABOUT_DIALOG = "about_dialog"
     VECTOR_TO_SVG = "vector_to_svg"
+    CREATE_PROJECT = "create_project"
 
     # model3 / panel tool
     # processing/
@@ -50,6 +51,7 @@ class ToolKey:
         SETTINGS: "#95A5A6",  # cinza -> configuracoes / sistema
         VECTOR_FIELDS: "#C39BD3",  # purpura -> calculos vetoriais
         VECTOR_TO_SVG: "#7FB3D5",  # azul suave -> exportacao vetorial
+        CREATE_PROJECT: "#73C6B6",  # verde agua -> criacao de projeto
         # === Processing / analises ===
         ATTRIBUTE_STATISTICS: "#F7DC6F",  # amarelo -> estatistica
         DIFFERENCE_FIELDS: "#BB8FCE",  # roxo -> comparacao
