@@ -12,7 +12,7 @@ from qgis.PyQt.QtWidgets import (
     QLineEdit,
     QVBoxLayout,
 )
-from qgis.core import QgsProject
+from qgis.core import QgsProject, QgsRasterLayer
 
 from ..core.config.LogUtils import LogUtils
 from ..i18n.TranslationManager import STR
@@ -95,6 +95,11 @@ class CreateProjectPlugin:
     PROJECTS_FOLDER_PREF_KEY = "projects_folder"
     TOOL_KEY = ToolKey.CREATE_PROJECT
     GENERIC_PROJECT_PATTERN = re.compile(r"^NovoProjeto_(\d+)$")
+    GOOGLE_SATELLITE_LAYER_NAME = "Google Satellite"
+    GOOGLE_SATELLITE_URI = (
+        "type=xyz&zmin=0&zmax=21&"
+        "url=https://mt1.google.com/vt/lyrs=s%26x=%7Bx%7D%26y=%7By%7D%26z=%7Bz%7D"
+    )
 
     def __init__(self, iface):
         self.iface = iface
@@ -203,6 +208,24 @@ class CreateProjectPlugin:
         )
         return bool(started)
 
+    def _add_google_basemap(self, project: QgsProject):
+        existing_names = [layer.name() for layer in project.mapLayers().values()]
+        if self.GOOGLE_SATELLITE_LAYER_NAME in existing_names:
+            self.logger.debug("Camada base Google ja existe no projeto; ignorando")
+            return
+
+        layer = QgsRasterLayer(
+            self.GOOGLE_SATELLITE_URI,
+            self.GOOGLE_SATELLITE_LAYER_NAME,
+            "wms",
+        )
+        if not layer.isValid():
+            self.logger.warning("Falha ao criar camada base Google (XYZ)")
+            return
+
+        project.addMapLayer(layer, True)
+        self.logger.info("Camada base Google adicionada ao projeto")
+
     def _create_project_structure(self, base_folder: str, project_name: str):
         project_folder = Path(base_folder) / project_name
         project_file = project_folder / f"{project_name}.qgz"
@@ -234,6 +257,7 @@ class CreateProjectPlugin:
 
         try:
             if not current_project_path:
+                self._add_google_basemap(current_project)
                 if hasattr(current_project, "setPresetHomePath"):
                     current_project.setPresetHomePath(str(project_folder))
                 current_project.setFileName(str(project_file))
@@ -246,6 +270,7 @@ class CreateProjectPlugin:
                 )
             else:
                 new_project = QgsProject()
+                self._add_google_basemap(new_project)
                 if hasattr(new_project, "setPresetHomePath"):
                     new_project.setPresetHomePath(str(project_folder))
                 new_project.setFileName(str(project_file))

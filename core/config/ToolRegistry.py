@@ -63,7 +63,7 @@ class ToolRegistry:
             icon=im.icon(im.RESTART_QGIS),
             category=self.SYSTEM,
             tool_type=ToolTypeEnum.INSTANT,
-            main_action=True,
+            #main_action=True,
             executor=self.run_restart_qgis,
             tooltip=STR.RESTART_QGIS_TOOLTIP,
             order=10,
@@ -88,6 +88,7 @@ class ToolRegistry:
             icon=im.icon(im.SETTINGS),
             category=self.SYSTEM,
             tool_type=ToolTypeEnum.DIALOG,
+            main_action=True,
             executor=self.run_settings,
             tooltip=STR.SETTINGS_TOOLTIP,
             order=30,
@@ -116,7 +117,6 @@ class ToolRegistry:
             icon=im.icon(im.LOAD_FOLDER_LAYER),
             category=self.FOLDER,
             tool_type=ToolTypeEnum.DIALOG,
-            main_action=True,
             executor=self.run_load_folder,
             tooltip=STR.LOAD_FOLDER_LAYERS_TOOLTIP,
             order=10,
@@ -126,9 +126,10 @@ class ToolRegistry:
 
         create_project = Tool(
             name=STR.CREATE_PROJECT_TITLE,
-            icon=im.icon(im.LOAD_FOLDER_LAYER),
+            icon=im.icon(im.CREATE_PROJECT),
             category=self.FOLDER,
             tool_type=ToolTypeEnum.INSTANT,
+            main_action=True,
             executor=self.run_create_project,
             tooltip=STR.CREATE_PROJECT_TOOLTIP,
             order=15,
@@ -138,7 +139,7 @@ class ToolRegistry:
 
         vector_to_svg = Tool(
             name=STR.VECTOR_TO_SVG_TITLE,
-            icon=im.icon(im.CADMUS_ICON),
+            icon=im.icon(im.VECTOR_TO_SVG),
             category=self.FOLDER,
             tool_type=ToolTypeEnum.DIALOG,
             executor=self.run_vector_to_svg,

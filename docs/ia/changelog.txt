@@ -12,3 +12,7 @@
 [2.3.6.1.5] ToolRegistry/SettingsPlugin: Replaced local hard-coded UI strings with TranslationManager STR keys and added the required entries only in Strings_pt_BR.
 2.3.6.1.6 2026/04/06
 [2.3.6.1.6] SettingsPlugin/CreateProjectPlugin: Removed the duplicate default CRS label string by reusing DEFAULT_CRS directly and migrated CreateProjectPlugin user-facing texts to TranslationManager keys added only in Strings_pt_BR.
+2.3.6.1.7 2026/04/07
+[2.3.6.1.7] CreateProjectPlugin: Added automatic Google Satellite XYZ basemap insertion in newly created projects (both unsaved current project flow and new-window flow), with safe fallback when tile layer creation is invalid.
+2.3.6.1.8 2026/04/07
+[2.3.6.1.8] CreateProjectPlugin: Fixed Google Satellite XYZ source URI by percent-encoding nested URL parameters (`x/y/z`) to prevent tile source parsing issues that caused empty basemap layers.

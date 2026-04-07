@@ -32,7 +32,7 @@ class RasterMassSampler(BaseProcessingAlgorithm):
     ALGORITHM_NAME = "raster_mass_sampler"
     ALGORITHM_DISPLAY_NAME = STR.RASTER_MASS_SAMPLER_TITLE
     ALGORITHM_GROUP = BaseProcessingAlgorithm.GROUP_RASTER
-    ICON = "raster_mass.ico"
+    ICON = "raster_mass_sampler.ico"
     INSTRUCTIONS_FILE = "raster_mass_sampler.html"
 
     INPUT_POINTS = "INPUT_POINTS"

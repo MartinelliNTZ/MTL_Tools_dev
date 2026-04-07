@@ -37,12 +37,14 @@ class IconManager:
     DRONE_COORDINATES = "drone_cordinates.ico"
     VECTOR_MULTPART = "vector_multpart.ico"
     COPY_ATTRIBUTES = "copy_attributes.ico"
+    CREATE_PROJECT = "create_project.ico"
+    VECTOR_TO_SVG = "vector_to_svg.ico"
 
     # processing
     ATTRIBUTE_STATS = "attribute_stats.ico"
     FIELD_DIFFERENCE = "field_diference.ico"
     GEOMETRY_LINE_DIFFERENCE = "line_difference.ico"
-    RASTER_MASS_SAMPLER = "raster_mass.ico"
+    RASTER_MASS_SAMPLER = "raster_mass_sampler.ico"
     RASTER_MASS_CLIPPER = "raster_mass_clipper.ico"
 
     @classmethod
