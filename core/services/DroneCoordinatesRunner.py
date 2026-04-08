@@ -13,6 +13,7 @@ from ...utils.vector.VectorLayerGeometry import VectorLayerGeometry
 from ...utils.vector.VectorLayerSource import VectorLayerSource
 from ...utils.Preferences import load_tool_prefs
 from ...utils.mrk.PhotoMetadata import PhotoMetadata
+from ...utils.mrk.MetadataFields import MetadataFields
 
 
 class DroneCoordinatesRunner:
@@ -72,9 +73,18 @@ class DroneCoordinatesRunner:
         # Carregar preferências para configurar o pipeline automaticamente
         prefs = load_tool_prefs(self.tool_key)
         apply_photos = prefs.get("photos", False)
-        selected_required_fields = prefs.get("required_fields_selected", [])
-        selected_custom_fields = prefs.get("custom_fields_selected", [])
-        selected_mrk_fields = prefs.get("mrk_fields_selected", [])
+        selected_required_fields = MetadataFields.normalize_selected_keys(
+            prefs.get("required_fields_selected", []),
+            allowed_keys=MetadataFields.required_keys(),
+        )
+        selected_custom_fields = MetadataFields.normalize_selected_keys(
+            prefs.get("custom_fields_selected", []),
+            allowed_keys=MetadataFields.custom_keys(),
+        )
+        selected_mrk_fields = MetadataFields.normalize_selected_keys(
+            prefs.get("mrk_fields_selected", []),
+            allowed_keys=MetadataFields.mrk_keys(),
+        )
         extra_fields = None
         base_name = os.path.splitext(os.path.basename(file_path))[0]
         context = ExecutionContext()
@@ -142,14 +152,7 @@ class DroneCoordinatesRunner:
             points,
             name=track_layer_name,
             group_by_fields=["mrk_path", "mrk_file"],
-            attribute_fields=[
-                "date_name",
-                "folder",
-                "mrk_file",
-                "mrk_path",
-                "flight_number",
-                "flight_name",
-            ],
+            attribute_fields=MetadataFields.default_track_attribute_keys(),
         )
 
         track_layer = None

@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from typing import Dict, Iterable, List, Optional
+
 from ...core.model.Field import Field
+from ..adapter.StringAdapter import StringAdapter
 
 
 class MetadataFields:
@@ -943,7 +946,7 @@ class MetadataFields:
             normalized="MRK:folder_level1",
             core="mrk",
             label="Folder Level 1",
-            attribute="FolderLevel1",
+            attribute="Folder1",
             description="Primeiro nivel de pasta no caminho do MRK. [FolderLevel1]",
             level=5,
         ),
@@ -951,9 +954,127 @@ class MetadataFields:
             normalized="MRK:folder_level2",
             core="mrk",
             label="Folder Level 2",
-            attribute="FolderLevel2",
+            attribute="Folder2",
             description="Segundo nivel de pasta no caminho do MRK. [FolderLevel2]",
             level=5,
         ),
     }
+
+    @classmethod
+    def all_fields(cls) -> Dict[str, Field]:
+        fields: Dict[str, Field] = {}
+        fields.update(cls.REQUIRED_FIELDS)
+        fields.update(cls.CUSTOM_FIELDS)
+        fields.update(cls.MRK_FIELDS)
+        return fields
+
+    @classmethod
+    def required_keys(cls) -> List[str]:
+        return list(cls.REQUIRED_FIELDS.keys())
+
+    @classmethod
+    def custom_keys(cls) -> List[str]:
+        return list(cls.CUSTOM_FIELDS.keys())
+
+    @classmethod
+    def mrk_keys(cls) -> List[str]:
+        return list(cls.MRK_FIELDS.keys())
+
+    @classmethod
+    def key_to_attribute_map(cls) -> Dict[str, str]:
+        return {key: field.attribute for key, field in cls.all_fields().items()}
+
+    @classmethod
+    def attribute_to_key_map(cls) -> Dict[str, str]:
+        return {field.attribute: key for key, field in cls.all_fields().items()}
+
+    @classmethod
+    def get_field(cls, key: str) -> Optional[Field]:
+        return cls.all_fields().get(key)
+
+    @classmethod
+    def get_attribute(cls, key: str, default: Optional[str] = None) -> Optional[str]:
+        field = cls.get_field(key)
+        if field is None:
+            return default
+        return field.attribute
+
+    @classmethod
+    def resolve_key(cls, key_or_attribute: str) -> str:
+        if not key_or_attribute:
+            return key_or_attribute
+
+        if key_or_attribute in cls.all_fields():
+            return key_or_attribute
+
+        return cls.attribute_to_key_map().get(key_or_attribute, key_or_attribute)
+
+    @classmethod
+    def resolve_output_name(cls, key_or_attribute: str) -> str:
+        if not key_or_attribute:
+            return key_or_attribute
+
+        if key_or_attribute in cls.all_fields():
+            return cls.all_fields()[key_or_attribute].attribute
+
+        if key_or_attribute in cls.attribute_to_key_map():
+            return key_or_attribute
+
+        return key_or_attribute
+
+    @classmethod
+    def resolve_output_names(cls, names: Iterable[str]) -> List[str]:
+        resolved = [cls.resolve_output_name(name) for name in (names or [])]
+        return StringAdapter.unique_preserve_order(resolved)
+
+    @classmethod
+    def normalize_selected_keys(
+        cls,
+        names: Iterable[str],
+        *,
+        allowed_keys: Optional[Iterable[str]] = None,
+    ) -> List[str]:
+        normalized = [cls.resolve_key(name) for name in (names or [])]
+        normalized = StringAdapter.unique_preserve_order(normalized)
+        if allowed_keys is None:
+            return StringAdapter.filter_known_keys(normalized, cls.all_fields())
+
+        allowed_set = set(allowed_keys)
+        return [name for name in normalized if name in allowed_set]
+
+    @classmethod
+    def normalize_record_to_keys(cls, record: Dict[str, object]) -> Dict[str, object]:
+        """
+        Converte um registro com nomes de atributos de camada para chaves internas de metadata.
+        Campos nao catalogados sao mantidos inalterados.
+        """
+        normalized = {}
+        for key, value in (record or {}).items():
+            normalized[cls.resolve_key(key)] = value
+        return normalized
+
+    @classmethod
+    def map_record_to_output_attributes(
+        cls,
+        record: Dict[str, object],
+        *,
+        exclude_keys: Optional[Iterable[str]] = None,
+    ) -> Dict[str, object]:
+        """
+        Converte um registro baseado em chaves internas para nomes de atributos finais.
+        """
+        excluded = set(exclude_keys or [])
+        mapped = {}
+        for key, value in (record or {}).items():
+            if key in excluded:
+                continue
+            mapped[cls.resolve_output_name(key)] = value
+        return mapped
+
+    @classmethod
+    def default_track_attribute_keys(cls) -> List[str]:
+        """
+        Chaves canonicas para atributos da camada de trilha.
+        """
+        return ["date_name", "folder", "mrk_file", "mrk_path", "flight_number", "flight_name"]
 

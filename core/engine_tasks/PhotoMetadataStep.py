@@ -5,6 +5,7 @@ from .BaseStep import BaseStep
 from .ExecutionContext import ExecutionContext
 from ..task.PhotoMetadataTask import PhotoMetadataTask
 from ..config.LogUtils import LogUtils
+from ...utils.mrk.MetadataFields import MetadataFields
 from qgis.core import QgsField
 from qgis.PyQt.QtCore import QVariant
 
@@ -13,7 +14,7 @@ class PhotoMetadataStep(BaseStep):
     """Step para aplicar metadados de fotos diretamente na camada."""
 
     _NUMERIC_RE = re.compile(r"^[+-]?\d+(?:\.\d+)?$")
-    _FORCE_STRING_FIELDS = {
+    _FORCE_STRING_FIELD_KEYS = {
         "file",
         "path",
         "format",
@@ -40,6 +41,9 @@ class PhotoMetadataStep(BaseStep):
         "light_consistency",
         "rtk_effective_precision",
         "estimated_coverage",
+    }
+    _FORCE_STRING_FIELDS = _FORCE_STRING_FIELD_KEYS | {
+        MetadataFields.resolve_output_name(key) for key in _FORCE_STRING_FIELD_KEYS
     }
 
     def name(self) -> str:
@@ -185,10 +189,12 @@ class PhotoMetadataStep(BaseStep):
             started_editing = True
 
         # Mapear (mrk_folder, foto) -> fid (e compatibilidade por foto única)
+        photo_field_name = MetadataFields.get_attribute("foto", "foto")
+        mrk_folder_field_name = MetadataFields.get_attribute("mrk_folder", "mrk_folder")
         foto_to_fid = {}
         foto_mrk_to_fid = {}
         for feat in layer.getFeatures():
-            foto_val = feat.attribute("foto")
+            foto_val = feat.attribute(photo_field_name)
             if foto_val is None:
                 continue
 
@@ -203,7 +209,7 @@ class PhotoMetadataStep(BaseStep):
                 )
                 continue
 
-            mrk_folder_val = feat.attribute("mrk_folder")
+            mrk_folder_val = feat.attribute(mrk_folder_field_name)
             mrk_folder = str(mrk_folder_val or "").strip()
             foto_to_fid.setdefault(foto_int, feat.id())
             foto_mrk_to_fid[(mrk_folder, foto_int)] = feat.id()

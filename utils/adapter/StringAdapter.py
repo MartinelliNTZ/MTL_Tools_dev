@@ -1,4 +1,4 @@
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Iterable
 from dataclasses import is_dataclass
 
 
@@ -33,3 +33,23 @@ class StringAdapter:
                 }
             )
         return output
+
+    @staticmethod
+    def unique_preserve_order(values: Iterable[Any]) -> List[Any]:
+        """Remove duplicados preservando ordem de aparicao."""
+        seen = set()
+        result = []
+        for value in values or []:
+            if value in seen:
+                continue
+            seen.add(value)
+            result.append(value)
+        return result
+
+    @staticmethod
+    def filter_known_keys(values: Iterable[str], fields_dict: Dict[str, Any]) -> List[str]:
+        """Filtra lista de chaves para manter apenas as que existem no dicionario de campos."""
+        if not isinstance(fields_dict, dict):
+            return []
+        keys = set(fields_dict.keys())
+        return [value for value in (values or []) if value in keys]

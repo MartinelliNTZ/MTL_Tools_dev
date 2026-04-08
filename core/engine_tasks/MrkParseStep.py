@@ -4,7 +4,9 @@ from .ExecutionContext import ExecutionContext
 from ..task.MrkParseTask import MrkParseTask
 from ..config.LogUtils import LogUtils
 from ...utils.vector.VectorLayerGeometry import VectorLayerGeometry
+from ...utils.mrk.MetadataFields import MetadataFields
 from qgis.core import QgsProject
+from qgis.PyQt.QtCore import QVariant
 
 
 class MrkParseStep(BaseStep):
@@ -33,9 +35,21 @@ class MrkParseStep(BaseStep):
             return
 
         layer_name = context.get("points_layer_name", "MRK_Pontos")
+        field_specs = [
+            ("foto", QVariant.Int, MetadataFields.resolve_output_name("foto")),
+            ("alt", QVariant.Double, MetadataFields.resolve_output_name("alt")),
+            ("date_name", QVariant.String, MetadataFields.resolve_output_name("date_name")),
+            ("flight_number", QVariant.String, MetadataFields.resolve_output_name("flight_number")),
+            ("flight_name", QVariant.String, MetadataFields.resolve_output_name("flight_name")),
+            ("folder_level1", QVariant.String, MetadataFields.resolve_output_name("folder_level1")),
+            ("folder_level2", QVariant.String, MetadataFields.resolve_output_name("folder_level2")),
+            ("mrk_folder", QVariant.String, MetadataFields.resolve_output_name("mrk_folder")),
+        ]
         layer = VectorLayerGeometry.create_point_layer_from_dicts(
             points=points,
             name=layer_name,
+            field_specs=field_specs,
+            geometry_keys=("lon", "lat"),
             extra_fields=context.get("extra_fields"),
         )
 

@@ -74,10 +74,6 @@ class PhotoMetadata:
     @staticmethod
     def _extract_flight_context(point: dict) -> dict:
         return {
-            "FlightNumber": point.get("flight_number"),
-            "FlightName": point.get("flight_name"),
-            "FolderLevel1": point.get("folder_level1"),
-            "FolderLevel2": point.get("folder_level2"),
             "flight_number": point.get("flight_number"),
             "flight_name": point.get("flight_name"),
             "folder_level1": point.get("folder_level1"),
@@ -97,9 +93,13 @@ class PhotoMetadata:
         selected_custom_fields=None,
         selected_mrk_fields=None,
     ) -> set:
-        return set(selected_required_fields or []) | set(selected_custom_fields or []) | set(
-            selected_mrk_fields or []
+        selected = (
+            set(selected_required_fields or [])
+            | set(selected_custom_fields or [])
+            | set(selected_mrk_fields or [])
         )
+        known_keys = set(MetadataFields.all_fields().keys())
+        return selected & known_keys
 
     @staticmethod
     def _filter_payload(payload: dict, selected_keys: set) -> dict:

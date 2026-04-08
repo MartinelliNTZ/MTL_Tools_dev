@@ -230,10 +230,25 @@ class MrkParser:
     @staticmethod
     def to_point_layer(points, name="MRK_Pontos", extra_fields=None):
         from ..vector.VectorLayerGeometry import VectorLayerGeometry
+        from .MetadataFields import MetadataFields
+        from qgis.PyQt.QtCore import QVariant
+
+        field_specs = [
+            ("foto", QVariant.Int, MetadataFields.resolve_output_name("foto")),
+            ("alt", QVariant.Double, MetadataFields.resolve_output_name("alt")),
+            ("date_name", QVariant.String, MetadataFields.resolve_output_name("date_name")),
+            ("flight_number", QVariant.String, MetadataFields.resolve_output_name("flight_number")),
+            ("flight_name", QVariant.String, MetadataFields.resolve_output_name("flight_name")),
+            ("folder_level1", QVariant.String, MetadataFields.resolve_output_name("folder_level1")),
+            ("folder_level2", QVariant.String, MetadataFields.resolve_output_name("folder_level2")),
+            ("mrk_folder", QVariant.String, MetadataFields.resolve_output_name("mrk_folder")),
+        ]
 
         return VectorLayerGeometry.create_point_layer_from_dicts(
             points=points,
             name=name,
+            field_specs=field_specs,
+            geometry_keys=("lon", "lat"),
             extra_fields=extra_fields,
         )
 

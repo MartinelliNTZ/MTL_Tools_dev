@@ -4,6 +4,7 @@ from qgis.core import QgsProject
 from .BaseTask import BaseTask
 from ..config.LogUtils import LogUtils
 from ...utils.mrk.PhotoMetadata import PhotoMetadata
+from ...utils.mrk.MetadataFields import MetadataFields
 
 
 class PhotoMetadataTask(BaseTask):
@@ -38,13 +39,15 @@ class PhotoMetadataTask(BaseTask):
             raise RuntimeError("Camada nÃ£o encontrada para cruzamento de metadados")
 
         logger = LogUtils(tool=self.tool_key, class_name=self.__class__.__name__)
+        photo_field_name = MetadataFields.get_attribute("foto", "foto")
+        mrk_folder_field_name = MetadataFields.get_attribute("mrk_folder", "mrk_folder")
 
         # Extrair lista de fotos a serem cruzadas (campo 'foto')
         # ðŸ”´ IMPORTANTE: TambÃ©m extrair 'mrk_folder' se disponÃ­vel (para mÃºltiplos voos)
         pontos = []
 
         for feat in layer.getFeatures():
-            foto = feat.attribute("foto")
+            foto = feat.attribute(photo_field_name)
             if foto is None:
                 continue
             try:
@@ -61,13 +64,14 @@ class PhotoMetadataTask(BaseTask):
             # Isso garante que campos como lat/lon/mrk_* e contexto de voo cheguem ao PhotoMetadata.
             for field in feat.fields():
                 name = field.name()
-                if name == "foto":
+                if name == photo_field_name:
                     continue
-                ponto[name] = feat.attribute(name)
+                normalized_name = MetadataFields.resolve_key(name)
+                ponto[normalized_name] = feat.attribute(name)
 
             # Verificar se o campo mrk_folder existe (adicionado por MrkParseTask)
-            if feat.fieldNameIndex("mrk_folder") != -1:
-                mrk_folder = feat.attribute("mrk_folder")
+            if feat.fieldNameIndex(mrk_folder_field_name) != -1:
+                mrk_folder = feat.attribute(mrk_folder_field_name)
                 if mrk_folder:
                     ponto["mrk_folder"] = mrk_folder
 
@@ -132,7 +136,10 @@ class PhotoMetadataTask(BaseTask):
             photo_key = (mrk_folder, int(foto))
 
             # NÃ£o incluir mrk_folder nos updates (Ã© apenas campo de contexto)
-            data = {k: v for k, v in item.items() if k not in ("foto", "mrk_folder")}
+            data = MetadataFields.map_record_to_output_attributes(
+                item,
+                exclude_keys=("foto", "mrk_folder"),
+            )
             updates[photo_key] = data
             field_names.update(data.keys())
 
@@ -143,11 +150,26 @@ class PhotoMetadataTask(BaseTask):
         # Garante criacao de colunas mesmo quando o valor venha vazio para todo o lote.
         # Isso evita "sumir" com campos selecionados no grid quando metadado nao existe na fonte.
         selected_all = (
-            set(self.selected_required_fields)
-            | set(self.selected_custom_fields)
-            | set(self.selected_mrk_fields)
+            set(
+                MetadataFields.normalize_selected_keys(
+                    self.selected_required_fields,
+                    allowed_keys=MetadataFields.required_keys(),
+                )
+            )
+            | set(
+                MetadataFields.normalize_selected_keys(
+                    self.selected_custom_fields,
+                    allowed_keys=MetadataFields.custom_keys(),
+                )
+            )
+            | set(
+                MetadataFields.normalize_selected_keys(
+                    self.selected_mrk_fields,
+                    allowed_keys=MetadataFields.mrk_keys(),
+                )
+            )
         )
-        field_names.update(selected_all)
+        field_names.update(MetadataFields.resolve_output_names(selected_all))
 
         logger.debug(
             f"Cruzamento completo: {len(pontos)} fotos processadas, {len(updates)} atualizaÃ§Ãµes geradas"

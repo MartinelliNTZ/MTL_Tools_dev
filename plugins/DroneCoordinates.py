@@ -261,13 +261,22 @@ class DroneCordinates(BasePluginMTL):
 
 
     def _get_selected_required_fields(self):
-        return self.required_fields_grid.get_checked_keys()
+        return MetadataFields.normalize_selected_keys(
+            self.required_fields_grid.get_checked_keys(),
+            allowed_keys=MetadataFields.required_keys(),
+        )
 
     def _get_selected_custom_fields(self):
-        return self.custom_fields_grid.get_checked_keys()
+        return MetadataFields.normalize_selected_keys(
+            self.custom_fields_grid.get_checked_keys(),
+            allowed_keys=MetadataFields.custom_keys(),
+        )
 
     def _get_selected_mrk_fields(self):
-        return self.mrk_fields_grid.get_checked_keys()
+        return MetadataFields.normalize_selected_keys(
+            self.mrk_fields_grid.get_checked_keys(),
+            allowed_keys=MetadataFields.mrk_keys(),
+        )
 
     def _load_prefs(self):
         self.logger.debug("Carregando preferÃªncias", code="PREFS_LOAD_START")
@@ -290,11 +299,26 @@ class DroneCordinates(BasePluginMTL):
         mrk_selected = prefs.get(self.PREF_MRK_FIELDS)
 
         if isinstance(required_selected, list):
-            self.required_fields_grid.set_checked_keys(required_selected)
+            self.required_fields_grid.set_checked_keys(
+                MetadataFields.normalize_selected_keys(
+                    required_selected,
+                    allowed_keys=MetadataFields.required_keys(),
+                )
+            )
         if isinstance(custom_selected, list):
-            self.custom_fields_grid.set_checked_keys(custom_selected)
+            self.custom_fields_grid.set_checked_keys(
+                MetadataFields.normalize_selected_keys(
+                    custom_selected,
+                    allowed_keys=MetadataFields.custom_keys(),
+                )
+            )
         if isinstance(mrk_selected, list):
-            self.mrk_fields_grid.set_checked_keys(mrk_selected)
+            self.mrk_fields_grid.set_checked_keys(
+                MetadataFields.normalize_selected_keys(
+                    mrk_selected,
+                    allowed_keys=MetadataFields.mrk_keys(),
+                )
+            )
 
 
         # Salvamento
@@ -450,14 +474,7 @@ class DroneCordinates(BasePluginMTL):
         vl_line = VectorLayerGeometry.create_line_layer_from_points(
             points,
             group_by_fields=["mrk_path", "mrk_file"],
-            attribute_fields=[
-                "date_name",
-                "folder",
-                "mrk_file",
-                "mrk_path",
-                "flight_number",
-                "flight_name",
-            ],
+            attribute_fields=MetadataFields.default_track_attribute_keys(),
         )
         if vl_line:
             out_layer = None

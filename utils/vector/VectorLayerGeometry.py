@@ -72,28 +72,73 @@ class VectorLayerGeometry:
     def create_point_layer_from_dicts(
         points: list,
         name: str = "MRK_Pontos",
+        field_specs: Optional[list] = None,
+        geometry_keys: tuple = ("lon", "lat"),
         extra_fields: Optional[dict] = None,
         tool_key: str = ToolKey.UNTRACEABLE,
     ) -> Optional[QgsVectorLayer]:
-        """Cria uma camada de pontos em memória a partir de uma lista de dicionários."""
+        """
+        Cria uma camada de pontos em memória a partir de registros genéricos.
+
+        field_specs:
+            - [("input_key", QVariant.Type), ...] ou
+            - [("input_key", QVariant.Type, "output_field_name"), ...]
+
+        geometry_keys:
+            - tupla (x_key, y_key) usada para montar a geometria ponto.
+        """
         logger = VectorLayerGeometry._get_logger(tool_key)
         logger.debug(
-            f"create_point_layer_from_dicts(points={len(points) if points else 0}, name={name}, extra_fields={list(extra_fields.keys()) if extra_fields else None})"
+            f"create_point_layer_from_dicts(points={len(points) if points else 0}, name={name}, field_specs_count={len(field_specs) if field_specs else 0}, extra_fields={list(extra_fields.keys()) if extra_fields else None})"
         )
         if not points:
             return None
 
+        if len(geometry_keys) != 2:
+            raise ValueError("geometry_keys deve conter exatamente (x_key, y_key)")
+
+        x_key, y_key = geometry_keys
+
+        def infer_qvariant_type(values):
+            for value in values:
+                if value is None:
+                    continue
+                if isinstance(value, bool):
+                    return QVariant.Bool
+                if isinstance(value, int):
+                    return QVariant.Int
+                if isinstance(value, float):
+                    return QVariant.Double
+                return QVariant.String
+            return QVariant.String
+
+        # field_specs esperado:
+        #   [("key", QVariant.Type), ("key", QVariant.Type, "output_name"), ...]
+        # Se nao informado, infere a partir das chaves do primeiro registro.
+        normalized_specs = []
+        if field_specs:
+            for spec in field_specs:
+                if not isinstance(spec, (tuple, list)):
+                    continue
+                if len(spec) == 2:
+                    input_name, qvariant_type = spec
+                    output_name = input_name
+                elif len(spec) >= 3:
+                    input_name, qvariant_type, output_name = spec[:3]
+                else:
+                    continue
+                normalized_specs.append((input_name, qvariant_type, output_name))
+        else:
+            first = points[0] if points else {}
+            for key in first.keys():
+                if key in (x_key, y_key):
+                    continue
+                qvariant_type = infer_qvariant_type(p.get(key) for p in points)
+                normalized_specs.append((key, qvariant_type, key))
+
         fields = QgsFields()
-        fields.append(QgsField("foto", QVariant.Int))
-        fields.append(QgsField("alt", QVariant.Double))
-        fields.append(QgsField("date_name", QVariant.String))
-        fields.append(QgsField("flight_number", QVariant.String))
-        fields.append(QgsField("flight_name", QVariant.String))
-        fields.append(QgsField("folder_level1", QVariant.String))
-        fields.append(QgsField("folder_level2", QVariant.String))
-        # 🔴 NOVO: Campo para rastrear qual pasta (voo) cada ponto veio
-        # Isso permite PhotoMetadata distinguir fotos de múltiplos voos com mesma numeração
-        fields.append(QgsField("mrk_folder", QVariant.String))
+        for _, qvariant_type, output_name in normalized_specs:
+            fields.append(QgsField(output_name, qvariant_type))
 
         if extra_fields:
             for field_name, qtype in extra_fields.items():
@@ -106,19 +151,8 @@ class VectorLayerGeometry:
         vl.startEditing()
         for p in points:
             f = QgsFeature(vl.fields())
-            f.setGeometry(
-                QgsGeometry.fromPointXY(QgsPointXY(p.get("lon"), p.get("lat")))
-            )
-            attrs = [
-                p.get("foto"),
-                p.get("alt"),
-                p.get("date_name"),
-                p.get("flight_number"),
-                p.get("flight_name"),
-                p.get("folder_level1"),
-                p.get("folder_level2"),
-                p.get("mrk_folder"),  # 🔴 NOVO: pasta de origem do ponto
-            ]
+            f.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(p.get(x_key), p.get(y_key))))
+            attrs = [p.get(input_name) for input_name, _, _ in normalized_specs]
             if extra_fields:
                 for field_name in extra_fields.keys():
                     attrs.append(p.get(field_name))
@@ -159,9 +193,16 @@ class VectorLayerGeometry:
 
         # Preparar campos do layer
         fields = QgsFields()
+        resolved_attr_pairs = []
         if attribute_fields:
-            for field_name in attribute_fields:
-                fields.append(QgsField(field_name, QVariant.String))
+            seen_output_names = set()
+            for input_name in attribute_fields:
+                output_name = MetadataFields.resolve_output_name(input_name)
+                if output_name in seen_output_names:
+                    continue
+                seen_output_names.add(output_name)
+                resolved_attr_pairs.append((input_name, output_name))
+                fields.append(QgsField(output_name, QVariant.String))
 
         line = QgsVectorLayer("LineString?crs=EPSG:4326", name, "memory")
         line.dataProvider().addAttributes(fields)
@@ -187,9 +228,12 @@ class VectorLayerGeometry:
 
             if attribute_fields:
                 source = group[0]
-                for attr in attribute_fields:
-                    if attr in source:
-                        f.setAttribute(attr, source.get(attr))
+                for input_name, output_name in resolved_attr_pairs:
+                    value = source.get(input_name)
+                    if value is None and output_name != input_name:
+                        value = source.get(output_name)
+                    if value is not None:
+                        f.setAttribute(output_name, value)
 
             line.dataProvider().addFeature(f)
 
@@ -205,9 +249,12 @@ class VectorLayerGeometry:
                 f.setGeometry(geometry)
                 if attribute_fields:
                     source = points[0]
-                    for attr in attribute_fields:
-                        if attr in source:
-                            f.setAttribute(attr, source.get(attr))
+                    for input_name, output_name in resolved_attr_pairs:
+                        value = source.get(input_name)
+                        if value is None and output_name != input_name:
+                            value = source.get(output_name)
+                        if value is not None:
+                            f.setAttribute(output_name, value)
                 line.dataProvider().addFeature(f)
                 line.updateExtents()
             else:
@@ -596,4 +643,3 @@ class VectorLayerGeometry:
         logger = VectorLayerGeometry._get_logger(external_tool_key)
         logger.debug(f"merge_geometries(geometries_list={geometries_list})")
         pass
-
