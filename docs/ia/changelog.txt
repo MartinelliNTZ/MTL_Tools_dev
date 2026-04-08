@@ -85,4 +85,19 @@
 [2.3.8.15.3] Sistema adaptado ao novo formato: StringAdapter (dataclass-aware), PhotoMetadata (normalized via atributo), OBSOLETManager (normalized via atributo), CustomPhotosFieldsUtil (label de luz via LightSourceEnum).
 [2.3.8.15.4] core/enum/__init__.py atualizado para exportar LightSourceEnum.
 [2.3.8.15.5] Validacao sintatica executada via py_compile para modulos alterados.
+2.3.8.16 2026/04/08
+[2.3.8.16] Centralizacao reforcada no MetadataFields: adicionados resolvedores e utilitarios (all_fields, key_to_attribute_map, attribute_to_key_map, resolve_key, resolve_output_name, resolve_output_names, normalize_selected_keys, map_record_to_output_attributes, default_track_attribute_keys).
+[2.3.8.16.1] Fluxo de aplicacao alinhado para usar MetadataFields como fonte de verdade de nomes de saida (attribute): PhotoMetadataTask, PhotoMetadataStep, DroneCoordinatesRunner e plugin DroneCoordinates.
+[2.3.8.16.2] Selecao de campos em preferencias/UI passou por normalizacao canonica (aceitando entrada antiga e convertendo para chave valida do metadata).
+2.3.8.17 2026/04/08
+[2.3.8.17] Refatoracao de responsabilidade: VectorLayerGeometry.create_point_layer_from_dicts deixou de ser especifico de MRK e passou a receber schema do chamador (field_specs + geometry_keys), reduzindo acoplamento de dominio.
+[2.3.8.17.1] MrkParseStep e MrkParser.to_point_layer agora montam e injetam schema MRK explicitamente no caller.
+2.3.8.18 2026/04/08
+[2.3.8.18] Dump JSON temporario de fotos reformatado para raw_records no formato por arquivo (\"<ARQUIVO>.JPG\": {...}).
+[2.3.8.18.1] Dump passou a aplicar whitelist catalogada no MetadataFields (REQUIRED + CUSTOM + MRK), mantendo campos ausentes como null.
+[2.3.8.18.2] Correcao de preenchimento MRK no dump: merge por sequencia da foto (DJI ... _0001_ ...) com contexto dos pontos MRK do grupo, evitando null indevido em foto/lat/lon/alt/mrk_*.
+2.3.8.19 2026/04/08
+[2.3.8.19] Padronizacao de nomenclatura no MetadataFields: chaves e normalized migrados para formato sem snake_case (PascalCase), incluindo exemplos como Path e SizeMb.
+[2.3.8.19.1] Compatibilidade retroativa mantida via resolve_key com conversao automatica de nomes antigos (snake_case -> PascalCase) para evitar quebra de fluxos legados.
+[2.3.8.19.2] Ajuste de padrao de atributos: todos os attribute validados com limite maximo de 9 caracteres e descriptions sincronizadas com o codigo entre colchetes.
 
