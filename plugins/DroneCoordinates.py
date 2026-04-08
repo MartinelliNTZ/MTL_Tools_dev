@@ -27,6 +27,7 @@ class DroneCordinates(BasePluginMTL):
     CHECKBOX_OPTIONS = {
         "recursive": STR.RECURSIVE_SEARCH,
         "photos": STR.PHOTOS_METADATA,
+        "generate_report": STR.GENERATE_REPORT,
     }
 
     PREF_REQUIRED_FIELDS = "required_fields_selected"
@@ -292,6 +293,9 @@ class DroneCordinates(BasePluginMTL):
         # Checkboxes
         self.checkbox_map["recursive"].setChecked(prefs.get("recursive", True))
         self.checkbox_map["photos"].setChecked(prefs.get("photos", True))
+        self.checkbox_map["generate_report"].setChecked(
+            prefs.get("generate_report", True)
+        )
 
         # Filtros de campos de metadata
         required_selected = prefs.get(self.PREF_REQUIRED_FIELDS)
@@ -359,6 +363,7 @@ class DroneCordinates(BasePluginMTL):
             "folder": folder_path,
             "recursive": self.checkbox_map["recursive"].isChecked(),
             "photos": self.checkbox_map["photos"].isChecked(),
+            "generate_report": self.checkbox_map["generate_report"].isChecked(),
             self.PREF_REQUIRED_FIELDS: self._get_selected_required_fields(),
             self.PREF_CUSTOM_FIELDS: self._get_selected_custom_fields(),
             self.PREF_MRK_FIELDS: self._get_selected_mrk_fields(),

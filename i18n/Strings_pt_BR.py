@@ -356,6 +356,7 @@ class Strings_pt_BR:
     RECURSIVE_SEARCH = "Vasculhar subpastas"
     PHOTOS_METADATA = "Cruzar com metadados das fotos"
     PHOTOS_METADATA_REQUIRED_MESSAGE = "Para cruzar com metadados das fotos é necessário instalar o pacote Pillow.\n\nDeseja instalar agora?"
+    GENERATE_REPORT = "Gerar relatório"
     MRK_FOLDER = "Pasta MRK:"
     SAVE_POINTS_CHECKBOX = "Salvar pontos MRK em arquivo?"
     SAVE_IN = "Salvar em:"
