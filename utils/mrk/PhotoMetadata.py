@@ -44,6 +44,32 @@ class PhotoMetadata:
     DJI_RE = re.compile(r"_(\d{4})_[A-Z]\.JPG$", re.IGNORECASE)
 
     @staticmethod
+    def _dump_allowed_keys() -> list:
+        """
+        Campos permitidos no JSON de dump por foto.
+        Restrito aos campos catalogados no MetadataFields para evitar ruido.
+        """
+        return list(MetadataFields.REQUIRED_FIELDS.keys()) + list(
+            MetadataFields.CUSTOM_FIELDS.keys()
+        )
+
+    @staticmethod
+    def _normalize_dump_records(raw_by_file: dict) -> dict:
+        """
+        Converte registros por arquivo para formato:
+            { "ARQUIVO.JPG": {campo: valor, ...} }
+        mantendo apenas campos permitidos no MetadataFields.
+        """
+        allowed_keys = PhotoMetadata._dump_allowed_keys()
+        normalized = {}
+        for fname, payload in (raw_by_file or {}).items():
+            record = {}
+            for key in allowed_keys:
+                record[key] = payload.get(key)
+            normalized[fname] = record
+        return normalized
+
+    @staticmethod
     def _safe_parse_datetime(value):
         if not value:
             return None
@@ -215,7 +241,7 @@ class PhotoMetadata:
 
         raw_by_file = {}
         indexed_by_number = {}
-        raw_dump_records = []
+        raw_dump_records = {}
 
         for file_path in photo_files:
             fname = os.path.basename(file_path)
@@ -226,7 +252,6 @@ class PhotoMetadata:
 
             payload = PhotoMetadata._extract_photo_payload(file_path, tool_key=tool_key)
             raw_by_file[fname] = payload
-            raw_dump_records.append(payload)
             indexed_by_number[seq] = payload
 
         # Tenta enriquecer com campos custom quando o dataset possui base minima.
@@ -257,6 +282,7 @@ class PhotoMetadata:
                 raw_by_file,
                 tool_key=tool_key,
             )
+            raw_by_file = custom_enriched
             for fname, payload in custom_enriched.items():
                 seq_match = PhotoMetadata.DJI_RE.search(fname)
                 if not seq_match:
@@ -275,6 +301,7 @@ class PhotoMetadata:
                 "indexed_keys": len(indexed_by_number),
             },
         )
+        raw_dump_records = PhotoMetadata._normalize_dump_records(raw_by_file)
         return indexed_by_number, raw_dump_records
 
     @staticmethod
@@ -341,7 +368,8 @@ class PhotoMetadata:
                 "indexed": len(photo_index),
                 "raw_records": raw_records,
             }
-            sample_keys = sorted(list(raw_records[0].keys()))[:40] if raw_records else []
+            first_record = next(iter(raw_records.values()), None) if raw_records else None
+            sample_keys = sorted(list(first_record.keys()))[:40] if first_record else []
             logger.debug(
                 "Grupo indexado",
                 data={
