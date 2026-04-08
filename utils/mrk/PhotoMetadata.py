@@ -74,19 +74,18 @@ class PhotoMetadata:
     @staticmethod
     def _extract_flight_context(point: dict) -> dict:
         return {
-            "FlightNumber": point.get("numdovoo"),
-            "FlightName": point.get("nomedovoo"),
-            "FolderLevel1": point.get("pasta1"),
-            "FolderLevel2": point.get("pasta2"),
-            # Mantem legado MRK acessivel
-            "numdovoo": point.get("numdovoo"),
-            "nomedovoo": point.get("nomedovoo"),
-            "pasta1": point.get("pasta1"),
-            "pasta2": point.get("pasta2"),
+            "FlightNumber": point.get("flight_number"),
+            "FlightName": point.get("flight_name"),
+            "FolderLevel1": point.get("folder_level1"),
+            "FolderLevel2": point.get("folder_level2"),
+            "flight_number": point.get("flight_number"),
+            "flight_name": point.get("flight_name"),
+            "folder_level1": point.get("folder_level1"),
+            "folder_level2": point.get("folder_level2"),
             "mrk_file": point.get("mrk_file"),
             "mrk_path": point.get("mrk_path"),
             "mrk_folder": point.get("mrk_folder"),
-            "data_name": point.get("data_name"),
+            "date_name": point.get("date_name"),
             "lat": point.get("lat"),
             "lon": point.get("lon"),
             "alt": point.get("alt"),
@@ -171,7 +170,7 @@ class PhotoMetadata:
         # Mapeamento dinamico por sufixo para normalizados XMP/EXIF (ex.: "EXIF:GPSInfo:GPSMapDatum" -> "GPSMapDatum")
         required_by_suffix = {}
         for key, spec in MetadataFields.REQUIRED_FIELDS.items():
-            normalized = str(spec.get("normalized", ""))
+            normalized = str(getattr(spec, "normalized", ""))
             if ":" in normalized:
                 required_by_suffix[normalized.split(":")[-1]] = key
 

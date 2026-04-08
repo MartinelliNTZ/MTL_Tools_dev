@@ -1,5 +1,5 @@
-2.3.8 2026/04/07
-[2.3.8.1]#começe aqui
+﻿2.3.8 2026/04/07
+[2.3.8.1]#comeÃ§e aqui
 
 
 
@@ -30,7 +30,7 @@
 
 2.3.8.5 2026/04/07
 [2.3.8.5] Etapa E05 concluida: CheckboxGridWidget reimplementado com retrocompatibilidade de formatos (dict legado, dict expandido e lista key/label/description), suporte a tooltip por description e novos metodos de estado (checked/unchecked/state_map).
-[2.3.8.5.1] WidgetFactory.create_checkbox_grid atualizado para novo contrato sem quebrar chamadas antigas com options_dict, e com opcao return_widget=True para uso avan�ado.
+[2.3.8.5.1] WidgetFactory.create_checkbox_grid atualizado para novo contrato sem quebrar chamadas antigas com options_dict, e com opcao return_widget=True para uso avançado.
 
 2.3.8.6 2026/04/07
 [2.3.8.6] Etapa E06 concluida: DroneCoordinates UI atualizada com 3 collapsibles de campos (Required, Custom, MRK), grids via StringAdapter e persistencia completa de selecao/expansao em preferencias.
@@ -61,7 +61,7 @@
 [2.3.8.11.3] PhotoMetadataStep agora normaliza valores para string antes de changeAttributeValue e loga tipo/valor em caso de erro, reduzindo falhas de conversao do QGIS.
 [2.3.8.11.4] PhotoMetadataTask ganhou logs extras de selecao de campos e amostra de field_names retornados para facilitar auditoria do que entrou/ficou de fora.
 2.3.8.12 2026/04/07
-[2.3.8.12] Correcao de consistencia de campos no fluxo DroneCoordinates: PhotoMetadataTask passou a carregar todos os atributos da feicao MRK (nao apenas foto/mrk_folder), preservando lat/lon/alt/mrk_*/numdovoo/nomedovoo/pastas para enriquecimento e filtro final.
+[2.3.8.12] Correcao de consistencia de campos no fluxo DroneCoordinates: PhotoMetadataTask passou a carregar todos os atributos da feicao MRK (nao apenas foto/mrk_folder), preservando lat/lon/alt/mrk_*/flight_number/flight_name/pastas para enriquecimento e filtro final.
 [2.3.8.12.1] Garantia de schema completo: PhotoMetadataTask agora inclui todas as chaves selecionadas no field_names mesmo quando o valor estiver ausente, evitando perda de colunas no output.
 [2.3.8.12.2] Correcao de data custom: dt_full/dt_date/dt_time agora priorizam DateTimeOriginal e usam os_date apenas como fallback.
 [2.3.8.12.3] Expansao de normalizacao de metadados: PhotoMetadata recebeu novos aliases XMP/EXIF (AltitudeType, CaptureUUID, UTCAtExposure, PictureQuality, SensorFPS, LensPosition, LRFStatus, LRFTargetAbsAlt, GpsStatus e correlatos) e mapeamento dinamico por sufixo de normalized.
@@ -78,3 +78,11 @@
 [2.3.8.14.2] Novo log explicito no PhotoMetadataTask com code=PHOTO_METADATA_JSON_PATH para mostrar o caminho do JSON temporario no mesmo contexto da task.
 [2.3.8.14.3] PhotoMetadataStep passou source_points=context.get('points') para a task.
 [2.3.8.14.4] Validacao sintatica executada via py_compile para PhotoMetadata.py, PhotoMetadataTask.py e PhotoMetadataStep.py.
+2.3.8.15 2026/04/08
+[2.3.8.15] Refatoracao estrutural de metacampos: criado core/model/Field.py com dataclass Field(normalized, core, label, attribute, description, level).
+[2.3.8.15.1] MetadataFields.py migrado para dict de objetos Field em REQUIRED_FIELDS/CUSTOM_FIELDS/MRK_FIELDS, com level=3 para REQUIRED e level=5 para CUSTOM/MRK.
+[2.3.8.15.2] LIGHT_SOURCE_VALUES removido de MetadataFields e convertido para enum em core/enum/LightSourceEnum.py (com get_label/get_description).
+[2.3.8.15.3] Sistema adaptado ao novo formato: StringAdapter (dataclass-aware), PhotoMetadata (normalized via atributo), OBSOLETManager (normalized via atributo), CustomPhotosFieldsUtil (label de luz via LightSourceEnum).
+[2.3.8.15.4] core/enum/__init__.py atualizado para exportar LightSourceEnum.
+[2.3.8.15.5] Validacao sintatica executada via py_compile para modulos alterados.
+

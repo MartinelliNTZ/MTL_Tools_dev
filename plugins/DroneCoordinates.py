@@ -451,12 +451,12 @@ class DroneCordinates(BasePluginMTL):
             points,
             group_by_fields=["mrk_path", "mrk_file"],
             attribute_fields=[
-                "data_name",
+                "date_name",
                 "folder",
                 "mrk_file",
                 "mrk_path",
-                "numdovoo",
-                "nomedovoo",
+                "flight_number",
+                "flight_name",
             ],
         )
         if vl_line:

@@ -1,4 +1,4 @@
-[x] E01 - Planejamento inicial e trilha de execucao
+﻿[x] E01 - Planejamento inicial e trilha de execucao
     [x] Criar plano detalhado em docs/ia/PLANO_REIMPLEMENTACAO_DRONE_COORDINATES_V4.md
     [x] Criar todo rastreavel por etapas
     [x] Registrar changelog da etapa
@@ -12,7 +12,7 @@
 [x] E03 - Consolidar modelo de campos (REQUIRED_FIELDS, CUSTOM_FIELDS, MRK_FIELDS)
     [x] Criar MRK_FIELDS em MetadataFields.py
     [x] Migrar dt_full, dt_date, dt_time e FileType para padrao novo
-    [x] Definir nomes em ingles para numdovoo/nomedovoo/pasta1/pasta2
+    [x] Definir nomes em ingles para flight_number/flight_name/folder_level1/folder_level2
     [x] Garantir schema padrao (normalized/core/label/attribute/description)
 
 [x] E04 - Refatorar PhotoMetadata como manager e absorver OBSOLETManager
@@ -55,3 +55,11 @@
 Observacao operacional:
 - Sempre que uma etapa for concluida, marcar com [x] e atualizar docs/ia/changelog.txt.
 - Nao pular etapas de compatibilidade para evitar regressao nos outros plugins.
+
+[ ] E10 - Migracao de schema para Field dataclass + enum
+    [x] Criar core/model/Field.py
+    [x] Migrar MetadataFields para dict[str, Field] com level
+    [x] Mover LightSource para core/enum/LightSourceEnum
+    [x] Adaptar consumidores (StringAdapter, PhotoMetadata, OBSOLETManager, CustomPhotosFieldsUtil)
+    [ ] Validacao em runtime no QGIS
+

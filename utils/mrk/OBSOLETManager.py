@@ -68,12 +68,12 @@ class Manager:
         image_data: Dict[str, object],
         exif_data: Dict[str, object],
         xmp_data: Dict[str, object],
-        fields_dict: Dict[str, Dict[str, object]],
+        fields_dict: Dict[str, object],
     ) -> Dict[str, object]:
         output = {}
 
         for key, meta in fields_dict.items():
-            normalized = str(meta.get("normalized", ""))
+            normalized = str(getattr(meta, "normalized", ""))
 
             value = os_data.get(key)
             if value is None:
@@ -98,7 +98,7 @@ class Manager:
         return output
 
     def collect_metadata_from_image(
-        self, image_path: str, fields_dict: Dict[str, Dict[str, object]]
+        self, image_path: str, fields_dict: Dict[str, object]
     ) -> Dict[str, object]:
         os_data = ExifUtil.extract_metadata_os(image_path, tool_key=self.tool_key)
         image_data = ExifUtil.extract_metadata_image(image_path, tool_key=self.tool_key)
@@ -118,7 +118,7 @@ class Manager:
     def collect_metadata(
         self,
         item_path: str,
-        fields_dict: Dict[str, Dict[str, object]],
+        fields_dict: Dict[str, object],
         compute_custom: bool = False,
     ) -> Union[Dict[str, object], Dict[str, Dict[str, object]]]:
         if os.path.isdir(item_path):

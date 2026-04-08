@@ -1,4 +1,4 @@
-# Plano de Acao Detalhado - Reimplementacao DroneCoordinates (V4)
+﻿# Plano de Acao Detalhado - Reimplementacao DroneCoordinates (V4)
 
 Data: 2026/04/07
 Autor: Codex + Usuario
@@ -37,7 +37,7 @@ O sistema atual de `DroneCoordinates` funciona, mas a camada de metadados de fot
 2. `dt_date` (`%Y%m%d`)
 3. `dt_time` (`%H%M`)
 4. `tipo_arq` renomeado para `FileType`
-5. `numdovoo`, `nomedovoo`, `pasta1`, `pasta2` com nomes padrao em ingles
+5. `flight_number`, `flight_name`, `folder_level1`, `folder_level2` com nomes padrao em ingles
 - Esses campos devem entrar em `CUSTOM_FIELDS` com mesmo formato dos demais dicionarios.
 - Campos vindos do MRK devem ser mantidos e ganhar dicionario proprio no mesmo formato de `MetadataFields.py` (novo bloco `MRK_FIELDS`).
 
@@ -45,7 +45,7 @@ O sistema atual de `DroneCoordinates` funciona, mas a camada de metadados de fot
 
 No `plugins/DroneCoordinates.py`:
 
-- Criar 3 seções collapsible para parametros:
+- Criar 3 seÃ§Ãµes collapsible para parametros:
 1. `REQUIRED_FIELDS`
 2. `CUSTOM_FIELDS`
 3. `MRK_FIELDS`
@@ -323,14 +323,15 @@ Cada etapa concluida deve:
 ## 9. Perguntas em aberto para alinhar antes das etapas de codigo pesado
 
 1. Para os campos MRK em ingles, qual nomenclatura final voce quer para cada um destes:
-- `numdovoo`
-- `nomedovoo`
-- `pasta1`
-- `pasta2`
+- `flight_number`
+- `flight_name`
+- `folder_level1`
+- `folder_level2`
 2. O campo `FileType` deve manter o valor atual de extensao (ex: `.JPG`) ou formato expandido (ex: `JPEG_RGB`)?
 3. O JSON temporario deve ser:
 - sempre sobrescrito por execucao, ou
 - manter historico por timestamp?
 
 Estas respostas nao bloqueiam a etapa 2 (padronizacao tecnica), mas vao orientar a etapa 3/4 sem retrabalho.
+
 

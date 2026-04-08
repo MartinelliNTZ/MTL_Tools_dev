@@ -18,7 +18,8 @@ class MrkParser:
     DATE_RE = re.compile(r"DJI_(\d{8})", re.IGNORECASE)
 
     FILE_META_RE = re.compile(
-        r"DJI_\d+_(?P<numdovoo>\d+?)_(?P<nomedovoo>[^_]+?)_Timestamp", re.IGNORECASE
+        r"DJI_\d+_(?P<flight_number>\d+?)_(?P<flight_name>[^_]+?)_Timestamp",
+        re.IGNORECASE,
     )
 
     @staticmethod
@@ -26,11 +27,11 @@ class MrkParser:
         match = MrkParser.FILE_META_RE.search(file_name)
 
         if not match:
-            return {"numdovoo": None, "nomedovoo": None}
+            return {"flight_number": None, "flight_name": None}
 
         return {
-            "numdovoo": match.group("numdovoo"),
-            "nomedovoo": match.group("nomedovoo"),
+            "flight_number": match.group("flight_number"),
+            "flight_name": match.group("flight_name"),
         }
 
     @staticmethod
@@ -63,7 +64,7 @@ class MrkParser:
 
         data = {}
         for i, name in enumerate(folders, 1):
-            data[f"pasta{i}"] = name
+            data[f"folder_level{i}"] = name
         logger.debug(
             f"Generated folder fields: {data} for file_dir: {file_dir} and base_folder: {base_folder}"
         )
@@ -170,13 +171,13 @@ class MrkParser:
                     "lat": float(m.group("lat")),
                     "lon": float(m.group("lon")),
                     "alt": float(m.group("alt")),
-                    "data_name": data_mrk,
+                    "date_name": data_mrk,
                     "folder": os.path.basename(root),
                     "folder_path": root,
                     "mrk_file": file_name,
                     "mrk_path": file_path,
-                    "numdovoo": file_meta["numdovoo"],
-                    "nomedovoo": file_meta["nomedovoo"],
+                    "flight_number": file_meta["flight_number"],
+                    "flight_name": file_meta["flight_name"],
                 }
 
                 if gerarpastas:
@@ -198,15 +199,15 @@ class MrkParser:
     @staticmethod
     def _normalize_folder_fields(points: list) -> list:
         """
-        Garante que todos os pontos tenham os mesmos campos pasta1..pastaN.
+        Garante que todos os pontos tenham os mesmos campos folder_level1..folder_levelN.
         """
         max_n = 0
 
         for p in points:
             for k in p.keys():
-                if k.startswith("pasta"):
+                if k.startswith("folder_level"):
                     try:
-                        n = int(k[5:])
+                        n = int(k[len("folder_level") :])
                         if n > max_n:
                             max_n = n
                     except ValueError as e:
@@ -220,7 +221,7 @@ class MrkParser:
 
         for p in points:
             for i in range(1, max_n + 1):
-                key = f"pasta{i}"
+                key = f"folder_level{i}"
                 if key not in p:
                     p[key] = None
 

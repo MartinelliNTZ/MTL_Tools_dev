@@ -15,8 +15,8 @@ import statistics
 from datetime import datetime
 from typing import Dict, List, Tuple, Optional
 from ...core.config.LogUtils import LogUtils
+from ...core.enum.LightSourceEnum import LightSourceEnum
 from ..ToolKeys import ToolKey
-from .MetadataFields import MetadataFields
 
 DECIMAL_PLACES = 4
 
@@ -311,7 +311,7 @@ class CustomPhotosFieldsUtil:
     def _get_light_source_label(light_source: any) -> str:
         """Retorna o texto da fonte de luz a partir do cÃ³digo LightSource EXIF."""
         code = CustomPhotosFieldsUtil.safe_int(light_source, default=0)
-        return MetadataFields.LIGHT_SOURCE_VALUES.get(code, {}).get("value", "Unknown")
+        return LightSourceEnum.get_label(code)
 
     @staticmethod
     def _check_light_consistency(light_source: any, cct: any) -> str:

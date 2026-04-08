@@ -1,11 +1,12 @@
 from typing import Dict, List, Any
+from dataclasses import is_dataclass
 
 
 class StringAdapter:
     """Adapta dicionários de metacampos para saída mínima de UI."""
 
     @staticmethod
-    def to_key_label_description(fields_dict: Dict[str, Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def to_key_label_description(fields_dict: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
         Recebe um dicionário no formato de Strings.REQUIRED_FIELDS/CUSTOM_FIELDS
         e retorna uma lista contendo somente key, label e description.
@@ -15,13 +16,20 @@ class StringAdapter:
 
         output: List[Dict[str, Any]] = []
         for key, meta in fields_dict.items():
-            meta = meta if isinstance(meta, dict) else {}
+            if isinstance(meta, dict):
+                label = meta.get("label")
+                description = meta.get("description")
+            elif is_dataclass(meta):
+                label = getattr(meta, "label", None)
+                description = getattr(meta, "description", None)
+            else:
+                label = None
+                description = None
             output.append(
                 {
                     "key": key,
-                    "label": meta.get("label"),
-                    "description": meta.get("description"),
+                    "label": label,
+                    "description": description,
                 }
             )
         return output
-
