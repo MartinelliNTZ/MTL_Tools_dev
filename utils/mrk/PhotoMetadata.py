@@ -66,9 +66,10 @@ class PhotoMetadata:
         allowed_keys = PhotoMetadata._dump_allowed_keys()
         normalized = {}
         for fname, payload in (raw_by_file or {}).items():
+            canonical_payload = MetadataFields.normalize_record_to_keys(payload or {})
             record = {}
             for key in allowed_keys:
-                record[key] = payload.get(key)
+                record[key] = canonical_payload.get(key)
             normalized[fname] = record
         return normalized
 
@@ -90,7 +91,8 @@ class PhotoMetadata:
         index = {}
         mrk_keys = list(MetadataFields.MRK_FIELDS.keys())
         for point in folder_points or []:
-            foto = point.get("foto")
+            canonical_point = MetadataFields.normalize_record_to_keys(point or {})
+            foto = canonical_point.get("Foto")
             if foto is None:
                 continue
             try:
@@ -99,7 +101,7 @@ class PhotoMetadata:
                 continue
             if seq in index:
                 continue
-            ctx = {key: point.get(key) for key in mrk_keys}
+            ctx = {key: canonical_point.get(key) for key in mrk_keys}
             index[seq] = ctx
         return index
 
@@ -152,18 +154,20 @@ class PhotoMetadata:
 
     @staticmethod
     def _extract_flight_context(point: dict) -> dict:
+        canonical_point = MetadataFields.normalize_record_to_keys(point or {})
         return {
-            "flight_number": point.get("flight_number"),
-            "flight_name": point.get("flight_name"),
-            "folder_level1": point.get("folder_level1"),
-            "folder_level2": point.get("folder_level2"),
-            "mrk_file": point.get("mrk_file"),
-            "mrk_path": point.get("mrk_path"),
-            "mrk_folder": point.get("mrk_folder"),
-            "date_name": point.get("date_name"),
-            "lat": point.get("lat"),
-            "lon": point.get("lon"),
-            "alt": point.get("alt"),
+            "FlightNumber": canonical_point.get("FlightNumber"),
+            "FlightName": canonical_point.get("FlightName"),
+            "FolderLevel1": canonical_point.get("FolderLevel1"),
+            "FolderLevel2": canonical_point.get("FolderLevel2"),
+            "MrkFile": canonical_point.get("MrkFile"),
+            "MrkPath": canonical_point.get("MrkPath"),
+            "MrkFolder": canonical_point.get("MrkFolder"),
+            "DateName": canonical_point.get("DateName"),
+            "Foto": canonical_point.get("Foto"),
+            "Lat": canonical_point.get("Lat"),
+            "Lon": canonical_point.get("Lon"),
+            "Alt": canonical_point.get("Alt"),
         }
 
     @staticmethod
@@ -452,6 +456,9 @@ class PhotoMetadata:
                 merged_payload = {}
                 merged_payload.update(photo_payload)
                 merged_payload.update(PhotoMetadata._extract_flight_context(point))
+                # Normaliza aliases/snake_case para as chaves canonicas do MetadataFields
+                # antes do filtro para nao perder campos custom apos mudanca de nomenclatura.
+                merged_payload = MetadataFields.normalize_record_to_keys(merged_payload)
 
                 filtered_payload = PhotoMetadata._filter_payload(merged_payload, selected_keys)
                 if selected_keys and not filtered_payload:
