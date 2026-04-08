@@ -47,10 +47,13 @@ class PhotoMetadata:
     def _dump_allowed_keys() -> list:
         """
         Campos permitidos no JSON de dump por foto.
-        Restrito aos campos catalogados no MetadataFields para evitar ruido.
+        Inclui todos os campos catalogados no MetadataFields:
+        REQUIRED + CUSTOM + MRK.
         """
-        return list(MetadataFields.REQUIRED_FIELDS.keys()) + list(
-            MetadataFields.CUSTOM_FIELDS.keys()
+        return (
+            list(MetadataFields.REQUIRED_FIELDS.keys())
+            + list(MetadataFields.CUSTOM_FIELDS.keys())
+            + list(MetadataFields.MRK_FIELDS.keys())
         )
 
     @staticmethod
@@ -68,6 +71,56 @@ class PhotoMetadata:
                 record[key] = payload.get(key)
             normalized[fname] = record
         return normalized
+
+    @staticmethod
+    def _extract_photo_sequence(file_name: str) -> str:
+        """Extrai sequencia de 4 digitos do padrao DJI (..._0001_X.JPG)."""
+        if not file_name:
+            return None
+        match = PhotoMetadata.DJI_RE.search(str(file_name))
+        if not match:
+            return None
+        return match.group(1)
+
+    @staticmethod
+    def _build_mrk_context_by_sequence(folder_points: list) -> dict:
+        """
+        Indexa contexto MRK por sequencia de foto (0001, 0002, ...).
+        """
+        index = {}
+        mrk_keys = list(MetadataFields.MRK_FIELDS.keys())
+        for point in folder_points or []:
+            foto = point.get("foto")
+            if foto is None:
+                continue
+            try:
+                seq = f"{int(foto):04d}"
+            except Exception:
+                continue
+            if seq in index:
+                continue
+            ctx = {key: point.get(key) for key in mrk_keys}
+            index[seq] = ctx
+        return index
+
+    @staticmethod
+    def _merge_mrk_into_dump_records(raw_records: dict, mrk_by_seq: dict) -> dict:
+        """
+        Mescla campos MRK no dump por arquivo, quando houver match de sequencia.
+        """
+        if not raw_records:
+            return raw_records
+        mrk_keys = list(MetadataFields.MRK_FIELDS.keys())
+        for fname, record in raw_records.items():
+            seq = PhotoMetadata._extract_photo_sequence(fname)
+            if not seq:
+                continue
+            mrk_ctx = mrk_by_seq.get(seq)
+            if not mrk_ctx:
+                continue
+            for key in mrk_keys:
+                record[key] = mrk_ctx.get(key)
+        return raw_records
 
     @staticmethod
     def _safe_parse_datetime(value):
@@ -362,6 +415,8 @@ class PhotoMetadata:
                 recursive=False,
                 tool_key=TOOL_KEY,
             )
+            mrk_by_seq = PhotoMetadata._build_mrk_context_by_sequence(folder_points)
+            raw_records = PhotoMetadata._merge_mrk_into_dump_records(raw_records, mrk_by_seq)
 
             full_dump_payload["groups"][folder] = {
                 "points": len(folder_points),
@@ -376,6 +431,7 @@ class PhotoMetadata:
                     "folder": folder,
                     "points_count": len(folder_points),
                     "indexed_count": len(photo_index),
+                    "mrk_indexed_count": len(mrk_by_seq),
                     "sample_keys": sample_keys,
                 },
             )

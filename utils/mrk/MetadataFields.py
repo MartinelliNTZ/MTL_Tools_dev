@@ -8,32 +8,32 @@ from ..adapter.StringAdapter import StringAdapter
 
 class MetadataFields:
     REQUIRED_FIELDS = {
-        "file": Field(
-            normalized="file",
+        "File": Field(
+            normalized="File",
             core="os",
             label="File",
             attribute="File",
             description="Nome do arquivo de imagem. [File]",
             level=3,
         ),
-        "path": Field(
-            normalized="path",
+        "Path": Field(
+            normalized="Path",
             core="os",
             label="Path",
             attribute="Path",
             description="Caminho completo do arquivo de imagem. [Path]",
             level=3,
         ),
-        "format": Field(
-            normalized="format",
+        "Format": Field(
+            normalized="Format",
             core="os",
             label="Format",
             attribute="FormatMod",
             description="Formato e modo de cor da imagem. [FormatMod]",
             level=3,
         ),
-        "size_mb": Field(
-            normalized="size_mb",
+        "SizeMb": Field(
+            normalized="SizeMb",
             core="os",
             label="Size MB",
             attribute="SizeMB",
@@ -432,8 +432,8 @@ class MetadataFields:
             description="Nivel de qualidade/compressao da imagem. [ImgQualit]",
             level=3,
         ),
-        "segmentos_total": Field(
-            normalized="JPEG:segmentos_total",
+        "SegmentosTotal": Field(
+            normalized="JPEG:SegmentosTotal",
             core="xmp_bloco_1",
             label="Segmentos Total",
             attribute="Segments",
@@ -547,24 +547,24 @@ class MetadataFields:
             description="Tipo/Extensao do arquivo de imagem (ex.: .JPG). [FileType]",
             level=5,
         ),
-        "dt_full": Field(
-            normalized="Custom:dt_full",
+        "DtFull": Field(
+            normalized="Custom:DtFull",
             core="custom",
             label="Date Time Full",
             attribute="DateTmFul",
             description="Data/hora compacta no formato YYYYMMDDHHMM. [DateTmFul]",
             level=5,
         ),
-        "dt_date": Field(
-            normalized="Custom:dt_date",
+        "DtDate": Field(
+            normalized="Custom:DtDate",
             core="custom",
             label="Date Only",
             attribute="DateOnly",
             description="Data compacta no formato YYYYMMDD. [DateOnly]",
             level=5,
         ),
-        "dt_time": Field(
-            normalized="Custom:dt_time",
+        "DtTime": Field(
+            normalized="Custom:DtTime",
             core="custom",
             label="Time Only",
             attribute="TimeOnly",
@@ -619,240 +619,240 @@ class MetadataFields:
             description="Velocidade total 3D da aeronave em m/s, calculada como sqrt(FlightXSpeed² + FlightYSpeed² + FlightZSpeed²). Valores: 0-50 m/s. Valor referência: <10 m/s para voos estáveis. [3DSpeed]",
             level=5,
         ),
-        "time_since_previous": Field(
-            normalized="Custom:time_since_previous",
+        "TimeSincePrevious": Field(
+            normalized="Custom:TimeSincePrevious",
             core="custom",
             label="Time Since Previous",
             attribute="TimePrv",
             description="Tempo em segundos desde a foto anterior. Valores: 0-120 s. Valor referência: 2-5 s para cadência ideal. [TimePrv]",
             level=5,
         ),
-        "geodesic_distance_previous": Field(
-            normalized="Custom:geodesic_distance_previous",
+        "GeodesicDistancePrevious": Field(
+            normalized="Custom:GeodesicDistancePrevious",
             core="custom",
             label="Geodesic Distance Previous",
             attribute="GeoDstP",
             description="Distância horizontal em metros entre posições GPS consecutivas (fórmula Haversine). Valores: 0-100 m. Valor referência: 20-50 m para sobreposição adequada. [GeoDstP]",
             level=5,
         ),
-        "distance_3d_previous": Field(
-            normalized="Custom:distance_3d_previous",
+        "Distance3dPrevious": Field(
+            normalized="Custom:Distance3dPrevious",
             core="custom",
             label="Distance 3 D Previous",
             attribute="Dist3DP",
             description="Distância 3D em metros entre posições consecutivas (horizontal + altitude). Valores: 0-100 m. Valor referência: 20-50 m. [Dist3DP]",
             level=5,
         ),
-        "avg_velocity_between_photos": Field(
-            normalized="Custom:avg_velocity_between_photos",
+        "AvgVelocityBetweenPhotos": Field(
+            normalized="Custom:AvgVelocityBetweenPhotos",
             core="custom",
             label="Avg Velocity Between Photos",
             attribute="AvgVelB",
             description="Velocidade média em m/s entre fotos consecutivas. Valores: 0-20 m/s. Valor referência: 5-10 m/s. [AvgVelB]",
             level=5,
         ),
-        "linear_velocity_instant": Field(
-            normalized="Custom:linear_velocity_instant",
+        "LinearVelocityInstant": Field(
+            normalized="Custom:LinearVelocityInstant",
             core="custom",
             label="Linear Velocity Instant",
             attribute="LinVelI",
             description="Velocidade instantânea 3D em m/s. Valores: 0-50 m/s. Valor referência: <10 m/s. [LinVelI]",
             level=5,
         ),
-        "displacement_direction": Field(
-            normalized="Custom:displacement_direction",
+        "DisplacementDirection": Field(
+            normalized="Custom:DisplacementDirection",
             core="custom",
             label="Displacement Direction",
             attribute="DirDispl",
             description="Azimute do deslocamento em graus (0=Norte). Valores: 0-360°. Valor referência: varia por missão. [DirDispl]",
             level=5,
         ),
-        "incidence_angle": Field(
-            normalized="Custom:incidence_angle",
+        "IncidenceAngle": Field(
+            normalized="Custom:IncidenceAngle",
             core="custom",
             label="Incidence Angle",
             attribute="IncAngle",
             description="Ângulo de incidência em graus (ângulo entre câmera e vertical). Valores: 0-180°. Valor referência: <5° para nadir. [IncAngle]",
             level=5,
         ),
-        "estimated_coverage": Field(
-            normalized="Custom:estimated_coverage",
+        "EstimatedCoverage": Field(
+            normalized="Custom:EstimatedCoverage",
             core="custom",
             label="Estimated Coverage",
             attribute="EstCover",
             description="Tupla (largura, altura) em metros da cobertura estimada no solo. Valores: (0-200, 0-150) m. Valor referência: depende altitude. [EstCover]",
             level=5,
         ),
-        "predicted_overlap": Field(
-            normalized="Custom:predicted_overlap",
+        "PredictedOverlap": Field(
+            normalized="Custom:PredictedOverlap",
             core="custom",
             label="Predicted Overlap",
             attribute="PredOver",
             description="Percentual de sobreposição longitudinal com foto anterior. Valores: 0-100%. Valor referência: >60%. [PredOver]",
             level=5,
         ),
-        "rtk_effective_precision": Field(
-            normalized="Custom:rtk_effective_precision",
+        "RtkEffectivePrecision": Field(
+            normalized="Custom:RtkEffectivePrecision",
             core="custom",
             label="RTK Effective Precision",
             attribute="RTKPrec",
             description="Classificação textual da precisão RTK. Valores: Alta, Média, Baixa, Sem RTK. Valor referência: Alta. [RTKPrec]",
             level=5,
         ),
-        "is_ideal_overlap": Field(
-            normalized="Custom:is_ideal_overlap",
+        "IsIdealOverlap": Field(
+            normalized="Custom:IsIdealOverlap",
             core="custom",
             label="Is Ideal Overlap",
             attribute="IdealOvl",
             description="Booleano indicando se sobreposição >=60%. Valores: True/False. Valor referência: True. [IdealOvl]",
             level=5,
         ),
-        "abrupt_change_flag": Field(
-            normalized="Custom:abrupt_change_flag",
+        "AbruptChangeFlag": Field(
+            normalized="Custom:AbruptChangeFlag",
             core="custom",
             label="Abrupt Change Flag",
             attribute="AbrChgF",
             description="Flag de mudança brusca (tempo ou distância >2x mediana). Valores: True/False. Valor referência: False. [AbrChgF]",
             level=5,
         ),
-        "gimbal_angular_velocity": Field(
-            normalized="Custom:gimbal_angular_velocity",
+        "GimbalAngularVelocity": Field(
+            normalized="Custom:GimbalAngularVelocity",
             core="custom",
             label="Gimbal Angular Velocity",
             attribute="GimAngV",
             description="Variação angular do gimbal em °/s. Valores: 0-100 °/s. Valor referência: <1 °/s. [GimAngV]",
             level=5,
         ),
-        "orthorectification_potential": Field(
-            normalized="Custom:orthorectification_potential",
+        "OrthorectificationPotential": Field(
+            normalized="Custom:OrthorectificationPotential",
             core="custom",
             label="Orthorectification Potential",
             attribute="OrtoPot",
             description="Score de potencial para ortorretificação (0-100). Valores: 0-100. Valor referência: >80. [OrtoPot]",
             level=5,
         ),
-        "shutter_life_pct": Field(
-            normalized="Custom:shutter_life_pct",
+        "ShutterLifePct": Field(
+            normalized="Custom:ShutterLifePct",
             core="custom",
             label="Shutter Life Pct",
             attribute="ShutPct",
             description="% de vida útil do obturador. Valores: 0-100%. Valor referência: <50%. [ShutPct]",
             level=5,
         ),
-        "ground_sample_distance_cm": Field(
-            normalized="Custom:ground_sample_distance_cm",
+        "GroundSampleDistanceCm": Field(
+            normalized="Custom:GroundSampleDistanceCm",
             core="custom",
             label="Ground Sample Distance Cm",
             attribute="GsdCmPx",
             description="GSD em cm/pixel. Valores: 0-10 cm. Valor referência: <2 cm. [GsdCmPx]",
             level=5,
         ),
-        "total_heat_index": Field(
-            normalized="Custom:total_heat_index",
+        "TotalHeatIndex": Field(
+            normalized="Custom:TotalHeatIndex",
             core="custom",
             label="Total Heat Index",
             attribute="HeatIdx",
             description="Índice térmico médio em °C. Valores: 20-60 °C. Valor referência: <40 °C. [HeatIdx]",
             level=5,
         ),
-        "speed_3d_kmh": Field(
-            normalized="Custom:speed_3d_kmh",
+        "Speed3dKmh": Field(
+            normalized="Custom:Speed3dKmh",
             core="custom",
             label="Speed 3 D Kmh",
             attribute="SpdKmH",
             description="Velocidade 3D do drone em km/h. Valores: 0-180 km/h. Valor referência: <36 km/h. [SpdKmH]",
             level=5,
         ),
-        "yaw_alignment_error": Field(
-            normalized="Custom:yaw_alignment_error",
+        "YawAlignmentError": Field(
+            normalized="Custom:YawAlignmentError",
             core="custom",
             label="Yaw Alignment Error",
             attribute="YawErr",
             description="Erro de alinhamento yaw em graus. Valores: 0-180°. Valor referência: <5°. [YawErr]",
             level=5,
         ),
-        "motion_blur_risk": Field(
-            normalized="Custom:motion_blur_risk",
+        "MotionBlurRisk": Field(
+            normalized="Custom:MotionBlurRisk",
             core="custom",
             label="Motion Blur Risk",
             attribute="BlurRisk",
             description="Risco de motion blur em pixels. Valores: 0-5. Valor referência: <0.5. [BlurRisk]",
             level=5,
         ),
-        "exposure_value_ev": Field(
-            normalized="Custom:exposure_value_ev",
+        "ExposureValueEv": Field(
+            normalized="Custom:ExposureValueEv",
             core="custom",
             label="Exposure Value EV",
             attribute="EV",
             description="Valor de exposição EV. Valores: 8-16. Valor referência: 12-14. [EV]",
             level=5,
         ),
-        "light_source_classification": Field(
-            normalized="Custom:light_source_classification",
+        "LightSourceClassification": Field(
+            normalized="Custom:LightSourceClassification",
             core="custom",
             label="Light Source Classification",
             attribute="LSrcClass",
             description="Classificação textual da fonte de luz EXIF. Valores: Daylight, Fluorescent, etc. Valor referência: Daylight. [LSrcClass]",
             level=5,
         ),
-        "light_consistency": Field(
-            normalized="Custom:light_consistency",
+        "LightConsistency": Field(
+            normalized="Custom:LightConsistency",
             core="custom",
             label="Light Consistency",
             attribute="LightCons",
             description="Consistência entre LightSource e CCT. Valores: Consistent, Inconsistent, Unknown. Valor referência: Consistent. [LightCons]",
             level=5,
         ),
-        "vertical_stability": Field(
-            normalized="Custom:vertical_stability",
+        "VerticalStability": Field(
+            normalized="Custom:VerticalStability",
             core="custom",
             label="Vertical Stability",
             attribute="VertStb",
             description="Variação vertical em metros. Valores: 0-10 m. Valor referência: <1 m. [VertStb]",
             level=5,
         ),
-        "trajectory_smoothness": Field(
-            normalized="Custom:trajectory_smoothness",
+        "TrajectorySmoothness": Field(
+            normalized="Custom:TrajectorySmoothness",
             core="custom",
             label="Trajectory Smoothness",
             attribute="TrajSmt",
             description="Diferença angular de direção em graus. Valores: 0-180°. Valor referência: <10°. [TrajSmt]",
             level=5,
         ),
-        "speed_variation_index": Field(
-            normalized="Custom:speed_variation_index",
+        "SpeedVariationIndex": Field(
+            normalized="Custom:SpeedVariationIndex",
             core="custom",
             label="Speed Variation Index",
             attribute="SpdVar",
             description="Índice de variação de velocidade (coeficiente de variação). Valores: 0-1. Valor referência: <0.1. [SpdVar]",
             level=5,
         ),
-        "rtk_stability_score": Field(
-            normalized="Custom:rtk_stability_score",
+        "RtkStabilityScore": Field(
+            normalized="Custom:RtkStabilityScore",
             core="custom",
             label="RTK Stability Score",
             attribute="RtkStab",
             description="Score de estabilidade RTK (0-100). Valores: 0-100. Valor referência: >90. [RtkStab]",
             level=5,
         ),
-        "capture_efficiency": Field(
-            normalized="Custom:capture_efficiency",
+        "CaptureEfficiency": Field(
+            normalized="Custom:CaptureEfficiency",
             core="custom",
             label="Capture Efficiency",
             attribute="CapEff",
             description="Eficiência de captura (distância/cobertura). Valores: 0-1. Valor referência: 0.5-0.8. [CapEff]",
             level=5,
         ),
-        "photogrammetry_quality_index": Field(
-            normalized="Custom:photogrammetry_quality_index",
+        "PhotogrammetryQualityIndex": Field(
+            normalized="Custom:PhotogrammetryQualityIndex",
             core="custom",
             label="Photogrammetry Quality Index",
             attribute="PQI",
             description="Índice de qualidade fotogramétrica (0-100). Valores: 0-100. Valor referência: >80. [PQI]",
             level=5,
         ),
-        "strip_id": Field(
-            normalized="Custom:strip_id",
+        "StripId": Field(
+            normalized="Custom:StripId",
             core="custom",
             label="Strip ID",
             attribute="StripID",
@@ -862,96 +862,96 @@ class MetadataFields:
     }
 
     MRK_FIELDS = {
-        "foto": Field(
-            normalized="MRK:foto",
+        "Foto": Field(
+            normalized="MRK:Foto",
             core="mrk",
             label="Photo Number",
             attribute="PhotoNum",
             description="Numero sequencial da foto vindo do MRK. [PhotoNum]",
             level=5,
         ),
-        "lat": Field(
-            normalized="MRK:lat",
+        "Lat": Field(
+            normalized="MRK:Lat",
             core="mrk",
             label="Latitude",
             attribute="Latitude",
             description="Latitude extraida do arquivo MRK. [Latitude]",
             level=5,
         ),
-        "lon": Field(
-            normalized="MRK:lon",
+        "Lon": Field(
+            normalized="MRK:Lon",
             core="mrk",
             label="Longitude",
             attribute="Longitude",
             description="Longitude extraida do arquivo MRK. [Longitude]",
             level=5,
         ),
-        "alt": Field(
-            normalized="MRK:alt",
+        "Alt": Field(
+            normalized="MRK:Alt",
             core="mrk",
             label="Altitude",
             attribute="Altitude",
             description="Altitude extraida do arquivo MRK. [Altitude]",
             level=5,
         ),
-        "date_name": Field(
-            normalized="MRK:date_name",
+        "DateName": Field(
+            normalized="MRK:DateName",
             core="mrk",
             label="Date Name",
             attribute="DateName",
             description="Data identificada a partir do nome do MRK. [DateName]",
             level=5,
         ),
-        "mrk_file": Field(
-            normalized="MRK:mrk_file",
+        "MrkFile": Field(
+            normalized="MRK:MrkFile",
             core="mrk",
             label="MRK File",
             attribute="MrkFile",
             description="Nome do arquivo MRK de origem. [MrkFile]",
             level=5,
         ),
-        "mrk_path": Field(
-            normalized="MRK:mrk_path",
+        "MrkPath": Field(
+            normalized="MRK:MrkPath",
             core="mrk",
             label="MRK Path",
             attribute="MrkPath",
             description="Caminho completo do arquivo MRK de origem. [MrkPath]",
             level=5,
         ),
-        "mrk_folder": Field(
-            normalized="MRK:mrk_folder",
+        "MrkFolder": Field(
+            normalized="MRK:MrkFolder",
             core="mrk",
             label="MRK Folder",
             attribute="MrkFolder",
             description="Pasta absoluta de origem do ponto MRK. [MrkFolder]",
             level=5,
         ),
-        "flight_number": Field(
-            normalized="MRK:flight_number",
+        "FlightNumber": Field(
+            normalized="MRK:FlightNumber",
             core="mrk",
             label="Flight Number",
             attribute="FlightNum",
             description="Numero do voo identificado no MRK. [FlightNum]",
             level=5,
         ),
-        "flight_name": Field(
-            normalized="MRK:flight_name",
+        "FlightName": Field(
+            normalized="MRK:FlightName",
             core="mrk",
             label="Flight Name",
             attribute="FlightNam",
             description="Nome do voo identificado no MRK. [FlightNam]",
             level=5,
         ),
-        "folder_level1": Field(
-            normalized="MRK:folder_level1",
+        "FolderLevel1": Field(
+            normalized="MRK:FolderLevel1",
             core="mrk",
             label="Folder Level 1",
             attribute="Folder1",
             description="Primeiro nivel de pasta no caminho do MRK. [Folder1]",
             level=5,
         ),
-        "folder_level2": Field(
-            normalized="MRK:folder_level2",
+        "FolderLevel2": Field(
+            normalized="MRK:FolderLevel2",
             core="mrk",
             label="Folder Level 2",
             attribute="Folder2",
@@ -967,6 +967,15 @@ class MetadataFields:
         fields.update(cls.CUSTOM_FIELDS)
         fields.update(cls.MRK_FIELDS)
         return fields
+
+    @staticmethod
+    def _to_pascal_case(value: str) -> str:
+        if not value:
+            return value
+        parts = [part for part in str(value).split("_") if part]
+        if not parts:
+            return str(value)
+        return "".join(part[:1].upper() + part[1:] for part in parts)
 
     @classmethod
     def required_keys(cls) -> List[str]:
@@ -990,7 +999,7 @@ class MetadataFields:
 
     @classmethod
     def get_field(cls, key: str) -> Optional[Field]:
-        return cls.all_fields().get(key)
+        return cls.all_fields().get(cls.resolve_key(key))
 
     @classmethod
     def get_attribute(cls, key: str, default: Optional[str] = None) -> Optional[str]:
@@ -1007,15 +1016,23 @@ class MetadataFields:
         if key_or_attribute in cls.all_fields():
             return key_or_attribute
 
-        return cls.attribute_to_key_map().get(key_or_attribute, key_or_attribute)
+        if key_or_attribute in cls.attribute_to_key_map():
+            return cls.attribute_to_key_map()[key_or_attribute]
+
+        candidate = cls._to_pascal_case(key_or_attribute)
+        if candidate in cls.all_fields():
+            return candidate
+
+        return key_or_attribute
 
     @classmethod
     def resolve_output_name(cls, key_or_attribute: str) -> str:
         if not key_or_attribute:
             return key_or_attribute
 
-        if key_or_attribute in cls.all_fields():
-            return cls.all_fields()[key_or_attribute].attribute
+        resolved_key = cls.resolve_key(key_or_attribute)
+        if resolved_key in cls.all_fields():
+            return cls.all_fields()[resolved_key].attribute
 
         if key_or_attribute in cls.attribute_to_key_map():
             return key_or_attribute
@@ -1076,5 +1093,4 @@ class MetadataFields:
         """
         Chaves canonicas para atributos da camada de trilha.
         """
-        return ["date_name", "folder", "mrk_file", "mrk_path", "flight_number", "flight_name"]
-
+        return ["DateName", "Folder", "MrkFile", "MrkPath", "FlightNumber", "FlightName"]
