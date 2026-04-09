@@ -351,7 +351,7 @@ class Strings_es(Strings_pt_BR):
     PROCESS_FINISHED_SUCCESS = "Proceso finalizado con éxito."
 
     # plugins/DroneCoordinates.py
-    DRONE_COORDINATES_TITLE = "Coordenadas de dron"
+    DRONE_COORDINATES_TITLE = "DJI Coordenadas de dron"
     DRONE_COORDINATES_TOOLTIP = (
         "Lee archivos MRK de dron para generar puntos de fotos y la ruta de vuelo.\n"
         "Puede cruzar los puntos con metadatos de imágenes,\n"
