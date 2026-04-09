@@ -411,7 +411,7 @@ class PhotoFolderVectorizationService:
         json_path = ExplorerUtils.create_temp_json(
             full_dump_payload,
             tool_key=self.tool_key,
-            prefix="photo_folder_metadata",
+            prefix="PFM",
             subfolder=os.path.join(
                 ExplorerUtils.REPORTS_TEMP_FOLDER,
                 ExplorerUtils.REPORTS_JSON_FOLDER,

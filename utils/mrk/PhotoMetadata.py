@@ -478,7 +478,7 @@ class PhotoMetadata:
         dump_path = ExplorerUtils.create_temp_json(
             full_dump_payload,
             tool_key=TOOL_KEY,
-            prefix="drone_photo_metadata_full",
+            prefix="DPM",
             subfolder=os.path.join(
                 ExplorerUtils.REPORTS_TEMP_FOLDER,
                 ExplorerUtils.REPORTS_JSON_FOLDER,

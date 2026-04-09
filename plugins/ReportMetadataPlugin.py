@@ -2,6 +2,9 @@
 import os
 from datetime import datetime
 
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import QComboBox, QSizePolicy
+
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..core.services.PhotoFolderVectorizationService import (
     PhotoFolderVectorizationService,
@@ -127,6 +130,30 @@ class ReportMetadataPlugin(BasePluginMTL):
                 buttons_layout,
             ]
         )
+        self._apply_compact_horizontal_ui()
+
+    def _apply_compact_horizontal_ui(self):
+        """Evita largura horizontal excessiva no plugin de relatorios."""
+        try:
+            combo = self.json_selector.combo()
+            if isinstance(combo, QComboBox):
+                # Evita que o maior texto do JSON force largura minima gigante.
+                combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
+                combo.setMinimumContentsLength(24)
+                combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                combo.setMaximumWidth(520)
+
+            for btn in (
+                self.refresh_button,
+                self.open_json_button,
+                self.open_reports_button,
+                self.photo_run_button,
+            ):
+                btn.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
+                btn.setMaximumWidth(360)
+                btn.setCursor(Qt.PointingHandCursor)
+        except Exception as e:
+            self.logger.warning(f"Falha ao ajustar UI compacta: {e}")
 
     def _format_json_label(self, file_path: str) -> str:
         file_name = os.path.basename(file_path)
@@ -135,7 +162,7 @@ class ReportMetadataPlugin(BasePluginMTL):
                 "%Y-%m-%d %H:%M:%S"
             )
             size_kb = round(os.path.getsize(file_path) / 1024.0, 1)
-            return f"{mtime} | {size_kb} KB | {file_name}"
+            return f"{file_name}"
         except Exception:
             return file_name
 
