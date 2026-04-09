@@ -380,6 +380,10 @@ class Strings_en(Strings_pt_BR):
         "Lists temporary metadata JSON files and regenerates the HTML report.\n"
         "Also provides a shortcut to open the reports folder."
     )
+    PHOTO_VECTORIZATION_TITLE = "Photo Vectorization"
+    PHOTO_VECTORIZATION_TOOLTIP = (
+        "Generates a vector layer from photos and optionally a report with the extracted data."
+    )
     REFRESH_JSON_LIST = "Refresh JSON list"
     OPEN_REPORTS_FOLDER = "Open reports folder"
     OPEN_JSONS_FOLDER = "Open JSON folder"

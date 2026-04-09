@@ -3,6 +3,9 @@
 [2.3.8.26.1] PhotoMetadata._extract_photo_payload now imports MetadataFieldKey locally and builds a value-to-key map on first use, avoiding unnecessary iterating over field specs.
 [2.3.8.26.2] Syntax validation passed for PhotoMetadata.py.
 
+[2.3.8.27] ReportMetadataPlugin refactor: removed photo folder vectorization UI from the report tool and created a dedicated PhotoVectorizationPlugin for image-to-vector generation.
+[2.3.8.27.1] Added ToolKey.PHOTO_VECTORIZATION and registered a new agriculture tool in ToolRegistry.
+[2.3.8.27.2] PhotoVectorizationPlugin now persists folder path and options separately from report metadata preferences.
 [2.3.8.25] MetadataFields: Removed all direct REQUIRED_FIELDS usage patterns. Methods all_fields() and required_keys() now build data from EXIF_FIELDS and DJI_XMP_FIELDS instead of the union.
 [2.3.8.25.1] PhotoMetadata._extract_photo_payload now maps EXIF and DJI_XMP fields separately in suffix lookup, avoiding deprecated REQUIRED_FIELDS iteration.
 [2.3.8.25.2] REQUIRED_FIELDS union preserved as {**EXIF_FIELDS, **DJI_XMP_FIELDS} for backward compatibility only; internal code uses explicit dictionaries.

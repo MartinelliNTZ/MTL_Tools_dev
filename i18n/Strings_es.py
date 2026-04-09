@@ -378,6 +378,11 @@ class Strings_es(Strings_pt_BR):
         "Lista JSON temporales de metadatos y permite regenerar el informe HTML.\n"
         "Tambien ofrece un acceso rapido a la carpeta de informes."
     )
+    PHOTO_VECTORIZATION_TITLE = "Vectorizacion de Fotos"
+    PHOTO_VECTORIZATION_TOOLTIP = (
+        "Genera una capa vectorial a partir de imagenes y opcionalmente un informe "
+        "con los datos extraidos."
+    )
     REFRESH_JSON_LIST = "Actualizar lista JSON"
     OPEN_REPORTS_FOLDER = "Abrir carpeta de informes"
     OPEN_JSONS_FOLDER = "Abrir carpeta de JSON"

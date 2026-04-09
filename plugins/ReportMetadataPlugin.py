@@ -6,9 +6,6 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QComboBox, QSizePolicy
 
 from ..core.ui.WidgetFactory import WidgetFactory
-from ..core.services.PhotoFolderVectorizationService import (
-    PhotoFolderVectorizationService,
-)
 from ..core.services.ReportGenerationService import ReportGenerationService
 from ..i18n.TranslationManager import STR
 from ..plugins.BasePlugin import BasePluginMTL
@@ -23,9 +20,6 @@ class ReportMetadataPlugin(BasePluginMTL):
 
     TOOL_KEY = ToolKey.REPORT_METADATA
     PREF_SELECTED_JSON = "selected_json"
-    PREF_PHOTO_FOLDER = "photo_folder"
-    PREF_PHOTO_RECURSIVE = "photo_recursive"
-    PREF_PHOTO_GENERATE_REPORT = "photo_generate_report"
 
     def __init__(self, iface):
         super().__init__(iface.mainWindow())
@@ -74,43 +68,6 @@ class ReportMetadataPlugin(BasePluginMTL):
         )
         self.open_reports_button.clicked.connect(self._open_reports_folder)
 
-        photos_block_layout, self.photos_collapsible = (
-            WidgetFactory.create_collapsible_parameters(
-                parent=self,
-                title=STR.VECTOR_WITHOUT_MRK_BLOCK_TITLE,
-                expanded_by_default=False,
-            )
-        )
-
-        folder_layout, self.photo_folder_selector = WidgetFactory.create_path_selector(
-            parent=self,
-            title=STR.PHOTO_FOLDER,
-            mode="folder",
-            separator_top=False,
-            separator_bottom=False,
-        )
-        self.photos_collapsible.add_content_layout(folder_layout)
-
-        photo_opts_layout, self.photo_opts_map = WidgetFactory.create_checkbox_grid(
-            options_data={
-                "photo_recursive": STR.RECURSIVE_SEARCH,
-                "photo_generate_report": STR.GENERATE_REPORT,
-            },
-            items_per_row=1,
-            checked_by_default=False,
-            separator_top=False,
-            separator_bottom=False,
-        )
-        self.photos_collapsible.add_content_layout(photo_opts_layout)
-
-        photo_run_layout, self.photo_run_button = WidgetFactory.create_simple_button(
-            text=STR.VECTORIZE_PHOTOS,
-            parent=self,
-            spacing=8,
-        )
-        self.photo_run_button.clicked.connect(self._run_photo_vectorization)
-        self.photos_collapsible.add_content_layout(photo_run_layout)
-
         buttons_layout, _ = WidgetFactory.create_bottom_action_buttons(
             parent=self,
             run_callback=self.execute_tool,
@@ -126,7 +83,6 @@ class ReportMetadataPlugin(BasePluginMTL):
                 refresh_layout,
                 open_json_layout,
                 open_reports_layout,
-                photos_block_layout,
                 buttons_layout,
             ]
         )
@@ -147,7 +103,6 @@ class ReportMetadataPlugin(BasePluginMTL):
                 self.refresh_button,
                 self.open_json_button,
                 self.open_reports_button,
-                self.photo_run_button,
             ):
                 btn.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
                 btn.setMaximumWidth(360)
@@ -220,29 +175,11 @@ class ReportMetadataPlugin(BasePluginMTL):
 
     def _save_prefs(self):
         selected = self.json_selector.get_selected_key() if self.json_selector else ""
-        photo_paths = self.photo_folder_selector.get_paths()
-        photo_folder = photo_paths[0] if photo_paths else ""
         self.preferences[self.PREF_SELECTED_JSON] = selected or ""
-        self.preferences[self.PREF_PHOTO_FOLDER] = photo_folder
-        self.preferences[self.PREF_PHOTO_RECURSIVE] = bool(
-            self.photo_opts_map["photo_recursive"].isChecked()
-        )
-        self.preferences[self.PREF_PHOTO_GENERATE_REPORT] = bool(
-            self.photo_opts_map["photo_generate_report"].isChecked()
-        )
         save_tool_prefs(self.TOOL_KEY, self.preferences)
 
     def _load_prefs(self):
         self.preferences = load_tool_prefs(self.TOOL_KEY)
-        folder = self.preferences.get(self.PREF_PHOTO_FOLDER, "")
-        if folder:
-            self.photo_folder_selector.set_path(folder)
-        self.photo_opts_map["photo_recursive"].setChecked(
-            self.preferences.get(self.PREF_PHOTO_RECURSIVE, True)
-        )
-        self.photo_opts_map["photo_generate_report"].setChecked(
-            self.preferences.get(self.PREF_PHOTO_GENERATE_REPORT, True)
-        )
 
     def execute_tool(self):
         selected_json = self.json_selector.get_selected_key() if self.json_selector else ""
@@ -275,49 +212,6 @@ class ReportMetadataPlugin(BasePluginMTL):
             )
         except Exception as e:
             self.logger.error(f"Erro ao gerar relatorio via plugin: {e}")
-            QgisMessageUtil.modal_error(self.iface, f"{STR.ERROR}: {e}")
-
-    def _run_photo_vectorization(self):
-        photo_paths = self.photo_folder_selector.get_paths()
-        photo_folder = (photo_paths[0] if photo_paths else "").strip()
-        if not photo_folder or not os.path.isdir(photo_folder):
-            QgisMessageUtil.modal_warning(self.iface, STR.SELECT_VALID_FOLDER)
-            return
-
-        recursive = bool(self.photo_opts_map["photo_recursive"].isChecked())
-        generate_report = bool(self.photo_opts_map["photo_generate_report"].isChecked())
-
-        try:
-            payload = PhotoFolderVectorizationService(
-                tool_key=self.TOOL_KEY
-            ).generate_from_folder(
-                base_folder=photo_folder,
-                recursive=recursive,
-                generate_report=generate_report,
-                layer_name=STR.PHOTOS_WITHOUT_MRK_LAYER_NAME,
-            )
-            self._save_prefs()
-            self._on_refresh()
-            html_path = (
-                (payload.get("report_payload") or {}).get("html_path")
-                if payload.get("report_payload")
-                else ""
-            )
-            summary = (
-                f"{STR.SUCCESS_MESSAGE} "
-                f"{STR.POINTS}: {payload.get('total_points', 0)} | "
-                f"JSON: {payload.get('json_path', '')}"
-            )
-            if html_path:
-                summary += f" | HTML: {html_path}"
-                if not ExplorerUtils.open_file(html_path, self.TOOL_KEY):
-                    QgisMessageUtil.bar_warning(
-                        self.iface,
-                        f"{STR.WARNING}: nao foi possivel abrir o HTML automaticamente.",
-                    )
-            QgisMessageUtil.bar_success(self.iface, summary, duration=8)
-        except Exception as e:
-            self.logger.error(f"Erro na vetorizacao sem MRK: {e}")
             QgisMessageUtil.modal_error(self.iface, f"{STR.ERROR}: {e}")
 
 

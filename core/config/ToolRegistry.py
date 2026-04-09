@@ -243,6 +243,18 @@ class ToolRegistry:
         )
         tools.append(gerar_rastro)
 
+        photo_vectorization = Tool(
+            name=STR.PHOTO_VECTORIZATION_TITLE,
+            icon=im.icon(im.DRONE_COORDINATES),
+            category=self.AGRICULTURE,
+            tool_type=ToolTypeEnum.DIALOG,
+            executor=self.run_photo_vectorization,
+            tooltip=STR.PHOTO_VECTORIZATION_TOOLTIP,
+            order=25,
+            show_in_toolbar=True,
+        )
+        tools.append(photo_vectorization)
+
         report_metadata = Tool(
             name=STR.REPORT_METADATA_TITLE,
             icon=im.icon(im.DRONE_COORDINATES),
@@ -493,8 +505,21 @@ class ToolRegistry:
             )
 
     # =====================================================
-    # EXECUTAR: Relatorio de Metadata
+    # EXECUTAR: Vetorizacao de Fotos
     # =====================================================
+    def run_photo_vectorization(self):
+        try:
+            from ...plugins.PhotoVectorizationPlugin import run
+
+            self.logger.info("Abrindo diálogo: Vetorização de Fotos")
+            self.photo_vectorization_dlg = run(self.iface)
+            self.logger.info("Diálogo Vetorização de Fotos aberto com sucesso")
+        except Exception as e:
+            self.logger.error(f"Erro ao executar Vetorização de Fotos: {str(e)}")
+            QgisMessageUtil.bar_critical(
+                self.iface, f"Erro no plugin Vetorização de Fotos:\n{str(e)}"
+            )
+
     def run_report_metadata(self):
         try:
             from ...plugins.ReportMetadataPlugin import run

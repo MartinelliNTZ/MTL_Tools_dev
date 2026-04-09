@@ -376,6 +376,10 @@ class Strings_de(Strings_pt_BR):
         "Listet temporare Metadaten-JSON-Dateien und erzeugt den HTML-Bericht erneut.\n"
         "Bietet zudem einen Schnellzugriff auf den Berichtsordner."
     )
+    PHOTO_VECTORIZATION_TITLE = "Foto-Vektorisierung"
+    PHOTO_VECTORIZATION_TOOLTIP = (
+        "Erzeugt eine Vektorebene aus Bildern und optional einen Bericht mit den extrahierten Daten."
+    )
     REFRESH_JSON_LIST = "JSON-Liste aktualisieren"
     OPEN_REPORTS_FOLDER = "Berichtsordner offnen"
     OPEN_JSONS_FOLDER = "JSON-Ordner offnen"

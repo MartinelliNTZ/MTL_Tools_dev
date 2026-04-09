@@ -374,6 +374,11 @@ class Strings_pt_BR:
         "Lista JSONs temporarios de metadata e permite regerar o relatorio HTML.\n"
         "Tambem oferece atalho para abrir a pasta de relatorios gerados."
     )
+    PHOTO_VECTORIZATION_TITLE = "Vetorizacao de Fotos"
+    PHOTO_VECTORIZATION_TOOLTIP = (
+        "Gera uma camada vetorial a partir de imagens e opcionalmente um relatorio "
+        "com os dados extraidos."
+    )
     REFRESH_JSON_LIST = "Atualizar lista de JSON"
     OPEN_REPORTS_FOLDER = "Abrir pasta de relatorios"
     OPEN_JSONS_FOLDER = "Abrir pasta de JSON"
