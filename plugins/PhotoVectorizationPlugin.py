@@ -2,7 +2,10 @@
 import os
 
 from ..core.ui.WidgetFactory import WidgetFactory
-from ..core.services.PhotoFolderVectorizationService import PhotoFolderVectorizationService
+from ..core.engine_tasks.AsyncPipelineEngine import AsyncPipelineEngine
+from ..core.engine_tasks.ExecutionContext import ExecutionContext
+from ..core.engine_tasks.PhotoVectorizationStep import PhotoVectorizationStep
+from ..core.engine_tasks.ReportGenerationStep import ReportGenerationStep
 from ..i18n.TranslationManager import STR
 from ..plugins.BasePlugin import BasePluginMTL
 from ..utils.ExplorerUtils import ExplorerUtils
@@ -92,9 +95,9 @@ class PhotoVectorizationPlugin(BasePluginMTL):
         )
 
     def execute_tool(self):
-        self._run_photo_vectorization()
+        self._run_photo_vectorization_with_task()
 
-    def _run_photo_vectorization(self):
+    def _run_photo_vectorization_with_task(self):
         photo_paths = self.photo_folder_selector.get_paths()
         photo_folder = (photo_paths[0] if photo_paths else "").strip()
         if not photo_folder or not os.path.isdir(photo_folder):
@@ -105,34 +108,77 @@ class PhotoVectorizationPlugin(BasePluginMTL):
         generate_report = bool(self.photo_opts_map["photo_generate_report"].isChecked())
 
         try:
-            payload = PhotoFolderVectorizationService(tool_key=self.TOOL_KEY).generate_from_folder(
-                base_folder=photo_folder,
-                recursive=recursive,
-                generate_report=generate_report,
-                layer_name=STR.PHOTOS_WITHOUT_MRK_LAYER_NAME,
-            )
             self._save_prefs()
-            html_path = (
-                (payload.get("report_payload") or {}).get("html_path")
-                if payload.get("report_payload")
-                else ""
+
+            context = ExecutionContext()
+            context.set("base_folder", photo_folder)
+            context.set("recursive", recursive)
+            context.set("generate_report", generate_report)
+            context.set("layer_name", STR.PHOTOS_WITHOUT_MRK_LAYER_NAME)
+            context.set("tool_key", self.TOOL_KEY)
+            context.set("iface", self.iface)
+
+            steps = [PhotoVectorizationStep()]
+
+            # Adicionar step de geração de relatório se solicitado
+            if generate_report:
+                steps.append(ReportGenerationStep())
+
+            self.logger.info("Iniciando pipeline de vetorização de fotos", data={
+                "base_folder": photo_folder,
+                "recursive": recursive,
+                "generate_report": generate_report
+            })
+
+            engine = AsyncPipelineEngine(
+                steps=steps,
+                context=context,
+                on_finished=self._on_pipeline_finished,
+                on_error=self._on_pipeline_error,
             )
-            summary = (
-                f"{STR.SUCCESS_MESSAGE} "
-                f"{STR.POINTS}: {payload.get('total_points', 0)} | "
-                f"JSON: {payload.get('json_path', '')}"
-            )
+            engine.start()
+
+        except Exception as e:
+            self.logger.error(f"Erro ao iniciar vetorização com TASK: {e}")
+            QgisMessageUtil.modal_error(self.iface, f"{STR.ERROR}: {e}")
+
+    def _on_pipeline_finished(self, context):
+        """Callback chamado quando o pipeline de TASK é concluído com sucesso."""
+        layer = context.get("layer")
+        total_points = context.get("total_points", 0)
+        json_path = context.get("json_path")
+        report_payload = context.get("report_payload")
+
+        summary = (
+            f"{STR.SUCCESS_MESSAGE} "
+            f"{STR.POINTS}: {total_points}"
+        )
+
+        if json_path:
+            summary += f" | JSON: {json_path}"
+
+        if report_payload and isinstance(report_payload, dict):
+            html_path = report_payload.get("html_path")
             if html_path:
                 summary += f" | HTML: {html_path}"
-                if not ExplorerUtils.open_file(html_path, self.TOOL_KEY):
-                    QgisMessageUtil.bar_warning(
-                        self.iface,
-                        f"{STR.WARNING}: nao foi possivel abrir o HTML automaticamente.",
-                    )
-            QgisMessageUtil.bar_success(self.iface, summary, duration=8)
-        except Exception as e:
-            self.logger.error(f"Erro ao gerar vetor por fotos: {e}")
-            QgisMessageUtil.modal_error(self.iface, f"{STR.ERROR}: {e}")
+
+        self.logger.info("Pipeline de vetorização concluído", data={
+            "total_points": total_points,
+            "has_layer": layer is not None,
+            "has_json": json_path is not None,
+            "has_report": report_payload is not None
+        })
+
+        QgisMessageUtil.bar_success(self.iface, summary, duration=8)
+
+    def _on_pipeline_error(self, context, exception):
+        """Callback chamado quando ocorre erro no pipeline de TASK."""
+        self.logger.error(f"Erro no pipeline de vetorização: {exception}")
+        QgisMessageUtil.modal_error(self.iface, f"{STR.ERROR}: {exception}")
+
+    def _run_photo_vectorization(self):
+        """Método legado mantido para compatibilidade, mas não usado."""
+        pass
 
 
 def run(iface):

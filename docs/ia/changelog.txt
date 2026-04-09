@@ -1,8 +1,27 @@
 ﻿2.3.8 2026/04/07
+[2.3.8.31] ReportGenerationStep: Added should_run() method to skip report generation when json_path is not available in context, preventing ValueError exceptions.
+[2.3.8.31.1] ReportGenerationStep.should_run() checks for valid json_path before attempting task creation.
+[2.3.8.31.2] Added logging when step is skipped due to missing json_path.
+[2.3.8.31.3] ReportGenerationStep now resolves JSON path from either json_path or photo_metadata_json_path, fixing DroneCoordinates report opening.
+[2.3.8.31.4] DroneCoordinates now passes iface through ExecutionContext so ReportGenerationStep can show warnings and open HTML using ExplorerUtils from the pipeline.
+[2.3.8.30] Report Generation Pipeline: Fixed KeyError when json_path missing in context. Added validation and error handling for missing JSON metadata file in ReportGenerationStep.
+[2.3.8.30.1] PhotoVectorizationStep.on_success() now validates json_path before setting in context and adds debug logging.
+[2.3.8.30.2] ReportGenerationStep.create_task() provides clearer error message when json_path is missing.
+[2.3.8.30.3] PhotoVectorizationTask._run() validates result structure and json_path presence with detailed error logging.
+[2.3.8.29] Report Generation: Moved report generation from UI thread to background TASK to prevent UI freezing. Created ReportGenerationStep and ReportGenerationTask following AsyncPipelineEngine pattern.
+[2.3.8.29.1] Added ReportGenerationStep class that creates ReportGenerationTask and handles HTML report opening.
+[2.3.8.29.2] Added ReportGenerationTask class that wraps ReportGenerationService.generate_from_json() in cancellable background TASK.
+[2.3.8.29.3] DroneCoordinates now includes ReportGenerationStep in pipeline when generate_report=True, removing UI-blocking report generation from _on_pipeline_finished callback.
+[2.3.8.29.4] PhotoVectorizationPlugin now includes ReportGenerationStep in pipeline when generate_report=True, with PhotoVectorizationTask modified to skip internal report generation.
+[2.3.8.29.5] PhotoVectorizationTask constructor simplified by removing generate_report parameter (always False now, report handled by separate step).
 [2.3.8.26] PhotoMetadata: Simplified field mapping logic in _extract_photo_payload. Removed complex suffix-based normalization workaround and replaced with direct enum value lookup: {enum.value: enum.key} mapping. Now canonicalizes raw field names (e.g., "GPSMapDatum") to MetadataFieldKey enums directly.
 [2.3.8.26.1] PhotoMetadata._extract_photo_payload now imports MetadataFieldKey locally and builds a value-to-key map on first use, avoiding unnecessary iterating over field specs.
 [2.3.8.26.2] Syntax validation passed for PhotoMetadata.py.
 
+[2.3.8.28] PhotoVectorizationPlugin: Refactored to use TASK system instead of direct service calls. Created PhotoVectorizationStep and PhotoVectorizationTask to leverage AsyncPipelineEngine infrastructure from DroneCoordinates, eliminating code duplication and improving consistency.
+[2.3.8.28.1] Added PhotoVectorizationStep class that creates PhotoVectorizationTask and handles success/error callbacks.
+[2.3.8.28.2] Added PhotoVectorizationTask class that wraps PhotoFolderVectorizationService.generate_from_folder() in a cancellable TASK.
+[2.3.8.28.3] PhotoVectorizationPlugin now uses AsyncPipelineEngine with PhotoVectorizationStep, maintaining same UI but with TASK-based execution for better error handling and progress reporting.
 [2.3.8.27] ReportMetadataPlugin refactor: removed photo folder vectorization UI from the report tool and created a dedicated PhotoVectorizationPlugin for image-to-vector generation.
 [2.3.8.27.1] Added ToolKey.PHOTO_VECTORIZATION and registered a new agriculture tool in ToolRegistry.
 [2.3.8.27.2] PhotoVectorizationPlugin now persists folder path and options separately from report metadata preferences.
