@@ -32,7 +32,8 @@ class DroneCordinates(BasePluginMTL):
         "generate_report": STR.GENERATE_REPORT,
     }
 
-    PREF_REQUIRED_FIELDS = "required_fields_selected"
+    PREF_EXIF_FIELDS = "exif_fields_selected"
+    PREF_XMP_FIELDS = "xmp_fields_selected"
     PREF_CUSTOM_FIELDS = "custom_fields_selected"
     PREF_MRK_FIELDS = "mrk_fields_selected"
 
@@ -86,27 +87,47 @@ class DroneCordinates(BasePluginMTL):
         if self.chk_photos:
             self.chk_photos.toggled.connect(self.on_photos_changed)
 
-        # ====== METADATA REQUIRED FIELDS ======
-        required_layout, self.required_fields_collapsible = (
+        # ====== METADATA EXIF FIELDS ======
+        exif_layout, self.exif_fields_collapsible = (
             WidgetFactory.create_collapsible_parameters(
                 parent=self,
-                title="Required Fields",
+                title="EXIF Fields",
                 expanded_by_default=False,
             )
         )
-        required_items = StringAdapter.to_key_label_description(
-            MetadataFields.REQUIRED_FIELDS
+        exif_items = StringAdapter.to_key_label_description(
+            MetadataFields.EXIF_FIELDS
         )
-        req_grid_layout, self.required_fields_grid = WidgetFactory.create_checkbox_grid(
-            options_data=required_items,
+        exif_grid_layout, self.exif_fields_grid = WidgetFactory.create_checkbox_grid(
+            options_data=exif_items,
             items_per_row=2,
             checked_by_default=True,
             return_widget=True,
             separator_bottom=False,
-            show_control_buttons=True,  # Habilita "Select All" e "Deselect All"
+            show_control_buttons=True,
         )
-            
-        self.required_fields_collapsible.add_content_layout(req_grid_layout)
+        self.exif_fields_collapsible.add_content_layout(exif_grid_layout)
+
+        # ====== METADATA DJI FIELDS (XMP) ======
+        xmp_layout, self.xmp_fields_collapsible = (
+            WidgetFactory.create_collapsible_parameters(
+                parent=self,
+                title="DJI Fields",
+                expanded_by_default=False,
+            )
+        )
+        xmp_items = StringAdapter.to_key_label_description(
+            MetadataFields.DJI_XMP_FIELDS
+        )
+        xmp_grid_layout, self.xmp_fields_grid = WidgetFactory.create_checkbox_grid(
+            options_data=xmp_items,
+            items_per_row=2,
+            checked_by_default=True,
+            return_widget=True,
+            separator_bottom=False,
+            show_control_buttons=True,
+        )
+        self.xmp_fields_collapsible.add_content_layout(xmp_grid_layout)
 
         # ====== METADATA CUSTOM FIELDS ======
         custom_layout, self.custom_fields_collapsible = (
@@ -226,7 +247,8 @@ class DroneCordinates(BasePluginMTL):
             [
                 folder_layout,
                 opts_layout,
-                required_layout,
+                exif_layout,
+                xmp_layout,
                 custom_layout,
                 mrk_layout,
                 save_layout,
@@ -267,10 +289,16 @@ class DroneCordinates(BasePluginMTL):
         self._ensure_photos_dependency(checked)
 
 
-    def _get_selected_required_fields(self):
+    def _get_selected_exif_fields(self):
         return MetadataFields.normalize_selected_keys(
-            self.required_fields_grid.get_checked_keys(),
-            allowed_keys=MetadataFields.required_keys(),
+            self.exif_fields_grid.get_checked_keys(),
+            allowed_keys=MetadataFields.exif_keys(),
+        )
+
+    def _get_selected_xmp_fields(self):
+        return MetadataFields.normalize_selected_keys(
+            self.xmp_fields_grid.get_checked_keys(),
+            allowed_keys=MetadataFields.xmp_keys(),
         )
 
     def _get_selected_custom_fields(self):
@@ -304,15 +332,23 @@ class DroneCordinates(BasePluginMTL):
         )
 
         # Filtros de campos de metadata
-        required_selected = prefs.get(self.PREF_REQUIRED_FIELDS)
+        exif_selected = prefs.get(self.PREF_EXIF_FIELDS)
+        xmp_selected = prefs.get(self.PREF_XMP_FIELDS)
         custom_selected = prefs.get(self.PREF_CUSTOM_FIELDS)
         mrk_selected = prefs.get(self.PREF_MRK_FIELDS)
 
-        if isinstance(required_selected, list):
-            self.required_fields_grid.set_checked_keys(
+        if isinstance(exif_selected, list):
+            self.exif_fields_grid.set_checked_keys(
                 MetadataFields.normalize_selected_keys(
-                    required_selected,
-                    allowed_keys=MetadataFields.required_keys(),
+                    exif_selected,
+                    allowed_keys=MetadataFields.exif_keys(),
+                )
+            )
+        if isinstance(xmp_selected, list):
+            self.xmp_fields_grid.set_checked_keys(
+                MetadataFields.normalize_selected_keys(
+                    xmp_selected,
+                    allowed_keys=MetadataFields.xmp_keys(),
                 )
             )
         if isinstance(custom_selected, list):
@@ -345,8 +381,11 @@ class DroneCordinates(BasePluginMTL):
 
         # Estados dos CollapsibleParametersWidget
         self.opts_collapsible.set_expanded(prefs.get("opts_expanded", True))
-        self.required_fields_collapsible.set_expanded(
-            prefs.get("required_expanded", False)
+        self.exif_fields_collapsible.set_expanded(
+            prefs.get("exif_expanded", False)
+        )
+        self.xmp_fields_collapsible.set_expanded(
+            prefs.get("xmp_expanded", False)
         )
         self.custom_fields_collapsible.set_expanded(
             prefs.get("custom_expanded", False)
@@ -370,7 +409,8 @@ class DroneCordinates(BasePluginMTL):
             "recursive": self.checkbox_map["recursive"].isChecked(),
             "photos": self.checkbox_map["photos"].isChecked(),
             "generate_report": self.checkbox_map["generate_report"].isChecked(),
-            self.PREF_REQUIRED_FIELDS: self._get_selected_required_fields(),
+            self.PREF_EXIF_FIELDS: self._get_selected_exif_fields(),
+            self.PREF_XMP_FIELDS: self._get_selected_xmp_fields(),
             self.PREF_CUSTOM_FIELDS: self._get_selected_custom_fields(),
             self.PREF_MRK_FIELDS: self._get_selected_mrk_fields(),
             "save_file": self.save_track_selector.is_enabled(),
@@ -383,7 +423,8 @@ class DroneCordinates(BasePluginMTL):
             "qml_path_points": self.qml_points_selector.get_file_path(),
             # Estados dos CollapsibleParametersWidget
             "opts_expanded": self.opts_collapsible.is_expanded(),
-            "required_expanded": self.required_fields_collapsible.is_expanded(),
+            "exif_expanded": self.exif_fields_collapsible.is_expanded(),
+            "xmp_expanded": self.xmp_fields_collapsible.is_expanded(),
             "custom_expanded": self.custom_fields_collapsible.is_expanded(),
             "mrk_expanded": self.mrk_fields_collapsible.is_expanded(),
             "save_expanded": self.save_collapsible.is_expanded(),
@@ -422,7 +463,11 @@ class DroneCordinates(BasePluginMTL):
         context.set("paths", paths)
         context.set("recursive", recursive)
         context.set("extra_fields", extra_fields)
-        context.set("selected_required_fields", self._get_selected_required_fields())
+        # Combine EXIF and XMP fields into selected_required_fields for pipeline compatibility
+        selected_required_fields = (
+            self._get_selected_exif_fields() + self._get_selected_xmp_fields()
+        )
+        context.set("selected_required_fields", selected_required_fields)
         context.set("selected_custom_fields", self._get_selected_custom_fields())
         context.set("selected_mrk_fields", self._get_selected_mrk_fields())
         context.set("generate_report", self.checkbox_map["generate_report"].isChecked())

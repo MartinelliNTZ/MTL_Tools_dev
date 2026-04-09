@@ -243,7 +243,7 @@ class MetadataFields:
         ),
     }
 
-    XMP_FIELDS = {
+    DJI_XMP_FIELDS = {
         MetadataFieldKey.GPS_STATUS: Field(
             normalized="EXIF:GPSInfo:GPSStatus",
             core="xmp_bloco_1",
@@ -582,7 +582,7 @@ class MetadataFields:
         ),
     }
 
-    REQUIRED_FIELDS = {**EXIF_FIELDS, **XMP_FIELDS}
+    REQUIRED_FIELDS = {**EXIF_FIELDS, **DJI_XMP_FIELDS}
 
     CUSTOM_FIELDS = {
         MetadataFieldKey.FILE_TYPE: Field(
@@ -1009,7 +1009,8 @@ class MetadataFields:
     @classmethod
     def all_fields(cls) -> Dict[str, Field]:
         fields: Dict[str, Field] = {}
-        fields.update({key.value: field for key, field in cls.REQUIRED_FIELDS.items()})
+        fields.update({key.value: field for key, field in cls.EXIF_FIELDS.items()})
+        fields.update({key.value: field for key, field in cls.DJI_XMP_FIELDS.items()})
         fields.update({key.value: field for key, field in cls.CUSTOM_FIELDS.items()})
         fields.update({key.value: field for key, field in cls.MRK_FIELDS.items()})
         return fields
@@ -1024,8 +1025,16 @@ class MetadataFields:
         return "".join(part[:1].upper() + part[1:] for part in parts)
 
     @classmethod
+    def exif_keys(cls) -> List[str]:
+        return [key.value for key in cls.EXIF_FIELDS.keys()]
+
+    @classmethod
+    def xmp_keys(cls) -> List[str]:
+        return [key.value for key in cls.DJI_XMP_FIELDS.keys()]
+
+    @classmethod
     def required_keys(cls) -> List[str]:
-        return [key.value for key in cls.REQUIRED_FIELDS.keys()]
+        return [key.value for key in cls.EXIF_FIELDS.keys()] + [key.value for key in cls.DJI_XMP_FIELDS.keys()]
 
     @classmethod
     def custom_keys(cls) -> List[str]:

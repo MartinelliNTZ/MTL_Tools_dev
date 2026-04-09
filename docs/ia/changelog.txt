@@ -1,4 +1,19 @@
 ﻿2.3.8 2026/04/07
+[2.3.8.26] PhotoMetadata: Simplified field mapping logic in _extract_photo_payload. Removed complex suffix-based normalization workaround and replaced with direct enum value lookup: {enum.value: enum.key} mapping. Now canonicalizes raw field names (e.g., "GPSMapDatum") to MetadataFieldKey enums directly.
+[2.3.8.26.1] PhotoMetadata._extract_photo_payload now imports MetadataFieldKey locally and builds a value-to-key map on first use, avoiding unnecessary iterating over field specs.
+[2.3.8.26.2] Syntax validation passed for PhotoMetadata.py.
+
+[2.3.8.25] MetadataFields: Removed all direct REQUIRED_FIELDS usage patterns. Methods all_fields() and required_keys() now build data from EXIF_FIELDS and DJI_XMP_FIELDS instead of the union.
+[2.3.8.25.1] PhotoMetadata._extract_photo_payload now maps EXIF and DJI_XMP fields separately in suffix lookup, avoiding deprecated REQUIRED_FIELDS iteration.
+[2.3.8.25.2] REQUIRED_FIELDS union preserved as {**EXIF_FIELDS, **DJI_XMP_FIELDS} for backward compatibility only; internal code uses explicit dictionaries.
+[2.3.8.25.3] Syntax validation passed for MetadataFields.py and PhotoMetadata.py.
+
+[2.3.8.24] DroneCoordinates UI refactored: split single "Required Fields" collapsible into two separate sections "EXIF Fields" and "DJI Fields" (XMP) for better field organization and user clarity.
+[2.3.8.24.1] MetadataFields now exposes exif_keys() and xmp_keys() methods for UI and pipeline usage.
+[2.3.8.24.2] DroneCoordinates stores EXIF and XMP field selections in separate preferences (exif_fields_selected, xmp_fields_selected) with dedicated collapsible state tracking.
+[2.3.8.24.3] Execute pipeline combines EXIF + XMP selections into selected_required_fields for backward compatibility with downstream PhotoMetadataTask.
+[2.3.8.24.4] Syntax validation passed for MetadataFields.py and DroneCoordinates.py.
+
 [2.3.8.23] MetadataFields: separated required field catalog into EXIF_FIELDS and XMP_FIELDS, preserving REQUIRED_FIELDS as a compatibility union.
 [2.3.8.23.1] PhotoMetadata._dump_allowed_keys now uses EXIF_FIELDS/XMP_FIELDS explicitly instead of the legacy single REQUIRED_FIELDS dictionary.
 

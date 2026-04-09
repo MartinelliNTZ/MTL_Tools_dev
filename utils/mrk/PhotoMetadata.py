@@ -52,7 +52,7 @@ class PhotoMetadata:
         """
         return (
             [k.value for k in MetadataFields.EXIF_FIELDS.keys()]
-            + [k.value for k in MetadataFields.XMP_FIELDS.keys()]
+            + [k.value for k in MetadataFields.DJI_XMP_FIELDS.keys()]
             + [k.value for k in MetadataFields.CUSTOM_FIELDS.keys()]
             + [k.value for k in MetadataFields.MRK_FIELDS.keys()]
         )
@@ -251,17 +251,14 @@ class PhotoMetadata:
             if target_key not in payload and source_key in payload:
                 payload[target_key] = payload.get(source_key)
 
-        # Mapeamento dinamico por sufixo para normalizados XMP/EXIF (ex.: "EXIF:GPSInfo:GPSMapDatum" -> "GPSMapDatum")
-        required_by_suffix = {}
-        for key, spec in MetadataFields.REQUIRED_FIELDS.items():
-            normalized = str(getattr(spec, "normalized", ""))
-            if ":" in normalized:
-                required_by_suffix[normalized.split(":")[-1]] = key
+        # Mapeamento direto: valor enum -> chave enum (ex: "GPSMapDatum" -> MetadataFieldKey.GPS_MAP_DATUM)
+        from ...core.enum import MetadataFieldKey as MFK
+        enum_value_to_key = {key.value: key for key in MFK}
 
         for source_key, source_val in list(payload.items()):
             source_str = str(source_key)
-            source_suffix = source_str.split(":")[-1]
-            target_key = required_by_suffix.get(source_suffix)
+            # Tenta encontrar a chave enum correspondente ao valor
+            target_key = enum_value_to_key.get(source_str)
             if target_key and target_key not in payload:
                 payload[target_key] = source_val
 
