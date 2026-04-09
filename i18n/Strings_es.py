@@ -373,6 +373,19 @@ class Strings_es(Strings_pt_BR):
     CONVERT_FILE_SUCCESS = "Archivo convertido con exito."
     LOADED_EXISTING_GPKG = "Salidas GPKG existentes cargadas con exito."
     CONVERT_FILE_ERROR = "No fue posible convertir el archivo."
+    REPORT_METADATA_TITLE = "Informe de Metadatos"
+    REPORT_METADATA_TOOLTIP = (
+        "Lista JSON temporales de metadatos y permite regenerar el informe HTML.\n"
+        "Tambien ofrece un acceso rapido a la carpeta de informes."
+    )
+    REFRESH_JSON_LIST = "Actualizar lista JSON"
+    OPEN_REPORTS_FOLDER = "Abrir carpeta de informes"
+    OPEN_JSONS_FOLDER = "Abrir carpeta de JSON"
+    VECTOR_WITHOUT_MRK_BLOCK_TITLE = "Generar Vector Sin MRK"
+    PHOTO_FOLDER = "Carpeta de fotos:"
+    VECTORIZE_PHOTOS = "Generar vector de fotos"
+    PHOTOS_WITHOUT_MRK_LAYER_NAME = "Fotos_Sin_MRK"
+    NO_JSON_FOUND = "No se encontraron JSON temporales."
 
     # plugins/SettingsPlugin.py
     SETTINGS_TITLE = "Configuraciones de Cadmus"

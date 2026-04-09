@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import re
 from ..i18n.TranslationManager import STR
 
 
@@ -57,3 +58,13 @@ class StringManager:
         ".gpkg",
     }
     RASTER_EXTS = {".tif", ".tiff", ".ecw", ".jp2", ".asc"}
+
+    @staticmethod
+    def _normalize_key(key: str) -> str:
+        """Normaliza nomes de chaves para snake_case consistente."""
+        if key is None:
+            return ""
+        key = re.sub(r"(?<!^)(?=[A-Z])", "_", str(key))
+        key = key.replace(" ", "_").replace("-", "_").replace("/", "_")
+        key = re.sub(r"_+", "_", key).strip("_")
+        return key.lower()

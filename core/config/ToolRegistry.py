@@ -215,7 +215,7 @@ class ToolRegistry:
         tools.append(copy_attributes)
 
         # =====================================================
-        # AGRICULTURE (Ordem: Drone=10, Trail=20)
+        # AGRICULTURE (Ordem: Drone=10, Trail=20, Report=30)
         # =====================================================
 
         drone_coords = Tool(
@@ -242,6 +242,18 @@ class ToolRegistry:
             show_in_toolbar=True,
         )
         tools.append(gerar_rastro)
+
+        report_metadata = Tool(
+            name=STR.REPORT_METADATA_TITLE,
+            icon=im.icon(im.DRONE_COORDINATES),
+            category=self.AGRICULTURE,
+            tool_type=ToolTypeEnum.DIALOG,
+            executor=self.run_report_metadata,
+            tooltip=STR.REPORT_METADATA_TOOLTIP,
+            order=30,
+            show_in_toolbar=True,
+        )
+        tools.append(report_metadata)
 
         # =====================================================
         # RASTER (Ordem: Mass Clipper=10)
@@ -478,6 +490,22 @@ class ToolRegistry:
             self.logger.error(f"Erro ao executar Obter Coordenadas de Drone: {str(e)}")
             QgisMessageUtil.bar_critical(
                 self.iface, f"Erro no plugin Obter Coordenadas de Drone:\n{str(e)}"
+            )
+
+    # =====================================================
+    # EXECUTAR: Relatorio de Metadata
+    # =====================================================
+    def run_report_metadata(self):
+        try:
+            from ...plugins.ReportMetadataPlugin import run
+
+            self.logger.info("Abrindo dialogo: Relatorio de Metadata")
+            self.report_metadata_dlg = run(self.iface)
+            self.logger.info("Dialogo Relatorio de Metadata aberto com sucesso")
+        except Exception as e:
+            self.logger.error(f"Erro ao executar Relatorio de Metadata: {str(e)}")
+            QgisMessageUtil.bar_critical(
+                self.iface, f"Erro no plugin Relatorio de Metadata:\n{str(e)}"
             )
 
     # ====FERRAMENTAS DE JANELA SEM SAIDAS=================

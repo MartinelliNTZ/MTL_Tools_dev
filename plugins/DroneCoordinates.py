@@ -9,6 +9,7 @@ from ..core.engine_tasks.PhotoMetadataStep import PhotoMetadataStep
 from ..utils.mrk.PhotoMetadata import PhotoMetadata
 from ..utils.vector.VectorLayerGeometry import VectorLayerGeometry
 from ..utils.vector.VectorLayerSource import VectorLayerSource
+from ..utils.ExplorerUtils import ExplorerUtils
 from ..utils.StringManager import StringManager
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.ToolKeys import ToolKey
@@ -18,6 +19,7 @@ from ..utils.DependenciesManager import DependenciesManager
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.adapter.StringAdapter import StringAdapter
 from ..utils.mrk.MetadataFields import MetadataFields
+from ..core.services.ReportGenerationService import ReportGenerationService
 
 
 class DroneCordinates(BasePluginMTL):
@@ -419,6 +421,7 @@ class DroneCordinates(BasePluginMTL):
         context.set("selected_required_fields", self._get_selected_required_fields())
         context.set("selected_custom_fields", self._get_selected_custom_fields())
         context.set("selected_mrk_fields", self._get_selected_mrk_fields())
+        context.set("generate_report", self.checkbox_map["generate_report"].isChecked())
         context.set("tool_key", self.TOOL_KEY)
         context.set("points_layer_name", "MRK_Pontos")
 
@@ -513,6 +516,45 @@ class DroneCordinates(BasePluginMTL):
                         out_layer.triggerRepaint()
 
         from ..utils.QgisMessageUtil import QgisMessageUtil
+
+        # ===== REPORT HTML =====
+        generate_report = self.checkbox_map["generate_report"].isChecked()
+        json_path = context.get("photo_metadata_json_path")
+        self.logger.info(
+            "Pos-processamento de report",
+            data={"generate_report": generate_report, "json_path": json_path},
+        )
+        if generate_report:
+            if json_path:
+                try:
+                    report_payload = ReportGenerationService(
+                        tool_key=self.TOOL_KEY
+                    ).generate_from_json(json_path)
+                    self.logger.info(
+                        "Report metadata gerado com sucesso",
+                        data=report_payload,
+                    )
+                    html_path = (report_payload or {}).get("html_path")
+                    if html_path:
+                        opened = ExplorerUtils.open_file(html_path, self.TOOL_KEY)
+                        if not opened:
+                            self.logger.warning(
+                                "Falha ao abrir report HTML automaticamente",
+                                data={"html_path": html_path},
+                            )
+                            report_folder = os.path.dirname(html_path)
+                            if report_folder:
+                                ExplorerUtils.open_folder(report_folder, self.TOOL_KEY)
+                            QgisMessageUtil.bar_warning(
+                                self.iface,
+                                f"{STR.WARNING}: nao foi possivel abrir o HTML automaticamente.",
+                            )
+                except Exception as e:
+                    self.logger.error(f"Erro ao gerar report metadata: {e}")
+            else:
+                self.logger.warning(
+                    "Generate Report marcado, mas JSON de metadata nao foi encontrado no contexto"
+                )
 
         QgisMessageUtil.bar_success(self.iface, STR.SUCCESS_MESSAGE)
 

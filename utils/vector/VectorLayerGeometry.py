@@ -149,9 +149,21 @@ class VectorLayerGeometry:
         vl.updateFields()
 
         vl.startEditing()
+        skipped_invalid_geometry = 0
         for p in points:
+            x_val = p.get(x_key)
+            y_val = p.get(y_key)
+            if x_val is None or y_val is None:
+                skipped_invalid_geometry += 1
+                continue
+            try:
+                x_num = float(x_val)
+                y_num = float(y_val)
+            except Exception:
+                skipped_invalid_geometry += 1
+                continue
             f = QgsFeature(vl.fields())
-            f.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(p.get(x_key), p.get(y_key))))
+            f.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(x_num, y_num)))
             attrs = [p.get(input_name) for input_name, _, _ in normalized_specs]
             if extra_fields:
                 for field_name in extra_fields.keys():
@@ -161,6 +173,15 @@ class VectorLayerGeometry:
 
         vl.commitChanges()
         vl.updateExtents()
+        if skipped_invalid_geometry:
+            logger.warning(
+                f"create_point_layer_from_dicts: pulados {skipped_invalid_geometry} registros sem coordenada valida"
+            )
+        if vl.featureCount() == 0:
+            logger.warning(
+                "create_point_layer_from_dicts: nenhuma feicao valida foi criada"
+            )
+            return None
         return vl
 
     @staticmethod

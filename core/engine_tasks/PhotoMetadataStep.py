@@ -138,6 +138,9 @@ class PhotoMetadataStep(BaseStep):
 
         updates = result.get("updates", {}) or {}
         field_names = result.get("field_names", []) or []
+        json_dump_path = result.get("json_dump_path")
+        if json_dump_path:
+            context.set("photo_metadata_json_path", json_dump_path)
 
         if not updates:
             LogUtils(

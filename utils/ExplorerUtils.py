@@ -104,6 +104,22 @@ class ExplorerUtils:
         return True
 
     @staticmethod
+    def open_file(file_path: str, tool_key: str) -> bool:
+        """Abre um arquivo com o aplicativo padrao do sistema (ex.: HTML no navegador)."""
+        logger = ExplorerUtils._get_logger(tool_key)
+        if not file_path or not os.path.isfile(file_path):
+            logger.error(f"open_file: arquivo invalido: {file_path}")
+            return False
+
+        ok = QDesktopServices.openUrl(QUrl.fromLocalFile(file_path))
+        if ok:
+            logger.info(f"open_file: arquivo aberto: {file_path}")
+            return True
+
+        logger.error(f"open_file: falha ao abrir arquivo: {file_path}")
+        return False
+
+    @staticmethod
     def copy_file_to_folder(
         source_file: str,
         destination_folder: str,
@@ -146,13 +162,24 @@ class ExplorerUtils:
         payload,
         tool_key: str,
         prefix: str = "cadmus_drone_metadata",
+        subfolder: str = None,
+        file_stem_hint: str = None,
     ) -> str:
         """Cria arquivo JSON temporario e retorna caminho absoluto."""
         logger = ExplorerUtils._get_logger(tool_key)
         try:
-            temp_dir = tempfile.gettempdir()
+            if subfolder:
+                temp_dir = ExplorerUtils.ensure_temp_subfolder(
+                    subfolder, tool_key=tool_key
+                )
+            else:
+                temp_dir = tempfile.gettempdir()
             stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            file_name = f"{prefix}_{stamp}.json"
+            hint = ExplorerUtils.sanitize_path_component(file_stem_hint or "")
+            if hint:
+                file_name = f"{prefix}_{hint}_{stamp}.json"
+            else:
+                file_name = f"{prefix}_{stamp}.json"
             output_path = os.path.join(temp_dir, file_name)
             with open(output_path, "w", encoding="utf-8") as fh:
                 json.dump(payload, fh, ensure_ascii=False, indent=2, default=str)
@@ -161,6 +188,100 @@ class ExplorerUtils:
         except Exception as e:
             logger.error(f"create_temp_json: erro ao criar json temporario: {e}")
             return ""
+
+    @staticmethod
+    def get_cadmus_temp_root(tool_key: str) -> str:
+        """Retorna pasta base temporaria do Cadmus em %TEMP%."""
+        logger = ExplorerUtils._get_logger(tool_key)
+        temp_root = os.path.join(
+            tempfile.gettempdir(),
+            ExplorerUtils.CADMUS_TEMP_FOLDER,
+        )
+        try:
+            os.makedirs(temp_root, exist_ok=True)
+            return temp_root
+        except Exception as e:
+            logger.error(f"get_cadmus_temp_root: erro ao criar pasta base: {e}")
+            return tempfile.gettempdir()
+
+    @staticmethod
+    def ensure_temp_subfolder(subfolder: str, tool_key: str) -> str:
+        """Cria e retorna subpasta dentro da raiz temporaria do Cadmus."""
+        logger = ExplorerUtils._get_logger(tool_key)
+        root = ExplorerUtils.get_cadmus_temp_root(tool_key)
+        subfolder_text = str(subfolder or "").strip()
+        if not subfolder_text:
+            logger.warning(
+                "ensure_temp_subfolder: subfolder vazio/invalido, usando raiz cadmus temp"
+            )
+            return root
+
+        parts = re.split(r"[\\/]+", subfolder_text)
+        safe_parts = [
+            ExplorerUtils.sanitize_path_component(part)
+            for part in parts
+            if ExplorerUtils.sanitize_path_component(part)
+        ]
+        if not safe_parts:
+            logger.warning(
+                "ensure_temp_subfolder: subfolder sem partes validas, usando raiz cadmus temp"
+            )
+            return root
+
+        full_path = os.path.join(root, *safe_parts)
+        try:
+            os.makedirs(full_path, exist_ok=True)
+            return full_path
+        except Exception as e:
+            logger.error(f"ensure_temp_subfolder: erro ao criar subpasta: {e}")
+            return root
+
+    @staticmethod
+    def get_temp_folder(tool_key: str, *subfolders: str) -> str:
+        """Retorna pasta temporaria do Cadmus opcionalmente navegando por subpastas."""
+        if not subfolders:
+            return ExplorerUtils.get_cadmus_temp_root(tool_key)
+        joined = os.path.join(*[str(part) for part in subfolders if str(part).strip()])
+        return ExplorerUtils.ensure_temp_subfolder(joined, tool_key=tool_key)
+
+    @staticmethod
+    def build_report_json_stem(base_folder: str = "", points_total: int = None) -> str:
+        """
+        Monta sufixo amigavel para nome de JSON de report.
+        Exemplo: `M3E_DJI_202604011322_001_m2_167pts`.
+        """
+        base_name = os.path.basename(str(base_folder or "").rstrip("\\/"))
+        base_name = ExplorerUtils.sanitize_path_component(base_name)
+        if points_total is None:
+            return base_name or "dataset"
+        return f"{base_name or 'dataset'}_{int(points_total)}pts"
+
+    @staticmethod
+    def build_report_html_stem(
+        source_json_path: str = "", default_stem: str = "report_metadata"
+    ) -> str:
+        """Monta sufixo amigavel para nome de HTML de report."""
+        json_stem = Path(source_json_path).stem if source_json_path else default_stem
+        return ExplorerUtils.sanitize_path_component(json_stem) or default_stem
+
+    @staticmethod
+    def build_temp_file_path(
+        *subfolders: str,
+        tool_key: str,
+        prefix: str = "cadmus",
+        extension: str = ".tmp",
+        file_stem_hint: str = "",
+    ) -> str:
+        """Monta caminho de arquivo temporario com nome padronizado em subpasta do Cadmus temp."""
+        temp_dir = ExplorerUtils.get_temp_folder(tool_key, *subfolders)
+        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        ext = extension if str(extension).startswith(".") else f".{extension}"
+        hint = ExplorerUtils.sanitize_path_component(file_stem_hint or "")
+        if hint:
+            file_name = f"{prefix}_{hint}_{stamp}{ext}"
+        else:
+            file_name = f"{prefix}_{stamp}{ext}"
+        return os.path.join(temp_dir, file_name)
 
     @staticmethod
     def scan_folder(folder: str, extensions: List[str], tool_key: str) -> List[Dict]:
@@ -215,3 +336,7 @@ class ExplorerUtils:
             if layer:
                 logger.info(f"Vector criado: {path}")
             return layer
+    CADMUS_TEMP_FOLDER = "cadmus"
+    REPORTS_TEMP_FOLDER = "reports"
+    REPORTS_JSON_FOLDER = "json"
+    REPORTS_HTML_FOLDER = "html"

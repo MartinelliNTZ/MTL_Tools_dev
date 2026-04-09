@@ -1026,6 +1026,56 @@ class MetadataFields:
         return key_or_attribute
 
     @classmethod
+    def resolve_candidates(cls, key_or_attribute: str) -> List[str]:
+        """
+        Retorna lista ordenada de candidatos de chave canonica para lookup robusto.
+
+        Suporta:
+        - chave canonica (ex.: `SizeMb`)
+        - attribute (ex.: `SizeMB`)
+        - formatos com namespace/prefixo (ex.: `EXIF:SizeMb`, `xmp_bloco_1:drone-dji:GpsLatitude`)
+        - variantes normalizadas em snake_case/PascalCase.
+        """
+        if not key_or_attribute:
+            return []
+
+        raw = str(key_or_attribute).strip()
+        if not raw:
+            return []
+
+        seen = set()
+        out: List[str] = []
+
+        def _push(value: str):
+            if value and value not in seen:
+                seen.add(value)
+                out.append(value)
+
+        _push(raw)
+        _push(cls.resolve_key(raw))
+
+        # Se vier com namespace (EXIF:, MRK:, xmp_bloco_1:drone-dji:...), tenta sufixos.
+        parts = [p for p in raw.split(":") if p]
+        if len(parts) > 1:
+            tail = parts[-1]
+            _push(tail)
+            _push(cls.resolve_key(tail))
+
+        # Variantes por estilo de nome (snake -> Pascal etc.)
+        pascal = cls._to_pascal_case(raw)
+        _push(pascal)
+        _push(cls.resolve_key(pascal))
+
+        if len(parts) > 1:
+            tail_pascal = cls._to_pascal_case(parts[-1])
+            _push(tail_pascal)
+            _push(cls.resolve_key(tail_pascal))
+
+        # Mantem apenas candidatos que realmente existem no catalogo.
+        catalog = cls.all_fields()
+        return [candidate for candidate in out if candidate in catalog]
+
+    @classmethod
     def resolve_output_name(cls, key_or_attribute: str) -> str:
         if not key_or_attribute:
             return key_or_attribute

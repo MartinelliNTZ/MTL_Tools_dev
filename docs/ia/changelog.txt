@@ -101,3 +101,33 @@
 [2.3.8.19.1] Compatibilidade retroativa mantida via resolve_key com conversao automatica de nomes antigos (snake_case -> PascalCase) para evitar quebra de fluxos legados.
 [2.3.8.19.2] Ajuste de padrao de atributos: todos os attribute validados com limite maximo de 9 caracteres e descriptions sincronizadas com o codigo entre colchetes.
 
+2.3.8.20 2026/04/08
+[2.3.8.20] Inicio da implementacao do sistema de report (E03): ExplorerUtils ganhou infraestrutura de diretorios temporarios dedicados (`%TEMP%/cadmus/reports/json` e `%TEMP%/cadmus/reports/html`) com helpers de criacao e resolucao de caminhos.
+[2.3.8.20.1] ExplorerUtils.create_temp_json foi expandido com `subfolder` e `file_stem_hint`, mantendo retrocompatibilidade e permitindo nomes de JSON mais amigaveis ao usuario.
+[2.3.8.20.2] Adicionados helpers de naming para report (`build_report_json_stem`, `build_report_html_stem`, `build_temp_report_html_path`) preparando a etapa de geracao HTML.
+[2.3.8.20.3] PhotoMetadata passou a salvar dump JSON no diretorio temporario dedicado de reports/json com naming sugestivo baseado em pasta de entrada e total de pontos.
+[2.3.8.20.4] StringManager recebeu `_normalize_key` centralizado para normalizacao consistente de chaves (snake_case), conforme requisito do plano.
+[2.3.8.20.5] Todo atualizado: etapa E03 marcada como concluida e item E05.2 concluido.
+2.3.8.21 2026/04/08
+[2.3.8.21] Etapa E04 concluida: sistema de report migrado para estrutura oficial do plugin com novos modulos em `utils/report` (JSONUtil, RangeMetadataManager, IMGMetadata, AggregateAnalyzer, RenderEngine) e recursos em `resources/reports` (template.html, config.yaml).
+[2.3.8.21.1] Criado `core/services/ReportGenerationService.py` para orquestracao de geracao de relatorio HTML a partir de JSON temporario, usando pipeline JSONUtil -> IMGMetadata -> AggregateAnalyzer -> RenderEngine.
+[2.3.8.21.2] Integracao inicial no DroneCoordinates (E06 parcial): quando `generate_report` esta marcado, o plugin consome `photo_metadata_json_path` do contexto e dispara a geracao de HTML sem interromper o fluxo vetorial em caso de erro.
+[2.3.8.21.3] Integracao inicial no DroneCoordinatesRunner (E07 parcial): runner passou a ler `generate_report` nas preferencias e acionar ReportGenerationService ao final, retornando `report_payload` no callback `on_finished`.
+[2.3.8.21.4] PhotoMetadataStep passou a propagar `json_dump_path` para o ExecutionContext (`photo_metadata_json_path`) para uso direto pela camada de servico de report.
+[2.3.8.21.5] Validacao sintatica executada com sucesso via `py_compile` para todos os modulos alterados nesta rodada.
+2.3.8.22 2026/04/08
+[2.3.8.22] Etapa E08 concluida: criada nova ferramenta `Report Metadata` (categoria Agriculture, tipo Dialog) com plugin dedicado `plugins/ReportMetadataPlugin.py` para listar JSONs temporarios e regerar HTML sob demanda.
+[2.3.8.22.1] ToolRegistry atualizado com novo item de menu/toolbar e executor `run_report_metadata`; ToolKey novo adicionado em `utils/ToolKeys.py` (`REPORT_METADATA`).
+[2.3.8.22.2] i18n expandido (pt_BR/en/es/de) com strings da nova ferramenta: titulo, tooltip, seletor JSON, atualizar lista, gerar relatorio e abrir pasta de relatorios.
+[2.3.8.22.3] WidgetFactory recebeu helper `create_open_reports_button(...)`, integrado ao plugin de report para navegacao rapida da pasta de HTMLs gerados.
+[2.3.8.22.4] Integracao de report no fluxo principal refinada: DroneCoordinates e DroneCoordinatesRunner usam `ReportGenerationService`, com contexto `photo_metadata_json_path` vindo do PhotoMetadataStep.
+[2.3.8.22.5] Validacao sintatica executada com sucesso via `py_compile` para todos os arquivos alterados nesta rodada.
+2.3.8.23 2026/04/09
+[2.3.8.23] Finalizacao da fase de implementacao do plano: consolidada centralizacao de metadata para report com `MetadataFields.resolve_candidates`, garantindo lookup consistente por key/attribute/prefixos (EXIF/XMP/MRK) em consumidores de analytics.
+[2.3.8.23.1] Correcao de runtime em `IMGMetadata` (import `re`) para derivacao de `flight_id` e compatibilidade completa com analise agregada.
+[2.3.8.23.2] Corrigida hierarquia de subpastas temporarias em `ExplorerUtils.ensure_temp_subfolder` (suporte real a `reports/json` e `reports/html` em vez de pasta unica sanitizada).
+[2.3.8.23.3] `ReportMetadataPlugin` expandido com fluxo "fotos sem MRK": selecao de pasta, opcao recursiva, opcao de gerar report e acao de vetorizacao usando `PhotoFolderVectorizationService`.
+[2.3.8.23.4] Novo fluxo gera camada vetorial (quando houver coordenadas), JSON de diagnostico em `%TEMP%/cadmus/reports/json` e HTML opcional em `%TEMP%/cadmus/reports/html`, com feedback na UI e atualizacao da lista de JSON.
+[2.3.8.23.5] i18n atualizado (pt_BR/en/es/de) para os novos controles de report metadata (pasta JSON, bloco sem MRK, opcoes e mensagens de fallback).
+[2.3.8.23.6] Documentacao adicionada: `docs/ia/GUIA_REPORT_METADATA_RAPIDO.md` e `docs/ia/CHECKLIST_REMOCAO_PHOTO_REPORT.md`.
+[2.3.8.23.7] Validacao sintatica executada com sucesso via `py_compile` para modulos alterados desta rodada.

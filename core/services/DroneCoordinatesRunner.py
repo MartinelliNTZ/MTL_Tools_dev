@@ -12,8 +12,9 @@ from ...utils.ExplorerUtils import ExplorerUtils
 from ...utils.vector.VectorLayerGeometry import VectorLayerGeometry
 from ...utils.vector.VectorLayerSource import VectorLayerSource
 from ...utils.Preferences import load_tool_prefs
-from ...utils.mrk.PhotoMetadata import PhotoMetadata
 from ...utils.mrk.MetadataFields import MetadataFields
+from ...core.config.LogUtils import LogUtils
+from .ReportGenerationService import ReportGenerationService
 
 
 class DroneCoordinatesRunner:
@@ -22,6 +23,7 @@ class DroneCoordinatesRunner:
     def __init__(self, iface, tool_key=ToolKey.DRONE_COORDINATES):
         self.iface = iface
         self.tool_key = tool_key
+        self.logger = LogUtils(tool=tool_key, class_name="DroneCoordinatesRunner")
         self._engine = None
         self._on_finished = None
         self._on_error = None
@@ -173,6 +175,28 @@ class DroneCoordinatesRunner:
                     if ok:
                         track_layer.triggerRepaint()
 
+        json_path = context.get("photo_metadata_json_path")
+        generate_report = prefs.get("generate_report", False)
+        report_payload = None
+        if generate_report:
+            if json_path:
+                try:
+                    report_payload = ReportGenerationService(
+                        tool_key=self.tool_key
+                    ).generate_from_json(json_path)
+                    self.logger.info(
+                        "Report metadata gerado pelo runner",
+                        data=report_payload,
+                    )
+                except Exception as e:
+                    self.logger.error(
+                        f"Falha ao gerar report metadata no runner: {e}"
+                    )
+            else:
+                self.logger.warning(
+                    "Runner com generate_report=True sem photo_metadata_json_path no contexto"
+                )
+
         QgisMessageUtil.bar_success(self.iface, STR.CONVERT_FILE_SUCCESS, duration=4)
         if callable(self._on_finished):
             self._on_finished(
@@ -181,6 +205,7 @@ class DroneCoordinatesRunner:
                     "points_layer": points_layer,
                     "track_layer": track_layer,
                     "used_existing": False,
+                    "report_payload": report_payload,
                 }
             )
 

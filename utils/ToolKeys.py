@@ -8,6 +8,7 @@ class ToolKey:
     CADMUS_PLUGIN = "cadmus_plugin"
     EXPORT_ALL_LAYOUTS = "export_all_layouts"
     DRONE_COORDINATES = "drone_coordinates"
+    REPORT_METADATA = "report_metadata"
     LOAD_FOLDER_LAYERS = "load_folder_layers"
     REPLACE_IN_LAYOUTS = "replace_in_layouts"
     RESTART_QGIS = "restart_qgis"
@@ -41,6 +42,7 @@ class ToolKey:
         CADMUS_PLUGIN: "#804E0A",  # laranja claro -> plugin principal
         EXPORT_ALL_LAYOUTS: "#4ECDC4",  # turquesa -> exportacao / layout
         DRONE_COORDINATES: "#45B7D1",  # azul -> coordenadas / espacial
+        REPORT_METADATA: "#5DADE2",  # azul medio -> relatorios de metadata
         LOAD_FOLDER_LAYERS: "#96CEB4",  # verde -> carga de dados
         REPLACE_IN_LAYOUTS: "#F8C471",  # laranja -> alteracao / replace
         RESTART_QGIS: "#FF6B6B",  # vermelho -> acao critica

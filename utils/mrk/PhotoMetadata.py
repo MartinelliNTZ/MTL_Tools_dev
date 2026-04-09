@@ -479,6 +479,14 @@ class PhotoMetadata:
             full_dump_payload,
             tool_key=TOOL_KEY,
             prefix="drone_photo_metadata_full",
+            subfolder=os.path.join(
+                ExplorerUtils.REPORTS_TEMP_FOLDER,
+                ExplorerUtils.REPORTS_JSON_FOLDER,
+            ),
+            file_stem_hint=ExplorerUtils.build_report_json_stem(
+                base_folder=base_folder,
+                points_total=len(points),
+            ),
         )
         PhotoMetadata.LAST_JSON_DUMP_PATH = dump_path
 
