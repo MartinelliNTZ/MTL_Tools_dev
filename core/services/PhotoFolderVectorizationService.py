@@ -1,5 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 import os
+import json
+import re
 from datetime import datetime
 from typing import Any, Dict, List, Tuple
 
@@ -12,12 +14,18 @@ from ...utils.ExplorerUtils import ExplorerUtils
 from ...utils.ToolKeys import ToolKey
 from ...utils.mrk.ExifUtil import ExifUtil
 from ...utils.mrk.MetadataFields import MetadataFields
+from ...utils.mrk.CustomPhotosFieldsUtil import CustomPhotosFieldsUtil
 from ...utils.mrk.XmpUtil import XmpUtil
 from ...utils.vector.VectorLayerGeometry import VectorLayerGeometry
 
 
 class PhotoFolderVectorizationService:
     """Gera camada vetorial e diagnostico a partir de pasta de fotos (sem MRK)."""
+    DJI_PHOTO_RE = re.compile(r"_(\d{4})_[A-Z]\.JPG$", re.IGNORECASE)
+    FLIGHT_FOLDER_RE = re.compile(
+        r"DJI_\d+_(?P<flight_number>\d+?)_(?P<flight_name>[^_\\\/]+)",
+        re.IGNORECASE,
+    )
 
     def __init__(self, tool_key: str = ToolKey.REPORT_METADATA):
         self.tool_key = tool_key
@@ -36,6 +44,152 @@ class PhotoFolderVectorizationService:
             return float(text)
         except Exception:
             return None
+
+    @staticmethod
+    def _normalize_attr_value(value: Any) -> Any:
+        """Normaliza valores para escrita segura em atributos QGIS."""
+        if isinstance(value, (list, tuple, dict)):
+            try:
+                return json.dumps(value, ensure_ascii=False)
+            except Exception:
+                return str(value)
+        return value
+
+    def _build_output_record_from_catalog(self, canonical: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Monta registro de saida somente com campos catalogados em MetadataFields,
+        garantindo mesmo padrao de atributos do DroneCoordinates.
+        """
+        output_record: Dict[str, Any] = {}
+        for key in MetadataFields.all_fields().keys():
+            attr_name = MetadataFields.resolve_output_name(key)
+            output_record[attr_name] = self._normalize_attr_value(canonical.get(key))
+        return output_record
+
+    @staticmethod
+    def _safe_parse_datetime(value: Any) -> datetime:
+        if value in (None, ""):
+            return None
+        text = str(value).strip()
+        for fmt in ("%Y:%m:%d %H:%M:%S", "%Y-%m-%d %H:%M:%S"):
+            try:
+                return datetime.strptime(text, fmt)
+            except Exception:
+                continue
+        return None
+
+    @staticmethod
+    def _format_dates(dt: datetime) -> Dict[str, str]:
+        return {
+            "dt_criacao": dt.strftime("%Y-%m-%d %H:%M:%S"),
+            "dt_full": dt.strftime("%Y%m%d%H%M"),
+            "dt_date": dt.strftime("%Y%m%d"),
+            "dt_time": dt.strftime("%H%M"),
+        }
+
+    def _extract_photo_number(self, file_path: str) -> Any:
+        fname = os.path.basename(file_path)
+        match = self.DJI_PHOTO_RE.search(fname)
+        if not match:
+            return None
+        try:
+            return int(match.group(1))
+        except Exception:
+            return None
+
+    def _extract_flight_context(self, file_path: str, base_folder: str) -> Dict[str, Any]:
+        folder_path = os.path.dirname(file_path)
+        folder_level_1 = os.path.basename(folder_path) or ""
+        folder_level_2 = os.path.basename(os.path.dirname(folder_path)) or ""
+
+        if not folder_level_1 and os.path.isdir(base_folder):
+            folder_level_1 = os.path.basename(base_folder)
+
+        flight_number = None
+        flight_name = None
+        match = self.FLIGHT_FOLDER_RE.search(folder_level_1)
+        if match:
+            flight_number = match.group("flight_number")
+            flight_name = match.group("flight_name")
+
+        return {
+            "FlightNumber": flight_number,
+            "FlightName": flight_name,
+            "FolderLevel1": folder_level_1,
+            "FolderLevel2": folder_level_2,
+            "MrkFolder": folder_path or base_folder,
+        }
+
+    def _extract_photo_payload(self, image_path: str) -> Dict[str, Any]:
+        """
+        Extracao de metadados no mesmo padrao do fluxo DroneCoordinates.
+        """
+        os_data = ExifUtil.extract_metadata_os(image_path, tool_key=self.tool_key)
+        image_data = ExifUtil.extract_metadata_image(image_path, tool_key=self.tool_key)
+        exif_data = ExifUtil.extract_metadata_exif(image_path, tool_key=self.tool_key)
+        xmp_data = XmpUtil.extract_metadata(image_path, tool_key=self.tool_key)
+
+        payload: Dict[str, Any] = {}
+        payload.update(os_data)
+        payload.update(image_data)
+        payload.update(exif_data)
+        payload.update(xmp_data)
+
+        alias_map = {
+            "drone-dji:AltitudeType": "AltitudeType",
+            "drone-dji:AbsoluteAltitude": "AbsoluteAltitude",
+            "drone-dji:RelativeAltitude": "RelativeAltitude",
+            "drone-dji:GimbalRollDegree": "GimbalRollDegree",
+            "drone-dji:GimbalYawDegree": "GimbalYawDegree",
+            "drone-dji:GimbalPitchDegree": "GimbalPitchDegree",
+            "drone-dji:FlightRollDegree": "FlightRollDegree",
+            "drone-dji:FlightYawDegree": "FlightYawDegree",
+            "drone-dji:FlightPitchDegree": "FlightPitchDegree",
+            "drone-dji:FlightXSpeed": "FlightXSpeed",
+            "drone-dji:FlightYSpeed": "FlightYSpeed",
+            "drone-dji:FlightZSpeed": "FlightZSpeed",
+            "drone-dji:RtkFlag": "RtkFlag",
+            "drone-dji:RtkStdLon": "RtkStdLon",
+            "drone-dji:RtkStdLat": "RtkStdLat",
+            "drone-dji:RtkStdHgt": "RtkStdHgt",
+            "drone-dji:RtkDiffAge": "RtkDiffAge",
+            "drone-dji:DewarpFlag": "DewarpFlag",
+            "drone-dji:ShutterCount": "ShutterCount",
+            "drone-dji:FocusDistance": "FocusDistance",
+            "drone-dji:CameraSerialNumber": "CameraSerialNumber",
+            "drone-dji:DroneSerialNumber": "DroneSerialNumber",
+            "drone-dji:DroneModel": "DroneModel",
+            "drone-dji:CaptureUUID": "CaptureUUID",
+            "drone-dji:PictureQuality": "PictureQuality",
+            "drone-dji:UTCAtExposure": "UTCAtExposure",
+            "drone-dji:SensorTemperature": "SensorTemperature",
+            "drone-dji:LensTemperature": "LensTemperature",
+            "drone-dji:SensorFPS": "SensorFPS",
+            "drone-dji:LensPosition": "LensPosition",
+            "drone-dji:LRFStatus": "LRFStatus",
+            "drone-dji:LRFTargetDistance": "LRFTargetDistance",
+            "drone-dji:LRFTargetLon": "LRFTargetLon",
+            "drone-dji:LRFTargetLat": "LRFTargetLat",
+            "drone-dji:LRFTargetAlt": "LRFTargetAlt",
+            "drone-dji:LRFTargetAbsAlt": "LRFTargetAbsAlt",
+            "drone-dji:WhiteBalanceCCT": "WhiteBalanceCCT",
+            "drone-dji:GpsStatus": "GpsStatus",
+            "drone-dji:GpsLatitude": "GpsLatitude",
+            "drone-dji:GpsLongitude": "GpsLongitude",
+        }
+        for source_key, target_key in alias_map.items():
+            if target_key not in payload and source_key in payload:
+                payload[target_key] = payload.get(source_key)
+
+        payload["FileType"] = os.path.splitext(image_path)[1].upper()
+        dt = self._safe_parse_datetime(
+            payload.get("DateTimeOriginal") or payload.get("DateTime") or payload.get("os_date")
+        )
+        if dt is not None:
+            payload.update(self._format_dates(dt))
+            payload["DateTimeOriginal"] = dt.strftime("%Y:%m:%d %H:%M:%S")
+
+        return payload
 
     @staticmethod
     def _extract_gps_decimal_from_dms(value, ref):
@@ -162,14 +316,7 @@ class PhotoFolderVectorizationService:
         y_geom_key = MetadataFields.resolve_output_name("Lat")
 
         for file_path in files:
-            os_payload = ExifUtil.extract_metadata_os(file_path, tool_key=self.tool_key)
-            exif_payload = ExifUtil.extract_metadata_exif(file_path, tool_key=self.tool_key)
-            xmp_payload = XmpUtil.extract_metadata(file_path, tool_key=self.tool_key)
-
-            merged = {}
-            merged.update(os_payload)
-            merged.update(exif_payload)
-            merged.update(xmp_payload)
+            merged = self._extract_photo_payload(file_path)
 
             has_xmp = str(merged.get("xmp_encontrado", "nao")).lower() == "sim"
             if has_xmp:
@@ -187,11 +334,18 @@ class PhotoFolderVectorizationService:
                 quality["with_coords"] += 1
 
             canonical = MetadataFields.normalize_record_to_keys(merged)
+            canonical.update(self._extract_flight_context(file_path, base_folder))
+
             canonical["Lat"] = lat
             canonical["Lon"] = lon
             canonical["Alt"] = alt
+            canonical["GpsLatitude"] = lat if lat is not None else canonical.get("GpsLatitude")
+            canonical["GpsLongitude"] = lon if lon is not None else canonical.get("GpsLongitude")
+            canonical["AbsoluteAltitude"] = (
+                alt if alt is not None else canonical.get("AbsoluteAltitude")
+            )
             canonical["DateName"] = self._date_name_from_payload(canonical)
-            canonical["MrkFolder"] = base_folder
+            canonical["Foto"] = self._extract_photo_number(file_path)
             canonical["CoordSource"] = source
             canonical["HasXmp"] = has_xmp
             canonical["HasExifGps"] = has_exif_gps
@@ -200,17 +354,36 @@ class PhotoFolderVectorizationService:
             file_key = os.path.basename(file_path)
             raw_records[file_key] = canonical
 
+        # Calcula campos custom em lote para manter paridade com DroneCoordinates.
+        try:
+            custom_ready = {
+                key: value
+                for key, value in raw_records.items()
+                if value.get("DateTimeOriginal") not in (None, "")
+            }
+            if custom_ready:
+                enriched = CustomPhotosFieldsUtil.calculate_all_custom_fields(
+                    custom_ready,
+                    tool_key=self.tool_key,
+                )
+                for key, value in enriched.items():
+                    raw_records[key].update(value)
+        except Exception as exc:
+            self.logger.warning(f"Falha ao calcular CUSTOM_FIELDS no modo sem MRK: {exc}")
+
+        for key, value in list(raw_records.items()):
+            raw_records[key] = MetadataFields.normalize_record_to_keys(value or {})
+
+        for canonical in raw_records.values():
+            lat = canonical.get("Lat")
+            lon = canonical.get("Lon")
             if lat is None or lon is None:
                 continue
 
-            output_record = MetadataFields.map_record_to_output_attributes(canonical)
+            output_record = self._build_output_record_from_catalog(canonical)
             # Garantir chaves de geometria exatamente no nome esperado pela camada.
             output_record[x_geom_key] = lon
             output_record[y_geom_key] = lat
-            output_record["CoordSource"] = source
-            output_record["HasXmp"] = "True" if has_xmp else "False"
-            output_record["HasExifGps"] = "True" if has_exif_gps else "False"
-            output_record["QualityFlag"] = canonical["QualityFlag"]
             points.append(output_record)
 
         schema = []
@@ -224,16 +397,6 @@ class PhotoFolderVectorizationService:
                 else:
                     qtype = QVariant.String
                 schema.append((key, qtype, key))
-
-        # Campos de diagnostico garantidos
-        for extra_name, qtype in (
-            ("CoordSource", QVariant.String),
-            ("HasXmp", QVariant.String),
-            ("HasExifGps", QVariant.String),
-            ("QualityFlag", QVariant.String),
-        ):
-            if extra_name not in [s[2] for s in schema]:
-                schema.append((extra_name, qtype, extra_name))
 
         layer = None
         if points:

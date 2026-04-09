@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
+import json
 
 from typing import Optional
 
@@ -20,6 +21,7 @@ from qgis.PyQt.QtCore import QVariant
 
 from ...core.config.LogUtils import LogUtils
 from ..ToolKeys import ToolKey
+from ..mrk.MetadataFields import MetadataFields
 import processing
 
 
@@ -148,6 +150,48 @@ class VectorLayerGeometry:
         vl.dataProvider().addAttributes(fields)
         vl.updateFields()
 
+        def _coerce_attr_value(value, qvariant_type):
+            if value is None:
+                return None
+            # Serializa containers para evitar erro de escrita em provider OGR.
+            if isinstance(value, (list, tuple, dict)):
+                try:
+                    value = json.dumps(value, ensure_ascii=False)
+                except Exception:
+                    value = str(value)
+
+            if qvariant_type == QVariant.String:
+                try:
+                    return str(value)
+                except Exception:
+                    return ""
+            if qvariant_type in (QVariant.Double,):
+                try:
+                    if value == "":
+                        return None
+                    return float(value)
+                except Exception:
+                    return None
+            if qvariant_type in (QVariant.Int, QVariant.LongLong):
+                try:
+                    if value == "":
+                        return None
+                    return int(float(value))
+                except Exception:
+                    return None
+            if qvariant_type == QVariant.Bool:
+                if isinstance(value, str):
+                    lowered = value.strip().lower()
+                    if lowered in ("1", "true", "sim", "yes"):
+                        return True
+                    if lowered in ("0", "false", "nao", "não", "no"):
+                        return False
+                try:
+                    return bool(value)
+                except Exception:
+                    return None
+            return value
+
         vl.startEditing()
         skipped_invalid_geometry = 0
         for p in points:
@@ -164,7 +208,11 @@ class VectorLayerGeometry:
                 continue
             f = QgsFeature(vl.fields())
             f.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(x_num, y_num)))
-            attrs = [p.get(input_name) for input_name, _, _ in normalized_specs]
+            attrs = []
+            for input_name, qvariant_type, _ in normalized_specs:
+                value = p.get(input_name)
+                value = _coerce_attr_value(value, qvariant_type)
+                attrs.append(value)
             if extra_fields:
                 for field_name in extra_fields.keys():
                     attrs.append(p.get(field_name))

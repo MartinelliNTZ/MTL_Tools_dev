@@ -479,41 +479,44 @@ class DroneCordinates(BasePluginMTL):
 
         # ===== TRAÃ‡O =====
         points = context.get("points", []) or []
-        vl_line = VectorLayerGeometry.create_line_layer_from_points(
-            points,
-            group_by_fields=["mrk_path", "mrk_file"],
-            attribute_fields=MetadataFields.default_track_attribute_keys(),
-        )
-        if vl_line:
-            out_layer = None
-            save_to_file = self.save_track_selector.is_enabled()
-            out_path = (
-                self.save_track_selector.get_file_path().strip()
-                if save_to_file
-                else None
+        try:
+            vl_line = VectorLayerGeometry.create_line_layer_from_points(
+                points,
+                group_by_fields=["mrk_path", "mrk_file"],
+                attribute_fields=MetadataFields.default_track_attribute_keys(),
             )
-            if save_to_file and out_path:
-                saved_layer = VectorLayerSource.save_and_load_layer(
-                    vl_line,
-                    out_path,
-                    tool_key=self.TOOL_KEY,
-                    decision="rename",
+            if vl_line:
+                out_layer = None
+                save_to_file = self.save_track_selector.is_enabled()
+                out_path = (
+                    self.save_track_selector.get_file_path().strip()
+                    if save_to_file
+                    else None
                 )
-                if saved_layer and saved_layer.isValid():
-                    out_layer = saved_layer
+                if save_to_file and out_path:
+                    saved_layer = VectorLayerSource.save_and_load_layer(
+                        vl_line,
+                        out_path,
+                        tool_key=self.TOOL_KEY,
+                        decision="rename",
+                    )
+                    if saved_layer and saved_layer.isValid():
+                        out_layer = saved_layer
+                        QgsProject.instance().addMapLayer(out_layer)
+                else:
+                    out_layer = vl_line
                     QgsProject.instance().addMapLayer(out_layer)
-            else:
-                out_layer = vl_line
-                QgsProject.instance().addMapLayer(out_layer)
 
-            if self.qml_track_selector.is_enabled() and out_layer:
-                qml = self.qml_track_selector.get_file_path().strip()
-                if qml and os.path.exists(qml):
-                    ok = out_layer.loadNamedStyle(qml)
-                    if isinstance(ok, tuple):
-                        ok = ok[0]
-                    if ok:
-                        out_layer.triggerRepaint()
+                if self.qml_track_selector.is_enabled() and out_layer:
+                    qml = self.qml_track_selector.get_file_path().strip()
+                    if qml and os.path.exists(qml):
+                        ok = out_layer.loadNamedStyle(qml)
+                        if isinstance(ok, tuple):
+                            ok = ok[0]
+                        if ok:
+                            out_layer.triggerRepaint()
+        except Exception as e:
+            self.logger.error(f"Falha ao gerar camada de traco: {e}")
 
         from ..utils.QgisMessageUtil import QgisMessageUtil
 

@@ -1117,7 +1117,20 @@ class MetadataFields:
         """
         normalized = {}
         for key, value in (record or {}).items():
-            normalized[cls.resolve_key(key)] = value
+            candidates = cls.resolve_candidates(key)
+            target_key = candidates[0] if candidates else cls.resolve_key(key)
+
+            if target_key not in normalized:
+                normalized[target_key] = value
+                continue
+
+            current_value = normalized.get(target_key)
+            current_empty = current_value in (None, "")
+            new_empty = value in (None, "")
+
+            # Nao sobrescrever valor preenchido por valor vazio.
+            if current_empty and (not new_empty):
+                normalized[target_key] = value
         return normalized
 
     @classmethod
