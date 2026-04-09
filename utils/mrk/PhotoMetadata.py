@@ -48,10 +48,11 @@ class PhotoMetadata:
         """
         Campos permitidos no JSON de dump por foto.
         Inclui todos os campos catalogados no MetadataFields:
-        REQUIRED + CUSTOM + MRK.
+        EXIF + XMP + CUSTOM + MRK.
         """
         return (
-            [k.value for k in MetadataFields.REQUIRED_FIELDS.keys()]
+            [k.value for k in MetadataFields.EXIF_FIELDS.keys()]
+            + [k.value for k in MetadataFields.XMP_FIELDS.keys()]
             + [k.value for k in MetadataFields.CUSTOM_FIELDS.keys()]
             + [k.value for k in MetadataFields.MRK_FIELDS.keys()]
         )

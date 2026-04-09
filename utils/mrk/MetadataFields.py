@@ -8,7 +8,7 @@ from ...core.enum import MetadataFieldKey
 
 
 class MetadataFields:
-    REQUIRED_FIELDS = {
+    EXIF_FIELDS = {
         MetadataFieldKey.FILE: Field(
             normalized="File",
             core="os",
@@ -201,6 +201,49 @@ class MetadataFields:
             description="Razao de zoom digital aplicada na captura. [ZoomRatio]",
             level=3,
         ),
+        MetadataFieldKey.EXIF_SHARPNESS: Field(
+            normalized="EXIF:Sharpness",
+            core="EXIF",
+            label="EXIF Sharpness",
+            attribute="Sharpness",
+            description="Nivel de nitidez da imagem mapeado pelo EXIF. [Sharpness]",
+            level=3,
+        ),
+        MetadataFieldKey.EXIF_CONTRAST: Field(
+            normalized="EXIF:Contrast",
+            core="EXIF",
+            label="EXIF Contrast",
+            attribute="Contrast",
+            description="Nivel de contraste aplicado na captura. [Contrast]",
+            level=3,
+        ),
+        MetadataFieldKey.EXIF_SATURATION: Field(
+            normalized="EXIF:Saturation",
+            core="EXIF",
+            label="EXIF Saturation",
+            attribute="Saturation",
+            description="Nivel de saturacao de cor da imagem. [Saturation]",
+            level=3,
+        ),
+        MetadataFieldKey.EXIF_FLASH_PIX_VERSION: Field(
+            normalized="EXIF:FlashPixVersion",
+            core="EXIF",
+            label="EXIF Flash Pix Version",
+            attribute="FlashPixVer",
+            description="Versao FlashPix gravada no EXIF. [FlashPixVer]",
+            level=3,
+        ),
+        MetadataFieldKey.EXIF_COLOR_SPACE: Field(
+            normalized="EXIF:ColorSpace",
+            core="EXIF",
+            label="EXIF Color Space",
+            attribute="ColorSpace",
+            description="Espaco de cor utilizado na captura da imagem. [ColorSpace]",
+            level=3,
+        ),
+    }
+
+    XMP_FIELDS = {
         MetadataFieldKey.GPS_STATUS: Field(
             normalized="EXIF:GPSInfo:GPSStatus",
             core="xmp_bloco_1",
@@ -537,47 +580,9 @@ class MetadataFields:
             description="Temperatura da lente no momento da captura. [LensTemp]",
             level=3,
         ),
-        MetadataFieldKey.EXIF_SHARPNESS: Field(
-            normalized="EXIF:Sharpness",
-            core="EXIF",
-            label="EXIF Sharpness",
-            attribute="Sharpness",
-            description="Nivel de nitidez da imagem mapeado pelo EXIF. [Sharpness]",
-            level=3,
-        ),
-        MetadataFieldKey.EXIF_CONTRAST: Field(
-            normalized="EXIF:Contrast",
-            core="EXIF",
-            label="EXIF Contrast",
-            attribute="Contrast",
-            description="Nivel de contraste aplicado na captura. [Contrast]",
-            level=3,
-        ),
-        MetadataFieldKey.EXIF_SATURATION: Field(
-            normalized="EXIF:Saturation",
-            core="EXIF",
-            label="EXIF Saturation",
-            attribute="Saturation",
-            description="Nivel de saturacao de cor da imagem. [Saturation]",
-            level=3,
-        ),
-        MetadataFieldKey.EXIF_FLASH_PIX_VERSION: Field(
-            normalized="EXIF:FlashPixVersion",
-            core="EXIF",
-            label="EXIF Flash Pix Version",
-            attribute="FlashPixVer",
-            description="Versao FlashPix gravada no EXIF. [FlashPixVer]",
-            level=3,
-        ),
-        MetadataFieldKey.EXIF_COLOR_SPACE: Field(
-            normalized="EXIF:ColorSpace",
-            core="EXIF",
-            label="EXIF Color Space",
-            attribute="ColorSpace",
-            description="Espaco de cor utilizado na captura da imagem. [ColorSpace]",
-            level=3,
-        ),
     }
+
+    REQUIRED_FIELDS = {**EXIF_FIELDS, **XMP_FIELDS}
 
     CUSTOM_FIELDS = {
         MetadataFieldKey.FILE_TYPE: Field(
@@ -1038,32 +1043,40 @@ class MetadataFields:
     def sanitize_field_name(cls, raw_field_name: str) -> Optional[str]:
         """
         Mapeia nomes de campos brutos/ilegais para campos canonizados em MetadataFields.
-        
+
         Realiza as seguintes normalizacoes:
         1. Remove espacos e converte para PascalCase
         2. Remove prefixos de namespace (xmp:, drone-dji:, crs:, tiff:, rdf:)
         3. Mapeia campos de sistema (arquivo, caminho, etc.) para canonicos
         4. Valida contra MetadataFields.all_fields()
-        
+
         Args:
             raw_field_name: Nome bruto do campo (ex: "xmp:CreateDate", "arquivo", "tamanho_mb")
-            
+
         Returns:
             Nome canonizado do atributo se mapeado com sucesso, None caso contrario
         """
         if not raw_field_name or not isinstance(raw_field_name, str):
             return None
-            
+
         # Remove espacos
         normalized = raw_field_name.strip()
-        
+
         # Remove prefixos de namespace
-        namespace_prefixes = ("xmp:", "drone-dji:", "crs:", "tiff:", "rdf:", "EXIF:", "GPS:")
+        namespace_prefixes = (
+            "xmp:",
+            "drone-dji:",
+            "crs:",
+            "tiff:",
+            "rdf:",
+            "EXIF:",
+            "GPS:",
+        )
         for prefix in namespace_prefixes:
             if normalized.startswith(prefix):
-                normalized = normalized[len(prefix):]
+                normalized = normalized[len(prefix) :]
                 break
-        
+
         # Mapeamento especial para campos de sistema
         field_mappings = {
             "arquivo": "File",
@@ -1084,42 +1097,44 @@ class MetadataFields:
             "createdate": "DateTime",
             "modifydate": "DateTime",
         }
-        
+
         # Verifica mapemento especial (case-insensitive)
         normalized_lower = normalized.lower()
         if normalized_lower in field_mappings:
             return field_mappings[normalized_lower]
-        
+
         # Tenta encontrar nos campos canonicos
         all_fields_dict = cls.all_fields()
-        
+
         # Primeiro: busca exata (case-sensitive)
         if normalized in all_fields_dict:
             return all_fields_dict[normalized].attribute
-        
+
         # Segundo: busca case-insensitive
         normalized_lower = normalized.lower()
         for field_name, field_obj in all_fields_dict.items():
             if field_name.lower() == normalized_lower:
                 return field_obj.attribute
-        
+
         # Terceiro: tenta conversao para PascalCase
-        pascal_case = cls._to_pascal_case(normalized.replace(" ", "_").replace("-", "_"))
+        pascal_case = cls._to_pascal_case(
+            normalized.replace(" ", "_").replace("-", "_")
+        )
         for field_name, field_obj in all_fields_dict.items():
             if field_name.lower() == pascal_case.lower():
                 return field_obj.attribute
-        
+
         # Nenhuma correspondencia encontrada
         return None
-    
+
     @classmethod
     def is_authorized_field(cls, field_name: str) -> bool:
         """
         Verifica se um nome de campo e um dos campos autorizados em MetadataFields.
-        
+
         Args:
             field_name: Nome do campo a validar
-            
+
         Returns:
             True se o campo e autorizado, False caso contrario
         """

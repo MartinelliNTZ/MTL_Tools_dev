@@ -1,5 +1,4 @@
-﻿from math import cos, sin, pi
-from pathlib import Path
+﻿from pathlib import Path
 from typing import Any, Dict, List
 
 import jinja2
@@ -57,35 +56,110 @@ class RenderEngine:
         return charts
 
     @staticmethod
-    def generate_map_data(results: List[Any]) -> Dict[str, Any]:
-        """Gera snippet Leaflet com marcadores sinteticos para visualizacao no relatorio."""
-        markers = []
-        center_lat, center_lon = -10.217, -48.359
+    def _to_float(value: Any):
+        """Converte valor para float com tolerancia a strings vazias."""
+        if value is None:
+            return None
+        if isinstance(value, (int, float)):
+            return float(value)
+        text = str(value).strip().replace("+", "")
+        if text.lower() in {"", "none", "null", "nan"}:
+            return None
+        try:
+            return float(text)
+        except Exception:
+            return None
 
-        for i, result in enumerate(results):
-            angle = (2 * pi * i) / max(len(results), 1)
-            radius = 0.00015 + (i % 7) * 0.00003
-            lat = center_lat + cos(angle) * radius
-            lon = center_lon + sin(angle) * radius
+    @staticmethod
+    def _extract_lat_lon(result: Any):
+        """Extrai lat/lon reais a partir do resultado da imagem."""
+        if hasattr(result, "get_indicator"):
+            lat = RenderEngine._to_float(result.get_indicator("Lat"))
+            lon = RenderEngine._to_float(result.get_indicator("Lon"))
+            if lat is None or lon is None:
+                lat = RenderEngine._to_float(result.get_indicator("GpsLatitude"))
+                lon = RenderEngine._to_float(result.get_indicator("GpsLongitude"))
+            if lat is not None and lon is not None:
+                return lat, lon
+
+        for lat_key, lon_key in (
+            ("Lat", "Lon"),
+            ("GpsLatitude", "GpsLongitude"),
+            ("lat", "lon"),
+            ("latitude", "longitude"),
+        ):
+            if isinstance(result, dict):
+                lat = RenderEngine._to_float(result.get(lat_key))
+                lon = RenderEngine._to_float(result.get(lon_key))
+            else:
+                lat = RenderEngine._to_float(getattr(result, lat_key, None))
+                lon = RenderEngine._to_float(getattr(result, lon_key, None))
+            if lat is not None and lon is not None:
+                return lat, lon
+
+        return None, None
+
+    @staticmethod
+    def generate_map_data(results: List[Any]) -> Dict[str, Any]:
+        """Gera snippet Leaflet com pontos reais (lat/lon) das imagens."""
+        markers = []
+
+        for result in results:
+            lat, lon = RenderEngine._extract_lat_lon(result)
+            if lat is None or lon is None:
+                continue
+            if abs(lat) < 0.000001 and abs(lon) < 0.000001:
+                continue
+
+            filename = getattr(result, "filename", "unknown")
+            score = getattr(result, "overall_score", "-")
+            levels = getattr(result, "levels", {}) or {}
             popup = (
-                f"<b>{result.filename}</b><br>"
-                f"Score: {result.overall_score}<br>"
-                f"GSD nivel: {result.levels.get('gsd_cm', '?')}"
+                f"<b>{filename}</b><br>"
+                f"Score: {score}<br>"
+                f"GSD nivel: {levels.get('gsd_cm', '?')}"
             )
             markers.append({"lat": lat, "lon": lon, "popup": popup})
+
+        if markers:
+            center_lat = sum(m["lat"] for m in markers) / len(markers)
+            center_lon = sum(m["lon"] for m in markers) / len(markers)
+        else:
+            center_lat, center_lon = -10.217, -48.359
 
         leaflet_lines = [
             '<div id="map" style="height:220px;border-radius:8px"></div>',
             '<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>',
             '<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>',
             "<script>",
-            f'var map = L.map("map").setView([{center_lat}, {center_lon}], 18);',
+            f'var map = L.map("map").setView([{center_lat}, {center_lon}], 16);',
             'L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 21}).addTo(map);',
         ]
 
         for marker in markers:
             leaflet_lines.append(
                 f'L.marker([{marker["lat"]}, {marker["lon"]}]).addTo(map).bindPopup(`{marker["popup"]}`);'
+            )
+        if len(markers) >= 2:
+            leaflet_lines.append(
+                "L.polyline(["
+                + ",".join([f"[{m['lat']},{m['lon']}]" for m in markers])
+                + "], {color:'#1e88e5', weight:2, opacity:0.8}).addTo(map);"
+            )
+
+        if markers:
+            leaflet_lines.append(
+                "var bounds = L.latLngBounds(["
+                + ",".join([f"[{m['lat']},{m['lon']}]" for m in markers])
+                + "]);"
+            )
+            leaflet_lines.append("if (bounds.isValid()) { map.fitBounds(bounds.pad(0.15)); }")
+        else:
+            leaflet_lines.append(
+                'L.popup({closeButton:false,autoClose:false,closeOnClick:false})'
+                f'.setLatLng([{center_lat}, {center_lon}])'
+                '.setContent("Sem coordenadas válidas para exibir no mapa.")'
+                ".openOn(map);"
             )
 
         leaflet_lines.append("</script>")

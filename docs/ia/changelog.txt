@@ -1,4 +1,7 @@
 ﻿2.3.8 2026/04/07
+[2.3.8.23] MetadataFields: separated required field catalog into EXIF_FIELDS and XMP_FIELDS, preserving REQUIRED_FIELDS as a compatibility union.
+[2.3.8.23.1] PhotoMetadata._dump_allowed_keys now uses EXIF_FIELDS/XMP_FIELDS explicitly instead of the legacy single REQUIRED_FIELDS dictionary.
+
 [2.3.8.1]#comeÃ§e aqui
 
 
