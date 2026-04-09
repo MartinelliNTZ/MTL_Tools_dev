@@ -51,9 +51,9 @@ class PhotoMetadata:
         REQUIRED + CUSTOM + MRK.
         """
         return (
-            list(MetadataFields.REQUIRED_FIELDS.keys())
-            + list(MetadataFields.CUSTOM_FIELDS.keys())
-            + list(MetadataFields.MRK_FIELDS.keys())
+            [k.value for k in MetadataFields.REQUIRED_FIELDS.keys()]
+            + [k.value for k in MetadataFields.CUSTOM_FIELDS.keys()]
+            + [k.value for k in MetadataFields.MRK_FIELDS.keys()]
         )
 
     @staticmethod
@@ -89,7 +89,7 @@ class PhotoMetadata:
         Indexa contexto MRK por sequencia de foto (0001, 0002, ...).
         """
         index = {}
-        mrk_keys = list(MetadataFields.MRK_FIELDS.keys())
+        mrk_keys = [k.value for k in MetadataFields.MRK_FIELDS.keys()]
         for point in folder_points or []:
             canonical_point = MetadataFields.normalize_record_to_keys(point or {})
             foto = canonical_point.get("Foto")
@@ -112,7 +112,7 @@ class PhotoMetadata:
         """
         if not raw_records:
             return raw_records
-        mrk_keys = list(MetadataFields.MRK_FIELDS.keys())
+        mrk_keys = [k.value for k in MetadataFields.MRK_FIELDS.keys()]
         for fname, record in raw_records.items():
             seq = PhotoMetadata._extract_photo_sequence(fname)
             if not seq:
@@ -267,10 +267,10 @@ class PhotoMetadata:
         # Campos solicitados no novo padrao
         payload["FileType"] = os.path.splitext(image_path)[1].upper()
 
-        # dt_* deve priorizar metadado da foto (DateTimeOriginal), com fallback para os_date.
+        # dt_* deve priorizar metadado da foto (DateTimeOriginal), com fallback para DateTime (OS).
         dt = PhotoMetadata._safe_parse_datetime(payload.get("DateTimeOriginal"))
         if dt is None:
-            dt = PhotoMetadata._safe_parse_datetime(os_data.get("os_date"))
+            dt = PhotoMetadata._safe_parse_datetime(payload.get("DateTime"))
         if dt is not None:
             payload.update(PhotoMetadata._format_dates(dt))
         else:

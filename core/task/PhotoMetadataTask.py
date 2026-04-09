@@ -137,7 +137,7 @@ class PhotoMetadataTask(BaseTask):
 
             # NÃ£o incluir mrk_folder nos updates (Ã© apenas campo de contexto)
             data = MetadataFields.map_record_to_output_attributes(
-                item,
+                {k.value if hasattr(k, 'value') else str(k): v for k, v in item.items()},
                 exclude_keys=("foto", "mrk_folder"),
             )
             updates[photo_key] = data

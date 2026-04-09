@@ -19,7 +19,7 @@ class IMGMetadata:
 
     def __init__(self, json_record: Optional[Dict[str, Any]] = None):
         """Inicializa o objeto a partir de um registro JSON, preenchendo campos canonicos e extras."""
-        all_keys = list(MetadataFields.all_fields().keys())
+        all_keys = [k.value if hasattr(k, 'value') else str(k) for k in MetadataFields.all_fields().keys()]
         self._data: Dict[str, Any] = {key: None for key in all_keys}
         self._extras: Dict[str, Any] = {}
 

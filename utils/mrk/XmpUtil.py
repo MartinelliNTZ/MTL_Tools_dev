@@ -7,6 +7,7 @@ from xml.etree import ElementTree as ET
 
 from ...core.config.LogUtils import LogUtils
 from ..ToolKeys import ToolKey
+from .MetadataFields import MetadataFields
 
 
 class XmpUtil:
@@ -125,42 +126,106 @@ class XmpUtil:
         return ordered
 
     @staticmethod
+    def _sanitize_metadata(data: dict, logger: LogUtils) -> dict:
+        """
+        Valida e sanitiza metadata contra MetadataFields.
+        
+        Mapeia nomes de campos ilegais para campos canonicos usando MetadataFields.sanitize_field_name().
+        Campos nao autorizados sao ignorados.
+        
+        Args:
+            data: Dicionario bruto com campos potencialmente ilegais
+            logger: Logger para registrar campos rejeitados
+            
+        Returns:
+            Dicionario com apenas campos autorizados, com nomes sanitizados
+        """
+        sanitized = {}
+        rejected = []
+        
+        for field_name, field_value in data.items():
+            # Tenta sanitizar o nome do campo
+            canonical_name = MetadataFields.sanitize_field_name(field_name)
+            
+            if canonical_name:
+                # Campo e autorizado
+                if canonical_name not in sanitized:  # Evita sobrescrita de valores ja processados
+                    sanitized[canonical_name] = field_value
+            else:
+                # Campo nao e autorizado - registra rejeicao
+                rejected.append(field_name)
+        
+        # Log de campos rejeitados
+        if rejected:
+            logger.debug(f"Campos rejeitados (nao autorizados em MetadataFields): {sorted(set(rejected))}")
+        
+        return sanitized
+
+    @staticmethod
     def _extract_file_metadata(image_path: str) -> dict:
+        """
+        Extrai metadados do arquivo do sistema operacional.
+        
+        Retorna campos CANONICOS (legalizados em MetadataFields):
+        - File: nome do arquivo
+        - Path: caminho completo
+        - SizeMb: tamanho em megabytes
+        - DateTime: data de criacao do arquivo
+        """
         stat = os.stat(image_path)
         return {
-            "arquivo": os.path.basename(image_path),
-            "caminho": image_path,
-            "tamanho_mb": round(stat.st_size / (1024 * 1024), 2),
-            "data_criacao": datetime.fromtimestamp(stat.st_ctime).strftime(
+            "File": os.path.basename(image_path),
+            "Path": image_path,
+            "SizeMb": round(stat.st_size / (1024 * 1024), 2),
+            "DateTime": datetime.fromtimestamp(stat.st_ctime).strftime(
                 "%Y-%m-%d %H:%M:%S"
             ),
         }
 
     @staticmethod
     def extract_metadata(image_path: str, tool_key: str = ToolKey.UNTRACEABLE) -> dict:
+        """
+        Extrai metadados XMP de uma imagem com validacao contra MetadataFields.
+        
+        Apenas campos autorizados em MetadataFields sao retornados.
+        Campos ilegais sao silenciosamente descartados (log em DEBUG).
+        
+        Args:
+            image_path: Caminho para a imagem
+            tool_key: Chave de ferramenta para logging
+            
+        Returns:
+            Dicionario com metadados sanitizados (apenas campos autorizados)
+        """
         logger = XmpUtil._get_logger(tool_key)
         data = {}
 
         try:
+            # Extrai metadados do arquivo (retorna nomes canonicos)
             data = XmpUtil._extract_file_metadata(image_path)
+            
+            # Extrai XMP bruto
             xmp_text = XmpUtil._extract_xmp_text_raw(image_path)
             if not xmp_text:
-                data["xmp_encontrado"] = "nao"
+                logger.debug(f"Nenhum bloco XMP encontrado em {image_path}")
                 return data
 
-            data["xmp_encontrado"] = "sim"
             xmp_data = XmpUtil._parse_xmp_xml(xmp_text)
             if "xmp_erro" in xmp_data:
-                data.update(xmp_data)
+                logger.warning(f"Erro ao parsear XMP em {image_path}: {xmp_data.get('xmp_erro')}")
                 return data
 
-            data.update(XmpUtil._order_fields_by_priority(xmp_data))
+            # SANITIZA dados XMP antes de adicionar ao resultado
+            ordered_data = XmpUtil._order_fields_by_priority(xmp_data)
+            sanitized_xmp = XmpUtil._sanitize_metadata(ordered_data, logger)
+            
+            # Mescla dados sanitizados
+            data.update(sanitized_xmp)
             return data
+            
         except Exception as exc:
             logger.error(f"Erro ao extrair metadata XMP de {image_path}: {exc}")
-            data.setdefault("arquivo", os.path.basename(image_path))
-            data.setdefault("caminho", image_path)
-            data["xmp_erro"] = str(exc)
+            # Retorna pelo menos os metadados de arquivo (legalizados)
             return data
 
     @staticmethod

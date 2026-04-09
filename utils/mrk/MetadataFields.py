@@ -4,11 +4,12 @@ from typing import Dict, Iterable, List, Optional
 
 from ...core.model.Field import Field
 from ..adapter.StringAdapter import StringAdapter
+from ...core.enum import MetadataFieldKey
 
 
 class MetadataFields:
     REQUIRED_FIELDS = {
-        "File": Field(
+        MetadataFieldKey.FILE: Field(
             normalized="File",
             core="os",
             label="File",
@@ -16,7 +17,7 @@ class MetadataFields:
             description="Nome do arquivo de imagem. [File]",
             level=3,
         ),
-        "Path": Field(
+        MetadataFieldKey.PATH: Field(
             normalized="Path",
             core="os",
             label="Path",
@@ -24,7 +25,7 @@ class MetadataFields:
             description="Caminho completo do arquivo de imagem. [Path]",
             level=3,
         ),
-        "Format": Field(
+        MetadataFieldKey.FORMAT: Field(
             normalized="Format",
             core="os",
             label="Format",
@@ -32,7 +33,7 @@ class MetadataFields:
             description="Formato e modo de cor da imagem. [FormatMod]",
             level=3,
         ),
-        "SizeMb": Field(
+        MetadataFieldKey.SIZE_MB: Field(
             normalized="SizeMb",
             core="os",
             label="Size MB",
@@ -40,7 +41,7 @@ class MetadataFields:
             description="Tamanho do arquivo em megabytes. [SizeMB]",
             level=3,
         ),
-        "GPSMapDatum": Field(
+        MetadataFieldKey.GPS_MAP_DATUM: Field(
             normalized="EXIF:GPSInfo:GPSMapDatum",
             core="EXIF",
             label="GPS Map Datum",
@@ -48,7 +49,7 @@ class MetadataFields:
             description="Datum geodesico usado nas coordenadas GPS. [GPSDatum]",
             level=3,
         ),
-        "Model": Field(
+        MetadataFieldKey.MODEL: Field(
             normalized="EXIF:Model",
             core="EXIF",
             label="Model",
@@ -56,7 +57,7 @@ class MetadataFields:
             description="Modelo da camera que capturou a imagem. [Model]",
             level=3,
         ),
-        "Software": Field(
+        MetadataFieldKey.SOFTWARE: Field(
             normalized="EXIF:Software",
             core="EXIF",
             label="Software",
@@ -64,7 +65,7 @@ class MetadataFields:
             description="Software ou firmware gravado no metadado. [Firmware]",
             level=3,
         ),
-        "XResolution": Field(
+        MetadataFieldKey.X_RESOLUTION: Field(
             normalized="EXIF:XResolution",
             core="EXIF",
             label="X Resolution",
@@ -72,7 +73,7 @@ class MetadataFields:
             description="Resolucao horizontal informada no EXIF (DPI). [DPIWidth]",
             level=3,
         ),
-        "YResolution": Field(
+        MetadataFieldKey.Y_RESOLUTION: Field(
             normalized="EXIF:YResolution",
             core="EXIF",
             label="Y Resolution",
@@ -80,7 +81,7 @@ class MetadataFields:
             description="Resolucao vertical informada no EXIF (DPI). [DPIHeight]",
             level=3,
         ),
-        "ShutterSpeedValue": Field(
+        MetadataFieldKey.SHUTTER_SPEED_VALUE: Field(
             normalized="EXIF:ShutterSpeedValue",
             core="EXIF",
             label="Shutter Speed Value",
@@ -88,7 +89,7 @@ class MetadataFields:
             description="Velocidade do obturador registrada no EXIF. [ShutterSp]",
             level=3,
         ),
-        "DateTimeOriginal": Field(
+        MetadataFieldKey.DATE_TIME_ORIGINAL: Field(
             normalized="EXIF:DateTimeOriginal",
             core="EXIF",
             label="Date Time Original",
@@ -96,7 +97,7 @@ class MetadataFields:
             description="Data e hora original da captura. [DateTime]",
             level=3,
         ),
-        "ApertureValue": Field(
+        MetadataFieldKey.APERTURE_VALUE: Field(
             normalized="EXIF:ApertureValue",
             core="EXIF",
             label="Aperture Value",
@@ -104,7 +105,7 @@ class MetadataFields:
             description="Valor de abertura usado na captura. [ApertureV]",
             level=3,
         ),
-        "MaxApertureValue": Field(
+        MetadataFieldKey.MAX_APERTURE_VALUE: Field(
             normalized="EXIF:MaxApertureValue",
             core="EXIF",
             label="Max Aperture Value",
@@ -112,7 +113,7 @@ class MetadataFields:
             description="Maior abertura disponivel da lente. [MaxApertV]",
             level=3,
         ),
-        "LightSource": Field(
+        MetadataFieldKey.LIGHT_SOURCE: Field(
             normalized="EXIF:LightSource",
             core="EXIF",
             label="Light Source",
@@ -120,7 +121,7 @@ class MetadataFields:
             description="Codigo da fonte de iluminacao da cena. [LightSour]",
             level=3,
         ),
-        "FocalLength": Field(
+        MetadataFieldKey.FOCAL_LENGTH: Field(
             normalized="EXIF:FocalLength",
             core="EXIF",
             label="Focal Length",
@@ -128,7 +129,7 @@ class MetadataFields:
             description="Distancia focal da lente em mm. [FocalLeng]",
             level=3,
         ),
-        "ExifImageWidth": Field(
+        MetadataFieldKey.EXIF_IMAGE_WIDTH: Field(
             normalized="EXIF:ExifImageWidth",
             core="EXIF",
             label="EXIF Image Width",
@@ -136,7 +137,7 @@ class MetadataFields:
             description="Largura da imagem em pixels (EXIF). [WidthPX]",
             level=3,
         ),
-        "ExifImageHeight": Field(
+        MetadataFieldKey.EXIF_IMAGE_HEIGHT: Field(
             normalized="EXIF:ExifImageHeight",
             core="EXIF",
             label="EXIF Image Height",
@@ -144,7 +145,7 @@ class MetadataFields:
             description="Altura da imagem em pixels (EXIF). [HeightPX]",
             level=3,
         ),
-        "ExposureTime": Field(
+        MetadataFieldKey.EXPOSURE_TIME: Field(
             normalized="EXIF:ExposureTime",
             core="EXIF",
             label="Exposure Time",
@@ -152,7 +153,7 @@ class MetadataFields:
             description="Tempo de exposicao da foto em segundos. [ExpTime]",
             level=3,
         ),
-        "FNumber": Field(
+        MetadataFieldKey.F_NUMBER: Field(
             normalized="EXIF:FNumber",
             core="EXIF",
             label="F Number",
@@ -160,7 +161,7 @@ class MetadataFields:
             description="Numero f usado na captura. [FNumber]",
             level=3,
         ),
-        "ExposureProgram": Field(
+        MetadataFieldKey.EXPOSURE_PROGRAM: Field(
             normalized="EXIF:ExposureProgram",
             core="EXIF",
             label="Exposure Program",
@@ -168,7 +169,7 @@ class MetadataFields:
             description="Programa de exposicao selecionado pela camera. [ExpProg]",
             level=3,
         ),
-        "ISOSpeedRatings": Field(
+        MetadataFieldKey.ISO_SPEED_RATINGS: Field(
             normalized="EXIF:ISOSpeedRatings",
             core="EXIF",
             label="ISO Speed Ratings",
@@ -176,7 +177,7 @@ class MetadataFields:
             description="Sensibilidade ISO usada na captura. [ISOSpeed]",
             level=3,
         ),
-        "ExposureMode": Field(
+        MetadataFieldKey.EXPOSURE_MODE: Field(
             normalized="EXIF:ExposureMode",
             core="EXIF",
             label="Exposure Mode",
@@ -184,7 +185,7 @@ class MetadataFields:
             description="Modo de exposicao configurado na camera. [ExpMode]",
             level=3,
         ),
-        "LensSpecification": Field(
+        MetadataFieldKey.LENS_SPECIFICATION: Field(
             normalized="EXIF:LensSpecification",
             core="EXIF",
             label="Lens Specification",
@@ -192,7 +193,7 @@ class MetadataFields:
             description="Faixa focal e de abertura da lente. [Lens]",
             level=3,
         ),
-        "DigitalZoomRatio": Field(
+        MetadataFieldKey.DIGITAL_ZOOM_RATIO: Field(
             normalized="EXIF:DigitalZoomRatio",
             core="EXIF",
             label="Digital Zoom Ratio",
@@ -200,7 +201,7 @@ class MetadataFields:
             description="Razao de zoom digital aplicada na captura. [ZoomRatio]",
             level=3,
         ),
-        "GpsStatus": Field(
+        MetadataFieldKey.GPS_STATUS: Field(
             normalized="EXIF:GPSInfo:GPSStatus",
             core="xmp_bloco_1",
             label="GPS Status",
@@ -208,7 +209,7 @@ class MetadataFields:
             description="Status do GPS no momento da foto. [GpsStatus]",
             level=3,
         ),
-        "AltitudeType": Field(
+        MetadataFieldKey.ALTITUDE_TYPE: Field(
             normalized="xmp_bloco_1:drone-dji:AltitudeType",
             core="xmp_bloco_1",
             label="Altitude Type",
@@ -216,7 +217,7 @@ class MetadataFields:
             description="Tipo de altitude registrado pelo drone. [Ytype]",
             level=3,
         ),
-        "GpsLatitude": Field(
+        MetadataFieldKey.GPS_LATITUDE: Field(
             normalized="EXIF:GPSInfo:GPSLatitude",
             core="xmp_bloco_1",
             label="GPS Latitude",
@@ -224,7 +225,7 @@ class MetadataFields:
             description="Latitude GPS da aeronave na captura. [GpsLat]",
             level=3,
         ),
-        "GpsLongitude": Field(
+        MetadataFieldKey.GPS_LONGITUDE: Field(
             normalized="EXIF:GPSInfo:GPSLongitude",
             core="xmp_bloco_1",
             label="GPS Longitude",
@@ -232,7 +233,7 @@ class MetadataFields:
             description="Longitude GPS da aeronave na captura. [GPSLong]",
             level=3,
         ),
-        "AbsoluteAltitude": Field(
+        MetadataFieldKey.ABSOLUTE_ALTITUDE: Field(
             normalized="xmp_bloco_1:drone-dji:AbsoluteAltitude",
             core="xmp_bloco_1",
             label="Absolute Altitude",
@@ -240,7 +241,7 @@ class MetadataFields:
             description="Altitude absoluta da aeronave. [AbsY]",
             level=3,
         ),
-        "RelativeAltitude": Field(
+        MetadataFieldKey.RELATIVE_ALTITUDE: Field(
             normalized="xmp_bloco_1:drone-dji:RelativeAltitude",
             core="xmp_bloco_1",
             label="Relative Altitude",
@@ -248,7 +249,7 @@ class MetadataFields:
             description="Altitude relativa ao ponto de decolagem. [RelativeY]",
             level=3,
         ),
-        "GimbalRollDegree": Field(
+        MetadataFieldKey.GIMBAL_ROLL_DEGREE: Field(
             normalized="xmp_bloco_1:drone-dji:GimbalRollDegree",
             core="xmp_bloco_1",
             label="Gimbal Roll Degree",
@@ -256,7 +257,7 @@ class MetadataFields:
             description="Angulo de rolagem do gimbal em graus. [GimbRoll]",
             level=3,
         ),
-        "GimbalYawDegree": Field(
+        MetadataFieldKey.GIMBAL_YAW_DEGREE: Field(
             normalized="xmp_bloco_1:drone-dji:GimbalYawDegree",
             core="xmp_bloco_1",
             label="Gimbal Yaw Degree",
@@ -264,7 +265,7 @@ class MetadataFields:
             description="Angulo de yaw do gimbal em graus. [GimbYaw]",
             level=3,
         ),
-        "GimbalPitchDegree": Field(
+        MetadataFieldKey.GIMBAL_PITCH_DEGREE: Field(
             normalized="xmp_bloco_1:drone-dji:GimbalPitchDegree",
             core="xmp_bloco_1",
             label="Gimbal Pitch Degree",
@@ -272,7 +273,7 @@ class MetadataFields:
             description="Angulo de pitch do gimbal em graus. [GimbPitch]",
             level=3,
         ),
-        "FlightRollDegree": Field(
+        MetadataFieldKey.FLIGHT_ROLL_DEGREE: Field(
             normalized="xmp_bloco_1:drone-dji:FlightRollDegree",
             core="xmp_bloco_1",
             label="Flight Roll Degree",
@@ -280,7 +281,7 @@ class MetadataFields:
             description="Angulo de rolagem da aeronave em graus. [DroneRoll]",
             level=3,
         ),
-        "FlightYawDegree": Field(
+        MetadataFieldKey.FLIGHT_YAW_DEGREE: Field(
             normalized="xmp_bloco_1:drone-dji:FlightYawDegree",
             core="xmp_bloco_1",
             label="Flight Yaw Degree",
@@ -288,7 +289,7 @@ class MetadataFields:
             description="Angulo de yaw da aeronave em graus. [DroneYaw]",
             level=3,
         ),
-        "FlightPitchDegree": Field(
+        MetadataFieldKey.FLIGHT_PITCH_DEGREE: Field(
             normalized="xmp_bloco_1:drone-dji:FlightPitchDegree",
             core="xmp_bloco_1",
             label="Flight Pitch Degree",
@@ -296,7 +297,7 @@ class MetadataFields:
             description="Angulo de pitch da aeronave em graus. [DronePitc]",
             level=3,
         ),
-        "FlightXSpeed": Field(
+        MetadataFieldKey.FLIGHT_X_SPEED: Field(
             normalized="xmp_bloco_1:drone-dji:FlightXSpeed",
             core="xmp_bloco_1",
             label="Flight X Speed",
@@ -304,7 +305,7 @@ class MetadataFields:
             description="Velocidade da aeronave no eixo X. [XSpeed]",
             level=3,
         ),
-        "FlightYSpeed": Field(
+        MetadataFieldKey.FLIGHT_Y_SPEED: Field(
             normalized="xmp_bloco_1:drone-dji:FlightYSpeed",
             core="xmp_bloco_1",
             label="Flight Y Speed",
@@ -312,7 +313,7 @@ class MetadataFields:
             description="Velocidade da aeronave no eixo Y. [YSpeed]",
             level=3,
         ),
-        "FlightZSpeed": Field(
+        MetadataFieldKey.FLIGHT_Z_SPEED: Field(
             normalized="xmp_bloco_1:drone-dji:FlightZSpeed",
             core="xmp_bloco_1",
             label="Flight Z Speed",
@@ -320,7 +321,7 @@ class MetadataFields:
             description="Velocidade da aeronave no eixo Z. [ZSpeed]",
             level=3,
         ),
-        "RtkFlag": Field(
+        MetadataFieldKey.RTK_FLAG: Field(
             normalized="xmp_bloco_1:drone-dji:RtkFlag",
             core="xmp_bloco_1",
             label="RTK Flag",
@@ -328,7 +329,7 @@ class MetadataFields:
             description="Indicador de qualidade/correcao RTK. [RtkFlag]",
             level=3,
         ),
-        "RtkStdLon": Field(
+        MetadataFieldKey.RTK_STD_LON: Field(
             normalized="xmp_bloco_1:drone-dji:RtkStdLon",
             core="xmp_bloco_1",
             label="RTK Std Lon",
@@ -336,7 +337,7 @@ class MetadataFields:
             description="Desvio padrao RTK na longitude. [RtkStdLon]",
             level=3,
         ),
-        "RtkStdLat": Field(
+        MetadataFieldKey.RTK_STD_LAT: Field(
             normalized="xmp_bloco_1:drone-dji:RtkStdLat",
             core="xmp_bloco_1",
             label="RTK Std Lat",
@@ -344,7 +345,7 @@ class MetadataFields:
             description="Desvio padrao RTK na latitude. [RtkStdLat]",
             level=3,
         ),
-        "RtkStdHgt": Field(
+        MetadataFieldKey.RTK_STD_HGT: Field(
             normalized="xmp_bloco_1:drone-dji:RtkStdHgt",
             core="xmp_bloco_1",
             label="RTK Std Hgt",
@@ -352,7 +353,7 @@ class MetadataFields:
             description="Desvio padrao RTK na altitude. [RtkStdHgt]",
             level=3,
         ),
-        "RtkDiffAge": Field(
+        MetadataFieldKey.RTK_DIFF_AGE: Field(
             normalized="xmp_bloco_1:drone-dji:RtkDiffAge",
             core="xmp_bloco_1",
             label="RTK Diff Age",
@@ -360,7 +361,7 @@ class MetadataFields:
             description="Tempo desde a ultima correcao RTK. [RtkDifAge]",
             level=3,
         ),
-        "DewarpFlag": Field(
+        MetadataFieldKey.DEWARP_FLAG: Field(
             normalized="xmp_bloco_1:drone-dji:DewarpFlag",
             core="xmp_bloco_1",
             label="Dewarp Flag",
@@ -368,7 +369,7 @@ class MetadataFields:
             description="Estado da correcao de distorcao (dewarp). [Dewarp]",
             level=3,
         ),
-        "UTCAtExposure": Field(
+        MetadataFieldKey.UTC_AT_EXPOSURE: Field(
             normalized="xmp_bloco_1:drone-dji:UTCAtExposure",
             core="xmp_bloco_1",
             label="UTC At Exposure",
@@ -376,7 +377,7 @@ class MetadataFields:
             description="Horario UTC exato do momento da exposicao. [UTCTime]",
             level=3,
         ),
-        "ShutterCount": Field(
+        MetadataFieldKey.SHUTTER_COUNT: Field(
             normalized="xmp_bloco_1:drone-dji:ShutterCount",
             core="xmp_bloco_1",
             label="Shutter Count",
@@ -384,7 +385,7 @@ class MetadataFields:
             description="Total de disparos acumulados da camera. [ShotCount]",
             level=3,
         ),
-        "FocusDistance": Field(
+        MetadataFieldKey.FOCUS_DISTANCE: Field(
             normalized="xmp_bloco_1:drone-dji:FocusDistance",
             core="xmp_bloco_1",
             label="Focus Distance",
@@ -392,7 +393,7 @@ class MetadataFields:
             description="Distancia de foco usada na captura. [FocusDist]",
             level=3,
         ),
-        "CameraSerialNumber": Field(
+        MetadataFieldKey.CAMERA_SERIAL_NUMBER: Field(
             normalized="xmp_bloco_1:drone-dji:CameraSerialNumber",
             core="xmp_bloco_1",
             label="Camera Serial Number",
@@ -400,7 +401,7 @@ class MetadataFields:
             description="Numero serial da camera. [CameraID]",
             level=3,
         ),
-        "DroneModel": Field(
+        MetadataFieldKey.DRONE_MODEL: Field(
             normalized="xmp_bloco_1:drone-dji:DroneModel",
             core="xmp_bloco_1",
             label="Drone Model",
@@ -408,7 +409,7 @@ class MetadataFields:
             description="Modelo da aeronave/drone. [DronModel]",
             level=3,
         ),
-        "DroneSerialNumber": Field(
+        MetadataFieldKey.DRONE_SERIAL_NUMBER: Field(
             normalized="xmp_bloco_1:drone-dji:DroneSerialNumber",
             core="xmp_bloco_1",
             label="Drone Serial Number",
@@ -416,7 +417,7 @@ class MetadataFields:
             description="Numero serial da aeronave/drone. [DroneID]",
             level=3,
         ),
-        "CaptureUUID": Field(
+        MetadataFieldKey.CAPTURE_UUID: Field(
             normalized="xmp_bloco_1:drone-dji:CaptureUUID",
             core="xmp_bloco_1",
             label="Capture UUID",
@@ -424,7 +425,7 @@ class MetadataFields:
             description="Identificador unico do conjunto de captura. [CaptureID]",
             level=3,
         ),
-        "PictureQuality": Field(
+        MetadataFieldKey.PICTURE_QUALITY: Field(
             normalized="xmp_bloco_1:drone-dji:PictureQuality",
             core="xmp_bloco_1",
             label="Picture Quality",
@@ -432,7 +433,7 @@ class MetadataFields:
             description="Nivel de qualidade/compressao da imagem. [ImgQualit]",
             level=3,
         ),
-        "SegmentosTotal": Field(
+        MetadataFieldKey.SEGMENTOS_TOTAL: Field(
             normalized="JPEG:SegmentosTotal",
             core="xmp_bloco_1",
             label="Segmentos Total",
@@ -440,7 +441,7 @@ class MetadataFields:
             description="Quantidade total de segmentos JPEG lidos. [Segments]",
             level=3,
         ),
-        "SensorTemperature": Field(
+        MetadataFieldKey.SENSOR_TEMPERATURE: Field(
             normalized="xmp_bloco_1:drone-dji:SensorTemperature",
             core="xmp_bloco_1",
             label="Sensor Temperature",
@@ -448,7 +449,7 @@ class MetadataFields:
             description="Temperatura do sensor da camera. [SensTemp]",
             level=3,
         ),
-        "LRFStatus": Field(
+        MetadataFieldKey.LRF_STATUS: Field(
             normalized="xmp_bloco_1:drone-dji:LRFStatus",
             core="xmp_bloco_1",
             label="LRF Status",
@@ -456,7 +457,7 @@ class MetadataFields:
             description="Status do laser range finder (LRF). [LRFStatus]",
             level=3,
         ),
-        "LRFTargetDistance": Field(
+        MetadataFieldKey.LRF_TARGET_DISTANCE: Field(
             normalized="xmp_bloco_1:drone-dji:LRFTargetDistance",
             core="xmp_bloco_1",
             label="LRF Target Distance",
@@ -464,7 +465,7 @@ class MetadataFields:
             description="Distancia medida pelo LRF ate o alvo central. [LRFDist]",
             level=3,
         ),
-        "LRFTargetLon": Field(
+        MetadataFieldKey.LRF_TARGET_LON: Field(
             normalized="xmp_bloco_1:drone-dji:LRFTargetLon",
             core="xmp_bloco_1",
             label="LRF Target Lon",
@@ -472,7 +473,7 @@ class MetadataFields:
             description="Longitude do alvo medida pelo LRF. [LRFLong]",
             level=3,
         ),
-        "LRFTargetLat": Field(
+        MetadataFieldKey.LRF_TARGET_LAT: Field(
             normalized="xmp_bloco_1:drone-dji:LRFTargetLat",
             core="xmp_bloco_1",
             label="LRF Target Lat",
@@ -480,7 +481,7 @@ class MetadataFields:
             description="Latitude do alvo medida pelo LRF. [LRFLati]",
             level=3,
         ),
-        "LRFTargetAlt": Field(
+        MetadataFieldKey.LRF_TARGET_ALT: Field(
             normalized="xmp_bloco_1:drone-dji:LRFTargetAlt",
             core="xmp_bloco_1",
             label="LRF Target Alt",
@@ -488,7 +489,7 @@ class MetadataFields:
             description="Altitude relativa do alvo medida pelo LRF. [LRFY]",
             level=3,
         ),
-        "LRFTargetAbsAlt": Field(
+        MetadataFieldKey.LRF_TARGET_ABS_ALT: Field(
             normalized="xmp_bloco_1:drone-dji:LRFTargetAbsAlt",
             core="xmp_bloco_1",
             label="LRF Target Abs Alt",
@@ -496,7 +497,7 @@ class MetadataFields:
             description="Altitude absoluta do alvo medida pelo LRF. [LrfAbsAlt]",
             level=3,
         ),
-        "WhiteBalanceCCT": Field(
+        MetadataFieldKey.WHITE_BALANCE_CCT: Field(
             normalized="xmp_bloco_1:drone-dji:WhiteBalanceCCT",
             core="xmp_bloco_1",
             label="White Balance CCT",
@@ -504,7 +505,7 @@ class MetadataFields:
             description="Temperatura de cor (Kelvin) no balanco de branco. [WhiteBlc]",
             level=3,
         ),
-        "SensorFPS": Field(
+        MetadataFieldKey.SENSOR_FPS: Field(
             normalized="xmp_bloco_1:drone-dji:SensorFPS",
             core="xmp_bloco_1",
             label="Sensor FPS",
@@ -512,7 +513,7 @@ class MetadataFields:
             description="Taxa de amostragem do sensor em FPS. [SensorFPS]",
             level=3,
         ),
-        "RecommendedExposureIndex": Field(
+        MetadataFieldKey.RECOMMENDED_EXPOSURE_INDEX: Field(
             normalized="EXIF:RecommendedExposureIndex",
             core="xmp_bloco_1",
             label="Recommended Exposure Index",
@@ -520,7 +521,7 @@ class MetadataFields:
             description="Indice de exposicao recomendado (REI). [REI]",
             level=3,
         ),
-        "LensPosition": Field(
+        MetadataFieldKey.LENS_POSITION: Field(
             normalized="xmp_bloco_1:drone-dji:LensPosition",
             core="xmp_bloco_1",
             label="Lens Position",
@@ -528,7 +529,7 @@ class MetadataFields:
             description="Posicao da lente no momento da captura. [LensPosit]",
             level=3,
         ),
-        "LensTemperature": Field(
+        MetadataFieldKey.LENS_TEMPERATURE: Field(
             normalized="xmp_bloco_1:drone-dji:LensTemperature",
             core="xmp_bloco_1",
             label="Lens Temperature",
@@ -536,10 +537,50 @@ class MetadataFields:
             description="Temperatura da lente no momento da captura. [LensTemp]",
             level=3,
         ),
+        MetadataFieldKey.EXIF_SHARPNESS: Field(
+            normalized="EXIF:Sharpness",
+            core="EXIF",
+            label="EXIF Sharpness",
+            attribute="Sharpness",
+            description="Nivel de nitidez da imagem mapeado pelo EXIF. [Sharpness]",
+            level=3,
+        ),
+        MetadataFieldKey.EXIF_CONTRAST: Field(
+            normalized="EXIF:Contrast",
+            core="EXIF",
+            label="EXIF Contrast",
+            attribute="Contrast",
+            description="Nivel de contraste aplicado na captura. [Contrast]",
+            level=3,
+        ),
+        MetadataFieldKey.EXIF_SATURATION: Field(
+            normalized="EXIF:Saturation",
+            core="EXIF",
+            label="EXIF Saturation",
+            attribute="Saturation",
+            description="Nivel de saturacao de cor da imagem. [Saturation]",
+            level=3,
+        ),
+        MetadataFieldKey.EXIF_FLASH_PIX_VERSION: Field(
+            normalized="EXIF:FlashPixVersion",
+            core="EXIF",
+            label="EXIF Flash Pix Version",
+            attribute="FlashPixVer",
+            description="Versao FlashPix gravada no EXIF. [FlashPixVer]",
+            level=3,
+        ),
+        MetadataFieldKey.EXIF_COLOR_SPACE: Field(
+            normalized="EXIF:ColorSpace",
+            core="EXIF",
+            label="EXIF Color Space",
+            attribute="ColorSpace",
+            description="Espaco de cor utilizado na captura da imagem. [ColorSpace]",
+            level=3,
+        ),
     }
 
     CUSTOM_FIELDS = {
-        "FileType": Field(
+        MetadataFieldKey.FILE_TYPE: Field(
             normalized="Custom:FileType",
             core="custom",
             label="File Type",
@@ -547,7 +588,7 @@ class MetadataFields:
             description="Tipo/Extensao do arquivo de imagem (ex.: .JPG). [FileType]",
             level=5,
         ),
-        "DtFull": Field(
+        MetadataFieldKey.DT_FULL: Field(
             normalized="Custom:DtFull",
             core="custom",
             label="Date Time Full",
@@ -555,7 +596,7 @@ class MetadataFields:
             description="Data/hora compacta no formato YYYYMMDDHHMM. [DateTmFul]",
             level=5,
         ),
-        "DtDate": Field(
+        MetadataFieldKey.DT_DATE: Field(
             normalized="Custom:DtDate",
             core="custom",
             label="Date Only",
@@ -563,7 +604,7 @@ class MetadataFields:
             description="Data compacta no formato YYYYMMDD. [DateOnly]",
             level=5,
         ),
-        "DtTime": Field(
+        MetadataFieldKey.DT_TIME: Field(
             normalized="Custom:DtTime",
             core="custom",
             label="Time Only",
@@ -571,23 +612,23 @@ class MetadataFields:
             description="Horario compacto no formato HHMM. [TimeOnly]",
             level=5,
         ),
-        "FlightNumber": Field(
+        MetadataFieldKey.FLIGHT_NUMBER: Field(
             normalized="Custom:FlightNumber",
             core="custom",
             label="Flight Number",
-            attribute="FlightNum",
-            description="Numero do voo derivado do MRK. [FlightNum]",
+            attribute="DrvFNum",
+            description="Numero do voo derivado do MRK. [DrvFNum]",
             level=5,
         ),
-        "FlightName": Field(
+        MetadataFieldKey.FLIGHT_NAME: Field(
             normalized="Custom:FlightName",
             core="custom",
             label="Flight Name",
-            attribute="FlightNam",
-            description="Nome do voo derivado do MRK. [FlightNam]",
+            attribute="DrvFNam",
+            description="Nome do voo derivado do MRK. [DrvFNam]",
             level=5,
         ),
-        "FolderLevel1": Field(
+        MetadataFieldKey.FOLDER_LEVEL_1: Field(
             normalized="Custom:FolderLevel1",
             core="custom",
             label="Folder Level 1",
@@ -595,7 +636,7 @@ class MetadataFields:
             description="Primeiro nivel de pasta do voo. [FolderL1]",
             level=5,
         ),
-        "FolderLevel2": Field(
+        MetadataFieldKey.FOLDER_LEVEL_2: Field(
             normalized="Custom:FolderLevel2",
             core="custom",
             label="Folder Level 2",
@@ -603,7 +644,7 @@ class MetadataFields:
             description="Segundo nivel de pasta do voo. [FolderL2]",
             level=5,
         ),
-        "GimbalOffset": Field(
+        MetadataFieldKey.GIMBAL_OFFSET: Field(
             normalized="xmp_bloco_1:drone-dji:GimbalOffset",
             core="custom",
             label="Gimbal Offset",
@@ -611,7 +652,7 @@ class MetadataFields:
             description="Deslocamento angular mínimo do gimbal em relação à aeronave em graus (GimbalYawDegree - FlightYawDegree - 180, normalizado para menor ângulo). Valores: 0-180°. Valor referência: <1°. [GimOffset]",
             level=5,
         ),
-        "3DSpeed": Field(
+        MetadataFieldKey.THREE_D_SPEED: Field(
             normalized="Custom:3DSpeed",
             core="custom",
             label="3 D Speed",
@@ -619,7 +660,7 @@ class MetadataFields:
             description="Velocidade total 3D da aeronave em m/s, calculada como sqrt(FlightXSpeed² + FlightYSpeed² + FlightZSpeed²). Valores: 0-50 m/s. Valor referência: <10 m/s para voos estáveis. [3DSpeed]",
             level=5,
         ),
-        "TimeSincePrevious": Field(
+        MetadataFieldKey.TIME_SINCE_PREVIOUS: Field(
             normalized="Custom:TimeSincePrevious",
             core="custom",
             label="Time Since Previous",
@@ -627,7 +668,7 @@ class MetadataFields:
             description="Tempo em segundos desde a foto anterior. Valores: 0-120 s. Valor referência: 2-5 s para cadência ideal. [TimePrv]",
             level=5,
         ),
-        "GeodesicDistancePrevious": Field(
+        MetadataFieldKey.GEODESIC_DISTANCE_PREVIOUS: Field(
             normalized="Custom:GeodesicDistancePrevious",
             core="custom",
             label="Geodesic Distance Previous",
@@ -635,7 +676,7 @@ class MetadataFields:
             description="Distância horizontal em metros entre posições GPS consecutivas (fórmula Haversine). Valores: 0-100 m. Valor referência: 20-50 m para sobreposição adequada. [GeoDstP]",
             level=5,
         ),
-        "Distance3dPrevious": Field(
+        MetadataFieldKey.DISTANCE_3D_PREVIOUS: Field(
             normalized="Custom:Distance3dPrevious",
             core="custom",
             label="Distance 3 D Previous",
@@ -643,7 +684,7 @@ class MetadataFields:
             description="Distância 3D em metros entre posições consecutivas (horizontal + altitude). Valores: 0-100 m. Valor referência: 20-50 m. [Dist3DP]",
             level=5,
         ),
-        "AvgVelocityBetweenPhotos": Field(
+        MetadataFieldKey.AVG_VELOCITY_BETWEEN_PHOTOS: Field(
             normalized="Custom:AvgVelocityBetweenPhotos",
             core="custom",
             label="Avg Velocity Between Photos",
@@ -651,7 +692,7 @@ class MetadataFields:
             description="Velocidade média em m/s entre fotos consecutivas. Valores: 0-20 m/s. Valor referência: 5-10 m/s. [AvgVelB]",
             level=5,
         ),
-        "LinearVelocityInstant": Field(
+        MetadataFieldKey.LINEAR_VELOCITY_INSTANT: Field(
             normalized="Custom:LinearVelocityInstant",
             core="custom",
             label="Linear Velocity Instant",
@@ -659,7 +700,7 @@ class MetadataFields:
             description="Velocidade instantânea 3D em m/s. Valores: 0-50 m/s. Valor referência: <10 m/s. [LinVelI]",
             level=5,
         ),
-        "DisplacementDirection": Field(
+        MetadataFieldKey.DISPLACEMENT_DIRECTION: Field(
             normalized="Custom:DisplacementDirection",
             core="custom",
             label="Displacement Direction",
@@ -667,7 +708,7 @@ class MetadataFields:
             description="Azimute do deslocamento em graus (0=Norte). Valores: 0-360°. Valor referência: varia por missão. [DirDispl]",
             level=5,
         ),
-        "IncidenceAngle": Field(
+        MetadataFieldKey.INCIDENCE_ANGLE: Field(
             normalized="Custom:IncidenceAngle",
             core="custom",
             label="Incidence Angle",
@@ -675,7 +716,7 @@ class MetadataFields:
             description="Ângulo de incidência em graus (ângulo entre câmera e vertical). Valores: 0-180°. Valor referência: <5° para nadir. [IncAngle]",
             level=5,
         ),
-        "EstimatedCoverage": Field(
+        MetadataFieldKey.ESTIMATED_COVERAGE: Field(
             normalized="Custom:EstimatedCoverage",
             core="custom",
             label="Estimated Coverage",
@@ -683,7 +724,7 @@ class MetadataFields:
             description="Tupla (largura, altura) em metros da cobertura estimada no solo. Valores: (0-200, 0-150) m. Valor referência: depende altitude. [EstCover]",
             level=5,
         ),
-        "PredictedOverlap": Field(
+        MetadataFieldKey.PREDICTED_OVERLAP: Field(
             normalized="Custom:PredictedOverlap",
             core="custom",
             label="Predicted Overlap",
@@ -691,7 +732,7 @@ class MetadataFields:
             description="Percentual de sobreposição longitudinal com foto anterior. Valores: 0-100%. Valor referência: >60%. [PredOver]",
             level=5,
         ),
-        "RtkEffectivePrecision": Field(
+        MetadataFieldKey.RTK_EFFECTIVE_PRECISION: Field(
             normalized="Custom:RtkEffectivePrecision",
             core="custom",
             label="RTK Effective Precision",
@@ -699,7 +740,7 @@ class MetadataFields:
             description="Classificação textual da precisão RTK. Valores: Alta, Média, Baixa, Sem RTK. Valor referência: Alta. [RTKPrec]",
             level=5,
         ),
-        "IsIdealOverlap": Field(
+        MetadataFieldKey.IS_IDEAL_OVERLAP: Field(
             normalized="Custom:IsIdealOverlap",
             core="custom",
             label="Is Ideal Overlap",
@@ -707,7 +748,7 @@ class MetadataFields:
             description="Booleano indicando se sobreposição >=60%. Valores: True/False. Valor referência: True. [IdealOvl]",
             level=5,
         ),
-        "AbruptChangeFlag": Field(
+        MetadataFieldKey.ABRUPT_CHANGE_FLAG: Field(
             normalized="Custom:AbruptChangeFlag",
             core="custom",
             label="Abrupt Change Flag",
@@ -715,7 +756,7 @@ class MetadataFields:
             description="Flag de mudança brusca (tempo ou distância >2x mediana). Valores: True/False. Valor referência: False. [AbrChgF]",
             level=5,
         ),
-        "GimbalAngularVelocity": Field(
+        MetadataFieldKey.GIMBAL_ANGULAR_VELOCITY: Field(
             normalized="Custom:GimbalAngularVelocity",
             core="custom",
             label="Gimbal Angular Velocity",
@@ -723,7 +764,7 @@ class MetadataFields:
             description="Variação angular do gimbal em °/s. Valores: 0-100 °/s. Valor referência: <1 °/s. [GimAngV]",
             level=5,
         ),
-        "OrthorectificationPotential": Field(
+        MetadataFieldKey.ORTHORECTIFICATION_POTENTIAL: Field(
             normalized="Custom:OrthorectificationPotential",
             core="custom",
             label="Orthorectification Potential",
@@ -731,7 +772,7 @@ class MetadataFields:
             description="Score de potencial para ortorretificação (0-100). Valores: 0-100. Valor referência: >80. [OrtoPot]",
             level=5,
         ),
-        "ShutterLifePct": Field(
+        MetadataFieldKey.SHUTTER_LIFE_PCT: Field(
             normalized="Custom:ShutterLifePct",
             core="custom",
             label="Shutter Life Pct",
@@ -739,7 +780,7 @@ class MetadataFields:
             description="% de vida útil do obturador. Valores: 0-100%. Valor referência: <50%. [ShutPct]",
             level=5,
         ),
-        "GroundSampleDistanceCm": Field(
+        MetadataFieldKey.GROUND_SAMPLE_DISTANCE_CM: Field(
             normalized="Custom:GroundSampleDistanceCm",
             core="custom",
             label="Ground Sample Distance Cm",
@@ -747,7 +788,7 @@ class MetadataFields:
             description="GSD em cm/pixel. Valores: 0-10 cm. Valor referência: <2 cm. [GsdCmPx]",
             level=5,
         ),
-        "TotalHeatIndex": Field(
+        MetadataFieldKey.TOTAL_HEAT_INDEX: Field(
             normalized="Custom:TotalHeatIndex",
             core="custom",
             label="Total Heat Index",
@@ -755,7 +796,7 @@ class MetadataFields:
             description="Índice térmico médio em °C. Valores: 20-60 °C. Valor referência: <40 °C. [HeatIdx]",
             level=5,
         ),
-        "Speed3dKmh": Field(
+        MetadataFieldKey.SPEED_3D_KMH: Field(
             normalized="Custom:Speed3dKmh",
             core="custom",
             label="Speed 3 D Kmh",
@@ -763,7 +804,7 @@ class MetadataFields:
             description="Velocidade 3D do drone em km/h. Valores: 0-180 km/h. Valor referência: <36 km/h. [SpdKmH]",
             level=5,
         ),
-        "YawAlignmentError": Field(
+        MetadataFieldKey.YAW_ALIGNMENT_ERROR: Field(
             normalized="Custom:YawAlignmentError",
             core="custom",
             label="Yaw Alignment Error",
@@ -771,7 +812,7 @@ class MetadataFields:
             description="Erro de alinhamento yaw em graus. Valores: 0-180°. Valor referência: <5°. [YawErr]",
             level=5,
         ),
-        "MotionBlurRisk": Field(
+        MetadataFieldKey.MOTION_BLUR_RISK: Field(
             normalized="Custom:MotionBlurRisk",
             core="custom",
             label="Motion Blur Risk",
@@ -779,7 +820,7 @@ class MetadataFields:
             description="Risco de motion blur em pixels. Valores: 0-5. Valor referência: <0.5. [BlurRisk]",
             level=5,
         ),
-        "ExposureValueEv": Field(
+        MetadataFieldKey.EXPOSURE_VALUE_EV: Field(
             normalized="Custom:ExposureValueEv",
             core="custom",
             label="Exposure Value EV",
@@ -787,7 +828,7 @@ class MetadataFields:
             description="Valor de exposição EV. Valores: 8-16. Valor referência: 12-14. [EV]",
             level=5,
         ),
-        "LightSourceClassification": Field(
+        MetadataFieldKey.LIGHT_SOURCE_CLASSIFICATION: Field(
             normalized="Custom:LightSourceClassification",
             core="custom",
             label="Light Source Classification",
@@ -795,7 +836,7 @@ class MetadataFields:
             description="Classificação textual da fonte de luz EXIF. Valores: Daylight, Fluorescent, etc. Valor referência: Daylight. [LSrcClass]",
             level=5,
         ),
-        "LightConsistency": Field(
+        MetadataFieldKey.LIGHT_CONSISTENCY: Field(
             normalized="Custom:LightConsistency",
             core="custom",
             label="Light Consistency",
@@ -803,7 +844,7 @@ class MetadataFields:
             description="Consistência entre LightSource e CCT. Valores: Consistent, Inconsistent, Unknown. Valor referência: Consistent. [LightCons]",
             level=5,
         ),
-        "VerticalStability": Field(
+        MetadataFieldKey.VERTICAL_STABILITY: Field(
             normalized="Custom:VerticalStability",
             core="custom",
             label="Vertical Stability",
@@ -811,7 +852,7 @@ class MetadataFields:
             description="Variação vertical em metros. Valores: 0-10 m. Valor referência: <1 m. [VertStb]",
             level=5,
         ),
-        "TrajectorySmoothness": Field(
+        MetadataFieldKey.TRAJECTORY_SMOOTHNESS: Field(
             normalized="Custom:TrajectorySmoothness",
             core="custom",
             label="Trajectory Smoothness",
@@ -819,7 +860,7 @@ class MetadataFields:
             description="Diferença angular de direção em graus. Valores: 0-180°. Valor referência: <10°. [TrajSmt]",
             level=5,
         ),
-        "SpeedVariationIndex": Field(
+        MetadataFieldKey.SPEED_VARIATION_INDEX: Field(
             normalized="Custom:SpeedVariationIndex",
             core="custom",
             label="Speed Variation Index",
@@ -827,7 +868,7 @@ class MetadataFields:
             description="Índice de variação de velocidade (coeficiente de variação). Valores: 0-1. Valor referência: <0.1. [SpdVar]",
             level=5,
         ),
-        "RtkStabilityScore": Field(
+        MetadataFieldKey.RTK_STABILITY_SCORE: Field(
             normalized="Custom:RtkStabilityScore",
             core="custom",
             label="RTK Stability Score",
@@ -835,7 +876,7 @@ class MetadataFields:
             description="Score de estabilidade RTK (0-100). Valores: 0-100. Valor referência: >90. [RtkStab]",
             level=5,
         ),
-        "CaptureEfficiency": Field(
+        MetadataFieldKey.CAPTURE_EFFICIENCY: Field(
             normalized="Custom:CaptureEfficiency",
             core="custom",
             label="Capture Efficiency",
@@ -843,7 +884,7 @@ class MetadataFields:
             description="Eficiência de captura (distância/cobertura). Valores: 0-1. Valor referência: 0.5-0.8. [CapEff]",
             level=5,
         ),
-        "PhotogrammetryQualityIndex": Field(
+        MetadataFieldKey.PHOTOGRAMMETRY_QUALITY_INDEX: Field(
             normalized="Custom:PhotogrammetryQualityIndex",
             core="custom",
             label="Photogrammetry Quality Index",
@@ -851,7 +892,7 @@ class MetadataFields:
             description="Índice de qualidade fotogramétrica (0-100). Valores: 0-100. Valor referência: >80. [PQI]",
             level=5,
         ),
-        "StripId": Field(
+        MetadataFieldKey.STRIP_ID: Field(
             normalized="Custom:StripId",
             core="custom",
             label="Strip ID",
@@ -862,7 +903,7 @@ class MetadataFields:
     }
 
     MRK_FIELDS = {
-        "Foto": Field(
+        MetadataFieldKey.FOTO: Field(
             normalized="MRK:Foto",
             core="mrk",
             label="Photo Number",
@@ -870,7 +911,7 @@ class MetadataFields:
             description="Numero sequencial da foto vindo do MRK. [PhotoNum]",
             level=5,
         ),
-        "Lat": Field(
+        MetadataFieldKey.LAT: Field(
             normalized="MRK:Lat",
             core="mrk",
             label="Latitude",
@@ -878,7 +919,7 @@ class MetadataFields:
             description="Latitude extraida do arquivo MRK. [Latitude]",
             level=5,
         ),
-        "Lon": Field(
+        MetadataFieldKey.LON: Field(
             normalized="MRK:Lon",
             core="mrk",
             label="Longitude",
@@ -886,7 +927,7 @@ class MetadataFields:
             description="Longitude extraida do arquivo MRK. [Longitude]",
             level=5,
         ),
-        "Alt": Field(
+        MetadataFieldKey.ALT: Field(
             normalized="MRK:Alt",
             core="mrk",
             label="Altitude",
@@ -894,7 +935,7 @@ class MetadataFields:
             description="Altitude extraida do arquivo MRK. [Altitude]",
             level=5,
         ),
-        "DateName": Field(
+        MetadataFieldKey.DATE_NAME: Field(
             normalized="MRK:DateName",
             core="mrk",
             label="Date Name",
@@ -902,7 +943,7 @@ class MetadataFields:
             description="Data identificada a partir do nome do MRK. [DateName]",
             level=5,
         ),
-        "MrkFile": Field(
+        MetadataFieldKey.MRK_FILE: Field(
             normalized="MRK:MrkFile",
             core="mrk",
             label="MRK File",
@@ -910,7 +951,7 @@ class MetadataFields:
             description="Nome do arquivo MRK de origem. [MrkFile]",
             level=5,
         ),
-        "MrkPath": Field(
+        MetadataFieldKey.MRK_PATH: Field(
             normalized="MRK:MrkPath",
             core="mrk",
             label="MRK Path",
@@ -918,7 +959,7 @@ class MetadataFields:
             description="Caminho completo do arquivo MRK de origem. [MrkPath]",
             level=5,
         ),
-        "MrkFolder": Field(
+        MetadataFieldKey.MRK_FOLDER: Field(
             normalized="MRK:MrkFolder",
             core="mrk",
             label="MRK Folder",
@@ -926,7 +967,7 @@ class MetadataFields:
             description="Pasta absoluta de origem do ponto MRK. [MrkFolder]",
             level=5,
         ),
-        "FlightNumber": Field(
+        MetadataFieldKey.FLIGHT_NUMBER: Field(
             normalized="MRK:FlightNumber",
             core="mrk",
             label="Flight Number",
@@ -934,7 +975,7 @@ class MetadataFields:
             description="Numero do voo identificado no MRK. [FlightNum]",
             level=5,
         ),
-        "FlightName": Field(
+        MetadataFieldKey.FLIGHT_NAME: Field(
             normalized="MRK:FlightName",
             core="mrk",
             label="Flight Name",
@@ -942,7 +983,7 @@ class MetadataFields:
             description="Nome do voo identificado no MRK. [FlightNam]",
             level=5,
         ),
-        "FolderLevel1": Field(
+        MetadataFieldKey.FOLDER_LEVEL_1: Field(
             normalized="MRK:FolderLevel1",
             core="mrk",
             label="Folder Level 1",
@@ -950,7 +991,7 @@ class MetadataFields:
             description="Primeiro nivel de pasta no caminho do MRK. [Folder1]",
             level=5,
         ),
-        "FolderLevel2": Field(
+        MetadataFieldKey.FOLDER_LEVEL_2: Field(
             normalized="MRK:FolderLevel2",
             core="mrk",
             label="Folder Level 2",
@@ -963,9 +1004,9 @@ class MetadataFields:
     @classmethod
     def all_fields(cls) -> Dict[str, Field]:
         fields: Dict[str, Field] = {}
-        fields.update(cls.REQUIRED_FIELDS)
-        fields.update(cls.CUSTOM_FIELDS)
-        fields.update(cls.MRK_FIELDS)
+        fields.update({key.value: field for key, field in cls.REQUIRED_FIELDS.items()})
+        fields.update({key.value: field for key, field in cls.CUSTOM_FIELDS.items()})
+        fields.update({key.value: field for key, field in cls.MRK_FIELDS.items()})
         return fields
 
     @staticmethod
@@ -979,19 +1020,110 @@ class MetadataFields:
 
     @classmethod
     def required_keys(cls) -> List[str]:
-        return list(cls.REQUIRED_FIELDS.keys())
+        return [key.value for key in cls.REQUIRED_FIELDS.keys()]
 
     @classmethod
     def custom_keys(cls) -> List[str]:
-        return list(cls.CUSTOM_FIELDS.keys())
+        return [key.value for key in cls.CUSTOM_FIELDS.keys()]
 
     @classmethod
     def mrk_keys(cls) -> List[str]:
-        return list(cls.MRK_FIELDS.keys())
+        return [key.value for key in cls.MRK_FIELDS.keys()]
 
     @classmethod
     def key_to_attribute_map(cls) -> Dict[str, str]:
-        return {key: field.attribute for key, field in cls.all_fields().items()}
+        return {key.value: field.attribute for key, field in cls.all_fields().items()}
+
+    @classmethod
+    def sanitize_field_name(cls, raw_field_name: str) -> Optional[str]:
+        """
+        Mapeia nomes de campos brutos/ilegais para campos canonizados em MetadataFields.
+        
+        Realiza as seguintes normalizacoes:
+        1. Remove espacos e converte para PascalCase
+        2. Remove prefixos de namespace (xmp:, drone-dji:, crs:, tiff:, rdf:)
+        3. Mapeia campos de sistema (arquivo, caminho, etc.) para canonicos
+        4. Valida contra MetadataFields.all_fields()
+        
+        Args:
+            raw_field_name: Nome bruto do campo (ex: "xmp:CreateDate", "arquivo", "tamanho_mb")
+            
+        Returns:
+            Nome canonizado do atributo se mapeado com sucesso, None caso contrario
+        """
+        if not raw_field_name or not isinstance(raw_field_name, str):
+            return None
+            
+        # Remove espacos
+        normalized = raw_field_name.strip()
+        
+        # Remove prefixos de namespace
+        namespace_prefixes = ("xmp:", "drone-dji:", "crs:", "tiff:", "rdf:", "EXIF:", "GPS:")
+        for prefix in namespace_prefixes:
+            if normalized.startswith(prefix):
+                normalized = normalized[len(prefix):]
+                break
+        
+        # Mapeamento especial para campos de sistema
+        field_mappings = {
+            "arquivo": "File",
+            "caminho": "Path",
+            "tamanho_mb": "SizeMb",
+            "data_criacao": "DateTime",
+            "dt_criacao": "DateTime",
+            "os_date": "DateTime",
+            "folder_path": "FolderLevel1",
+            "voo_id": "FlightNumber",
+            "width_px": "ExifImageWidth",
+            "height_px": "ExifImageHeight",
+            "coverage_width": "EstimatedCoverage",
+            # Variantes de nomes EXIF brutos
+            "gpsstatus": "GpsStatus",
+            "gpsversion": "GpsStatus",
+            # Variantes de datas
+            "createdate": "DateTime",
+            "modifydate": "DateTime",
+        }
+        
+        # Verifica mapemento especial (case-insensitive)
+        normalized_lower = normalized.lower()
+        if normalized_lower in field_mappings:
+            return field_mappings[normalized_lower]
+        
+        # Tenta encontrar nos campos canonicos
+        all_fields_dict = cls.all_fields()
+        
+        # Primeiro: busca exata (case-sensitive)
+        if normalized in all_fields_dict:
+            return all_fields_dict[normalized].attribute
+        
+        # Segundo: busca case-insensitive
+        normalized_lower = normalized.lower()
+        for field_name, field_obj in all_fields_dict.items():
+            if field_name.lower() == normalized_lower:
+                return field_obj.attribute
+        
+        # Terceiro: tenta conversao para PascalCase
+        pascal_case = cls._to_pascal_case(normalized.replace(" ", "_").replace("-", "_"))
+        for field_name, field_obj in all_fields_dict.items():
+            if field_name.lower() == pascal_case.lower():
+                return field_obj.attribute
+        
+        # Nenhuma correspondencia encontrada
+        return None
+    
+    @classmethod
+    def is_authorized_field(cls, field_name: str) -> bool:
+        """
+        Verifica se um nome de campo e um dos campos autorizados em MetadataFields.
+        
+        Args:
+            field_name: Nome do campo a validar
+            
+        Returns:
+            True se o campo e autorizado, False caso contrario
+        """
+        return cls.sanitize_field_name(field_name) is not None
 
     @classmethod
     def attribute_to_key_map(cls) -> Dict[str, str]:

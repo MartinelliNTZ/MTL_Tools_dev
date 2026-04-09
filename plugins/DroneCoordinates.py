@@ -103,7 +103,9 @@ class DroneCordinates(BasePluginMTL):
             checked_by_default=True,
             return_widget=True,
             separator_bottom=False,
+            show_control_buttons=True,  # Habilita "Select All" e "Deselect All"
         )
+            
         self.required_fields_collapsible.add_content_layout(req_grid_layout)
 
         # ====== METADATA CUSTOM FIELDS ======
@@ -121,6 +123,7 @@ class DroneCordinates(BasePluginMTL):
             checked_by_default=False,
             return_widget=True,
             separator_bottom=False,
+            show_control_buttons=True,
         )
         self.custom_fields_collapsible.add_content_layout(custom_grid_layout)
 
@@ -139,6 +142,7 @@ class DroneCordinates(BasePluginMTL):
             checked_by_default=True,
             return_widget=True,
             separator_bottom=False,
+            show_control_buttons=True,  
         )
         self.mrk_fields_collapsible.add_content_layout(mrk_grid_layout)
 

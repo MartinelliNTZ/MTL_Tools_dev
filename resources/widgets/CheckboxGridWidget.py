@@ -1,7 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 from typing import Dict, List, Tuple
 
-from qgis.PyQt.QtWidgets import QWidget, QVBoxLayout, QGridLayout, QCheckBox, QLabel
+from qgis.PyQt.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QCheckBox, QLabel, QPushButton
 
 from ...resources.styles.Styles import Styles
 
@@ -51,12 +51,14 @@ class CheckboxGridWidget(QWidget):
         items_per_row: int = 3,
         checked_by_default: bool = False,
         title: str = None,
+        show_control_buttons: bool = False,
         parent=None,
     ):
         super().__init__(parent)
         self.items_per_row = max(1, int(items_per_row))
         self.checked_by_default = checked_by_default
         self.title = title
+        self.show_control_buttons = bool(show_control_buttons)
         self.checkbox_map: Dict[str, QCheckBox] = {}
         self._options = self._normalize_options(options)
         self._build()
@@ -72,7 +74,8 @@ class CheckboxGridWidget(QWidget):
                 else:
                     label = value
                     description = ""
-                normalized.append((str(key), str(label), str(description or "")))
+                key_str = key.value if hasattr(key, 'value') else str(key)
+                normalized.append((key_str, str(label), str(description or "")))
             return normalized
 
         if isinstance(options, list):
@@ -82,9 +85,10 @@ class CheckboxGridWidget(QWidget):
                 key = item.get("key")
                 if not key:
                     continue
+                key_str = key.value if hasattr(key, 'value') else str(key)
                 label = item.get("label") or key
                 description = item.get("description") or ""
-                normalized.append((str(key), str(label), str(description)))
+                normalized.append((key_str, str(label), str(description)))
 
         return normalized
 
@@ -121,6 +125,30 @@ class CheckboxGridWidget(QWidget):
             grid.setColumnStretch(col, 1)
 
         layout.addLayout(grid)
+
+        if self.show_control_buttons:
+            layout.addSpacing(6)
+
+            # Criar botões de controle
+            buttons_layout = QHBoxLayout()
+            buttons_layout.setContentsMargins(0, 0, 0, 0)
+            buttons_layout.setSpacing(6)
+
+            btn_select_all = QPushButton("✔ Selecionar Todos")
+            btn_deselect_all = QPushButton("✖ Desselecionar Todos")
+            btn_toggle = QPushButton("⇄ Inverter")
+
+            btn_select_all.clicked.connect(self.select_all)
+            btn_deselect_all.clicked.connect(self.deselect_all)
+            btn_toggle.clicked.connect(self.toggle_all)
+
+            buttons_layout.addWidget(btn_select_all)
+            buttons_layout.addWidget(btn_deselect_all)
+            buttons_layout.addWidget(btn_toggle)
+            buttons_layout.addStretch()
+
+            layout.addLayout(buttons_layout)
+
         self.setLayout(layout)
 
     def get_checkbox(self, key):
@@ -159,3 +187,18 @@ class CheckboxGridWidget(QWidget):
         ]
         if hasattr(controller, "set_dependents"):
             controller.set_dependents(dependents)
+
+    def select_all(self):
+        """Marca todos os checkboxes como selecionados."""
+        for chk in self.checkbox_map.values():
+            chk.setChecked(True)
+
+    def deselect_all(self):
+        """Desseleciona todos os checkboxes."""
+        for chk in self.checkbox_map.values():
+            chk.setChecked(False)
+
+    def toggle_all(self):
+        """Inverte o estado de todos os checkboxes."""
+        for chk in self.checkbox_map.values():
+            chk.setChecked(not chk.isChecked())

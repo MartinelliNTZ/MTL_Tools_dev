@@ -76,6 +76,7 @@ class LoadFolderLayersDialog(BasePluginMTL):
             title=None,
             separator_top=False,
             separator_bottom=False,
+            show_control_buttons=True,
         )
 
         self.coll_widget.add_content_layout(types_layout)

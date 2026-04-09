@@ -11,6 +11,7 @@ class IconManager:
     BASE_PATH = os.path.join(os.path.dirname(__file__), "icons")
     # SYSTEM
     MTL_AGRO = "mtl_agro.ico"
+    MTL_AGRO_PNG = "mtl_agro.png"
     CADMUS_ICON = "cadmus_icon.ico"
     CADMUS_PNG = "cadmus_icon.png"
     COPY_BUTTON = "copy.png"

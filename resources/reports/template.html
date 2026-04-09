@@ -69,6 +69,26 @@
         }
         .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
         .summary-grid { display: grid; gap: 16px; grid-template-columns: 1.2fr 1.2fr 1fr 1fr; align-items: stretch; }
+        .report-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .report-title h1 {
+            margin-bottom: 6px;
+        }
+        .brand-logos {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .brand-logo {
+            height: 150px;
+            width: auto;
+            object-fit: contain;
+        }
         h1, h2, h3 { margin-top: 0; }
         .muted { color: var(--muted); }
         table { width: 100%; border-collapse: collapse; }
@@ -92,6 +112,7 @@
         .level-3 { background: var(--l3); color: #111; font-weight: 700; }
         .level-4 { background: var(--l4); color: #111; font-weight: 700; }
         .level-5 { background: var(--l5); color: #111; font-weight: 700; }
+        .level-na { background: #5f6b7a; color: #fff; font-weight: 700; }
         .stars { font-size: 22px; letter-spacing: 2px; }
         .chart-wrap { min-height: 220px; }
         #levelChart { max-height: 180px; }
@@ -198,15 +219,23 @@
 </head>
 <body data-theme="dark">
     <div class="card">
-        <h1>Relatorio Fotogrametrico</h1>
-        <p class="muted">Total de imagens: <strong>{{ total_images }}</strong></p>
-        <p>
-            Score geral medio: <strong>{{ mean_overall }}/5</strong>
-            <span class="stars">
-                {% for _ in range(mean_overall|round(0, 'floor')|int) %}★{% endfor %}
-                {% for _ in range(5 - (mean_overall|round(0, 'floor')|int)) %}☆{% endfor %}
-            </span>
-        </p>
+        <div class="report-header">
+            <div class="report-title">
+                <h1>Relatorio Fotogrametrico</h1>
+                <p class="muted">Total de imagens: <strong>{{ total_images }}</strong></p>
+                <p>
+                    Score geral medio: <strong>{{ mean_overall }}/5</strong>
+                    <span class="stars">
+                        {% for _ in range(mean_overall|round(0, 'floor')|int) %}★{% endfor %}
+                        {% for _ in range(5 - (mean_overall|round(0, 'floor')|int)) %}☆{% endfor %}
+                    </span>
+                </p>
+            </div>
+            <div class="brand-logos">
+                <img src="{{ cadmus_icon_url }}" alt="Cadmus" class="brand-logo" onerror="this.onerror=null;this.src='{{ cadmus_icon_path }}';" />
+                <img src="{{ mtl_agro_icon_url }}" alt="MTL Agro" class="brand-logo" onerror="this.onerror=null;this.src='{{ mtl_agro_icon_path }}';" />
+            </div>
+        </div>
         <div class="theme-switcher">
             <label><input type="radio" name="theme_mode" value="dark" checked> Dark Premium</label>
             <label><input type="radio" name="theme_mode" value="light"> Light Classic</label>
@@ -398,7 +427,8 @@
                     {{ stat.label }}
                     <span class="rule-badge">{{ stat.threshold_type }}</span>
                 </td>
-                <td class="level-{{ stat.mean|round(0)|int }}">{{ stat.mean }}</td>
+                {% set stat_level = stat.mean|round(0)|int %}
+                <td class="{{ ('level-' ~ stat_level) if (stat_level >= 1 and stat_level <= 5) else 'level-na' }}">{{ stat.mean }}</td>
                 <td>{{ stat.value_mean if stat.value_mean is not none else '-' }}</td>
                 <td>{{ stat.value_std if stat.value_std is not none else '-' }}</td>
                 <td>{{ stat.value_max if stat.value_max is not none else '-' }}</td>
@@ -464,7 +494,8 @@
             <tr>
                 <td>{{ f.flight_id }}</td>
                 <td>{{ f.images }}</td>
-                <td class="level-{{ f.mean_score|round(0)|int }}">{{ f.mean_score }}</td>
+                {% set flight_level = f.mean_score|round(0)|int %}
+                <td class="{{ ('level-' ~ flight_level) if (flight_level >= 1 and flight_level <= 5) else 'level-na' }}">{{ f.mean_score }}</td>
                 <td>{{ f.start }}</td>
                 <td>{{ f.end }}</td>
                 <td>{{ f.flight_time }}</td>
@@ -491,7 +522,8 @@
             {% for r in results[:20] %}
             <tr>
                 <td>{{ r.filename }}</td>
-                <td class="level-{{ r.overall_score|round(0)|int }}">{{ r.overall_score }}</td>
+                {% set overall_level = r.overall_score|round(0)|int %}
+                <td class="{{ ('level-' ~ overall_level) if (overall_level >= 1 and overall_level <= 5) else 'level-na' }}">{{ r.overall_score }}</td>
                 <td class="level-{{ r.levels.get('gsd_cm', 3) }}">{{ r.levels.get('gsd_cm', '-') }}</td>
                 <td>{{ r.messages.get('motion_blur_risk', '-') }}</td>
                 <td>{{ r.messages.get('shutter_life_pct', '-') }}</td>

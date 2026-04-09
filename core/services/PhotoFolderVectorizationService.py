@@ -61,10 +61,27 @@ class PhotoFolderVectorizationService:
         garantindo mesmo padrao de atributos do DroneCoordinates.
         """
         output_record: Dict[str, Any] = {}
+        mrk_keys = set(MetadataFields.mrk_keys())
         for key in MetadataFields.all_fields().keys():
+            if key in mrk_keys:
+                continue
             attr_name = MetadataFields.resolve_output_name(key)
             output_record[attr_name] = self._normalize_attr_value(canonical.get(key))
         return output_record
+
+    @staticmethod
+    def _filter_out_mrk_fields(record: Dict[str, Any]) -> Dict[str, Any]:
+        if not isinstance(record, dict):
+            return {}
+
+        mrk_keys = set(MetadataFields.mrk_keys())
+        filtered: Dict[str, Any] = {}
+        for key, value in record.items():
+            normalized_key = MetadataFields.resolve_key(str(key))
+            if normalized_key in mrk_keys:
+                continue
+            filtered[key] = value
+        return filtered
 
     @staticmethod
     def _safe_parse_datetime(value: Any) -> datetime:
@@ -335,6 +352,7 @@ class PhotoFolderVectorizationService:
             canonical["HasExifGps"] = has_exif_gps
             canonical["QualityFlag"] = "LOW" if source == "NONE" else "OK"
 
+            canonical = self._filter_out_mrk_fields(canonical)
             file_key = os.path.basename(file_path)
             raw_records[file_key] = canonical
 
@@ -359,6 +377,7 @@ class PhotoFolderVectorizationService:
             raw_records[key] = MetadataFields.normalize_record_to_keys(value or {})
 
         for canonical in raw_records.values():
+            canonical = self._filter_out_mrk_fields(canonical)
             lat = self._to_float(canonical.get("GpsLatitude"))
             lon = self._to_float(canonical.get("GpsLongitude"))
             if lat is None or lon is None:

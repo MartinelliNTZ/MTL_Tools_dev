@@ -98,6 +98,8 @@
 [2.3.8.18.2] Correcao de preenchimento MRK no dump: merge por sequencia da foto (DJI ... _0001_ ...) com contexto dos pontos MRK do grupo, evitando null indevido em foto/lat/lon/alt/mrk_*.
 2.3.8.19 2026/04/08
 [2.3.8.19] Padronizacao de nomenclatura no MetadataFields: chaves e normalized migrados para formato sem snake_case (PascalCase), incluindo exemplos como Path e SizeMb.
+2.3.8.20 2026/04/09
+[2.3.8.20] MetadataFields: Criado enum MetadataFieldKey em core/enum com todas as chaves dos dicionarios REQUIRED_FIELDS, CUSTOM_FIELDS e MRK_FIELDS. Substituido as chaves dos dicionarios por objetos enum. Ajustados metodos all_fields(), required_keys(), etc., para retornar strings conforme esperado pelo codigo legado. Adicionado import no __init__.py de core/enum.
 [2.3.8.19.1] Compatibilidade retroativa mantida via resolve_key com conversao automatica de nomes antigos (snake_case -> PascalCase) para evitar quebra de fluxos legados.
 [2.3.8.19.2] Ajuste de padrao de atributos: todos os attribute validados com limite maximo de 9 caracteres e descriptions sincronizadas com o codigo entre colchetes.
 
@@ -131,3 +133,39 @@
 [2.3.8.23.5] i18n atualizado (pt_BR/en/es/de) para os novos controles de report metadata (pasta JSON, bloco sem MRK, opcoes e mensagens de fallback).
 [2.3.8.23.6] Documentacao adicionada: `docs/ia/GUIA_REPORT_METADATA_RAPIDO.md` e `docs/ia/CHECKLIST_REMOCAO_PHOTO_REPORT.md`.
 [2.3.8.23.7] Validacao sintatica executada com sucesso via `py_compile` para modulos alterados desta rodada.
+2.3.8.24 2026/04/09
+[2.3.8.24] Correcao critica: Refactoring de enum MetadataFieldKey para evitar erros de comparacao nativa em operacoes sorted() e set(). PROBLEMA: PhotoMetadata.py tentava comparar diretamente enums (MetadataFieldKey objects) em sorted(), causando "'<' not supported between instances of 'MetadataFieldKey' and 'MetadataFieldKey'" durante PhotoMetadataTask. SOLUCAO: Padronizado uso de `.value` para converter enum -> string em todas as operacoes de iteracao/comparacao, garantindo que dictionaries, sets e sorted() trabalhem com strings, nao enums.
+[2.3.8.24.1] PhotoMetadata.py: Alteradas linhas 54-56 para retornar strings `[k.value for k in MetadataFields.REQUIRED_FIELDS.keys()]` em lugar de enum keys. Mesmo padrao aplicado nas linhas 92 e 115 para MRK_FIELDS.
+[2.3.8.24.2] PhotoMetadata.py linha 184: Alterado set comprehension de `set(MetadataFields.all_fields().keys())` para `set(k.value for k in MetadataFields.all_fields().keys())` para garantir operacoes sobre strings.
+[2.3.8.24.3] PhotoMetadata.py linhas 391 e 431: Adicionado `key=lambda x: x.value if hasattr(x, 'value') else str(x)` ao sorted() para permitir comparacao transitoria de enums antes de conversao.
+[2.3.8.24.4] PhotoFolderVectorizationService.py linha 64-67: Adicionado `key_str = key.value if hasattr(key, 'value') else str(key)` e uso em `resolve_output_name(key_str)` e `canonical.get(key_str)` para garantir operacoes com strings.
+[2.3.8.24.5] IMGMetadata.py linha 22: Alterado `all_keys = list(MetadataFields.all_fields().keys())` para `all_keys = [k.value if hasattr(k, 'value') else str(k) for k in MetadataFields.all_fields().keys()]` para inicializar dicionario com chaves string.
+[2.3.8.24.6] Validacao sintatica executada com sucesso via `py_compile` para PhotoMetadata.py, PhotoFolderVectorizationService.py e IMGMetadata.py.
+[2.3.8.24.7] Padroes de conversao enum->string consolidados: Use `[k.value for k in ...]` para iteracoes; use `key.value if hasattr(key, 'value') else str(key)` quando transicoes sao necessarias; ensure dictionarios/sets recebem sempre strings, nunca enums.
+2.3.8.25 2026/04/09
+[2.3.8.25] Correcao critica: CheckboxGridWidget nao estava convertendo chaves enum para strings corretamente. PROBLEMA: Quando MetadataFields.REQUIRED_FIELDS tinha chaves enum, StringAdapter.to_key_label_description passava enums como "key", CheckboxGridWidget fazia str(enum) resultando em "MetadataFieldKey.FILE" em vez de "File", causando falha na normalizacao dos campos selecionados. SOLUCAO: CheckboxGridWidget._normalize_options agora usa `key.value if hasattr(key, 'value') else str(key)` para extrair o valor string dos enums, garantindo que get_checked_keys() retorne strings validas como "File" em vez de "MetadataFieldKey.FILE".
+[2.3.8.25.1] Aplicado para ambos os formatos aceitos: dicionario (caso MetadataFields) e lista (caso StringAdapter).
+[2.3.8.25.2] Validacao sintatica executada via py_compile para CheckboxGridWidget.py.
+2.3.8.26 2026/04/09
+[2.3.8.26] Correcao critica: bug em PhotoMetadata._build_selected_keys() tentando chamar .value em strings. PROBLEMA: known_keys = set(k.value for k in MetadataFields.all_fields().keys()), mas all_fields().keys() ja retorna strings (valores .value dos enums), causando "'str' object has no attribute 'value'". SOLUCAO: Alterado para known_keys = set(MetadataFields.all_fields().keys()), pois as chaves ja sao strings.
+[2.3.8.26.1] Validacao sintatica executada via py_compile para PhotoMetadata.py.
+
+2.3.8.27 2026/04/09
+[2.3.8.27] Correcao critica: erro de comparacao entre MetadataFieldKey enum e str em PhotoMetadataTask. PROBLEMA: map_record_to_output_attributes recebia dicionario com chaves enum de PhotoMetadata.enrich, causando "'<' not supported between instances of 'MetadataFieldKey' and 'str'" ao tentar ordenar field_names. SOLUCAO: Conversao de chaves enum para string usando {k.value if hasattr(k, 'value') else str(k): v for k, v in item.items()} antes de passar para map_record_to_output_attributes.
+
+2.3.8.28 2026/04/09
+[2.3.8.28] Correcao de atributos duplicados em MetadataFields.py. PROBLEMA: FlightNum e FlightNam apareciam 2x (uma em CUSTOM_FIELDS derivado do MRK, outra em MRK_FIELDS original). Isso violava unicidade de atributos para shapefiles. SOLUCAO: Renomeou CUSTOM_FIELDS FlightNumber para DrvFNum (Derived Flight Number) e FlightName para DrvFNam (Derived Flight Name), preservando MRK_FIELDS originais com FlightNum e FlightNam. Total atributos unicos: 118, compatibilidade DBF (max 9 caracteres).
+[2.3.8.28.1] Validacao sintatica executada com sucesso em MetadataFields.py via py_compile.
+
+2.3.8.29 2026/04/09
+[2.3.8.29] Governanca centralizada de metadados: aplicacao da "LAI (Lei de Atributos Ilegalizados)" em XmpUtil, ExifUtil e PhotoMetadata. PROBLEMA: 84 campos ilegais sendo gerados (arquivo, caminho, tamanho_mb, data_criacao, xmp:*, drone-dji:*, etc.) sem validacao contra MetadataFields, corrompendo schema de shapefiles. SOLUCAO: Tres camadas de sanitizacao implementadas:
+[2.3.8.29.1] MetadataFieldKey.py: Adicionados 5 novos enums de EXIF faltantes (EXIF_SHARPNESS, EXIF_CONTRAST, EXIF_SATURATION, EXIF_FLASH_PIX_VERSION, EXIF_COLOR_SPACE).
+[2.3.8.29.2] MetadataFields.py: Adicionadas definicoes de Field para os 5 novos campos EXIF em REQUIRED_FIELDS (nivel 3). Novo metodo classmethod sanitize_field_name(raw_field_name) que mapeia nomes brutos/ilegais para nomes canonicos em MetadataFields. Novo metodo is_authorized_field(field_name) para validar se campo e legalizaado.
+[2.3.8.29.3] XmpUtil.py: Refatoracao completa para garantir apenas campos autorizados. _extract_file_metadata() retorna nomes canonicos (File, Path, SizeMb, DateTime em vez de arquivo, caminho, tamanho_mb, data_criacao). Novo metodo _sanitize_metadata() filtra output XMP contra MetadataFields.sanitize_field_name(). extract_metadata() aplica sanitizacao automatica antes de retornar, descartando campos nao autorizados com log DEBUG.
+[2.3.8.29.4] ExifUtil.py: Refatoracao para compatibilidade com XmpUtil. extract_metadata_os() retorna nomes canonicos (File, Path, SizeMb, DateTime, DPIWidth, DPIHeight). extract_metadata_image() retorna nomes canonicos (ExifImageWidth, ExifImageHeight, Format, DPIWidth, DPIHeight). Novo extract_metadata_exif() sanitiza campos EXIF contra MetadataFields, rejeitando campo nao autorizado sob log DEBUG.
+[2.3.8.29.5] PhotoMetadata.py: Ajuste de fallback dt_* para usar "DateTime" (canonizado) em vez de "os_date" (antigo).
+[2.3.8.29.6] Impacto: 194 campos shapefile reduzidos para ~118+ campos auotrizados. Todas as 84 violacoes sao escaladas para rejecao silenciosa com auditoria em DEBUG. Resultado esperado: schemas consistentes, sem garbage fields, compatibilidade maxima com DBF (9 char limit).
+[2.3.8.29.7] Validacao sintatica executada com sucesso via py_compile para MetadataFieldKey.py, MetadataFields.py, XmpUtil.py, ExifUtil.py e PhotoMetadata.py.
+[2.3.8.29.8] PhotoFolderVectorizationService: filtro "sem MRK" aplicado no registro de saida e no JSON de raw_records. PROBLEMA: o modo sem MRK ainda incluia campos MRK no catalogo final, gerando lixo e nulos desnecessarios. SOLUCAO: removidos campos de MetadataFields.MRK_FIELDS do output_record e dos raw_records antes de gerar camada e relatorio.
+
+

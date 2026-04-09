@@ -5,6 +5,7 @@ from typing import Any, Dict, List
 import jinja2
 
 from ...core.config.LogUtils import LogUtils
+from ...resources.IconManager import IconManager as IM
 from ..ToolKeys import ToolKey
 
 
@@ -15,7 +16,8 @@ class RenderEngine:
         """Inicializa ambiente Jinja2 e carrega o template principal do relatorio."""
         self.tool_key = tool_key
         self.logger = LogUtils(tool=tool_key, class_name="RenderEngine")
-        template_dir = Path(__file__).resolve().parents[2] / "resources" / "reports"
+        self.resources_dir = Path(__file__).resolve().parents[2] / "resources"
+        template_dir = self.resources_dir / "reports"
         loader = jinja2.FileSystemLoader(str(template_dir))
         self.env = jinja2.Environment(
             loader=loader,
@@ -105,6 +107,10 @@ class RenderEngine:
         total_images = len(results)
         mean_overall = agg.get("mean_overall", 0)
         per_indicator = agg.get("per_indicator", {})
+        cadmus_icon_path = Path(IM.icon_path(IM.CADMUS_PNG)).resolve()
+        mtl_agro_icon_path = Path(IM.icon_path(IM.MTL_AGRO_PNG)).resolve()
+        cadmus_icon_url = cadmus_icon_path.as_uri()
+        mtl_agro_icon_url = mtl_agro_icon_path.as_uri()
 
         return self.template.render(
             results=results,
@@ -114,6 +120,10 @@ class RenderEngine:
             total_images=total_images,
             mean_overall=mean_overall,
             per_indicator=per_indicator,
+            cadmus_icon_url=cadmus_icon_url,
+            mtl_agro_icon_url=mtl_agro_icon_url,
+            cadmus_icon_path=str(cadmus_icon_path),
+            mtl_agro_icon_path=str(mtl_agro_icon_path),
         )
 
     def save_report(self, html: str, output_path: str = "relatorio.html") -> None:

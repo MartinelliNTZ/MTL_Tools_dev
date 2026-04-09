@@ -185,6 +185,7 @@ class WidgetFactory:
         items_per_row=3,
         checked_by_default=False,
         title=None,
+        show_control_buttons=False,
         return_widget=False,
         separator_top=False,
         separator_bottom=True,
@@ -199,6 +200,8 @@ class WidgetFactory:
 
         Retorno padrao: (layout, checkbox_map).
         Use return_widget=True para receber o widget completo.
+
+        :param show_control_buttons: Se True, exibe botões de seleção, deseleção e inversão.
         """
         layout = QVBoxLayout()
         if separator_top:
@@ -212,6 +215,7 @@ class WidgetFactory:
             items_per_row=items_per_row,
             checked_by_default=checked_by_default,
             title=title,
+            show_control_buttons=show_control_buttons,
         )
         layout.addWidget(widget)
         widget.setStyleSheet(Styles.grid_checkboxes())
