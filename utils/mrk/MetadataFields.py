@@ -1156,4 +1156,12 @@ class MetadataFields:
         """
         Chaves canonicas para atributos da camada de trilha.
         """
-        return ["DateName", "Folder", "MrkFile", "MrkPath", "FlightNumber", "FlightName"]
+        return [
+            "DateName",
+            "FolderLevel1",
+            "FolderLevel2",
+            "MrkFile",
+            "MrkPath",
+            "FlightNumber",
+            "FlightName",
+        ]

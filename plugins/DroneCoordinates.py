@@ -479,10 +479,13 @@ class DroneCordinates(BasePluginMTL):
 
         # ===== TRAÃ‡O =====
         points = context.get("points", []) or []
+        normalized_points = [
+            MetadataFields.normalize_record_to_keys(point or {}) for point in points
+        ]
         try:
             vl_line = VectorLayerGeometry.create_line_layer_from_points(
-                points,
-                group_by_fields=["mrk_path", "mrk_file"],
+                normalized_points,
+                group_by_fields=["MrkPath", "MrkFile"],
                 attribute_fields=MetadataFields.default_track_attribute_keys(),
             )
             if vl_line:

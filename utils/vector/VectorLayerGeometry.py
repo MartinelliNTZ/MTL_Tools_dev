@@ -240,11 +240,7 @@ class VectorLayerGeometry:
         attribute_fields: list = None,
         tool_key: str = ToolKey.UNTRACEABLE,
     ) -> Optional[QgsVectorLayer]:
-        """Cria linha(s) em memória a partir de pontos.
-
-        group_by_fields: lista de campos para agrupar em várias linhas.
-        attribute_fields: lista de campos a serem incluidos no layer de saída.
-        """
+        """Cria linha(s) em memoria a partir de pontos."""
         logger = VectorLayerGeometry._get_logger(tool_key)
         logger.debug(
             f"create_line_layer_from_points(points={len(points) if points else 0}, name={name}, group_by_fields={group_by_fields}, attribute_fields={attribute_fields})"
@@ -252,15 +248,66 @@ class VectorLayerGeometry:
         if not points:
             return None
 
-        # Agrupa o conjunto de pontos por chave específica
+        def _first_non_empty(record, keys):
+            for key in keys:
+                value = record.get(key)
+                if value not in (None, ""):
+                    return value
+            return None
+
+        def _to_float(value):
+            if value in (None, ""):
+                return None
+            try:
+                return float(value)
+            except Exception:
+                return None
+
+        def _extract_xy(record):
+            x_candidates = [
+                "Lon",
+                "lon",
+                "Longitude",
+                "GPSLong",
+                "GpsLongitude",
+                MetadataFields.resolve_output_name("Lon"),
+                MetadataFields.resolve_output_name("GpsLongitude"),
+            ]
+            y_candidates = [
+                "Lat",
+                "lat",
+                "Latitude",
+                "GpsLat",
+                "GpsLatitude",
+                MetadataFields.resolve_output_name("Lat"),
+                MetadataFields.resolve_output_name("GpsLatitude"),
+            ]
+            x_val = _to_float(_first_non_empty(record, x_candidates))
+            y_val = _to_float(_first_non_empty(record, y_candidates))
+            if x_val is None or y_val is None:
+                return None
+            return (x_val, y_val)
+
+        def _photo_sort_key(record):
+            photo_candidates = [
+                "Foto",
+                "foto",
+                "PhotoNum",
+                MetadataFields.resolve_output_name("Foto"),
+            ]
+            raw = _first_non_empty(record, photo_candidates)
+            try:
+                return int(raw)
+            except Exception:
+                return 0
+
         groups = {None: points}
         if group_by_fields:
             groups = {}
-            for p in points:
-                key = tuple(str(p.get(f, "") or "").strip() for f in group_by_fields)
-                groups.setdefault(key, []).append(p)
+            for point in points:
+                key = tuple(str(point.get(field, "") or "").strip() for field in group_by_fields)
+                groups.setdefault(key, []).append(point)
 
-        # Preparar campos do layer
         fields = QgsFields()
         resolved_attr_pairs = []
         if attribute_fields:
@@ -277,23 +324,25 @@ class VectorLayerGeometry:
         line.dataProvider().addAttributes(fields)
         line.updateFields()
 
-        for group_key, group in groups.items():
-            if len(group) < 2:
-                continue
-
-            # Ordenar por foto se existir
+        for _, group in groups.items():
             try:
-                group = sorted(group, key=lambda x: int(x.get("foto", 0)))
+                group = sorted(group, key=_photo_sort_key)
             except Exception as e:
                 logger.error(f"Erro ordenando pontos para linha: {e}")
                 return None
 
-            geometry = QgsGeometry.fromPolylineXY(
-                [QgsPointXY(p.get("lon"), p.get("lat")) for p in group]
-            )
+            vertices = []
+            for point in group:
+                xy = _extract_xy(point)
+                if not xy:
+                    continue
+                vertices.append(QgsPointXY(xy[0], xy[1]))
 
-            f = QgsFeature(line.fields())
-            f.setGeometry(geometry)
+            if len(vertices) < 2:
+                continue
+
+            feature = QgsFeature(line.fields())
+            feature.setGeometry(QgsGeometry.fromPolylineXY(vertices))
 
             if attribute_fields:
                 source = group[0]
@@ -302,33 +351,13 @@ class VectorLayerGeometry:
                     if value is None and output_name != input_name:
                         value = source.get(output_name)
                     if value is not None:
-                        f.setAttribute(output_name, value)
+                        feature.setAttribute(output_name, value)
 
-            line.dataProvider().addFeature(f)
+            line.dataProvider().addFeature(feature)
 
         line.updateExtents()
-
-        # Se não houve grupos válidos, tenta criar uma linha única com todos
-        if line.featureCount() == 0 and points:
-            if len(points) >= 2:
-                geometry = QgsGeometry.fromPolylineXY(
-                    [QgsPointXY(p.get("lon"), p.get("lat")) for p in points]
-                )
-                f = QgsFeature(line.fields())
-                f.setGeometry(geometry)
-                if attribute_fields:
-                    source = points[0]
-                    for input_name, output_name in resolved_attr_pairs:
-                        value = source.get(input_name)
-                        if value is None and output_name != input_name:
-                            value = source.get(output_name)
-                        if value is not None:
-                            f.setAttribute(output_name, value)
-                line.dataProvider().addFeature(f)
-                line.updateExtents()
-            else:
-                return None
-
+        if line.featureCount() == 0:
+            return None
         return line
 
     def create_buffer_geometry(

@@ -105,19 +105,9 @@ class PhotoFolderVectorizationService:
         if not folder_level_1 and os.path.isdir(base_folder):
             folder_level_1 = os.path.basename(base_folder)
 
-        flight_number = None
-        flight_name = None
-        match = self.FLIGHT_FOLDER_RE.search(folder_level_1)
-        if match:
-            flight_number = match.group("flight_number")
-            flight_name = match.group("flight_name")
-
         return {
-            "FlightNumber": flight_number,
-            "FlightName": flight_name,
             "FolderLevel1": folder_level_1,
             "FolderLevel2": folder_level_2,
-            "MrkFolder": folder_path or base_folder,
         }
 
     def _extract_photo_payload(self, image_path: str) -> Dict[str, Any]:
@@ -312,8 +302,8 @@ class PhotoFolderVectorizationService:
             "with_exif_gps": 0,
             "missing_xmp_and_exif": 0,
         }
-        x_geom_key = MetadataFields.resolve_output_name("Lon")
-        y_geom_key = MetadataFields.resolve_output_name("Lat")
+        x_geom_key = MetadataFields.resolve_output_name("GpsLongitude")
+        y_geom_key = MetadataFields.resolve_output_name("GpsLatitude")
 
         for file_path in files:
             merged = self._extract_photo_payload(file_path)
@@ -335,17 +325,11 @@ class PhotoFolderVectorizationService:
 
             canonical = MetadataFields.normalize_record_to_keys(merged)
             canonical.update(self._extract_flight_context(file_path, base_folder))
-
-            canonical["Lat"] = lat
-            canonical["Lon"] = lon
-            canonical["Alt"] = alt
             canonical["GpsLatitude"] = lat if lat is not None else canonical.get("GpsLatitude")
             canonical["GpsLongitude"] = lon if lon is not None else canonical.get("GpsLongitude")
             canonical["AbsoluteAltitude"] = (
                 alt if alt is not None else canonical.get("AbsoluteAltitude")
             )
-            canonical["DateName"] = self._date_name_from_payload(canonical)
-            canonical["Foto"] = self._extract_photo_number(file_path)
             canonical["CoordSource"] = source
             canonical["HasXmp"] = has_xmp
             canonical["HasExifGps"] = has_exif_gps
@@ -375,8 +359,8 @@ class PhotoFolderVectorizationService:
             raw_records[key] = MetadataFields.normalize_record_to_keys(value or {})
 
         for canonical in raw_records.values():
-            lat = canonical.get("Lat")
-            lon = canonical.get("Lon")
+            lat = self._to_float(canonical.get("GpsLatitude"))
+            lon = self._to_float(canonical.get("GpsLongitude"))
             if lat is None or lon is None:
                 continue
 
