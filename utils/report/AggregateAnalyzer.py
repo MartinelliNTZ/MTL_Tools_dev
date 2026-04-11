@@ -1,4 +1,4 @@
-﻿from typing import List, Dict, Any
+﻿from typing import List, Dict, Any, Optional
 from .IMGMetadata import IMGMetadata
 from collections import defaultdict
 import statistics
@@ -97,7 +97,7 @@ class AggregateAnalyzer:
         return any(keyword in text for keyword in AggregateAnalyzer.FLIGHT_EXCLUDE_KEYWORDS)
 
     @staticmethod
-    def _format_duration(seconds: int | None) -> str:
+    def _format_duration(seconds: Optional[int]) -> str:
         """Formata duracao em segundos para HH:MM:SS."""
         if seconds is None:
             return 'N/A'

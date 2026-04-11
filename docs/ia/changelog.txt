@@ -1,5 +1,5 @@
-﻿2.3.8 2026/04/07
-[2.3.8.31] ReportGenerationStep: Added should_run() method to skip report generation when json_path is not available in context, preventing ValueError exceptions.
+﻿3.162.3.8 2026/04/11
+[2.3.8.32] AggregateAnalyzer: Fixed type annotation syntax for Python 3.9 compatibility. Changed 'int | None' to 'Optional[int]' in _format_duration method to support QGIS 3.16 (Python 3.9).
 [2.3.8.31.1] ReportGenerationStep.should_run() checks for valid json_path before attempting task creation.
 [2.3.8.31.2] Added logging when step is skipped due to missing json_path.
 [2.3.8.31.3] ReportGenerationStep now resolves JSON path from either json_path or photo_metadata_json_path, fixing DroneCoordinates report opening.
@@ -208,4 +208,5 @@
 [2.3.8.29.7] Validacao sintatica executada com sucesso via py_compile para MetadataFieldKey.py, MetadataFields.py, XmpUtil.py, ExifUtil.py e PhotoMetadata.py.
 [2.3.8.29.8] PhotoFolderVectorizationService: filtro "sem MRK" aplicado no registro de saida e no JSON de raw_records. PROBLEMA: o modo sem MRK ainda incluia campos MRK no catalogo final, gerando lixo e nulos desnecessarios. SOLUCAO: removidos campos de MetadataFields.MRK_FIELDS do output_record e dos raw_records antes de gerar camada e relatorio.
 
+[2.3.8.33] Created comprehensive expert documentation for the full Report system in docs/skills/report_system.md, covering architecture (Mermaid), data flow, all key classes (code excerpts), temp structure, config.yaml (full), template.html Jinja vars, pipeline integration, plugins, customization, troubleshooting, and ready-to-use code snippets. Self-contained guide makes any reader a specialist in the entire system from JSON generation to HTML output.
 
