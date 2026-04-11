@@ -221,6 +221,7 @@ class Strings_pt_BR:
     NONE = "None"
     FILE_SAVED_IN = "Arquivo salvo em:"
     RASTER_MASS_SAMPLER_TITLE = "Amostragem Massiva de Rasters"
+    RASTER_WEIGHTED_AVERAGE_TITLE = "Média Ponderada de Rasters"
     RASTER_MASS_CLIPPER_TITLE = "Recorte Massivo de Rasters"
     RASTER_MASS_SAMPLER_TOOLTIP = (
         "Executa amostragem em lote de varios rasters sobre uma camada vetorial.\n"

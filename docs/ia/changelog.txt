@@ -1,5 +1,5 @@
-﻿3.162.3.8 2026/04/11
-[2.3.8.32] AggregateAnalyzer: Fixed type annotation syntax for Python 3.9 compatibility. Changed 'int | None' to 'Optional[int]' in _format_duration method to support QGIS 3.16 (Python 3.9).
+﻿2.3.8 2026/04/11
+[2.3.8.36] RasterWeightedAverage: Fixed QGIS 3.16 compatibility error. Removed asRectF() method call (not available in QGIS 3.16 QgsRectangle). Now logs extent as string representation.
 [2.3.8.31.1] ReportGenerationStep.should_run() checks for valid json_path before attempting task creation.
 [2.3.8.31.2] Added logging when step is skipped due to missing json_path.
 [2.3.8.31.3] ReportGenerationStep now resolves JSON path from either json_path or photo_metadata_json_path, fixing DroneCoordinates report opening.

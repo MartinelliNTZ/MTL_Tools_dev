@@ -221,6 +221,7 @@ class Strings_en(Strings_pt_BR):
     NONE = "None"
     FILE_SAVED_IN = "File saved in:"
     RASTER_MASS_SAMPLER_TITLE = "Mass Raster Sampling"
+    RASTER_WEIGHTED_AVERAGE_TITLE = "Weighted Average of Rasters"
     RASTER_MASS_CLIPPER_TITLE = "Mass Raster Clipping"
     RASTER_MASS_SAMPLER_TOOLTIP = (
         "Runs batch sampling of multiple rasters over a vector layer.\n"

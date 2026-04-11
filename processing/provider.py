@@ -8,6 +8,7 @@ from .DifferenceFields import DifferenceFieldsAlgorithm
 from .AttributeStatistics import AttributeStatistics
 from .GeometryLineFromPoints import GeometryLineFromPoints
 from .RasterDifferenceStatiscs import RasterDifferenceStatiscs
+from .RasterWeightedAverage import RasterWeightedAverage
 from ..i18n.TranslationManager import STR
 
 
@@ -21,6 +22,7 @@ class MTLProvider(QgsProcessingProvider):
         self.addAlgorithm(AttributeStatistics())
         self.addAlgorithm(GeometryLineFromPoints())
         self.addAlgorithm(RasterDifferenceStatiscs())
+        self.addAlgorithm(RasterWeightedAverage())
 
     def id(self):
         return "cadmus"
