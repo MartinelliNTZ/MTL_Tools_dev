@@ -12,6 +12,14 @@ from qgis.core import (
     QgsProcessingParameterRasterLayer,
     QgsRasterLayer,
 )
+from qgis.core import (
+    QgsProcessingAlgorithm,
+    QgsProcessingParameterFeatureSource,
+    QgsProcessingParameterNumber,
+    QgsProcessingParameterDefinition,
+    QgsProcessingParameterFeatureSink
+)
+import processing
 
 from ..core.config.LogUtils import LogUtils
 from ..i18n.TranslationManager import STR
@@ -40,66 +48,66 @@ class RasterWeightedAverage(BaseProcessingAlgorithm):
     WEIGHT_2 = "WEIGHT_2"
     WEIGHT_3 = "WEIGHT_3"
     WEIGHT_4 = "WEIGHT_4"
+    OUTPUT_RESOLUTION = "OUTPUT_RESOLUTION"
     OUTPUT = "OUTPUT"
     DISPLAY_HELP = "DISPLAY_HELP"
     OPEN_OUTPUT_FOLDER = "OPEN_OUTPUT_FOLDER"
 
     def initAlgorithm(self, config=None):
-        self.logger.debug("Inicializando algoritmo RasterWeightedAverage…")
-        self.load_preferences()
+            self.logger.debug("Inicializando algoritmo RasterWeightedAverage…")
+            self.load_preferences()
 
-        self.addParameter(
-            QgsProcessingParameterRasterLayer(
-                self.INPUT_RASTER_1,
-                "Raster 1",
+            self.addParameter(
+                QgsProcessingParameterRasterLayer(
+                    self.INPUT_RASTER_1,
+                    "Raster 1",
+                )
             )
-        )
 
-        self.addParameter(
-            QgsProcessingParameterRasterLayer(
-                self.INPUT_RASTER_2,
-                "Raster 2",
+            self.addParameter(
+                QgsProcessingParameterRasterLayer(
+                    self.INPUT_RASTER_2,
+                    "Raster 2",
+                )
             )
-        )
 
-        self.addParameter(
-            QgsProcessingParameterRasterLayer(
+            param = QgsProcessingParameterRasterLayer(
                 self.INPUT_RASTER_3,
                 "Raster 3 (opcional)",
                 optional=True,
             )
-        )
+            param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+            self.addParameter(param)
 
-        self.addParameter(
-            QgsProcessingParameterRasterLayer(
+            param = QgsProcessingParameterRasterLayer(
                 self.INPUT_RASTER_4,
                 "Raster 4 (opcional)",
                 optional=True,
             )
-        )
+            param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+            self.addParameter(param)
 
-        self.addParameter(
-            QgsProcessingParameterNumber(
-                self.WEIGHT_1,
-                "Peso Raster 1",
-                type=QgsProcessingParameterNumber.Double,
-                defaultValue=self.prefs.get("weight_1", 50.0),
-                minValue=0.0,
+            self.addParameter(
+                QgsProcessingParameterNumber(
+                    self.WEIGHT_1,
+                    "Peso Raster 1",
+                    type=QgsProcessingParameterNumber.Double,
+                    defaultValue=self.prefs.get("weight_1", 50.0),
+                    minValue=0.0,
+                )
             )
-        )
 
-        self.addParameter(
-            QgsProcessingParameterNumber(
-                self.WEIGHT_2,
-                "Peso Raster 2",
-                type=QgsProcessingParameterNumber.Double,
-                defaultValue=self.prefs.get("weight_2", 50.0),
-                minValue=0.0,
+            self.addParameter(
+                QgsProcessingParameterNumber(
+                    self.WEIGHT_2,
+                    "Peso Raster 2",
+                    type=QgsProcessingParameterNumber.Double,
+                    defaultValue=self.prefs.get("weight_2", 50.0),
+                    minValue=0.0,
+                )
             )
-        )
 
-        self.addParameter(
-            QgsProcessingParameterNumber(
+            param = QgsProcessingParameterNumber(
                 self.WEIGHT_3,
                 "Peso Raster 3",
                 type=QgsProcessingParameterNumber.Double,
@@ -107,10 +115,10 @@ class RasterWeightedAverage(BaseProcessingAlgorithm):
                 minValue=0.0,
                 optional=True,
             )
-        )
+            param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+            self.addParameter(param)
 
-        self.addParameter(
-            QgsProcessingParameterNumber(
+            param = QgsProcessingParameterNumber(
                 self.WEIGHT_4,
                 "Peso Raster 4",
                 type=QgsProcessingParameterNumber.Double,
@@ -118,27 +126,39 @@ class RasterWeightedAverage(BaseProcessingAlgorithm):
                 minValue=0.0,
                 optional=True,
             )
-        )
+            param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+            self.addParameter(param)
 
-        self.addParameter(
-            QgsProcessingParameterRasterDestination(self.OUTPUT, "Saída")
-        )
-
-        self.addParameter(
-            QgsProcessingParameterBoolean(
-                self.OPEN_OUTPUT_FOLDER,
-                STR.OPEN_OUTPUT_FOLDER,
-                defaultValue=self.prefs.get("open_output_folder", True),
+            param = QgsProcessingParameterNumber(
+                self.OUTPUT_RESOLUTION,
+                "Resolução de Saída (pixels)",
+                type=QgsProcessingParameterNumber.Double,
+                defaultValue=self.prefs.get("output_resolution", 0),
+                minValue=0.0,
+                optional=True,
             )
-        )
+            param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+            self.addParameter(param)
 
-        self.addParameter(
-            QgsProcessingParameterBoolean(
-                self.DISPLAY_HELP,
-                STR.DISPLAY_HELP_FIELD,
-                defaultValue=self.prefs.get("display_help", True),
+            self.addParameter(
+                QgsProcessingParameterRasterDestination(self.OUTPUT, "Saída")
             )
-        )
+
+            self.addParameter(
+                QgsProcessingParameterBoolean(
+                    self.OPEN_OUTPUT_FOLDER,
+                    STR.OPEN_OUTPUT_FOLDER,
+                    defaultValue=self.prefs.get("open_output_folder", True),
+                )
+            )
+
+            self.addParameter(
+                QgsProcessingParameterBoolean(
+                    self.DISPLAY_HELP,
+                    STR.DISPLAY_HELP_FIELD,
+                    defaultValue=self.prefs.get("display_help", True),
+                )
+            )
 
     def processAlgorithm(self, params, context, feedback):
         self.logger.debug("Iniciando processAlgorithm…")
@@ -194,6 +214,14 @@ class RasterWeightedAverage(BaseProcessingAlgorithm):
                 f"Pesos brutos: W1={weight1}, W2={weight2}, W3={weight3}, W4={weight4}"
             )
 
+            # Recuperar resolução de saída
+            output_resolution = self.parameterAsDouble(params, self.OUTPUT_RESOLUTION, context)
+            if output_resolution is None or output_resolution <= 0:
+                output_resolution = None
+                self.logger.debug("Resolução de saída: nenhuma (usar resolução original)")
+            else:
+                self.logger.debug(f"Resolução de saída: {output_resolution}")
+
             # Recuperar parâmetros booleanos
             open_output_folder = self.parameterAsBool(params, self.OPEN_OUTPUT_FOLDER, context)
             display_help = self.parameterAsBool(params, self.DISPLAY_HELP, context)
@@ -223,6 +251,14 @@ class RasterWeightedAverage(BaseProcessingAlgorithm):
 
             # Validar compatibilidade (CRS e resolução)
             self._validate_raster_compatibility(rasters_with_weights)
+
+            # Reamostrar se resolução de saída foi definida
+            if output_resolution is not None:
+                self.logger.debug(f"Reamostrando rasters para resolução {output_resolution}…")
+                rasters_with_weights = self._resample_rasters(
+                    rasters_with_weights, output_resolution, context, feedback
+                )
+                self.logger.debug("Reamostragem concluída.")
 
             # Descarregar rasters não usados
             for ras in [raster3, raster4]:
@@ -287,6 +323,7 @@ class RasterWeightedAverage(BaseProcessingAlgorithm):
                     "weight_2": float(weight2),
                     "weight_3": float(weight3),
                     "weight_4": float(weight4),
+                    "output_resolution": float(output_resolution) if output_resolution else None,
                     "display_help": bool(display_help),
                     "open_output_folder": bool(open_output_folder),
                 }
@@ -317,6 +354,76 @@ class RasterWeightedAverage(BaseProcessingAlgorithm):
             self.logger.error(msg)
             self.logger.error(f"  Tipo: {type(e).__name__}")
             raise QgsProcessingException(msg)
+
+    def _resample_rasters(self, rasters_with_weights, target_resolution, context, feedback):
+        """
+        Reamostra os rasters para a resolução de saída usando QGIS Processing.
+        Retorna nova lista de tuplas (raster_reamostrado, peso).
+        """
+        import tempfile
+
+        resampled_rasters = []
+        base_raster = rasters_with_weights[0][0]
+        extent = base_raster.extent()
+
+        # Calcular dimensões baseado na resolução desejada
+        width = max(1, int(extent.width() / target_resolution))
+        height = max(1, int(extent.height() / target_resolution))
+
+        self.logger.debug(f"Dimensões de saída: {width} x {height}")
+
+        for idx, (ras, weight) in enumerate(rasters_with_weights):
+            self.logger.debug(f"Reamostrando raster {idx+1}: {ras.name()}…")
+            feedback.pushInfo(f"Reamostrando raster {idx+1}…")
+
+            try:
+                # Criar arquivo temporário
+                temp_file = os.path.join(
+                    tempfile.gettempdir(),
+                    f"cadmus_resample_{idx}_{os.path.basename(ras.source())}"
+                )
+
+                # Usar qgis:rasterlayerresampler (nativo do QGIS)
+                alg_params = {
+                    'INPUT': ras,
+                    'OUTPUT_WIDTH': width,
+                    'OUTPUT_HEIGHT': height,
+                    'OUTPUT': temp_file,
+                }
+
+                self.logger.debug(f"Executando qgis:rasterlayerresampler para {ras.name()}")
+                result = processing.run(
+                    'qgis:rasterlayerresampler',
+                    alg_params,
+                    context=context,
+                    feedback=feedback,
+                    is_child_algorithm=True
+                )
+
+                output_file = result.get('OUTPUT')
+                if not output_file:
+                    # Fallback: usar arquivo temporário
+                    output_file = temp_file
+                    self.logger.debug(f"Usando fallback temp file: {output_file}")
+
+                # Carregar raster reamostrado
+                resampled = QgsRasterLayer(output_file, f"Resampled_{idx}")
+                if not resampled.isValid():
+                    msg = f"Falha ao carregar raster reamostrado: {output_file}"
+                    self.logger.error(msg)
+                    raise QgsProcessingException(msg)
+
+                self.logger.debug(f"Raster {idx+1} reamostrado com sucesso.")
+                resampled_rasters.append((resampled, weight))
+
+            except Exception as e:
+                msg = f"Erro ao reamostrar raster {idx+1}: {e}"
+                self.logger.error(msg)
+                self.logger.error(f"  Exception type: {type(e).__name__}")
+                raise QgsProcessingException(msg)
+
+        self.logger.debug(f"Total de rasters reamostrados: {len(resampled_rasters)}")
+        return resampled_rasters
 
     def _validate_raster_compatibility(self, rasters_with_weights):
         """Valida se os rasters são compatíveis (CRS e resolução)."""

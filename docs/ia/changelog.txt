@@ -1,4 +1,9 @@
 ﻿2.3.8 2026/04/11
+[2.3.8.37.4] RasterWeightedAverage: Changed resampling from GDAL direct usage to QGIS Processing API (qgis:rasterlayerresampler). Improves compatibility, integrates safely with QGIS, supports child algorithms properly, and works reliably across QGIS versions 3.16+.
+[2.3.8.37.3] Preferences now include output_resolution parameter.
+[2.3.8.37.2] Added _resample_rasters() method: uses processing.run() with qgis:rasterlayerresampler, creates temporary GeoTIFF files, returns resampled QgsRasterLayer objects with weights preserved.
+[2.3.8.37.1] Added OUTPUT_RESOLUTION parameter and helper function for smart resampling.
+[2.3.8.37] RasterWeightedAverage: Added output resolution resampling feature. Moved Raster 3, 4, Weight 3, 4 and OUTPUT_RESOLUTION to advanced parameters. When output resolution is blank, executes normal calculation. When defined, resamples all rasters to target resolution using cubic spline interpolation (GDAL) before weighted average calculation.
 [2.3.8.36] RasterWeightedAverage: Fixed QGIS 3.16 compatibility error. Removed asRectF() method call (not available in QGIS 3.16 QgsRectangle). Now logs extent as string representation.
 [2.3.8.31.1] ReportGenerationStep.should_run() checks for valid json_path before attempting task creation.
 [2.3.8.31.2] Added logging when step is skipped due to missing json_path.
