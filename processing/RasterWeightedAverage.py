@@ -86,9 +86,6 @@ class RasterWeightedAverage(BaseProcessingAlgorithm):
         param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
         self.addParameter(param)
 
-
-
-
         param = QgsProcessingParameterNumber(
             self.WEIGHT_3,
             "Peso Raster 3",
