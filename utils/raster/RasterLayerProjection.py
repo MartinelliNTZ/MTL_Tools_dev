@@ -54,11 +54,38 @@ class RasterLayerProjection:
         normalized.createFromUserInput(str(crs_value))
         return normalized if normalized.isValid() else None
 
-    def get_raster_crs(self, raster, external_tool_key=ToolKey.UNTRACEABLE):
+    @staticmethod
+    def get_raster_crs(raster, external_tool_key=ToolKey.UNTRACEABLE):
         """Obtem o CRS atual do raster."""
         logger = RasterLayerProjection._get_logger(external_tool_key)
         logger.debug(f"get_raster_crs(raster={raster})")
-        pass
+        if raster is None:
+            logger.warning("get_raster_crs: raster nao informado")
+            return None
+
+        if isinstance(raster, QgsRasterLayer):
+            crs = raster.crs()
+            if crs and crs.isValid():
+                logger.info(f"get_raster_crs: CRS obtido do QgsRasterLayer: {crs.authid()}")
+                return crs
+            logger.warning("get_raster_crs: QgsRasterLayer sem CRS valido")
+            return None
+
+        if isinstance(raster, str):
+            if not os.path.exists(raster):
+                logger.warning(f"get_raster_crs: raster nao encontrado: {raster}")
+                return None
+            raster_layer = QgsRasterLayer(raster, os.path.basename(raster))
+            if raster_layer.isValid() and raster_layer.crs().isValid():
+                logger.info(
+                    f"get_raster_crs: CRS obtido do caminho raster: {raster_layer.crs().authid()}"
+                )
+                return raster_layer.crs()
+            logger.warning("get_raster_crs: falha ao carregar raster ou CRS invalido")
+            return None
+
+        logger.warning(f"get_raster_crs: tipo nao suportado: {type(raster).__name__}")
+        return None
 
     def set_raster_crs(self, raster, target_crs, external_tool_key=ToolKey.UNTRACEABLE):
         """Define o CRS do raster sem reprojetar (apenas muda a definicao)."""
@@ -82,6 +109,9 @@ class RasterLayerProjection:
         multithreading=False,
         creation_options="",
         extra="",
+        context=None,
+        feedback=None,
+        is_child_algorithm=False,
     ):
         """Reprojeta ou reamostra raster via `gdal:warpreproject`.
 
@@ -170,7 +200,13 @@ class RasterLayerProjection:
         logger.info(
             f"Executando gdal:warpreproject | input={raster_path} | output={output_path}"
         )
-        result = processing.run("gdal:warpreproject", params)
+        result = processing.run(
+            "gdal:warpreproject",
+            params,
+            context=context,
+            feedback=feedback,
+            is_child_algorithm=is_child_algorithm,
+        )
         output = result.get("OUTPUT")
 
         if not output or not os.path.exists(output):
