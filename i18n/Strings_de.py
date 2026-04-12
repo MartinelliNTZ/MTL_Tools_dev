@@ -540,6 +540,15 @@ class Strings_de(Strings_pt_BR):
     MINIMUM_POINT_COUNT = "Minimale Punktanzahl"
     TIME_TOLERANCE_MULTIPLIER = "Zeittoleranz (Multiplikator)"
     SELECT_POINT_VECTOR_LAYER = "Bitte einen Punkt-Vektorlayer auswählen."
+    SELECT_FILE_BASED_POINT_LAYER = "Bitte einen dateibasierten Punktlayer auswählen."
+    SELECT_REQUIRED_FIELDS = "Bitte wählen Sie die erforderlichen ID- und Zeitstempelfelder aus."
+    SAVE_AND_STOP_EDITING_LAYER = "Speichern Sie die Ebene und beenden Sie den Editiermodus, bevor Sie dieses Werkzeug ausführen."
+    SHOT_SEGMENTATION_COMPLETED = (
+        "Segmentierung abgeschlossen. Punkte: {total_points} | Streifen: {total_shots} | Gültig: {valid_shots} | Ungültig: {invalid_shots}"
+    )
+    SHOT_SEGMENTATION_BUFFER_COMPLETED = (
+        "Segmentierung im Editierpuffer abgeschlossen. Punkte: {total_points} | Streifen: {total_shots} | Gültig: {valid_shots} | Ungültig: {invalid_shots}"
+    )
     DIVIDE_POINTS_BY_STRIPS_UI_ONLY_MESSAGE = (
         "Die Oberfläche ist bereit. Die Streifenaufteilung wird in der nächsten Phase implementiert."
     )

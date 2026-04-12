@@ -594,6 +594,15 @@ class Strings_pt_BR:
     MINIMUM_POINT_COUNT = "Número mínimo de pontos"
     TIME_TOLERANCE_MULTIPLIER = "Tolerância de tempo (multiplicador)"
     SELECT_POINT_VECTOR_LAYER = "Selecione uma camada vetorial de pontos."
+    SELECT_FILE_BASED_POINT_LAYER = "Selecione uma camada de pontos baseada em arquivo."
+    SELECT_REQUIRED_FIELDS = "Selecione os campos obrigatórios de ID e timestamp."
+    SAVE_AND_STOP_EDITING_LAYER = "Salve e encerre a edição da camada antes de executar esta ferramenta."
+    SHOT_SEGMENTATION_COMPLETED = (
+        "Segmentação concluída. Pontos: {total_points} | Tiros: {total_shots} | Válidos: {valid_shots} | Inválidos: {invalid_shots}"
+    )
+    SHOT_SEGMENTATION_BUFFER_COMPLETED = (
+        "Segmentação concluída no buffer de edição. Pontos: {total_points} | Tiros: {total_shots} | Válidos: {valid_shots} | Inválidos: {invalid_shots}"
+    )
     DIVIDE_POINTS_BY_STRIPS_UI_ONLY_MESSAGE = (
         "A interface foi criada. A rotina de divisão por faixas será implementada na próxima etapa."
     )

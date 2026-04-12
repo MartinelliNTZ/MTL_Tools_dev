@@ -1,11 +1,119 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsField
+from qgis.core import QgsField, QgsFields
 
 from qgis.PyQt.QtCore import QVariant
 from ...core.config.LogUtils import LogUtils
 
 
 class VectorLayerAttributes:
+    @staticmethod
+    def ensure_fields(layer, field_specs, logger=None):
+        """Garante a existência de campos e retorna nomes adicionados."""
+        if not layer or not layer.isValid():
+            return []
+
+        if not layer.isEditable():
+            layer.startEditing()
+
+        added = []
+        for spec in field_specs or []:
+            if not spec:
+                continue
+
+            field_name = spec[0]
+            field_type = spec[1] if len(spec) > 1 else QVariant.String
+            field_len = spec[2] if len(spec) > 2 else 0
+            field_prec = spec[3] if len(spec) > 3 else 0
+
+            if layer.fields().lookupField(field_name) != -1:
+                continue
+
+            layer.addAttribute(
+                QgsField(field_name, field_type, len=field_len, prec=field_prec)
+            )
+            added.append(field_name)
+
+        if added:
+            layer.updateFields()
+            if logger:
+                logger.debug(f"Campos adicionados: {added}")
+
+        return added
+
+    @staticmethod
+    def apply_updates_by_field_name(layer, updates_by_fid, logger=None):
+        """Aplica updates no buffer de edição usando nomes de campos."""
+        if not layer or not layer.isValid() or not updates_by_fid:
+            return 0
+
+        if not layer.isEditable():
+            layer.startEditing()
+
+        name_to_idx = {field.name(): idx for idx, field in enumerate(layer.fields())}
+        applied = 0
+
+        for fid, field_map in updates_by_fid.items():
+            for field_name, value in (field_map or {}).items():
+                field_idx = name_to_idx.get(field_name)
+                if field_idx is None:
+                    if logger:
+                        logger.warning(f"Campo ausente ao aplicar update: {field_name}")
+                    continue
+                if layer.changeAttributeValue(fid, field_idx, value):
+                    applied += 1
+
+        if logger:
+            logger.debug(f"Total de updates aplicados: {applied}")
+        return applied
+
+    @staticmethod
+    def generate_compatible_field_name(layer, base_name, max_length=255):
+        """Gera nome compatível com limite do provider."""
+        base = str(base_name or "").strip()
+        if not base:
+            base = "campo"
+
+        if len(base) <= max_length and layer.fields().lookupField(base) == -1:
+            return base
+
+        suffix = 1
+        trimmed = base[:max_length]
+        candidate = trimmed
+        while layer.fields().lookupField(candidate) != -1:
+            suffix_text = f"_{suffix}"
+            allowed = max(1, max_length - len(suffix_text))
+            candidate = f"{base[:allowed]}{suffix_text}"
+            suffix += 1
+        return candidate
+
+    @staticmethod
+    def resolve_output_field_name(
+        layer,
+        base_name,
+        *,
+        conflict_resolver=None,
+        max_length=255,
+    ):
+        """Resolve nome final do campo respeitando conflitos e limite do provider."""
+        normalized = str(base_name or "").strip()[:max_length] or "campo"
+        if layer.fields().lookupField(normalized) == -1:
+            return normalized
+
+        action = "replace"
+        if conflict_resolver:
+            action = conflict_resolver(normalized)
+
+        if action == "cancel":
+            return None
+        if action == "replace":
+            return normalized
+
+        return VectorLayerAttributes.generate_compatible_field_name(
+            layer,
+            normalized,
+            max_length=max_length,
+        )
+
     @staticmethod
     def get_field_options(layer, include_empty=False, empty_key="", empty_label=""):
         """Retorna opcoes para seletores de campos no formato {key: label}."""
@@ -89,7 +197,21 @@ class VectorLayerAttributes:
 
     def get_layer_fields(self, layer, external_tool_key="untraceable"):
         """Retorna lista com todos os campos da camada e seus tipos."""
-        pass
+        if not layer or not layer.isValid():
+            return []
+
+        result = []
+        for field in layer.fields():
+            result.append(
+                {
+                    "name": field.name(),
+                    "type": field.type(),
+                    "type_name": field.typeName(),
+                    "length": field.length(),
+                    "precision": field.precision(),
+                }
+            )
+        return result
 
     @staticmethod
     def copy_attributes(

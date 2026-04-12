@@ -8,6 +8,7 @@ from ..i18n.TranslationManager import STR
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.ToolKeys import ToolKey
+from ..utils.judge.SequentialPointBreakJudge import SequentialPointBreakJudge
 from ..utils.vector.VectorLayerAttributes import VectorLayerAttributes
 
 
@@ -40,7 +41,7 @@ class DividePointsByStripsPlugin(BasePluginMTL):
             label_text=STR.INPUT_POINTS,
             filters=[QgsMapLayerProxyModel.PointLayer],
             allow_empty=False,
-            enable_selected_checkbox=True,
+            enable_selected_checkbox=False,
             parent=self,
             separator_top=False,
             separator_bottom=True,
@@ -83,7 +84,7 @@ class DividePointsByStripsPlugin(BasePluginMTL):
                     "type": "int",
                     "default": 1,
                 },
-                "largura_lateral": {
+                "largura_tiro": {
                     "title": STR.EXPECTED_LATERAL_WIDTH_METERS,
                     "type": "float",
                     "default": 20.0,
@@ -175,9 +176,13 @@ class DividePointsByStripsPlugin(BasePluginMTL):
         self.preferences = load_tool_prefs(self.TOOL_KEY)
         self.id_field = self.preferences.get("id_field", "")
         self.time_field = self.preferences.get("time_field", "")
-        self.operational_fields.set_values(
-            self.preferences.get("operational_fields", {})
-        )
+        operational_fields = self.preferences.get("operational_fields", {})
+        if (
+            "largura_lateral" in operational_fields
+            and "largura_tiro" not in operational_fields
+        ):
+            operational_fields["largura_tiro"] = operational_fields["largura_lateral"]
+        self.operational_fields.set_values(operational_fields)
         self.sensitivity_fields.set_values(
             self.preferences.get("sensitivity_fields", {})
         )
@@ -224,20 +229,86 @@ class DividePointsByStripsPlugin(BasePluginMTL):
             )
             return
 
+        if not layer.isEditable():
+            QgisMessageUtil.bar_warning(self.iface, STR.SELECT_EDITABLE_VECTOR_LAYER)
+            return
+
+        field_id = self.id_field_selector.get_selected_key()
+        field_time = self.time_field_selector.get_selected_key()
+        if not field_id or not field_time:
+            QgisMessageUtil.bar_warning(self.iface, STR.SELECT_REQUIRED_FIELDS)
+            return
+
+        operational_values = self.operational_fields.get_values()
+        sensitivity_values = self.sensitivity_fields.get_values()
+
         self.logger.info(
-            "UI pronta para Dividir Vetor de Pontos por Faixas",
+            "Executando segmentação de tiros em camada de pontos",
             layer=layer.name(),
-            id_field=self.id_field_selector.get_selected_key(),
-            time_field=self.time_field_selector.get_selected_key(),
-            operational_fields=self.operational_fields.get_values(),
-            sensitivity_fields=self.sensitivity_fields.get_values(),
-            only_selected=self.layer_input.only_selected_enabled(),
+            source_path=layer.source(),
+            id_field=field_id,
+            time_field=field_time,
+            operational_fields=operational_values,
+            sensitivity_fields=sensitivity_values,
         )
-        QgisMessageUtil.bar_info(
+
+        try:
+            summary = SequentialPointBreakJudge(
+                layer=layer,
+                tool_key=self.TOOL_KEY,
+            ).judge(
+                field_id=field_id,
+                field_time=field_time,
+                point_frequency_seconds=float(
+                    operational_values.get("frequencia_pontos", 1) or 1
+                ),
+                strip_width_meters=float(
+                    operational_values.get("largura_tiro", 20.0) or 20.0
+                ),
+                azimuth_window=int(
+                    sensitivity_values.get("janela_azimute", 10) or 10
+                ),
+                light_azimuth_threshold=float(
+                    sensitivity_values.get("threshold_azimute_leve", 20.0) or 20.0
+                ),
+                severe_azimuth_threshold=float(
+                    sensitivity_values.get("threshold_azimute_grave", 45.0) or 45.0
+                ),
+                minimum_break_score=int(
+                    sensitivity_values.get("score_minimo_quebra", 3) or 3
+                ),
+                minimum_point_count=int(
+                    sensitivity_values.get("n_minimo_pontos", 20) or 20
+                ),
+                time_tolerance_multiplier=float(
+                    sensitivity_values.get("tolerancia_tempo", 3.0) or 3.0
+                ),
+                conflict_resolver=lambda field_name: QgisMessageUtil.ask_field_conflict(
+                    self.iface, field_name
+                ),
+            )
+        except Exception as e:
+            self.logger.error(f"Erro na segmentação de tiros: {e}")
+            self.logger.exception(e)
+            QgisMessageUtil.bar_critical(
+                self.iface, f"{STR.ERROR}\n{e}"
+            )
+            return
+
+        try:
+            layer.triggerRepaint()
+        except Exception as e:
+            self.logger.warning(f"Falha ao atualizar camada após julgamento: {e}")
+
+        QgisMessageUtil.bar_success(
             self.iface,
-            STR.DIVIDE_POINTS_BY_STRIPS_UI_ONLY_MESSAGE,
-            title=STR.INFO,
-            duration=5,
+            STR.SHOT_SEGMENTATION_BUFFER_COMPLETED.format(
+                total_points=summary["total_points"],
+                total_shots=summary["total_shots"],
+                valid_shots=summary["valid_shots"],
+                invalid_shots=summary["invalid_shots"],
+            ),
+            duration=8,
         )
 
 

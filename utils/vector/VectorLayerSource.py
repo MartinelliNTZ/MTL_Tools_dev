@@ -416,88 +416,33 @@ class VectorLayerSource:
             logger.error(f"Erro carregando layer {file_path}: {e}")
             return None
 
-    def load_vector_layer_from_database(
-        self, connection_string, layer_name, external_tool_key=ToolKey.UNTRACEABLE
+    @staticmethod
+    def load_vector_layer_from_source_path(
+        source_path: str,
+        layer_name: str = "",
+        external_tool_key=ToolKey.UNTRACEABLE,
     ):
-        """Carrega uma camada vetorial de um banco de dados."""
+        """Carrega camada vetorial a partir da source completa do QGIS."""
         logger = VectorLayerSource._get_logger(external_tool_key)
         logger.debug(
-            f"load_vector_layer_from_database(connection_string={connection_string}, layer_name={layer_name})"
+            f"load_vector_layer_from_source_path(source_path={source_path}, layer_name={layer_name})"
         )
-        pass
 
-    def create_memory_layer(
-        self, layer_name, geometry_type, crs, external_tool_key=ToolKey.UNTRACEABLE
-    ):
-        """Cria uma camada vetorial em memória com geometria e CRS especificados."""
-        logger = VectorLayerSource._get_logger(external_tool_key)
-        logger.debug(
-            f"create_memory_layer(layer_name={layer_name}, geometry_type={geometry_type}, crs={crs})"
-        )
-        pass
+        try:
+            if not source_path:
+                logger.error("Source path vazio")
+                return None
 
-    def save_vector_layer_to_database(
-        self, layer, connection_string, table_name, external_tool_key=ToolKey.UNTRACEABLE
-    ):
-        """Salva uma camada vetorial em um banco de dados."""
-        logger = VectorLayerSource._get_logger(external_tool_key)
-        logger.debug(
-            f"save_vector_layer_to_database(layer={layer}, connection_string={connection_string}, table_name={table_name})"
-        )
-        pass
+            normalized_name = layer_name or Path(source_path.split("|", 1)[0]).stem
+            layer = QgsVectorLayer(source_path, normalized_name, "ogr")
+            if not layer or not layer.isValid():
+                logger.error(f"Falha ao carregar camada a partir de source path: {source_path}")
+                return None
 
-    def clone_vector_layer(
-        self, source_layer, include_features, external_tool_key=ToolKey.UNTRACEABLE
-    ):
-        """Cria uma cópia exata de uma camada vetorial com ou sem feições."""
-        logger = VectorLayerSource._get_logger(external_tool_key)
-        logger.debug(
-            f"clone_vector_layer(source_layer={source_layer}, include_features={include_features})"
-        )
-        pass
+            logger.info(f"Camada vetorial carregada por source path: {source_path}")
+            return layer
+        except Exception as e:
+            logger.error(f"Erro carregando camada por source path {source_path}: {e}")
+            return None
 
-    def validate_layer_integrity(self, layer, external_tool_key=ToolKey.UNTRACEABLE):
-        """Verifica se a camada está válida e íntegra para operações."""
-        logger = VectorLayerSource._get_logger(external_tool_key)
-        logger.debug(f"validate_layer_integrity(layer={layer})")
-        pass
-
-    def get_layer_source_uri(self, layer, external_tool_key=ToolKey.UNTRACEABLE):
-        """Obtém a URI ou caminho completo da origem da camada."""
-        logger = VectorLayerSource._get_logger(external_tool_key)
-        logger.debug(f"get_layer_source_uri(layer={layer})")
-        pass
-
-    def check_file_format_compatibility(
-        self, file_path, target_format, external_tool_key=ToolKey.UNTRACEABLE
-    ):
-        """Verifica se o arquivo pode ser convertido para o formato desejado."""
-        logger = VectorLayerSource._get_logger(external_tool_key)
-        logger.debug(
-            f"check_file_format_compatibility(file_path={file_path}, target_format={target_format})"
-        )
-        pass
-
-    def reload_layer_from_source(self, layer, external_tool_key=ToolKey.UNTRACEABLE):
-        """Recarrega a camada a partir de sua fonte original."""
-        logger = VectorLayerSource._get_logger(external_tool_key)
-        logger.debug(f"reload_layer_from_source(layer={layer})")
-        pass
-
-    def export_layer_statistics(
-        self, layer, output_path, external_tool_key=ToolKey.UNTRACEABLE
-    ):
-        """Exporta estatísticas básicas da camada para arquivo de relatório."""
-        logger = VectorLayerSource._get_logger(external_tool_key)
-        logger.debug(
-            f"export_layer_statistics(layer={layer}, output_path={output_path})"
-        )
-        pass
-
-    def validate_geometry_before_save(
-        self, layer, external_tool_key=ToolKey.UNTRACEABLE
-    ):
-        """Valida geometrias da camada antes de salvar para evitar corrupção."""
-        logger = VectorLayerSource._get_logger(external_tool_key)
-        logger.debug(f"validate_geometry_before_save(layer={layer})")
-        pass
+   

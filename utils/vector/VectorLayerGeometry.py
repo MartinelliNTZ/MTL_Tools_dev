@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
 import json
+import math
 
 from typing import Optional
 
@@ -15,6 +16,8 @@ from qgis.core import (
     QgsFeatureRequest,
     QgsField,
     QgsFields,
+    QgsDistanceArea,
+    QgsCoordinateReferenceSystem,
 )
 from qgis.PyQt.QtCore import QVariant
 
@@ -69,6 +72,72 @@ class VectorLayerGeometry:
             Instância de logger configurada para a classe
         """
         return LogUtils(tool=tool_key, class_name="VectorLayerGeometry")
+
+    @staticmethod
+    def calculate_point_azimuth(point_a: QgsPointXY, point_b: QgsPointXY) -> float:
+        """Calcula azimute 0-360 usando norte=0 e leste=90."""
+        dx = point_b.x() - point_a.x()
+        dy = point_b.y() - point_a.y()
+        angle = math.degrees(math.atan2(dx, dy))
+        return (angle + 360.0) % 360.0
+
+    @staticmethod
+    def angular_difference_degrees(angle_a: float, angle_b: float) -> float:
+        """Menor diferença angular absoluta entre dois ângulos."""
+        diff = (float(angle_a) - float(angle_b) + 180.0) % 360.0 - 180.0
+        return abs(diff)
+
+    @staticmethod
+    def circular_mean_degrees(values) -> float:
+        """Calcula média circular em graus."""
+        clean = [float(v) for v in values if v is not None]
+        if not clean:
+            return 0.0
+
+        sin_sum = sum(math.sin(math.radians(v)) for v in clean)
+        cos_sum = sum(math.cos(math.radians(v)) for v in clean)
+
+        if sin_sum == 0 and cos_sum == 0:
+            return clean[-1]
+
+        angle = math.degrees(math.atan2(sin_sum, cos_sum))
+        return (angle + 360.0) % 360.0
+
+    @staticmethod
+    def measure_distance_between_points(
+        point_a: QgsPointXY,
+        point_b: QgsPointXY,
+        crs: Optional[QgsCoordinateReferenceSystem] = None,
+    ) -> float:
+        """Mede distância entre pontos no CRS informado."""
+        if point_a is None or point_b is None:
+            return 0.0
+
+        if crs and crs.isValid():
+            distance_area = QgsDistanceArea()
+            distance_area.setSourceCrs(crs, QgsProject.instance().transformContext())
+            ellipsoid = crs.ellipsoidAcronym() or "WGS84"
+            distance_area.setEllipsoid(ellipsoid)
+            try:
+                return float(distance_area.measureLine(point_a, point_b))
+            except Exception:
+                pass
+
+        return math.hypot(point_b.x() - point_a.x(), point_b.y() - point_a.y())
+
+    @staticmethod
+    def get_representative_point(geometry: QgsGeometry) -> Optional[QgsPointXY]:
+        """Extrai um ponto representativo de geometrias Point/MultiPoint."""
+        if geometry is None or geometry.isEmpty():
+            return None
+
+        try:
+            if geometry.isMultipart():
+                points = geometry.asMultiPoint()
+                return points[0] if points else None
+            return geometry.asPoint()
+        except Exception:
+            return None
 
     @staticmethod
     def create_point_layer_from_dicts(

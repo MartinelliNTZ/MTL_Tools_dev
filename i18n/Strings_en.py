@@ -525,6 +525,15 @@ class Strings_en(Strings_pt_BR):
     MINIMUM_POINT_COUNT = "Minimum point count"
     TIME_TOLERANCE_MULTIPLIER = "Time tolerance (multiplier)"
     SELECT_POINT_VECTOR_LAYER = "Select a point vector layer."
+    SELECT_FILE_BASED_POINT_LAYER = "Select a file-based point layer."
+    SELECT_REQUIRED_FIELDS = "Select the required ID and timestamp fields."
+    SAVE_AND_STOP_EDITING_LAYER = "Save and stop editing the layer before running this tool."
+    SHOT_SEGMENTATION_COMPLETED = (
+        "Segmentation completed. Points: {total_points} | Shots: {total_shots} | Valid: {valid_shots} | Invalid: {invalid_shots}"
+    )
+    SHOT_SEGMENTATION_BUFFER_COMPLETED = (
+        "Segmentation completed in the edit buffer. Points: {total_points} | Shots: {total_shots} | Valid: {valid_shots} | Invalid: {invalid_shots}"
+    )
     DIVIDE_POINTS_BY_STRIPS_UI_ONLY_MESSAGE = (
         "The interface is ready. The strip division routine will be implemented in the next stage."
     )

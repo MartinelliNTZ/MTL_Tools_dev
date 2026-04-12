@@ -544,6 +544,15 @@ class Strings_es(Strings_pt_BR):
     MINIMUM_POINT_COUNT = "Número mínimo de puntos"
     TIME_TOLERANCE_MULTIPLIER = "Tolerancia de tiempo (multiplicador)"
     SELECT_POINT_VECTOR_LAYER = "Seleccione una capa vectorial de puntos."
+    SELECT_FILE_BASED_POINT_LAYER = "Seleccione una capa de puntos basada en archivo."
+    SELECT_REQUIRED_FIELDS = "Seleccione los campos obligatorios de ID y timestamp."
+    SAVE_AND_STOP_EDITING_LAYER = "Guarde y cierre la edición de la capa antes de ejecutar esta herramienta."
+    SHOT_SEGMENTATION_COMPLETED = (
+        "Segmentación finalizada. Puntos: {total_points} | Tiros: {total_shots} | Válidos: {valid_shots} | Inválidos: {invalid_shots}"
+    )
+    SHOT_SEGMENTATION_BUFFER_COMPLETED = (
+        "Segmentación finalizada en el buffer de edición. Puntos: {total_points} | Tiros: {total_shots} | Válidos: {valid_shots} | Inválidos: {invalid_shots}"
+    )
     DIVIDE_POINTS_BY_STRIPS_UI_ONLY_MESSAGE = (
         "La interfaz está lista. La rutina de división por franjas se implementará en la siguiente etapa."
     )
