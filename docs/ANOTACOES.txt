@@ -25,6 +25,10 @@ ferramentas = name                              tipo                            
     - 20: Ferramenta de remoção de campos KML   instantânea                     RemoveKmlFieldsPlugin         manipulação de vetores
     - 21: Vetor para SVG                        Janela
     - 22: Criador de Projeto                    Instantânea
+    - 23: Metadata de fotos
+    - 24: Relatorio de fotos 
+    - 25: Media Ponderada de Raster
+    - 26: Separacao de faixas
 
 
 Documentação de cenarios: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13
@@ -37,7 +41,68 @@ Traducao: 9
   - eLIMIAR TODOS OS untraceable exceptions e garantir que tudo seja logado
   - Usar iconManager para carregar ícones de forma centralizada e eficiente
  changelog=
-2.3.7 — 07/04/2026
+2.3.12 11/04/2026
+    - RasterLayerProjection: implementado reproject_raster_to_crs() usando gdal:warpreproject
+    - RasterLayerProjection: reproject_raster_to_crs() passou a usar ResamplingMethod com padrão CUBICO_SUAVIZADO
+    - RasterLayerProjection: implementado get_raster_crs()
+    - RasterWeightedAverage: removido _resample_rasters() e centralizada preparação em RasterLayerProjection
+    - RasterWeightedAverage: adicionado parâmetro OUTPUT_CRS
+    - RasterWeightedAverage: novo fluxo _prepare_rasters_for_execution()
+    - RasterWeightedAverage: validação e logs refinados no pipeline de média ponderada
+
+2.3.11 09/04/2026
+    - MetadataFields: separados campos EXIF e XMP com métodos exif_keys() e xmp_keys()
+    - DroneCoordinates UI: separada seção Required Fields em EXIF Fields e DJI Fields
+    - DroneCoordinates: preferências separadas para seleção EXIF e XMP
+    - PhotoMetadata: lookup direto por enum MetadataFieldKey substituindo lógica de sufixos
+    - MetadataFieldKey: adicionados 5 novos enums EXIF
+    - MetadataFields: adicionado sanitize_field_name() e is_authorized_field()
+    - XmpUtil: refatorado para retornar apenas campos autorizados com nomes canônicos
+    - ExifUtil: refatorado para nomes canônicos e sanitização contra MetadataFields
+    - PhotoFolderVectorizationService: removidos campos MRK do output no modo sem MRK
+    - Corrigido bug de comparação entre MetadataFieldKey enum e str em sorted() e set()
+    - CheckboxGridWidget: corrigida conversão de chaves enum para string
+    - Corrigidos atributos duplicados FlightNumber e FlightName (renomeados DrvFNum e DrvFNam)
+    - Criada documentação para Report system e Processing Provider em docs/skills/
+
+2.3.10 09/04/2026
+    - Criado enum MetadataFieldKey com todas as chaves de REQUIRED, CUSTOM e MRK fields
+    - MetadataFields: adicionados resolvedores centralizados (all_fields, resolve_key, map_record_to_output_attributes)
+    - Criado core/model/Field.py com dataclass Field
+    - Criado core/enum/LightSourceEnum.py
+    - VectorLayerGeometry.create_point_layer_from_dicts refatorado para receber schema do chamador
+    - Dump JSON reformatado para raw_records por arquivo com whitelist do MetadataFields
+    - Padronização de nomenclatura no MetadataFields para PascalCase
+    - ExplorerUtils: adicionados diretórios temporários dedicados para reports (json e html)
+    - Criado ReportGenerationService.py
+    - Novos módulos em utils/report: JSONUtil, RangeMetadataManager, IMGMetadata, AggregateAnalyzer, RenderEngine
+    - Criada ferramenta Report Metadata com ReportMetadataPlugin.py e ToolKey REPORT_METADATA
+    - ReportMetadataPlugin: adicionado fluxo para fotos sem MRK
+    - Geração de relatório movida para background task com ReportGenerationStep e ReportGenerationTask
+    - Criado PhotoVectorizationPlugin separando vetorização do ReportMetadataPlugin
+    - PhotoVectorizationPlugin refatorado para usar AsyncPipelineEngine
+    - i18n atualizado (pt_BR/en/es/de)
+
+2.3.9 08/04/2026
+    - Planejamento da reimplementação do DroneCoordinates com plano técnico em docs/ia/
+    - Padronização das classes de metadata em utils/mrk com logging unificado
+    - MetadataFields: adicionado MRK_FIELDS e expansão de CUSTOM_FIELDS
+    - PhotoMetadata reestruturado como manager/orquestrador
+    - CheckboxGridWidget reimplementado com retrocompatibilidade e suporte a tooltip
+    - DroneCoordinates UI: adicionados 3 collapsibles de campos (Required, Custom, MRK)
+    - Cadeia de filtros propagada para PhotoMetadataStep, PhotoMetadataTask e DroneCoordinatesRunner
+    - RasterWeightedAverage: adicionado OUTPUT_RESOLUTION com reamostragem via gdal:warp
+    - RasterWeightedAverage: corrigida compatibilidade com QGIS 3.16
+    - ReportGenerationStep: corrigido KeyError quando json_path ausente
+    - ExifUtil: expandido para expandir GPSInfo em chaves individuais
+    - PhotoMetadataStep: adicionada inferência de tipo de campo (numérico ou texto)
+    - PhotoMetadataTask: adicionado suporte a source_points do ExecutionContext
+
+2.3.8 07/04/2026
+    - DroneCoordinates: início da reimplementação completa com plano técnico em docs/ia/
+    - ExplorerUtils: adicionado helper create_temp_json()
+
+2.3.7 07/04/2026
     - Adicionado basemap Google (Hybrid) automaticamente ao criar novos projetos.
     - Corrigido problema na URL do basemap que impedia o carregamento correto.
     - Aplicação automática do CRS padrão definido nas preferências, com fallback para EPSG:4326.
@@ -49,7 +114,6 @@ Traducao: 9
       - Simplificação do CreateProjectPlugin.
       - Centralização da lógica de adição de camadas.
     - Generalização da criação de basemaps Google (satélite, híbrido e mapa), mantendo compatibilidade com versões anteriores.
-    
 2.3.6 — 05/04/2026
     - Adicionado seletor de “Pasta de projetos” nas configurações, com salvamento nas preferências.
     - Implementado seletor de CRS padrão usando o widget nativo do QGIS, com persistência da escolha.
