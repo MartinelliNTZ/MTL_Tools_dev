@@ -41,6 +41,7 @@ Traducao: 9
   - eLIMIAR TODOS OS untraceable exceptions e garantir que tudo seja logado
   - Usar iconManager para carregar ícones de forma centralizada e eficiente
  changelog=
+ use def load_vector_layer_from_file( e elimine o def load_vector_layer_from_source_path( mnao e necessario novo metodo, 
 2.3.12 11/04/2026
     - RasterLayerProjection: implementado reproject_raster_to_crs() usando gdal:warpreproject
     - RasterLayerProjection: reproject_raster_to_crs() passou a usar ResamplingMethod com padrão CUBICO_SUAVIZADO
