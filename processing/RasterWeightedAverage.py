@@ -135,9 +135,9 @@ class RasterWeightedAverage(BaseProcessingAlgorithm):
                 type=QgsProcessingParameterNumber.Double,
                 defaultValue=self.prefs.get("output_resolution", 0),
                 minValue=0.0,
-                optional=True,
+                #optional=True,
             )
-            param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+            #param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
             self.addParameter(param)
 
             self.addParameter(
@@ -357,20 +357,12 @@ class RasterWeightedAverage(BaseProcessingAlgorithm):
 
     def _resample_rasters(self, rasters_with_weights, target_resolution, context, feedback):
         """
-        Reamostra os rasters para a resolução de saída usando QGIS Processing.
+        Reamostra os rasters para a resolução de saída usando gdalwarp com cubic spline.
         Retorna nova lista de tuplas (raster_reamostrado, peso).
         """
         import tempfile
 
         resampled_rasters = []
-        base_raster = rasters_with_weights[0][0]
-        extent = base_raster.extent()
-
-        # Calcular dimensões baseado na resolução desejada
-        width = max(1, int(extent.width() / target_resolution))
-        height = max(1, int(extent.height() / target_resolution))
-
-        self.logger.debug(f"Dimensões de saída: {width} x {height}")
 
         for idx, (ras, weight) in enumerate(rasters_with_weights):
             self.logger.debug(f"Reamostrando raster {idx+1}: {ras.name()}…")
@@ -383,17 +375,24 @@ class RasterWeightedAverage(BaseProcessingAlgorithm):
                     f"cadmus_resample_{idx}_{os.path.basename(ras.source())}"
                 )
 
-                # Usar qgis:rasterlayerresampler (nativo do QGIS)
+                # Usar gdal:warp com resampling cubic spline
                 alg_params = {
                     'INPUT': ras,
-                    'OUTPUT_WIDTH': width,
-                    'OUTPUT_HEIGHT': height,
+                    'TARGET_RESOLUTION': target_resolution,
+                    'RESAMPLING': 3,  # 3 = cubic spline
                     'OUTPUT': temp_file,
+                    'NODATA': None,
+                    'TARGET_CRS': None,
+                    'TARGET_EXTENT': None,
+                    'MULTITHREADING': False,
                 }
 
-                self.logger.debug(f"Executando qgis:rasterlayerresampler para {ras.name()}")
+                self.logger.debug(f"Executando gdal:warp para {ras.name()}")
+                self.logger.debug(f"  TARGET_RESOLUTION: {target_resolution}")
+                self.logger.debug(f"  RESAMPLING: 3 (cubic spline)")
+                
                 result = processing.run(
-                    'qgis:rasterlayerresampler',
+                    'gdal:warp',
                     alg_params,
                     context=context,
                     feedback=feedback,
@@ -402,7 +401,6 @@ class RasterWeightedAverage(BaseProcessingAlgorithm):
 
                 output_file = result.get('OUTPUT')
                 if not output_file:
-                    # Fallback: usar arquivo temporário
                     output_file = temp_file
                     self.logger.debug(f"Usando fallback temp file: {output_file}")
 

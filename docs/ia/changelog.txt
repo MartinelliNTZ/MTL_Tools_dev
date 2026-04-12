@@ -1,5 +1,6 @@
 ﻿2.3.8 2026/04/11
-[2.3.8.37.4] RasterWeightedAverage: Changed resampling from GDAL direct usage to QGIS Processing API (qgis:rasterlayerresampler). Improves compatibility, integrates safely with QGIS, supports child algorithms properly, and works reliably across QGIS versions 3.16+.
+[2.3.8.37.6] RasterWeightedAverage: CRITICAL FIX - Changed resampling from 'gdal:translate' (non-functional for resampling) to 'gdal:warp' with TARGET_RESOLUTION and RESAMPLING=3 (cubic spline). Now properly resamples rasters to target pixel size using gdalwarp engine.
+[2.3.8.37.5] RasterWeightedAverage: Changed resampling algorithm from 'qgis:rasterlayerresampler' (not available in QGIS 3.16) to 'gdal:translate'. Uses OUTSIZE parameter to specify width/height in pixels. Works reliably with QGIS 3.16.16+ and GDAL 3.4.1.
 [2.3.8.37.3] Preferences now include output_resolution parameter.
 [2.3.8.37.2] Added _resample_rasters() method: uses processing.run() with qgis:rasterlayerresampler, creates temporary GeoTIFF files, returns resampled QgsRasterLayer objects with weights preserved.
 [2.3.8.37.1] Added OUTPUT_RESOLUTION parameter and helper function for smart resampling.
