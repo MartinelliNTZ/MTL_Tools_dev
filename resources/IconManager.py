@@ -38,6 +38,7 @@ class IconManager:
     DRONE_COORDINATES = "drone_cordinates.ico"
     VECTOR_MULTPART = "vector_multpart.ico"
     COPY_ATTRIBUTES = "copy_attributes.ico"
+    DIVIDE_POINTS_BY_STRIPS = "vector.ico"
     CREATE_PROJECT = "create_project.ico"
     VECTOR_TO_SVG = "vector_to_svg.ico"
 

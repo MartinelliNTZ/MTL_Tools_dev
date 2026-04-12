@@ -502,3 +502,29 @@ class Strings_en(Strings_pt_BR):
         "The tool only runs when the layer is already in edit mode\n"
         "and never saves or leaves edit mode."
     )
+    DIVIDE_POINTS_BY_STRIPS_TITLE = "Split Point Vector by Strips"
+    DIVIDE_POINTS_BY_STRIPS_TOOLTIP = (
+        "Prepares the configuration used to segment a point layer into strips.\n"
+        "In this first stage the tool registers the interface,\n"
+        "organizes operational and sensitivity parameters,\n"
+        "and leaves execution ready for the next implementation phase."
+    )
+    DIVIDE_POINTS_BY_STRIPS_INTRO = (
+        "Configure the point layer and the initial parameters for strip division."
+    )
+    OPERATIONAL_PARAMETERS = "Operational Parameters"
+    SENSITIVITY_PARAMETERS = "Sensitivity Parameters"
+    UNIQUE_SEQUENTIAL_ID_FIELD = "Unique/sequential ID field"
+    TIMESTAMP_FIELD = "Timestamp field"
+    EXPECTED_POINT_FREQUENCY_SECONDS = "Expected point frequency (s)"
+    EXPECTED_LATERAL_WIDTH_METERS = "Expected lateral width (m)"
+    AZIMUTH_MOVING_WINDOW = "Azimuth moving window"
+    LIGHT_AZIMUTH_DEVIATION_THRESHOLD = "Light azimuth deviation threshold (degrees)"
+    SEVERE_AZIMUTH_DEVIATION_THRESHOLD = "Severe azimuth deviation threshold (degrees)"
+    MINIMUM_BREAK_SCORE = "Minimum break score"
+    MINIMUM_POINT_COUNT = "Minimum point count"
+    TIME_TOLERANCE_MULTIPLIER = "Time tolerance (multiplier)"
+    SELECT_POINT_VECTOR_LAYER = "Select a point vector layer."
+    DIVIDE_POINTS_BY_STRIPS_UI_ONLY_MESSAGE = (
+        "The interface is ready. The strip division routine will be implemented in the next stage."
+    )

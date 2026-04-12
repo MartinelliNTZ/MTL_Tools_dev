@@ -521,3 +521,29 @@ class Strings_es(Strings_pt_BR):
     SHOW_LABEL = "Mostrar etiqueta"
     GENERATE_SVG_FOR_EACH_FEATURE = "Generar SVG para cada entidad"
     SVGS_GENERATED_SUCCESS = "SVG(s) generado(s) con exito."
+    DIVIDE_POINTS_BY_STRIPS_TITLE = "Dividir Vector de Puntos por Franjas"
+    DIVIDE_POINTS_BY_STRIPS_TOOLTIP = (
+        "Prepara la configuración para segmentar una capa de puntos en franjas.\n"
+        "En esta primera etapa la herramienta registra la interfaz,\n"
+        "organiza los parámetros operativos y de sensibilidad\n"
+        "y deja la ejecución lista para la siguiente fase."
+    )
+    DIVIDE_POINTS_BY_STRIPS_INTRO = (
+        "Configure la capa de puntos y los parámetros iniciales de la división por franjas."
+    )
+    OPERATIONAL_PARAMETERS = "Parámetros Operativos"
+    SENSITIVITY_PARAMETERS = "Parámetros de Sensibilidad"
+    UNIQUE_SEQUENTIAL_ID_FIELD = "Campo ID único/secuencial"
+    TIMESTAMP_FIELD = "Campo de timestamp"
+    EXPECTED_POINT_FREQUENCY_SECONDS = "Frecuencia esperada de puntos (s)"
+    EXPECTED_LATERAL_WIDTH_METERS = "Ancho lateral esperado (m)"
+    AZIMUTH_MOVING_WINDOW = "Ventana de media de azimut"
+    LIGHT_AZIMUTH_DEVIATION_THRESHOLD = "Umbral leve de desvío de azimut (grados)"
+    SEVERE_AZIMUTH_DEVIATION_THRESHOLD = "Umbral grave de desvío de azimut (grados)"
+    MINIMUM_BREAK_SCORE = "Puntaje mínimo de corte"
+    MINIMUM_POINT_COUNT = "Número mínimo de puntos"
+    TIME_TOLERANCE_MULTIPLIER = "Tolerancia de tiempo (multiplicador)"
+    SELECT_POINT_VECTOR_LAYER = "Seleccione una capa vectorial de puntos."
+    DIVIDE_POINTS_BY_STRIPS_UI_ONLY_MESSAGE = (
+        "La interfaz está lista. La rutina de división por franjas se implementará en la siguiente etapa."
+    )

@@ -517,3 +517,29 @@ class Strings_de(Strings_pt_BR):
     SHOW_LABEL = "Beschriftung anzeigen"
     GENERATE_SVG_FOR_EACH_FEATURE = "SVG fur jedes Feature erzeugen"
     SVGS_GENERATED_SUCCESS = "SVG(s) erfolgreich erzeugt."
+    DIVIDE_POINTS_BY_STRIPS_TITLE = "Punktvektor in Streifen aufteilen"
+    DIVIDE_POINTS_BY_STRIPS_TOOLTIP = (
+        "Bereitet die Konfiguration zur Segmentierung eines Punktlayers in Streifen vor.\n"
+        "In dieser ersten Phase registriert das Werkzeug die Oberfläche,\n"
+        "organisiert Betriebs- und Sensitivitätsparameter\n"
+        "und lässt die Ausführung für die nächste Implementierungsphase bereit."
+    )
+    DIVIDE_POINTS_BY_STRIPS_INTRO = (
+        "Konfigurieren Sie den Punktlayer und die Anfangsparameter für die Streifenaufteilung."
+    )
+    OPERATIONAL_PARAMETERS = "Betriebsparameter"
+    SENSITIVITY_PARAMETERS = "Sensitivitätsparameter"
+    UNIQUE_SEQUENTIAL_ID_FIELD = "Eindeutiges/fortlaufendes ID-Feld"
+    TIMESTAMP_FIELD = "Zeitstempel-Feld"
+    EXPECTED_POINT_FREQUENCY_SECONDS = "Erwartete Punktfrequenz (s)"
+    EXPECTED_LATERAL_WIDTH_METERS = "Erwartete Seitenbreite (m)"
+    AZIMUTH_MOVING_WINDOW = "Azimut-Mittlungsfenster"
+    LIGHT_AZIMUTH_DEVIATION_THRESHOLD = "Leichter Schwellenwert für Azimutabweichung (Grad)"
+    SEVERE_AZIMUTH_DEVIATION_THRESHOLD = "Starker Schwellenwert für Azimutabweichung (Grad)"
+    MINIMUM_BREAK_SCORE = "Mindestpunktzahl für Unterbrechung"
+    MINIMUM_POINT_COUNT = "Minimale Punktanzahl"
+    TIME_TOLERANCE_MULTIPLIER = "Zeittoleranz (Multiplikator)"
+    SELECT_POINT_VECTOR_LAYER = "Bitte einen Punkt-Vektorlayer auswählen."
+    DIVIDE_POINTS_BY_STRIPS_UI_ONLY_MESSAGE = (
+        "Die Oberfläche ist bereit. Die Streifenaufteilung wird in der nächsten Phase implementiert."
+    )

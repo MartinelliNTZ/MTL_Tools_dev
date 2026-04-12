@@ -7,6 +7,26 @@ from ...core.config.LogUtils import LogUtils
 
 class VectorLayerAttributes:
     @staticmethod
+    def get_field_options(layer, include_empty=False, empty_key="", empty_label=""):
+        """Retorna opcoes para seletores de campos no formato {key: label}."""
+        options = {}
+
+        if include_empty:
+            options[empty_key] = empty_label or ""
+
+        if not layer or not hasattr(layer, "fields"):
+            return options
+
+        try:
+            for field in layer.fields():
+                field_name = field.name()
+                options[field_name] = field_name
+        except Exception:
+            return options
+
+        return options
+
+    @staticmethod
     def ensure_has_features(layer, logger=None):
         """Valida se a camada tem feições.
         Recebe: layer (QgsVectorLayer), logger.

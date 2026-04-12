@@ -571,3 +571,29 @@ class Strings_pt_BR:
     SHOW_LABEL = "Mostrar Rotulo"
     GENERATE_SVG_FOR_EACH_FEATURE = "Gerar SVG para cada feicao"
     SVGS_GENERATED_SUCCESS = "SVG(s) gerado(s) com sucesso."
+    DIVIDE_POINTS_BY_STRIPS_TITLE = "Dividir Vetor de Pontos por Faixas"
+    DIVIDE_POINTS_BY_STRIPS_TOOLTIP = (
+        "Prepara a configuração para segmentar uma camada de pontos em faixas.\n"
+        "Nesta primeira etapa a ferramenta cadastra a interface,\n"
+        "organiza os parâmetros operacionais e de sensibilidade\n"
+        "e deixa a execução pronta para a lógica da próxima fase."
+    )
+    DIVIDE_POINTS_BY_STRIPS_INTRO = (
+        "Configure a camada de pontos e os parâmetros iniciais da divisão por faixas."
+    )
+    OPERATIONAL_PARAMETERS = "Parâmetros Operacionais"
+    SENSITIVITY_PARAMETERS = "Parâmetros de Sensibilidade"
+    UNIQUE_SEQUENTIAL_ID_FIELD = "Campo ID único/sequencial"
+    TIMESTAMP_FIELD = "Campo de timestamp"
+    EXPECTED_POINT_FREQUENCY_SECONDS = "Frequência esperada dos pontos (s)"
+    EXPECTED_LATERAL_WIDTH_METERS = "Largura lateral esperada (m)"
+    AZIMUTH_MOVING_WINDOW = "Janela de média de azimute"
+    LIGHT_AZIMUTH_DEVIATION_THRESHOLD = "Limiar leve de desvio de azimute (graus)"
+    SEVERE_AZIMUTH_DEVIATION_THRESHOLD = "Limiar grave de desvio de azimute (graus)"
+    MINIMUM_BREAK_SCORE = "Pontuação mínima para quebra"
+    MINIMUM_POINT_COUNT = "Número mínimo de pontos"
+    TIME_TOLERANCE_MULTIPLIER = "Tolerância de tempo (multiplicador)"
+    SELECT_POINT_VECTOR_LAYER = "Selecione uma camada vetorial de pontos."
+    DIVIDE_POINTS_BY_STRIPS_UI_ONLY_MESSAGE = (
+        "A interface foi criada. A rotina de divisão por faixas será implementada na próxima etapa."
+    )

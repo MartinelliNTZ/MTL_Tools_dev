@@ -16,6 +16,7 @@ class ToolKey:
     GENERATE_TRAIL = "generate_trail"
     COORD_CLICK_TOOL = "coord_click_tool"
     COPY_ATTRIBUTES = "copy_attributes"
+    DIVIDE_POINTS_BY_STRIPS = "divide_points_by_strips"
     CONVERTER_MULTIPART = "converter_multipart"
     REMOVE_KML_FIELDS = "remove_kml_fields"
     SETTINGS = "settings"
@@ -52,6 +53,7 @@ class ToolKey:
         GENERATE_TRAIL: "#82E0AA",  # verde limao -> geracao geometrica
         COORD_CLICK_TOOL: "#85C1E9",  # azul ceu -> map tool
         COPY_ATTRIBUTES: "#DDA0DD",  # plum -> dados / atributos
+        DIVIDE_POINTS_BY_STRIPS: "#76D7C4",  # agua -> segmentacao de pontos em faixas
         CONVERTER_MULTIPART: "#F5A962",  # laranja-pessego -> conversao geometrica
         REMOVE_KML_FIELDS: "#58D68D",  # verde -> limpeza de atributos KML
         SETTINGS: "#95A5A6",  # cinza -> configuracoes / sistema

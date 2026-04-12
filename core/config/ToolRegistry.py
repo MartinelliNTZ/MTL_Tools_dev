@@ -214,6 +214,18 @@ class ToolRegistry:
         )
         tools.append(copy_attributes)
 
+        divide_points_by_strips = Tool(
+            name=STR.DIVIDE_POINTS_BY_STRIPS_TITLE,
+            icon=im.icon(im.DIVIDE_POINTS_BY_STRIPS),
+            category=self.VECTOR,
+            tool_type=ToolTypeEnum.DIALOG,
+            executor=self.run_divide_points_by_strips,
+            tooltip=STR.DIVIDE_POINTS_BY_STRIPS_TOOLTIP,
+            order=60,
+            show_in_toolbar=True,
+        )
+        tools.append(divide_points_by_strips)
+
         # =====================================================
         # AGRICULTURE (Ordem: Drone=10, Trail=20, Report=30)
         # =====================================================
@@ -677,6 +689,24 @@ class ToolRegistry:
     # =====================================================
     # EXECUTAR: Configurações
     # =====================================================
+    def run_divide_points_by_strips(self):
+        try:
+            from ...plugins.DividePointsByStripsPlugin import run
+
+            self.logger.info("Abrindo dialogo: Dividir Vetor de Pontos por Faixas")
+            self.divide_points_by_strips_dlg = run(self.iface)
+            self.logger.info(
+                "Dialogo Dividir Vetor de Pontos por Faixas aberto com sucesso"
+            )
+        except Exception as e:
+            self.logger.error(
+                f"Erro ao executar Dividir Vetor de Pontos por Faixas: {str(e)}"
+            )
+            QgisMessageUtil.bar_critical(
+                self.iface,
+                f"Erro no plugin Dividir Vetor de Pontos por Faixas:\n{str(e)}",
+            )
+
     def run_settings(self):
         try:
             from ...plugins.SettingsPlugin import run
