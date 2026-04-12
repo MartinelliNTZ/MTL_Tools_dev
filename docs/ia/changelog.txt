@@ -1,4 +1,15 @@
-﻿2.3.8 2026/04/11
+2.3.8 2026/04/11
+[2.3.8.37.7] RasterLayerProjection: implementado `reproject_raster_to_crs(...)` usando `gdal:warpreproject`, com logging padronizado por `ToolKey`, suporte a `nodata_value`, `output_data_type=0` (usar tipo do raster de entrada), saida temporaria GeoTIFF e normalizacao de CRS de origem/destino.
+[2.3.8.37.8] RasterLayerProjection: `reproject_raster_to_crs(...)` passou a usar `ResamplingMethod` (`core/enum/ResamplingMethod.py`) com padrao `CUBICO_SUAVIZADO`; `target_resolution` agora e opcional e, quando `None` ou `0`, desabilita reamostragem e nao envia `RESAMPLING` para o warp.
+[2.3.8.37.9] RasterLayerProjection: implementado `get_raster_crs(...)` com suporte a `QgsRasterLayer` e caminho de arquivo, retornando `QgsCoordinateReferenceSystem` valido quando disponivel. O helper de logger da classe tambem foi corrigido para usar `class_name="RasterLayerProjection"`.
+[2.3.8.37.10] RasterLayerProjection: `reproject_raster_to_crs(...)` expandido para aceitar `context`, `feedback` e `is_child_algorithm`, permitindo reutilizacao segura dentro de algoritmos Processing filhos sem duplicar infraestrutura de warp/reprojecao.
+[2.3.8.37.11] RasterWeightedAverage: removido o metodo legado `_resample_rasters()` e centralizada toda a preparacao de raster em `RasterLayerProjection.reproject_raster_to_crs(...)`, eliminando duplicacao de logica de `gdal:warp` no algoritmo.
+[2.3.8.37.12] RasterWeightedAverage: adicionado parametro `OUTPUT_CRS` (CRS de saida opcional). O algoritmo agora resolve explicitamente o CRS alvo antes do calculo e passa a preparar as entradas conforme combinacao de CRS/resolucao solicitada pelo usuario.
+[2.3.8.37.13] RasterWeightedAverage: novo fluxo de preparacao de rasters implementado em `_prepare_rasters_for_execution(...)`. Regras: se `OUTPUT_CRS` vazio e `OUTPUT_RESOLUTION` vazio/0, apenas alinha rasters com CRS diferente ao CRS do primeiro; se `OUTPUT_CRS` informado e `OUTPUT_RESOLUTION` vazio/0, reprojeta mantendo resolucao original; se `OUTPUT_RESOLUTION > 0`, todas as camadas sao reprojetadas antes da execucao, usando `OUTPUT_CRS` quando informado ou o CRS do primeiro raster quando vazio.
+[2.3.8.37.14] RasterWeightedAverage: validacao e logs refinados para o novo pipeline de media ponderada raster, incluindo obtencao centralizada de CRS via `RasterLayerProjection.get_raster_crs(...)`, criacao de arquivos temporarios por raster preparado e persistencia da preferencia `output_resolution` no novo fluxo.
+[2.3.8.37.15] Validacao sintatica executada com sucesso via `ast.parse` para `utils/raster/RasterLayerProjection.py` e `processing/RasterWeightedAverage.py` apos a refatoracao de reprojecao/reamostragem.
+
+2.3.8 2026/04/11
 [2.3.8.37.6] RasterWeightedAverage: CRITICAL FIX - Changed resampling from 'gdal:translate' (non-functional for resampling) to 'gdal:warp' with TARGET_RESOLUTION and RESAMPLING=3 (cubic spline). Now properly resamples rasters to target pixel size using gdalwarp engine.
 [2.3.8.37.5] RasterWeightedAverage: Changed resampling algorithm from 'qgis:rasterlayerresampler' (not available in QGIS 3.16) to 'gdal:translate'. Uses OUTSIZE parameter to specify width/height in pixels. Works reliably with QGIS 3.16.16+ and GDAL 3.4.1.
 [2.3.8.37.3] Preferences now include output_resolution parameter.
@@ -45,7 +56,7 @@
 [2.3.8.23] MetadataFields: separated required field catalog into EXIF_FIELDS and XMP_FIELDS, preserving REQUIRED_FIELDS as a compatibility union.
 [2.3.8.23.1] PhotoMetadata._dump_allowed_keys now uses EXIF_FIELDS/XMP_FIELDS explicitly instead of the legacy single REQUIRED_FIELDS dictionary.
 
-[2.3.8.1]#comeÃ§e aqui
+[2.3.8.1]#comeÃƒÂ§e aqui
 
 
 
@@ -76,7 +87,7 @@
 
 2.3.8.5 2026/04/07
 [2.3.8.5] Etapa E05 concluida: CheckboxGridWidget reimplementado com retrocompatibilidade de formatos (dict legado, dict expandido e lista key/label/description), suporte a tooltip por description e novos metodos de estado (checked/unchecked/state_map).
-[2.3.8.5.1] WidgetFactory.create_checkbox_grid atualizado para novo contrato sem quebrar chamadas antigas com options_dict, e com opcao return_widget=True para uso avançado.
+[2.3.8.5.1] WidgetFactory.create_checkbox_grid atualizado para novo contrato sem quebrar chamadas antigas com options_dict, e com opcao return_widget=True para uso avanÃ§ado.
 
 2.3.8.6 2026/04/07
 [2.3.8.6] Etapa E06 concluida: DroneCoordinates UI atualizada com 3 collapsibles de campos (Required, Custom, MRK), grids via StringAdapter e persistencia completa de selecao/expansao em preferencias.
