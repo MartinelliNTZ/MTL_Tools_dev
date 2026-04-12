@@ -54,7 +54,25 @@ class RasterWeightedAverage(BaseProcessingAlgorithm):
         self.load_preferences()
 
         self.addParameter(QgsProcessingParameterRasterLayer(self.INPUT_RASTER_1, "Raster 1"))
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.WEIGHT_1,
+                "Peso Raster 1",
+                type=QgsProcessingParameterNumber.Double,
+                defaultValue=self.prefs.get("weight_1", 50.0),
+                minValue=0.0,
+            )
+        )
         self.addParameter(QgsProcessingParameterRasterLayer(self.INPUT_RASTER_2, "Raster 2"))
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.WEIGHT_2,
+                "Peso Raster 2",
+                type=QgsProcessingParameterNumber.Double,
+                defaultValue=self.prefs.get("weight_2", 50.0),
+                minValue=0.0,
+            )
+        )
 
         param = QgsProcessingParameterRasterLayer(
             self.INPUT_RASTER_3, "Raster 3 (opcional)", optional=True
@@ -68,24 +86,8 @@ class RasterWeightedAverage(BaseProcessingAlgorithm):
         param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
         self.addParameter(param)
 
-        self.addParameter(
-            QgsProcessingParameterNumber(
-                self.WEIGHT_1,
-                "Peso Raster 1",
-                type=QgsProcessingParameterNumber.Double,
-                defaultValue=self.prefs.get("weight_1", 50.0),
-                minValue=0.0,
-            )
-        )
-        self.addParameter(
-            QgsProcessingParameterNumber(
-                self.WEIGHT_2,
-                "Peso Raster 2",
-                type=QgsProcessingParameterNumber.Double,
-                defaultValue=self.prefs.get("weight_2", 50.0),
-                minValue=0.0,
-            )
-        )
+
+
 
         param = QgsProcessingParameterNumber(
             self.WEIGHT_3,
