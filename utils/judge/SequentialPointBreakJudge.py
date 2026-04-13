@@ -96,6 +96,7 @@ class SequentialPointBreakJudge:
         border_distance_threshold: float = 5.0,
         retroactive_window: int = 5,
         fusion_azimuth_tolerance: float = 10.0,
+        max_desvio: int = 5,
         conflict_resolver=None,
     ):
         layer = self._load_layer()
@@ -134,6 +135,7 @@ class SequentialPointBreakJudge:
             border_speed_threshold=border_speed_threshold,
             border_distance_threshold=border_distance_threshold,
             retroactive_window=retroactive_window,
+            max_desvio=max_desvio,
         )
         eval_time = time.time() - eval_start
         self.logger.info(
@@ -166,6 +168,13 @@ class SequentialPointBreakJudge:
         for values in updates.values():
             shot_id = values["tiro_id"]
             values["tiro_valido"] = 1 if shot_sizes.get(shot_id, 0) >= minimum_point_count else 0
+
+        # Marcar tiros órfãos (pequenos) como ID 0
+        for fid, values in updates.items():
+            shot_id = values["tiro_id"]
+            if shot_sizes.get(shot_id, 0) < minimum_point_count:
+                values["tiro_id"] = 0
+                values["tiro_valido"] = 0
 
         self.logger.debug("Criando nova camada de memória com resultados")
         result_layer = self._create_memory_layer_with_updates(layer, updates, field_name_map)
@@ -208,9 +217,6 @@ class SequentialPointBreakJudge:
 
         if layer.geometryType() != QgsWkbTypes.PointGeometry:
             raise RuntimeError("A camada deve ser do tipo ponto.")
-
-        if not layer.isEditable():
-            raise RuntimeError("A camada precisa estar em modo de edição.")
 
         if layer.fields().lookupField(field_id) == -1:
             raise RuntimeError(f"Campo de ID não encontrado: {field_id}")
@@ -289,6 +295,7 @@ class SequentialPointBreakJudge:
         border_speed_threshold: float,
         border_distance_threshold: float,
         retroactive_window: int,
+        max_desvio: int,
     ):
         import time
         start_time = time.time()
@@ -362,6 +369,47 @@ class SequentialPointBreakJudge:
 
             total_score = score_direcao + score_continuidade
 
+            # Verificar se é outlier e tentar pular
+            is_outlier = total_score >= minimum_break_score
+            skip_outliers = False
+            if is_outlier:
+                for skip in range(1, max_desvio + 1):
+                    if index + skip < len(ordered_points):
+                        next_point = ordered_points[index + skip]
+                        # Calcular score aproximado para o próximo
+                        next_az = VectorLayerGeometry.calculate_point_azimuth(
+                            previous["point"], next_point["point"]
+                        )
+                        next_mean = VectorLayerGeometry.circular_mean_degrees(azimuth_history[-azimuth_window:] or [next_az])
+                        next_delta = VectorLayerGeometry.angular_difference_degrees(next_az, next_mean)
+                        next_score_dir = 0
+                        if next_delta > light_azimuth_threshold:
+                            next_score_dir += 1
+                        if next_delta > severe_azimuth_threshold:
+                            next_score_dir += 2
+                        next_delta_time = max(0.0, next_point["timestamp"] - previous["timestamp"])
+                        next_score_cont = self._apply_time_score(
+                            score=0,
+                            delta_time=next_delta_time,
+                            point_frequency_seconds=point_frequency_seconds,
+                            time_tolerance_multiplier=time_tolerance_multiplier,
+                        )
+                        next_dist = VectorLayerGeometry.measure_distance_between_points(
+                            previous["point"], next_point["point"], layer.crs()
+                        )
+                        if next_dist > float(strip_width_meters) * 0.8:
+                            next_score_cont += 1
+                        next_total = next_score_dir + next_score_cont
+                        if next_total < minimum_break_score:
+                            skip_outliers = True
+                            # Recalcular delta_azimuth pulando
+                            delta_azimuth = VectorLayerGeometry.angular_difference_degrees(next_az, next_mean)
+                            delta_time = next_delta_time
+                            delta_distance = next_dist
+                            instant_speed = next_dist / next_delta_time if next_delta_time > 0 else 0.0
+                            total_score = next_total
+                            break
+
             # Detectar bordadura
             is_border = (
                 delta_azimuth > border_azimuth_threshold and
@@ -370,9 +418,9 @@ class SequentialPointBreakJudge:
             )
             seg_tipo = "bordadura" if is_border else "faixa"
 
-            # Janela de confirmação
+            # Janela de confirmação (se não pulou)
             should_break = False
-            if total_score >= minimum_break_score:
+            if not skip_outliers and total_score >= minimum_break_score:
                 confirmed = 0
                 for j in range(index + 1, min(index + 1 + confirmation_window, len(ordered_points))):
                     prev_p = ordered_points[j - 1]

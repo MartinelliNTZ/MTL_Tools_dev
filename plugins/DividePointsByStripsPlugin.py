@@ -131,6 +131,11 @@ class DividePointsByStripsPlugin(BasePluginMTL):
                         "type": "float",
                         "default": 3.0,
                     },
+                    "max_desvio": {
+                        "title": "Número máximo de pontos desvio",
+                        "type": "int",
+                        "default": 5,
+                    },
                 },
                 parent=self,
                 separator_top=False,
@@ -229,10 +234,6 @@ class DividePointsByStripsPlugin(BasePluginMTL):
             )
             return
 
-        if not layer.isEditable():
-            QgisMessageUtil.bar_warning(self.iface, STR.SELECT_EDITABLE_VECTOR_LAYER)
-            return
-
         field_id = self.id_field_selector.get_selected_key()
         field_time = self.time_field_selector.get_selected_key()
         if not field_id or not field_time:
@@ -286,6 +287,9 @@ class DividePointsByStripsPlugin(BasePluginMTL):
                 ),
                 time_tolerance_multiplier=float(
                     sensitivity_values.get("tolerancia_tempo", 3.0) or 3.0
+                ),
+                max_desvio=int(
+                    sensitivity_values.get("max_desvio", 5) or 5
                 ),
                 confirmation_window=3,
                 min_confirmed=2,
