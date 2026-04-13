@@ -10,3 +10,4 @@
 [2.3.12.8][13/04/2026] corrigido erro de API no método _create_memory_layer_with_updates ao usar dataProvider().addAttributes() em vez de setFields() inexistente para camadas de memória
 [2.3.12.9][13/04/2026] corrigido erro de KeyError ao copiar atributos de features: criando nova feature com campos da nova camada e copiando atributos por índice de campo
 [2.3.12.15][13/04/2026] simplificado Field.py removendo core, normalized, level; alterado OUTPUT_FIELDS para português nas descrições; adicionado comentários simples em todos os métodos de SequentialPointBreakJudge.py
+[2.3.12.16][13/04/2026] adicionada seleção de campos de saída em DividePointsByStripsPlugin; campos calculados continuam sendo gerados, mas apenas os checkados são gravados no shapefile final

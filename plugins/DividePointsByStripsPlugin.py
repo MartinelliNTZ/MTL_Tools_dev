@@ -8,12 +8,15 @@ from ..i18n.TranslationManager import STR
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.ToolKeys import ToolKey
+from ..utils.adapter.StringAdapter import StringAdapter
 from ..utils.judge.SequentialPointBreakJudge import SequentialPointBreakJudge
 from ..utils.vector.VectorLayerAttributes import VectorLayerAttributes
+from ..utils.vector.VectorLayerSource import VectorLayerSource
 
 
 class DividePointsByStripsPlugin(BasePluginMTL):
     TOOL_KEY = ToolKey.DIVIDE_POINTS_BY_STRIPS
+    PREF_SELECTED_OUTPUT_FIELDS = "selected_output_fields"
 
     def __init__(self, iface):
         super().__init__(iface.mainWindow())
@@ -103,36 +106,43 @@ class DividePointsByStripsPlugin(BasePluginMTL):
                 fields_dict={
                     "janela_azimute": {
                         "title": STR.AZIMUTH_MOVING_WINDOW,
+                        "description": "Janela em pontos para calcular o azimute médio usado na detecção de mudanças de direção.",
                         "type": "int",
                         "default": 10,
                     },
                     "threshold_azimute_leve": {
                         "title": STR.LIGHT_AZIMUTH_DEVIATION_THRESHOLD,
+                        "description": "Limiar leve de desvio de azimute para começar a acumular score de quebra.",
                         "type": "float",
                         "default": 20.0,
                     },
                     "threshold_azimute_grave": {
                         "title": STR.SEVERE_AZIMUTH_DEVIATION_THRESHOLD,
+                        "description": "Limiar grave de desvio de azimute que indica forte mudança de direção.",
                         "type": "float",
                         "default": 45.0,
                     },
                     "score_minimo_quebra": {
                         "title": STR.MINIMUM_BREAK_SCORE,
+                        "description": "Pontuação mínima necessária para considerar a ocorrência de uma quebra de segmento.",
                         "type": "int",
                         "default": 3,
                     },
                     "n_minimo_pontos": {
                         "title": STR.MINIMUM_POINT_COUNT,
+                        "description": "Número mínimo de pontos que um tiro deve ter para ser marcado como válido.",
                         "type": "int",
                         "default": 20,
                     },
                     "tolerancia_tempo": {
                         "title": STR.TIME_TOLERANCE_MULTIPLIER,
+                        "description": "Multiplicador de tolerância de tempo entre fotos para aumentar a sensibilidade de quebra.",
                         "type": "float",
                         "default": 3.0,
                     },
                     "max_desvio": {
                         "title": "Número máximo de pontos desvio",
+                        "description": "Quantidade máxima de pontos de desvio que podem ser ignorados antes de confirmar a quebra.",
                         "type": "int",
                         "default": 5,
                     },
@@ -154,6 +164,33 @@ class DividePointsByStripsPlugin(BasePluginMTL):
         )
         self.advanced_params.add_content_layout(sensitivity_layout)
 
+        output_layout, self.output_fields_grid = WidgetFactory.create_checkbox_grid(
+            options_data=StringAdapter.to_key_label_description(
+                SequentialPointBreakJudge.OUTPUT_FIELDS
+            ),
+            items_per_row=2,
+            checked_by_default=True,
+            show_control_buttons=True,
+            return_widget=True,
+            separator_top=False,
+            separator_bottom=False,
+        )
+        shot_id_checkbox = self.output_fields_grid.get_checkbox("shot_id")
+        if shot_id_checkbox is not None:
+            shot_id_checkbox.setChecked(True)
+            shot_id_checkbox.setEnabled(False)
+
+        attributes_layout, self.attributes_params = (
+            WidgetFactory.create_collapsible_parameters(
+                parent=self,
+                title=STR.ATTRIBUTES,
+                expanded_by_default=True,
+                separator_top=False,
+                separator_bottom=True,
+            )
+        )
+        self.attributes_params.add_content_layout(output_layout)
+
         buttons_layout, self.action_buttons = (
             WidgetFactory.create_bottom_action_buttons(
                 parent=self,
@@ -172,6 +209,7 @@ class DividePointsByStripsPlugin(BasePluginMTL):
                 layer_layout,
                 operational_container_layout,
                 advanced_layout,
+                attributes_layout,
                 buttons_layout,
             ]
         )
@@ -191,6 +229,13 @@ class DividePointsByStripsPlugin(BasePluginMTL):
         self.sensitivity_fields.set_values(
             self.preferences.get("sensitivity_fields", {})
         )
+        selected_output_fields = self.preferences.get(
+            self.PREF_SELECTED_OUTPUT_FIELDS, []
+        )
+        if isinstance(selected_output_fields, list) and hasattr(
+            self, "output_fields_grid"
+        ):
+            self.output_fields_grid.set_checked_keys(selected_output_fields)
         self._refresh_field_selectors()
 
     def _save_prefs(self):
@@ -200,12 +245,84 @@ class DividePointsByStripsPlugin(BasePluginMTL):
         )
         self.preferences["operational_fields"] = self.operational_fields.get_values()
         self.preferences["sensitivity_fields"] = self.sensitivity_fields.get_values()
+        self.preferences[self.PREF_SELECTED_OUTPUT_FIELDS] = (
+            self.output_fields_grid.get_checked_keys()
+            if hasattr(self, "output_fields_grid")
+            else []
+        )
         self.preferences["window_width"] = self.width()
         self.preferences["window_height"] = self.height()
         save_tool_prefs(self.TOOL_KEY, self.preferences)
 
     def _on_layer_changed(self, _layer):
         self._refresh_field_selectors()
+
+    def _build_filtered_result_layer(
+        self, layer, selected_output_fields, field_name_map
+    ):
+        """Cria um layer temporário com apenas os campos selecionados para salvar."""
+        if not layer or not layer.isValid():
+            return layer
+
+        if not selected_output_fields or not field_name_map:
+            return layer
+
+        selected_keys = [
+            key
+            for key in SequentialPointBreakJudge.OUTPUT_FIELDS.keys()
+            if key.value in selected_output_fields
+        ]
+
+        selected_field_names = [
+            field_name_map.get(key)
+            for key in selected_keys
+            if field_name_map.get(key)
+        ]
+
+        if not selected_field_names:
+            return layer
+
+        uri = f"Point?crs={layer.crs().authid()}"
+        filtered_layer = QgsVectorLayer(uri, f"{layer.name()}_filtered", "memory")
+        if not filtered_layer.isValid():
+            return layer
+
+        fields = []
+        for logical_key in selected_keys:
+            field_spec = SequentialPointBreakJudge.OUTPUT_FIELDS.get(logical_key)
+            field_name = field_name_map.get(logical_key)
+            if field_spec and field_name:
+                fields.append(
+                    QgsField(
+                        field_name,
+                        field_spec.type,
+                        len=field_spec.length,
+                        prec=field_spec.precision,
+                    )
+                )
+
+        filtered_layer.dataProvider().addAttributes(fields)
+        filtered_layer.updateFields()
+
+        filtered_layer.startEditing()
+        for feature in layer.getFeatures():
+            new_feature = QgsFeature(filtered_layer.fields())
+            new_feature.setGeometry(feature.geometry())
+            for logical_key in selected_keys:
+                resolved_name = field_name_map.get(logical_key)
+                if not resolved_name:
+                    continue
+                source_index = layer.fields().lookupField(resolved_name)
+                target_index = filtered_layer.fields().lookupField(resolved_name)
+                if source_index >= 0 and target_index >= 0:
+                    new_feature.setAttribute(
+                        target_index,
+                        feature.attribute(source_index),
+                    )
+            filtered_layer.addFeature(new_feature)
+        filtered_layer.commitChanges()
+        filtered_layer.updateFields()
+        return filtered_layer
 
     def _refresh_field_selectors(self):
         layer = self.layer_input.current_layer()
@@ -316,6 +433,36 @@ class DividePointsByStripsPlugin(BasePluginMTL):
                 self.logger.info("Nova camada adicionada ao projeto", layer_name=result_layer.name())
             else:
                 self.logger.warning("Camada de resultado inválida ou não encontrada")
+
+            if self.save_points_selector.is_enabled():
+                out_path = self.save_points_selector.get_file_path().strip()
+                if out_path:
+                    selected_fields = (
+                        self.output_fields_grid.get_checked_keys()
+                        if hasattr(self, "output_fields_grid")
+                        else []
+                    )
+                    filtered_layer = self._build_filtered_result_layer(
+                        result_layer,
+                        selected_fields,
+                        summary.get("field_name_map", {}),
+                    )
+                    saved_layer = VectorLayerSource.save_and_load_layer(
+                        filtered_layer,
+                        out_path,
+                        tool_key=self.TOOL_KEY,
+                        decision="rename",
+                    )
+                    if saved_layer and saved_layer.isValid():
+                        QgsProject.instance().addMapLayer(saved_layer)
+                        result_layer = saved_layer
+                        self.logger.info(
+                            "Camada salva e carregada", layer_name=saved_layer.name()
+                        )
+                    else:
+                        self.logger.warning(
+                            "Falha ao salvar camada de resultado selecionada"
+                        )
         except Exception as e:
             processing_time = time.time() - start_time
             self.logger.error(
