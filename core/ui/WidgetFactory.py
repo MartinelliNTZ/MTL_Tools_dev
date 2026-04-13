@@ -198,6 +198,8 @@ class WidgetFactory:
         - dict: chave->{label,description}
         - list: [{key,label,description}]
 
+        A descrição de cada item é exibida como tooltip do checkbox.
+
         Retorno padrao: (layout, checkbox_map).
         Use return_widget=True para receber o widget completo.
 
@@ -729,26 +731,23 @@ class WidgetFactory:
         separator_bottom=True,
     ):
         """
-        Cria widget com mÃºltiplos campos de input baseados em dicionÃ¡rio.
+        Cria widget com múltiplos campos de input baseados em dicionário.
 
         Parameters
         ----------
         fields_dict : dict
-            DicionÃ¡rio com configuraÃ§Ã£o dos campos
-            {
-                'chave': {
-                    'title': 'RÃ³tulo',
-                    'type': 'text' | 'int' | 'float',
-                    'default': valor_padrÃ£o
-                },
-                ...
-            }
+            Dicionário de campos.
+            Cada item deve usar:
+                title - rótulo do campo
+                description - tooltip de ajuda opcional
+                type - 'text', 'int' ou 'float'
+                default - valor inicial
 
         separator_top : bool
             Adicionar separador no topo
 
         separator_bottom : bool
-            Adicionar separador no rodapÃ©
+            Adicionar separador no rodapé
 
         Returns
         -------

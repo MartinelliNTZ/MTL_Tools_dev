@@ -49,6 +49,7 @@ class InputFieldsWidget(QWidget):
 
         for key, config in self.fields_dict.items():
             title = config.get("title", key)
+            description = str(config.get("description", ""))
             input_type = config.get("type", "text")
             default = config.get("default", "")
 
@@ -61,6 +62,8 @@ class InputFieldsWidget(QWidget):
             label = QLabel(title)
             label.setMinimumWidth(100)
             label.setMaximumWidth(150)
+            if description:
+                label.setToolTip(description)
             h_layout.addWidget(label)
 
             # Input widget conforme o tipo
@@ -84,6 +87,9 @@ class InputFieldsWidget(QWidget):
                 input_widget.setMaximumHeight(24)
                 input_widget.setText(str(default))
                 input_widget.textChanged.connect(self._on_value_changed)
+
+            if description:
+                input_widget.setToolTip(description)
 
             h_layout.addWidget(input_widget)
             layout.addLayout(h_layout)

@@ -106,43 +106,43 @@ class DividePointsByStripsPlugin(BasePluginMTL):
                 fields_dict={
                     "janela_azimute": {
                         "title": STR.AZIMUTH_MOVING_WINDOW,
-                        "description": "Janela em pontos para calcular o azimute médio usado na detecção de mudanças de direção.",
+                        "description": "Número de pontos usados para calcular a direção média antes de detectar mudança de rumo.",
                         "type": "int",
                         "default": 10,
                     },
                     "threshold_azimute_leve": {
                         "title": STR.LIGHT_AZIMUTH_DEVIATION_THRESHOLD,
-                        "description": "Limiar leve de desvio de azimute para começar a acumular score de quebra.",
+                        "description": "Desvio leve de azimute que inicia a identificação de uma possível quebra.",
                         "type": "float",
                         "default": 20.0,
                     },
                     "threshold_azimute_grave": {
                         "title": STR.SEVERE_AZIMUTH_DEVIATION_THRESHOLD,
-                        "description": "Limiar grave de desvio de azimute que indica forte mudança de direção.",
+                        "description": "Desvio alto de azimute que indica uma mudança de direção clara.",
                         "type": "float",
                         "default": 45.0,
                     },
                     "score_minimo_quebra": {
                         "title": STR.MINIMUM_BREAK_SCORE,
-                        "description": "Pontuação mínima necessária para considerar a ocorrência de uma quebra de segmento.",
+                        "description": "Pontos necessários para que o desvio seja considerado uma quebra real.",
                         "type": "int",
                         "default": 3,
                     },
                     "n_minimo_pontos": {
                         "title": STR.MINIMUM_POINT_COUNT,
-                        "description": "Número mínimo de pontos que um tiro deve ter para ser marcado como válido.",
+                        "description": "Menor quantidade de pontos que um trecho precisa para ser aceito.",
                         "type": "int",
                         "default": 20,
                     },
                     "tolerancia_tempo": {
                         "title": STR.TIME_TOLERANCE_MULTIPLIER,
-                        "description": "Multiplicador de tolerância de tempo entre fotos para aumentar a sensibilidade de quebra.",
+                        "description": "Multiplica a diferença de tempo permitida entre fotos para evitar quebra por pequenas variações.",
                         "type": "float",
                         "default": 3.0,
                     },
                     "max_desvio": {
-                        "title": "Número máximo de pontos desvio",
-                        "description": "Quantidade máxima de pontos de desvio que podem ser ignorados antes de confirmar a quebra.",
+                        "title": "Número máx de pontos desvio",
+                        "description": "Máximo de pontos fora do padrão que serão ignorados antes de confirmar a quebra.",
                         "type": "int",
                         "default": 5,
                     },
@@ -191,6 +191,28 @@ class DividePointsByStripsPlugin(BasePluginMTL):
         )
         self.attributes_params.add_content_layout(output_layout)
 
+        save_layout, self.save_collapsible = (
+            WidgetFactory.create_collapsible_parameters(
+                parent=self,
+                title=STR.SAVING,
+                expanded_by_default=False,
+                separator_top=False,
+                separator_bottom=True,
+            )
+        )
+
+        save_points_layout, self.save_points_selector = (
+            WidgetFactory.create_save_file_selector(
+                parent=self,
+                file_filter=StringManager.FILTER_VECTOR,
+                checkbox_text=STR.SAVE_POINTS_CHECKBOX,
+                label_text=STR.SAVE_IN,
+                separator_top=False,
+                separator_bottom=False,
+            )
+        )
+        self.save_collapsible.add_content_layout(save_points_layout)
+
         buttons_layout, self.action_buttons = (
             WidgetFactory.create_bottom_action_buttons(
                 parent=self,
@@ -210,6 +232,7 @@ class DividePointsByStripsPlugin(BasePluginMTL):
                 operational_container_layout,
                 advanced_layout,
                 attributes_layout,
+                save_layout,
                 buttons_layout,
             ]
         )
@@ -236,6 +259,13 @@ class DividePointsByStripsPlugin(BasePluginMTL):
             self, "output_fields_grid"
         ):
             self.output_fields_grid.set_checked_keys(selected_output_fields)
+        if hasattr(self, "save_points_selector"):
+            self.save_points_selector.set_enabled(
+                self.preferences.get("save_layer_enabled", False)
+            )
+            self.save_points_selector.set_file_path(
+                self.preferences.get("save_layer_path", "")
+            )
         self._refresh_field_selectors()
 
     def _save_prefs(self):
@@ -250,6 +280,9 @@ class DividePointsByStripsPlugin(BasePluginMTL):
             if hasattr(self, "output_fields_grid")
             else []
         )
+        if hasattr(self, "save_points_selector"):
+            self.preferences["save_layer_enabled"] = self.save_points_selector.is_enabled()
+            self.preferences["save_layer_path"] = self.save_points_selector.get_file_path()
         self.preferences["window_width"] = self.width()
         self.preferences["window_height"] = self.height()
         save_tool_prefs(self.TOOL_KEY, self.preferences)
