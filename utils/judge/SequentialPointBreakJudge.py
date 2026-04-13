@@ -5,6 +5,8 @@ from qgis.PyQt.QtCore import QVariant
 from qgis.core import QgsVectorLayer, QgsWkbTypes, QgsField, QgsFeature
 
 from ...core.config.LogUtils import LogUtils
+from ...core.enum.OutputFieldKey import OutputFieldKey
+from ...core.model.Field import Field
 from ..ToolKeys import ToolKey
 from ..vector.VectorLayerAttributes import VectorLayerAttributes
 from ..vector.VectorLayerGeometry import VectorLayerGeometry
@@ -15,53 +17,102 @@ class SequentialPointBreakJudge:
     """Juiz genérico para segmentar sequências de pontos em tiros/faixas."""
 
     OUTPUT_FIELDS = {
-        "tiro_id": {"name": "tiro_id", "type": QVariant.Int, "len": 10, "prec": 0},
-        "tiro_valido": {
-            "name": "tiro_val",
-            "type": QVariant.Int,
-            "len": 1,
-            "prec": 0,
-        },
-        "score": {"name": "score", "type": QVariant.Int, "len": 10, "prec": 0},
-        "score_direcao": {"name": "score_dir", "type": QVariant.Int, "len": 10, "prec": 0},
-        "score_continuidade": {"name": "score_cont", "type": QVariant.Int, "len": 10, "prec": 0},
-        "seg_tipo": {"name": "seg_tipo", "type": QVariant.String, "len": 20, "prec": 0},
-        "azimute_instantaneo": {
-            "name": "azi_inst",
-            "type": QVariant.Double,
-            "len": 20,
-            "prec": 8,
-        },
-        "azimute_medio": {
-            "name": "azi_med",
-            "type": QVariant.Double,
-            "len": 20,
-            "prec": 8,
-        },
-        "delta_azimute": {
-            "name": "del_azi",
-            "type": QVariant.Double,
-            "len": 20,
-            "prec": 8,
-        },
-        "delta_tempo": {
-            "name": "del_tmp",
-            "type": QVariant.Double,
-            "len": 20,
-            "prec": 8,
-        },
-        "delta_distancia": {
-            "name": "del_dst",
-            "type": QVariant.Double,
-            "len": 20,
-            "prec": 8,
-        },
-        "velocidade_instant": {
-            "name": "vel_inst",
-            "type": QVariant.Double,
-            "len": 20,
-            "prec": 8,
-        },
+        OutputFieldKey.SHOT_ID: Field(
+            label="Shot ID",
+            attribute="shot_id",
+            description="Identificador único do segmento de tiro/faixa.",
+            type=QVariant.Int,
+            length=10,
+            precision=0,
+        ),
+        OutputFieldKey.SHOT_VALID: Field(
+            label="Shot Valid",
+            attribute="shot_valid",
+            description="Indica se o tiro possui pontos suficientes para ser considerado válido.",
+            type=QVariant.Int,
+            length=1,
+            precision=0,
+        ),
+        OutputFieldKey.SCORE: Field(
+            label="Score",
+            attribute="score",
+            description="Pontuação total de quebra combinando fatores de direção e continuidade.",
+            type=QVariant.Int,
+            length=10,
+            precision=0,
+        ),
+        OutputFieldKey.SCORE_DIRECTION: Field(
+            label="Score Direction",
+            attribute="score_direction",
+            description="Componente de pontuação baseado em mudanças de direção do azimute.",
+            type=QVariant.Int,
+            length=10,
+            precision=0,
+        ),
+        OutputFieldKey.SCORE_CONTINUITY: Field(
+            label="Score Continuity",
+            attribute="score_continuity",
+            description="Componente de pontuação baseado na continuidade de tempo e distância.",
+            type=QVariant.Int,
+            length=10,
+            precision=0,
+        ),
+        OutputFieldKey.SEG_TYPE: Field(
+            label="Segment Type",
+            attribute="seg_type",
+            description="Tipo de segmento: 'faixa' (faixa) ou 'bordadura' (borda).",
+            type=QVariant.String,
+            length=20,
+            precision=0,
+        ),
+        OutputFieldKey.AZIMUTH_INSTANT: Field(
+            label="Azimuth Instant",
+            attribute="azimuth_instant",
+            description="Azimute instantâneo calculado entre pontos consecutivos.",
+            type=QVariant.Double,
+            length=20,
+            precision=8,
+        ),
+        OutputFieldKey.AZIMUTH_MEAN: Field(
+            label="Azimuth Mean",
+            attribute="azimuth_mean",
+            description="Azimute médio sobre a janela especificada.",
+            type=QVariant.Double,
+            length=20,
+            precision=8,
+        ),
+        OutputFieldKey.DELTA_AZIMUTH: Field(
+            label="Delta Azimuth",
+            attribute="delta_azimuth",
+            description="Diferença angular entre azimute instantâneo e médio.",
+            type=QVariant.Double,
+            length=20,
+            precision=8,
+        ),
+        OutputFieldKey.DELTA_TIME: Field(
+            label="Delta Time",
+            attribute="delta_time",
+            description="Diferença de tempo entre pontos consecutivos em segundos.",
+            type=QVariant.Double,
+            length=20,
+            precision=8,
+        ),
+        OutputFieldKey.DELTA_DISTANCE: Field(
+            label="Delta Distance",
+            attribute="delta_distance",
+            description="Diferença de distância entre pontos consecutivos em metros.",
+            type=QVariant.Double,
+            length=20,
+            precision=8,
+        ),
+        OutputFieldKey.VELOCITY_INSTANT: Field(
+            label="Velocity Instant",
+            attribute="velocity_instant",
+            description="Velocidade instantânea calculada a partir de distância e tempo.",
+            type=QVariant.Double,
+            length=20,
+            precision=8,
+        ),
     }
 
     def __init__(
@@ -71,6 +122,7 @@ class SequentialPointBreakJudge:
         source_path: str = "",
         tool_key: str = ToolKey.UNTRACEABLE,
     ):
+        """Inicializa o juiz com camada, caminho de origem e chave de ferramenta."""
         self.layer = layer
         self.source_path = source_path or (layer.source() if layer is not None else "")
         self.tool_key = tool_key
@@ -99,6 +151,7 @@ class SequentialPointBreakJudge:
         max_desvio: int = 5,
         conflict_resolver=None,
     ):
+        """Executa o julgamento completo de segmentação de pontos em tiros/faixas."""
         layer = self._load_layer()
         self._validate_layer(layer, field_id, field_time)
         field_name_map = self._resolve_output_fields(
@@ -147,13 +200,13 @@ class SequentialPointBreakJudge:
         self.logger.debug("Calculando tamanhos dos tiros")
         shot_sizes = {}
         for values in updates.values():
-            shot_id = values["tiro_id"]
+            shot_id = values[OutputFieldKey.SHOT_ID.value]
             shot_sizes[shot_id] = shot_sizes.get(shot_id, 0) + 1
 
         self.logger.debug("Marcando tiros válidos/inválidos")
         for values in updates.values():
-            shot_id = values["tiro_id"]
-            values["tiro_valido"] = 1 if shot_sizes.get(shot_id, 0) >= minimum_point_count else 0
+            shot_id = values[OutputFieldKey.SHOT_ID.value]
+            values[OutputFieldKey.SHOT_VALID.value] = 1 if shot_sizes.get(shot_id, 0) >= minimum_point_count else 0
 
         # Fusão de tiros pequenos consecutivos
         updates = self._fuse_small_shots(updates, minimum_point_count, fusion_azimuth_tolerance)
@@ -161,20 +214,20 @@ class SequentialPointBreakJudge:
         # Recalcular tamanhos após fusão
         shot_sizes = {}
         for values in updates.values():
-            shot_id = values["tiro_id"]
+            shot_id = values[OutputFieldKey.SHOT_ID.value]
             shot_sizes[shot_id] = shot_sizes.get(shot_id, 0) + 1
 
         # Remarcar válidos após fusão
         for values in updates.values():
-            shot_id = values["tiro_id"]
-            values["tiro_valido"] = 1 if shot_sizes.get(shot_id, 0) >= minimum_point_count else 0
+            shot_id = values[OutputFieldKey.SHOT_ID.value]
+            values[OutputFieldKey.SHOT_VALID.value] = 1 if shot_sizes.get(shot_id, 0) >= minimum_point_count else 0
 
         # Marcar tiros órfãos (pequenos) como ID 0
         for fid, values in updates.items():
-            shot_id = values["tiro_id"]
+            shot_id = values[OutputFieldKey.SHOT_ID.value]
             if shot_sizes.get(shot_id, 0) < minimum_point_count:
-                values["tiro_id"] = 0
-                values["tiro_valido"] = 0
+                values[OutputFieldKey.SHOT_ID.value] = 0
+                values[OutputFieldKey.SHOT_VALID.value] = 0
 
         self.logger.debug("Criando nova camada de memória com resultados")
         result_layer = self._create_memory_layer_with_updates(layer, updates, field_name_map)
@@ -200,6 +253,7 @@ class SequentialPointBreakJudge:
         return summary
 
     def _load_layer(self):
+        """Carrega a camada a partir do caminho de origem ou usa a camada fornecida."""
         if self.layer is not None:
             return self.layer
 
@@ -212,6 +266,7 @@ class SequentialPointBreakJudge:
         return layer
 
     def _validate_layer(self, layer, field_id: str, field_time: str):
+        """Valida se a camada é vetorial de pontos e possui os campos necessários."""
         if not isinstance(layer, QgsVectorLayer) or not layer.isValid():
             raise RuntimeError("Camada vetorial inválida.")
 
@@ -225,6 +280,7 @@ class SequentialPointBreakJudge:
             raise RuntimeError(f"Campo de timestamp não encontrado: {field_time}")
 
     def _load_ordered_points(self, layer, field_id: str, field_time: str):
+        """Carrega e ordena os pontos da camada por ID e timestamp."""
         import time
         load_start = time.time()
         self.logger.debug("Carregando pontos ordenados da camada")
@@ -297,6 +353,7 @@ class SequentialPointBreakJudge:
         retroactive_window: int,
         max_desvio: int,
     ):
+        """Avalia os pontos ordenados, calcula scores e determina quebras de segmento."""
         import time
         start_time = time.time()
         total_points = len(ordered_points)
@@ -351,23 +408,23 @@ class SequentialPointBreakJudge:
             instant_speed = delta_distance / delta_time if delta_time > 0 else 0.0
 
             # Calcular scores separados
-            score_direcao = 0
+            score_direction = 0
             if delta_azimuth > light_azimuth_threshold:
-                score_direcao += 1
+                score_direction += 1
             if delta_azimuth > severe_azimuth_threshold:
-                score_direcao += 2
+                score_direction += 2
 
-            score_continuidade = 0
-            score_continuidade = self._apply_time_score(
-                score=score_continuidade,
+            score_continuity = 0
+            score_continuity = self._apply_time_score(
+                score=score_continuity,
                 delta_time=delta_time,
                 point_frequency_seconds=point_frequency_seconds,
                 time_tolerance_multiplier=time_tolerance_multiplier,
             )
             if delta_distance > float(strip_width_meters) * 0.8:
-                score_continuidade += 1
+                score_continuity += 1
 
-            total_score = score_direcao + score_continuidade
+            total_score = score_direction + score_continuity
 
             # Verificar se é outlier e tentar pular
             is_outlier = total_score >= minimum_break_score
@@ -416,7 +473,7 @@ class SequentialPointBreakJudge:
                 instant_speed < border_speed_threshold and
                 delta_distance < border_distance_threshold
             )
-            seg_tipo = "bordadura" if is_border else "faixa"
+            seg_type = "bordadura" if is_border else "faixa"
 
             # Janela de confirmação (se não pulou)
             should_break = False
@@ -461,18 +518,18 @@ class SequentialPointBreakJudge:
                 current_shot_id += 1
 
             updates[current["fid"]] = {
-                "tiro_id": current_shot_id,
-                "tiro_valido": False,
-                "score": int(total_score),
-                "score_direcao": int(score_direcao),
-                "score_continuidade": int(score_continuidade),
-                "seg_tipo": seg_tipo,
-                "azimute_instantaneo": float(instant_azimuth),
-                "azimute_medio": float(mean_azimuth),
-                "delta_azimute": float(delta_azimuth),
-                "delta_tempo": float(delta_time),
-                "delta_distancia": float(delta_distance),
-                "velocidade_instant": float(instant_speed),
+                OutputFieldKey.SHOT_ID.value: current_shot_id,
+                OutputFieldKey.SHOT_VALID.value: False,
+                OutputFieldKey.SCORE.value: int(total_score),
+                OutputFieldKey.SCORE_DIRECTION.value: int(score_direction),
+                OutputFieldKey.SCORE_CONTINUITY.value: int(score_continuity),
+                OutputFieldKey.SEG_TYPE.value: seg_type,
+                OutputFieldKey.AZIMUTH_INSTANT.value: float(instant_azimuth),
+                OutputFieldKey.AZIMUTH_MEAN.value: float(mean_azimuth),
+                OutputFieldKey.DELTA_AZIMUTH.value: float(delta_azimuth),
+                OutputFieldKey.DELTA_TIME.value: float(delta_time),
+                OutputFieldKey.DELTA_DISTANCE.value: float(delta_distance),
+                OutputFieldKey.VELOCITY_INSTANT.value: float(instant_speed),
             }
 
             azimuth_history.append(instant_azimuth)
@@ -495,7 +552,7 @@ class SequentialPointBreakJudge:
         # Agrupar por tiro_id
         shots = {}
         for fid, values in updates.items():
-            shot_id = values["tiro_id"]
+            shot_id = values[OutputFieldKey.SHOT_ID.value]
             if shot_id not in shots:
                 shots[shot_id] = []
             shots[shot_id].append((fid, values))
@@ -504,7 +561,7 @@ class SequentialPointBreakJudge:
         shot_stats = {}
         for shot_id, features in shots.items():
             size = len(features)
-            azimuths = [v["azimute_medio"] for _, v in features if v["azimute_medio"] > 0]
+            azimuths = [v[OutputFieldKey.AZIMUTH_MEAN.value] for _, v in features if v[OutputFieldKey.AZIMUTH_MEAN.value] > 0]
             mean_azimuth = VectorLayerGeometry.circular_mean_degrees(azimuths) if azimuths else 0
             shot_stats[shot_id] = {"size": size, "mean_azimuth": mean_azimuth}
 
@@ -525,25 +582,26 @@ class SequentialPointBreakJudge:
         # Aplicar fusões
         for from_id, to_id in fusions:
             for fid, values in shots[from_id]:
-                values["tiro_id"] = to_id
+                values[OutputFieldKey.SHOT_ID.value] = to_id
 
         self.logger.info("Fusão de tiros pequenos aplicada", fusions_count=len(fusions))
         return updates
 
     def _build_default_output(self, shot_id: int):
+        """Constrói a saída padrão para um novo tiro."""
         return {
-            "tiro_id": shot_id,
-            "tiro_valido": 0,
-            "score": 0,
-            "score_direcao": 0,
-            "score_continuidade": 0,
-            "seg_tipo": "faixa",
-            "azimute_instantaneo": 0.0,
-            "azimute_medio": 0.0,
-            "delta_azimute": 0.0,
-            "delta_tempo": 0.0,
-            "delta_distancia": 0.0,
-            "velocidade_instant": 0.0,
+            OutputFieldKey.SHOT_ID.value: shot_id,
+            OutputFieldKey.SHOT_VALID.value: 0,
+            OutputFieldKey.SCORE.value: 0,
+            OutputFieldKey.SCORE_DIRECTION.value: 0,
+            OutputFieldKey.SCORE_CONTINUITY.value: 0,
+            OutputFieldKey.SEG_TYPE.value: "faixa",
+            OutputFieldKey.AZIMUTH_INSTANT.value: 0.0,
+            OutputFieldKey.AZIMUTH_MEAN.value: 0.0,
+            OutputFieldKey.DELTA_AZIMUTH.value: 0.0,
+            OutputFieldKey.DELTA_TIME.value: 0.0,
+            OutputFieldKey.DELTA_DISTANCE.value: 0.0,
+            OutputFieldKey.VELOCITY_INSTANT.value: 0.0,
         }
 
     @staticmethod
@@ -554,6 +612,7 @@ class SequentialPointBreakJudge:
         point_frequency_seconds: float,
         time_tolerance_multiplier: float,
     ) -> int:
+        """Aplica pontuação baseada na diferença de tempo."""
         threshold = float(point_frequency_seconds) * float(time_tolerance_multiplier)
         if delta_time > threshold:
             score += 1
@@ -562,22 +621,24 @@ class SequentialPointBreakJudge:
         return score
 
     def _resolve_output_fields(self, layer, *, conflict_resolver=None):
+        """Resolve nomes dos campos de saída, evitando conflitos."""
         max_length = 10 if self.source_path.lower().endswith(".shp") else 255
         resolved = {}
-        for logical_name, spec in self.OUTPUT_FIELDS.items():
+        for logical_key, field_spec in self.OUTPUT_FIELDS.items():
             field_name = VectorLayerAttributes.resolve_output_field_name(
                 layer,
-                spec["name"],
+                field_spec.attribute,
                 conflict_resolver=conflict_resolver,
                 max_length=max_length,
             )
             if field_name is None:
                 raise RuntimeError("Operação cancelada pelo usuário.")
-            resolved[logical_name] = field_name
+            resolved[logical_key] = field_name
         return resolved
 
     @staticmethod
     def _map_updates_to_resolved_fields(updates, field_name_map):
+        """Mapeia updates para os nomes de campos resolvidos."""
         remapped = {}
         for fid, values in (updates or {}).items():
             remapped[fid] = {
@@ -588,6 +649,7 @@ class SequentialPointBreakJudge:
 
     @staticmethod
     def _build_sort_key(value):
+        """Constrói chave de ordenação para valores heterogêneos."""
         try:
             return (0, int(value))
         except Exception:
@@ -598,6 +660,7 @@ class SequentialPointBreakJudge:
 
     @staticmethod
     def _parse_timestamp(value):
+        """Converte valor para timestamp em segundos."""
         if value is None:
             return None
 
@@ -658,10 +721,10 @@ class SequentialPointBreakJudge:
         # Copiar campos da camada original
         new_fields = layer.fields()
         # Adicionar campos de saída
-        for logical_name, spec in SequentialPointBreakJudge.OUTPUT_FIELDS.items():
-            field_name = field_name_map[logical_name]
+        for logical_key, field_spec in SequentialPointBreakJudge.OUTPUT_FIELDS.items():
+            field_name = field_name_map[logical_key]
             if new_fields.lookupField(field_name) == -1:
-                new_fields.append(QgsField(field_name, spec["type"], len=spec["len"], prec=spec["prec"]))
+                new_fields.append(QgsField(field_name, field_spec.type, len=field_spec.length, prec=field_spec.precision))
 
         # Para camadas de memória, usar dataProvider para adicionar campos
         new_layer.dataProvider().addAttributes(new_fields)
