@@ -24,6 +24,7 @@ from ..utils.vector.VectorLayerSource import VectorLayerSource
 class DividePointsByStripsPlugin(BasePluginMTL):
     TOOL_KEY = ToolKey.DIVIDE_POINTS_BY_STRIPS
     PREF_SELECTED_OUTPUT_FIELDS = "selected_output_fields"
+    REQUIRED_OUTPUT_FIELD = "shot_id"
 
     def __init__(self, iface):
         super().__init__(iface.mainWindow())
@@ -252,13 +253,14 @@ class DividePointsByStripsPlugin(BasePluginMTL):
         self.sensitivity_fields.set_values(
             self.preferences.get("sensitivity_fields", {})
         )
-        selected_output_fields = self.preferences.get(
-            self.PREF_SELECTED_OUTPUT_FIELDS, []
-        )
-        if isinstance(selected_output_fields, list) and hasattr(
-            self, "output_fields_grid"
-        ):
-            self.output_fields_grid.set_checked_keys(selected_output_fields)
+        selected_output_fields = self.preferences.get(self.PREF_SELECTED_OUTPUT_FIELDS, [])
+        normalized_selected = self._normalize_selected_output_fields(selected_output_fields)
+        if hasattr(self, "output_fields_grid"):
+            self.output_fields_grid.set_checked_keys(normalized_selected)
+            shot_id_checkbox = self.output_fields_grid.get_checkbox(self.REQUIRED_OUTPUT_FIELD)
+            if shot_id_checkbox is not None:
+                shot_id_checkbox.setChecked(True)
+                shot_id_checkbox.setEnabled(False)
         if hasattr(self, "save_points_selector"):
             self.save_points_selector.set_enabled(
                 self.preferences.get("save_layer_enabled", False)
@@ -275,11 +277,7 @@ class DividePointsByStripsPlugin(BasePluginMTL):
         )
         self.preferences["operational_fields"] = self.operational_fields.get_values()
         self.preferences["sensitivity_fields"] = self.sensitivity_fields.get_values()
-        self.preferences[self.PREF_SELECTED_OUTPUT_FIELDS] = (
-            self.output_fields_grid.get_checked_keys()
-            if hasattr(self, "output_fields_grid")
-            else []
-        )
+        self.preferences[self.PREF_SELECTED_OUTPUT_FIELDS] = self._get_selected_output_fields()
         if hasattr(self, "save_points_selector"):
             self.preferences["save_layer_enabled"] = self.save_points_selector.is_enabled()
             self.preferences["save_layer_path"] = self.save_points_selector.get_file_path()
@@ -289,6 +287,37 @@ class DividePointsByStripsPlugin(BasePluginMTL):
 
     def _on_layer_changed(self, _layer):
         self._refresh_field_selectors()
+
+    def _normalize_selected_output_fields(self, selected_output_fields):
+        normalized = []
+        for value in selected_output_fields or []:
+            if hasattr(value, "value"):
+                normalized.append(str(value.value))
+            else:
+                normalized.append(str(value))
+        normalized = [v for v in normalized if v]
+        if self.REQUIRED_OUTPUT_FIELD not in normalized:
+            normalized.append(self.REQUIRED_OUTPUT_FIELD)
+        return normalized
+
+    def _get_selected_output_fields(self):
+        selected = (
+            self.output_fields_grid.get_checked_keys()
+            if hasattr(self, "output_fields_grid")
+            else []
+        )
+        return self._normalize_selected_output_fields(selected)
+
+    @staticmethod
+    def _resolve_field_name_from_map(field_name_map, logical_key):
+        if not isinstance(field_name_map, dict):
+            return None
+        key_value = logical_key.value if hasattr(logical_key, "value") else logical_key
+        return (
+            field_name_map.get(logical_key)
+            or field_name_map.get(key_value)
+            or field_name_map.get(str(key_value))
+        )
 
     def _build_filtered_result_layer(
         self, layer, selected_output_fields, field_name_map
@@ -300,16 +329,19 @@ class DividePointsByStripsPlugin(BasePluginMTL):
         if not selected_output_fields or not field_name_map:
             return layer
 
+        normalized_selected = set(
+            self._normalize_selected_output_fields(selected_output_fields)
+        )
         selected_keys = [
             key
             for key in SequentialPointBreakJudge.OUTPUT_FIELDS.keys()
-            if key.value in selected_output_fields
+            if key.value in normalized_selected
         ]
 
         selected_field_names = [
-            field_name_map.get(key)
+            self._resolve_field_name_from_map(field_name_map, key)
             for key in selected_keys
-            if field_name_map.get(key)
+            if self._resolve_field_name_from_map(field_name_map, key)
         ]
 
         if not selected_field_names:
@@ -323,7 +355,7 @@ class DividePointsByStripsPlugin(BasePluginMTL):
         fields = []
         for logical_key in selected_keys:
             field_spec = SequentialPointBreakJudge.OUTPUT_FIELDS.get(logical_key)
-            field_name = field_name_map.get(logical_key)
+            field_name = self._resolve_field_name_from_map(field_name_map, logical_key)
             if field_spec and field_name:
                 fields.append(
                     QgsField(
@@ -342,7 +374,9 @@ class DividePointsByStripsPlugin(BasePluginMTL):
             new_feature = QgsFeature(filtered_layer.fields())
             new_feature.setGeometry(feature.geometry())
             for logical_key in selected_keys:
-                resolved_name = field_name_map.get(logical_key)
+                resolved_name = self._resolve_field_name_from_map(
+                    field_name_map, logical_key
+                )
                 if not resolved_name:
                     continue
                 source_index = layer.fields().lookupField(resolved_name)
@@ -474,11 +508,7 @@ class DividePointsByStripsPlugin(BasePluginMTL):
             ):
                 out_path = self.save_points_selector.get_file_path().strip()
                 if out_path:
-                    selected_fields = (
-                        self.output_fields_grid.get_checked_keys()
-                        if hasattr(self, "output_fields_grid")
-                        else []
-                    )
+                    selected_fields = self._get_selected_output_fields()
                     filtered_layer = self._build_filtered_result_layer(
                         result_layer,
                         selected_fields,
