@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from qgis.core import QgsMapLayerProxyModel, QgsVectorLayer
+from qgis.core import QgsMapLayerProxyModel, QgsVectorLayer, QgsProject
 
 from .BasePlugin import BasePluginMTL
 from ..core.ui.WidgetFactory import WidgetFactory
@@ -252,6 +252,10 @@ class DividePointsByStripsPlugin(BasePluginMTL):
             sensitivity_fields=sensitivity_values,
         )
 
+        import time
+        start_time = time.time()
+        self.logger.info("Iniciando processamento síncrono da segmentação")
+
         try:
             summary = SequentialPointBreakJudge(
                 layer=layer,
@@ -283,12 +287,37 @@ class DividePointsByStripsPlugin(BasePluginMTL):
                 time_tolerance_multiplier=float(
                     sensitivity_values.get("tolerancia_tempo", 3.0) or 3.0
                 ),
+                confirmation_window=3,
+                min_confirmed=2,
+                border_azimuth_threshold=90.0,
+                border_speed_threshold=1.0,
+                border_distance_threshold=5.0,
+                retroactive_window=5,
+                fusion_azimuth_tolerance=10.0,
                 conflict_resolver=lambda field_name: QgisMessageUtil.ask_field_conflict(
                     self.iface, field_name
                 ),
             )
+            processing_time = time.time() - start_time
+            self.logger.info(
+                "Segmentação concluída com sucesso",
+                processing_time_seconds=round(processing_time, 2),
+                summary=summary
+            )
+
+            # Adicionar nova camada ao projeto
+            result_layer = summary.get("result_layer")
+            if result_layer and result_layer.isValid():
+                QgsProject.instance().addMapLayer(result_layer)
+                self.logger.info("Nova camada adicionada ao projeto", layer_name=result_layer.name())
+            else:
+                self.logger.warning("Camada de resultado inválida ou não encontrada")
         except Exception as e:
-            self.logger.error(f"Erro na segmentação de tiros: {e}")
+            processing_time = time.time() - start_time
+            self.logger.error(
+                f"Erro na segmentação de tiros após {processing_time:.2f}s: {e}",
+                exception_details=str(e)
+            )
             self.logger.exception(e)
             QgisMessageUtil.bar_critical(
                 self.iface, f"{STR.ERROR}\n{e}"
@@ -298,7 +327,7 @@ class DividePointsByStripsPlugin(BasePluginMTL):
         try:
             layer.triggerRepaint()
         except Exception as e:
-            self.logger.warning(f"Falha ao atualizar camada após julgamento: {e}")
+            self.logger.warning(f"Falha ao atualizar camada original após julgamento: {e}")
 
         QgisMessageUtil.bar_success(
             self.iface,
