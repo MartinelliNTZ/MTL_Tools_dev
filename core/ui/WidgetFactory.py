@@ -350,6 +350,50 @@ class WidgetFactory:
         return layout, widget
 
     @staticmethod
+    def create_save_layer_collapsible(
+        *,
+        parent,
+        title: str = STR.SAVING,
+        expanded_by_default: bool = False,
+        file_filter=StringManager.FILTER_VECTOR,
+        checkbox_text: str = STR.SAVE_TO_FILE,
+        label_text: str = STR.SAVE_IN,
+        path_button=None,
+        separator_top: bool = False,
+        separator_bottom: bool = True,
+    ):
+        """
+        Cria um bloco colapsável de salvamento com seletor de arquivo.
+
+        Returns
+        -------
+        tuple:
+            (layout_colapsavel, widget_colapsavel, widget_selector)
+        """
+        collapsible_layout, collapsible_widget = (
+            WidgetFactory.create_collapsible_parameters(
+                parent=parent,
+                title=title,
+                expanded_by_default=expanded_by_default,
+                separator_top=separator_top,
+                separator_bottom=separator_bottom,
+            )
+        )
+
+        selector_layout, selector_widget = WidgetFactory.create_save_file_selector(
+            parent=parent,
+            file_filter=file_filter,
+            checkbox_text=checkbox_text,
+            label_text=label_text,
+            path_button=path_button,
+            separator_top=False,
+            separator_bottom=False,
+        )
+        collapsible_widget.add_content_layout(selector_layout)
+
+        return collapsible_layout, collapsible_widget, selector_widget
+
+    @staticmethod
     def create_layer_input(
         label_text,
         filters,

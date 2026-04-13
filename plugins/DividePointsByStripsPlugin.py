@@ -1,12 +1,19 @@
 # -*- coding: utf-8 -*-
 
-from qgis.core import QgsMapLayerProxyModel, QgsVectorLayer, QgsProject
+from qgis.core import (
+    QgsMapLayerProxyModel,
+    QgsVectorLayer,
+    QgsProject,
+    QgsField,
+    QgsFeature,
+)
 
 from .BasePlugin import BasePluginMTL
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..i18n.TranslationManager import STR
 from ..utils.Preferences import load_tool_prefs, save_tool_prefs
 from ..utils.QgisMessageUtil import QgisMessageUtil
+from ..utils.StringManager import StringManager
 from ..utils.ToolKeys import ToolKey
 from ..utils.adapter.StringAdapter import StringAdapter
 from ..utils.judge.SequentialPointBreakJudge import SequentialPointBreakJudge
@@ -21,6 +28,7 @@ class DividePointsByStripsPlugin(BasePluginMTL):
     def __init__(self, iface):
         super().__init__(iface.mainWindow())
         self.iface = iface
+        self.save_points_selector = None
         self.init(
             tool_key=self.TOOL_KEY,
             class_name=self.__class__.__name__,
@@ -175,6 +183,7 @@ class DividePointsByStripsPlugin(BasePluginMTL):
             separator_top=False,
             separator_bottom=False,
         )
+        self.output_fields_grid.set_checked_keys(["shot_id"])
         shot_id_checkbox = self.output_fields_grid.get_checkbox("shot_id")
         if shot_id_checkbox is not None:
             shot_id_checkbox.setChecked(True)
@@ -191,27 +200,18 @@ class DividePointsByStripsPlugin(BasePluginMTL):
         )
         self.attributes_params.add_content_layout(output_layout)
 
-        save_layout, self.save_collapsible = (
-            WidgetFactory.create_collapsible_parameters(
+        save_layout, self.save_collapsible, self.save_points_selector = (
+            WidgetFactory.create_save_layer_collapsible(
                 parent=self,
                 title=STR.SAVING,
                 expanded_by_default=False,
-                separator_top=False,
-                separator_bottom=True,
-            )
-        )
-
-        save_points_layout, self.save_points_selector = (
-            WidgetFactory.create_save_file_selector(
-                parent=self,
                 file_filter=StringManager.FILTER_VECTOR,
                 checkbox_text=STR.SAVE_POINTS_CHECKBOX,
                 label_text=STR.SAVE_IN,
                 separator_top=False,
-                separator_bottom=False,
+                separator_bottom=True,
             )
         )
-        self.save_collapsible.add_content_layout(save_points_layout)
 
         buttons_layout, self.action_buttons = (
             WidgetFactory.create_bottom_action_buttons(
@@ -467,7 +467,11 @@ class DividePointsByStripsPlugin(BasePluginMTL):
             else:
                 self.logger.warning("Camada de resultado inválida ou não encontrada")
 
-            if self.save_points_selector.is_enabled():
+            if (
+                hasattr(self, "save_points_selector")
+                and self.save_points_selector
+                and self.save_points_selector.is_enabled()
+            ):
                 out_path = self.save_points_selector.get_file_path().strip()
                 if out_path:
                     selected_fields = (
