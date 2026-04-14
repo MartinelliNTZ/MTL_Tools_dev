@@ -58,10 +58,6 @@ class BasePluginMTL(BaseDialog):
         self.preferences = {}
         self.preferences.clear()
         self.preferences = Preferences.load_tool_prefs(self.TOOL_KEY)
-        self.preferences["usages"] = self.preferences.get("usages", 0) + 1
-        prefs_por_tool = Preferences.load_pref_key_by_tool("usages")
-
-        self.logger.debug(f"Testando c321: {prefs_por_tool}Prefs :{self.preferences}")
 
         # Carregar preferências globais do Settings se solicitado
         if load_settings_prefs:
@@ -152,8 +148,13 @@ class BasePluginMTL(BaseDialog):
         Salva tamanho da janela e demais preferências antes de fechar.
         """
         self._persist_window_size()
+        self.preferences["usages"] = self.preferences.get("usages", 0) + 1
+        prefs_por_tool = Preferences.load_pref_key_by_tool("usages")
+
+        self.logger.debug(f"Testando c321: {prefs_por_tool}Prefs :{self.preferences}")
         if self.AUTO_SAVE_PREFS_ON_CLOSE:
             self._save_prefs()
+
         super().closeEvent(event)
 
     def _save_prefs(self):
