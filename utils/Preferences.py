@@ -65,7 +65,7 @@ class Preferences:
         prefs[tool_key] = values
         Preferences.save_prefs(prefs)
 
-
+#DEPRECATED - manter funções abaixo para compatibilidade, mas usar as versões da classe Preferences acima.
 PREF_FOLDER = os.path.join(_resolve_app_data_path(), "MTLTools")
 PREF_FILE = os.path.join(PREF_FOLDER, "mtl_prefs.json")
 

@@ -8,7 +8,7 @@ import time
 from ..utils.FormatUtils import FormatUtils
 from ..core.config.LogUtils import LogUtils
 from ..core.ui.info_dialog import InfoDialog
-from ..utils.Preferences import load_tool_prefs, save_tool_prefs
+from ..utils.Preferences import Preferences
 from ..utils.ToolKeys import ToolKey
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.ProjectUtils import ProjectUtils
@@ -56,12 +56,12 @@ class BasePluginMTL(BaseDialog):
         )
         self.preferences = {}
         self.preferences.clear()
-        self.preferences = load_tool_prefs(self.TOOL_KEY)
+        self.preferences = Preferences.load_tool_prefs(self.TOOL_KEY)
 
         # Carregar preferências globais do Settings se solicitado
         if load_settings_prefs:
             self.logger.debug("Carregando preferências globais do Cadmus Settings")
-            self.settings_preferences = load_tool_prefs(ToolKey.SYSTEM)
+            self.settings_preferences = Preferences.load_tool_prefs(ToolKey.SYSTEM)
             self.logger.debug(
                 f"Preferências globais carregadas: {list(self.settings_preferences.keys())}"
             )
@@ -224,7 +224,7 @@ class BasePluginMTL(BaseDialog):
                         )
                     TAM = FormatUtils.bytes(self.preferences.get("current_size", 0))
                     msg = f"Iniciando: size={TAM}"
- 
+
                     self.logger.info(msg)
         except Exception as e:
             self.logger.error(e)
@@ -317,7 +317,7 @@ class BasePluginMTL(BaseDialog):
             ):
                 self.preferences.pop(key, None)
             try:
-                save_tool_prefs(self.TOOL_KEY, self.preferences)
+                Preferences.save_tool_prefs(self.TOOL_KEY, self.preferences)
             except Exception as se:
                 self.logger.debug(f"Falha ao salvar prefs estatísticas: {se}")
         except Exception as e:
