@@ -360,7 +360,7 @@ class SettingsPlugin(BasePluginMTL):
         self.prefer_VectorFields["ellipsoidal_suffix"] = ellipsoidal_suffix
 
         self._persist_window_size()
-        self.increment_usage()
+        self.on_finish_plugin()
         Preferences.save_tool_prefs(ToolKey.SYSTEM, self.system_preferences)
         Preferences.save_tool_prefs(ToolKey.VECTOR_FIELDS, self.prefer_VectorFields)
         Preferences.save_tool_prefs(self.TOOL_KEY, self.preferences)

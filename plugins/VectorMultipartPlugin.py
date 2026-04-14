@@ -40,7 +40,7 @@ class VectorMultipartPlugin(BasePluginMTL):
     # --------------------------------------------------
     def run_multpart(self):
         self.logger.info("Iniciando conversão de multipart para singlepart")
-        self.increment_usage()
+        self.on_finish_plugin()
         Preferences.save_tool_prefs(self.TOOL_KEY, self.preferences)
 
         layer = self.iface.activeLayer()

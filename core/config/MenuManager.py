@@ -113,10 +113,6 @@ class MenuManager:
             f"Toolbar criada e adicionada ao QGIS: {self.toolbar.objectName()}"
         )
 
-        self.logger.debug(
-            f"Toolbar criada e adicionada ao QGIS: {self.toolbar.objectName()}"
-        )
-
         # Coletar todos os dropdown buttons por categoria
         dropdown_buttons = []
 

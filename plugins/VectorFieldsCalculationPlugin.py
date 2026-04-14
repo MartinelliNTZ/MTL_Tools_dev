@@ -46,7 +46,7 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
         self.logger.info("Iniciando Calcular Campos Vetoriais")
 
         from ..utils.ProjectUtils import ProjectUtils
-        self.increment_usage()
+        self.on_finish_plugin()
         Preferences.save_tool_prefs(self.TOOL_KEY, self.preferences)
 
         layer = ProjectUtils.get_active_vector_layer(

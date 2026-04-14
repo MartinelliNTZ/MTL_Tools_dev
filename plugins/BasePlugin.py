@@ -149,22 +149,20 @@ class BasePluginMTL(BaseDialog):
         """
         self.logger.debug("Fechando plugin, persistindo preferências")
         self._persist_window_size()
-        self.increment_usage()  # Incrementa o contador de uso ao fechar o plugin
+        self.on_finish_plugin()  # Incrementa o contador de uso ao fechar o plugin
         if self.AUTO_SAVE_PREFS_ON_CLOSE:
             self._save_prefs()
 
         super().closeEvent(event)
 
-    # No PluginPai
-    def increment_usage(self):
+
+    def on_finish_plugin(self):
         try:
-            print("DEBUG: Entrei no increment_usage do Pai")
+
             # 1. Operação simples primeiro
             valor_atual = self.preferences.get("usages", 0)
             self.preferences["usages"] = valor_atual + 1
 
-            # 2. Teste o logger sem variáveis complexas primeiro
-            self.logger.debug("DEBUG: Incremento funcionou")
 
             # 3. Onde pode estar o erro:
             prefs_por_tool = Preferences.load_pref_key_by_tool("usages")
