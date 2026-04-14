@@ -400,44 +400,48 @@ class DroneCordinates(BasePluginMTL):
 
         self.logger.debug("PreferÃªncias carregadas", code="PREFS_LOAD_COMPLETE")
 
+
     def _save_prefs(self):
         self.logger.debug("Salvando preferÃªncias", code="PREFS_SAVE_START")
 
         paths = self.folder_selector.get_paths()
         folder_path = paths[0] if paths else ""
 
-        prefs_data = {
-            "folder": folder_path,
-            "recursive": self.checkbox_map["recursive"].isChecked(),
-            "photos": self.checkbox_map["photos"].isChecked(),
-            "generate_report": self.checkbox_map["generate_report"].isChecked(),
-            self.PREF_EXIF_FIELDS: self._get_selected_exif_fields(),
-            self.PREF_XMP_FIELDS: self._get_selected_xmp_fields(),
-            self.PREF_CUSTOM_FIELDS: self._get_selected_custom_fields(),
-            self.PREF_MRK_FIELDS: self._get_selected_mrk_fields(),
-            "save_file": self.save_track_selector.is_enabled(),
-            "save_file_pts": self.save_points_selector.is_enabled(),
-            "output_path": self.save_track_selector.get_file_path(),
-            "output_path_pts": self.save_points_selector.get_file_path(),
-            "apply_style_track": self.qml_track_selector.is_enabled(),
-            "qml_path_track": self.qml_track_selector.get_file_path(),
-            "apply_style_points": self.qml_points_selector.is_enabled(),
-            "qml_path_points": self.qml_points_selector.get_file_path(),
-            # Estados dos CollapsibleParametersWidget
-            "opts_expanded": self.opts_collapsible.is_expanded(),
-            "exif_expanded": self.exif_fields_collapsible.is_expanded(),
-            "xmp_expanded": self.xmp_fields_collapsible.is_expanded(),
-            "custom_expanded": self.custom_fields_collapsible.is_expanded(),
-            "mrk_expanded": self.mrk_fields_collapsible.is_expanded(),
-            "save_expanded": self.save_collapsible.is_expanded(),
-            "styles_expanded": self.styles_collapsible.is_expanded(),
-            # Tamanho da janela (persistido automaticamente por BasePlugin.closeEvent)
-            "window_width": self.width(),
-            "window_height": self.height(),
-        }
-        save_tool_prefs(self.TOOL_KEY, prefs_data)
+        self.preferences["folder"] = folder_path
+        self.preferences["recursive"] = self.checkbox_map["recursive"].isChecked()
+        self.preferences["photos"] = self.checkbox_map["photos"].isChecked()
+        self.preferences["generate_report"] = self.checkbox_map[
+            "generate_report"
+        ].isChecked()
+        self.preferences[self.PREF_EXIF_FIELDS] = self._get_selected_exif_fields()
+        self.preferences[self.PREF_XMP_FIELDS] = self._get_selected_xmp_fields()
+        self.preferences[self.PREF_CUSTOM_FIELDS] = self._get_selected_custom_fields()
+        self.preferences[self.PREF_MRK_FIELDS] = self._get_selected_mrk_fields()
+        self.preferences["save_file"] = self.save_track_selector.is_enabled()
+        self.preferences["save_file_pts"] = self.save_points_selector.is_enabled()
+        self.preferences["output_path"] = self.save_track_selector.get_file_path()
+        self.preferences["output_path_pts"] = self.save_points_selector.get_file_path()
+        self.preferences["apply_style_track"] = self.qml_track_selector.is_enabled()
+        self.preferences["qml_path_track"] = self.qml_track_selector.get_file_path()
+        self.preferences["apply_style_points"] = self.qml_points_selector.is_enabled()
+        self.preferences["qml_path_points"] = self.qml_points_selector.get_file_path()
+        # Estados dos CollapsibleParametersWidget
+        self.preferences["opts_expanded"] = self.opts_collapsible.is_expanded()
+        self.preferences["exif_expanded"] = self.exif_fields_collapsible.is_expanded()
+        self.preferences["xmp_expanded"] = self.xmp_fields_collapsible.is_expanded()
+        self.preferences["custom_expanded"] = self.custom_fields_collapsible.is_expanded()
+        self.preferences["mrk_expanded"] = self.mrk_fields_collapsible.is_expanded()
+        self.preferences["save_expanded"] = self.save_collapsible.is_expanded()
+        self.preferences["styles_expanded"] = self.styles_collapsible.is_expanded()
+        # Tamanho da janela (persistido automaticamente por BasePlugin.closeEvent)
+        self.preferences["window_width"] = self.width()
+        self.preferences["window_height"] = self.height()
+
+        
+        save_tool_prefs(self.TOOL_KEY, self.preferences)
 
         self.logger.debug("PreferÃªncias salvas", code="PREFS_SAVE_COMPLETE")
+
 
     def execute_tool(self):
         self.logger.info(
