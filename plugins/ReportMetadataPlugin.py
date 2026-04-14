@@ -178,8 +178,8 @@ class ReportMetadataPlugin(BasePluginMTL):
         self.preferences[self.PREF_SELECTED_JSON] = selected or ""
         save_tool_prefs(self.TOOL_KEY, self.preferences)
 
-    def _load_prefs(self):
-        self.preferences = load_tool_prefs(self.TOOL_KEY)
+    def _load_prefs(self):       
+        self.logger.debug("")
 
     def execute_tool(self):
         selected_json = self.json_selector.get_selected_key() if self.json_selector else ""

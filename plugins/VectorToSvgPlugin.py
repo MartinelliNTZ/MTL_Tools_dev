@@ -9,7 +9,7 @@ from qgis.core import (
 from .BasePlugin import BasePluginMTL
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..i18n.TranslationManager import STR
-from ..utils.Preferences import load_tool_prefs, save_tool_prefs
+from ..utils.Preferences import Preferences
 from ..utils.ProjectUtils import ProjectUtils
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.SVGUtils import SVGUtils
@@ -151,7 +151,7 @@ class VectorToSvgPlugin(BasePluginMTL):
 
     def _load_prefs(self):
         self.logger.debug("Carregando preferencias do VectorToSvg")
-        self.preferences = load_tool_prefs(self.TOOL_KEY)
+
 
         self.fill_color_widget.set_color(
             QColor(self.preferences.get("fill_color", "#ffffff"))
@@ -223,7 +223,7 @@ class VectorToSvgPlugin(BasePluginMTL):
         self.preferences["window_width"] = self.width()
         self.preferences["window_height"] = self.height()
 
-        save_tool_prefs(self.TOOL_KEY, self.preferences)
+        Preferences.save_tool_prefs(self.TOOL_KEY, self.preferences)
 
     def execute_tool(self):
         self.logger.info("Iniciando exportacao de SVG a partir de camada vetorial")
