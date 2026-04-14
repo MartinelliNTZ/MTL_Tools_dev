@@ -8,8 +8,7 @@ from ..core.engine_tasks.PhotoVectorizationStep import PhotoVectorizationStep
 from ..core.engine_tasks.ReportGenerationStep import ReportGenerationStep
 from ..i18n.TranslationManager import STR
 from ..plugins.BasePlugin import BasePluginMTL
-from ..utils.ExplorerUtils import ExplorerUtils
-from ..utils.Preferences import load_tool_prefs, save_tool_prefs
+from ..utils.Preferences import  Preferences
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.ToolKeys import ToolKey
 
@@ -80,10 +79,9 @@ class PhotoVectorizationPlugin(BasePluginMTL):
         self.preferences[self.PREF_PHOTO_GENERATE_REPORT] = bool(
             self.photo_opts_map["photo_generate_report"].isChecked()
         )
-        save_tool_prefs(self.TOOL_KEY, self.preferences)
+        Preferences.save_tool_prefs(self.TOOL_KEY, self.preferences)
 
     def _load_prefs(self):
-        self.preferences = load_tool_prefs(self.TOOL_KEY)
         folder = self.preferences.get(self.PREF_PHOTO_FOLDER, "")
         if folder:
             self.photo_folder_selector.set_path(folder)

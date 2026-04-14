@@ -8,7 +8,7 @@ from ..utils.StringManager import StringManager
 from ..utils.vector.VectorLayerGeometry import VectorLayerGeometry
 from ..utils.vector.VectorLayerProjection import VectorLayerProjection
 from ..utils.vector.VectorLayerSource import VectorLayerSource
-from ..utils.Preferences import load_tool_prefs, save_tool_prefs
+from ..utils.Preferences import save_tool_prefs
 from ..utils.ToolKeys import ToolKey
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..core.engine_tasks.AsyncPipelineEngine import AsyncPipelineEngine
@@ -100,7 +100,6 @@ class GenerateTrailPlugin(BasePluginMTL):
 
     def _load_prefs(self):
         self.logger.debug(f"Carregando preferências salvas da ferramenta. Self={self}")
-        self.preferences = load_tool_prefs(self.TOOL_KEY)
         last_tam = self.preferences.get("last_implement_length")
         save_to_folder = self.preferences.get("save_to_folder", False)
         last_file = self.preferences.get("last_output_file", "")
