@@ -3,7 +3,7 @@ import os
 from qgis.core import QgsProject
 from ..plugins.BasePlugin import BasePluginMTL
 from ..core.ui.WidgetFactory import WidgetFactory
-from ..utils.Preferences import save_tool_prefs
+from ..utils.Preferences import Preferences
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.ExplorerUtils import ExplorerUtils
 from ..utils.ProjectUtils import ProjectUtils
@@ -211,7 +211,7 @@ class LoadFolderLayersDialog(BasePluginMTL):
             self.preferences["window_height"] = self.height()
             self.preferences["types_expanded"] = self.coll_widget.is_expanded()
 
-            save_tool_prefs(self.TOOL_KEY, self.preferences)
+            Preferences.save_tool_prefs(self.TOOL_KEY, self.preferences)
         except Exception as e:
             # não falhar ao salvar preferências
             self.logger.error(f"Erro {e}")

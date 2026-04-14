@@ -5,7 +5,7 @@ from .BasePlugin import BasePluginMTL
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..utils.ProjectUtils import ProjectUtils
 from ..utils.QgisMessageUtil import QgisMessageUtil
-from ..utils.Preferences import load_tool_prefs, save_tool_prefs
+from ..utils.Preferences import Preferences
 from ..i18n.TranslationManager import STR
 
 
@@ -115,40 +115,15 @@ class CoordResultDialog(BasePluginMTL):
         )
 
     def _load_prefs(self):
-        try:
-            self.preferences = load_tool_prefs(self.TOOL_KEY)
-            w = self.preferences.get("window_width")
-            h = self.preferences.get("window_height")
-            if w and h:
-                try:
-                    self.resize(int(w), int(h))
-                except Exception as e:
-                    self.logger.error(f"Error {e}")
-            self.logger.debug(
-                f"_load_prefs: loaded prefs keys={list(self.preferences.keys())}"
-            )
-        except Exception as e:
-            try:
-                self.logger.warning(f"_load_prefs: erro ao carregar preferencias: {e}")
-            except Exception as e:
-                self.logger.error(f"Error {e}")
+        self.logger.debug(
+            f"_load_prefs: loaded prefs keys={list(self.preferences.keys())}"
+        )
 
     def _save_prefs(self):
-        try:
-            self.preferences["window_width"] = self.width()
-            self.preferences["window_height"] = self.height()
-            save_tool_prefs(self.TOOL_KEY, self.preferences)
-            try:
-                self.logger.debug(
-                    f"_save_prefs: prefs salvas: {self.preferences.get('window_width')}x{self.preferences.get('window_height')}"
-                )
-            except Exception as e:
-                self.logger.error(f"Error {e}")
-        except Exception as e:
-            try:
-                self.logger.warning(f"_save_prefs: erro ao salvar preferencias: {e}")
-            except Exception as e:
-                self.logger.error(f"Error {e}")
+        Preferences.save_tool_prefs(self.TOOL_KEY, self.preferences)
+        self.logger.debug(
+            f"_save_prefs: prefs salvas: {self.preferences.get('window_width')}x{self.preferences.get('window_height')}"
+        )
 
     def copy_all_info(self):
         parts = []
@@ -221,10 +196,7 @@ class CoordResultDialog(BasePluginMTL):
         self.alt_widget.set_value(
             "altitude", STR.UNAVAILABLE if value is None else f"{value:.2f} m"
         )
-        try:
-            self.logger.debug(f"set_altitude: {value}")
-        except Exception as e:
-            self.logger.error(f"Error {e}")
+        self.logger.debug(f"set_altitude: {value}")
 
     def set_address(self, data):
         if not data:
@@ -244,11 +216,7 @@ class CoordResultDialog(BasePluginMTL):
         self.lbl_state.setText(f"{STR.STATE}: {data.get('state', '-')}")
         self.lbl_region.setText(f"{STR.REGION}: {data.get('region', '-')}")
         self.lbl_country.setText(f"{STR.COUNTRY}: {data.get('country', '-')}")
-
-        try:
-            self.logger.debug(f"set_address: {data}")
-        except Exception as e:
-            self.logger.error(f"Error {e}")
+        self.logger.debug(f"set_address: {data}")
 
     def copy_address(self):
         text = (

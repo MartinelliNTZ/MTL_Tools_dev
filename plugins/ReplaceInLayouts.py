@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from ..utils.Preferences import load_tool_prefs, save_tool_prefs
+from ..utils.Preferences import Preferences
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.LayoutsUtils import LayoutsUtils
 from ..utils.ProjectUtils import ProjectUtils
@@ -117,7 +117,7 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
         self.preferences["case_sensitive"] = self.checkbox_map["case_sensitive"].isChecked()
         self.preferences["full_replace"] = self.checkbox_map["full_replace"].isChecked()
         # Tamanho da janela (persistido automaticamente por BasePlugin.closeEvent)
-        save_tool_prefs(self.TOOL_KEY, self.preferences)
+        Preferences.save_tool_prefs(self.TOOL_KEY, self.preferences)
 
     def _swap_fields(self):
         """Inverte o conteúdo dos campos old_text e new_text."""

@@ -11,7 +11,7 @@ from ..i18n.TranslationManager import STR
 from ..plugins.BasePlugin import BasePluginMTL
 from ..utils.DependenciesManager import DependenciesManager
 from ..utils.PDFUtils import PDFUtils
-from ..utils.Preferences import load_tool_prefs, save_tool_prefs
+from ..utils.Preferences import Preferences
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.ToolKeys import ToolKey
 
@@ -246,7 +246,7 @@ class ExportAllLayoutsDialog(BasePluginMTL):
         )
         self.preferences["output_folder"] = pasta
 
-        save_tool_prefs(self.TOOL_KEY, self.preferences)
+        Preferences.save_tool_prefs(self.TOOL_KEY, self.preferences)
         self.logger.info(
             f"Preferências salvas: PDF={self.preferences['export_pdf']}, PNG={self.preferences['export_png']}"
         )

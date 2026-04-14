@@ -69,14 +69,16 @@ class DividePointsByStripsPlugin(BasePluginMTL):
                 separator_bottom=True,
             )
         )
-        id_field_layout, self.id_field_selector = WidgetFactory.create_dropdown_selector(
-            title=STR.UNIQUE_SEQUENTIAL_ID_FIELD,
-            options_dict={},
-            allow_empty=True,
-            empty_text=STR.SELECT,
-            parent=self,
-            separator_top=False,
-            separator_bottom=False,
+        id_field_layout, self.id_field_selector = (
+            WidgetFactory.create_dropdown_selector(
+                title=STR.UNIQUE_SEQUENTIAL_ID_FIELD,
+                options_dict={},
+                allow_empty=True,
+                empty_text=STR.SELECT,
+                parent=self,
+                separator_top=False,
+                separator_bottom=False,
+            )
         )
         time_field_layout, self.time_field_selector = (
             WidgetFactory.create_dropdown_selector(
@@ -89,22 +91,24 @@ class DividePointsByStripsPlugin(BasePluginMTL):
                 separator_bottom=False,
             )
         )
-        operational_layout, self.operational_fields = WidgetFactory.create_input_fields_widget(
-            fields_dict={
-                "frequencia_pontos": {
-                    "title": STR.EXPECTED_POINT_FREQUENCY_SECONDS,
-                    "type": "int",
-                    "default": 1,
+        operational_layout, self.operational_fields = (
+            WidgetFactory.create_input_fields_widget(
+                fields_dict={
+                    "frequencia_pontos": {
+                        "title": STR.EXPECTED_POINT_FREQUENCY_SECONDS,
+                        "type": "int",
+                        "default": 1,
+                    },
+                    "largura_tiro": {
+                        "title": STR.EXPECTED_LATERAL_WIDTH_METERS,
+                        "type": "float",
+                        "default": 20.0,
+                    },
                 },
-                "largura_tiro": {
-                    "title": STR.EXPECTED_LATERAL_WIDTH_METERS,
-                    "type": "float",
-                    "default": 20.0,
-                },
-            },
-            parent=self,
-            separator_top=False,
-            separator_bottom=False,
+                parent=self,
+                separator_top=False,
+                separator_bottom=False,
+            )
         )
         self.operational_params.add_content_layout(id_field_layout)
         self.operational_params.add_content_layout(time_field_layout)
@@ -240,7 +244,7 @@ class DividePointsByStripsPlugin(BasePluginMTL):
         self._refresh_field_selectors()
 
     def _load_prefs(self):
-        self.preferences = load_tool_prefs(self.TOOL_KEY)
+        #self.preferences = load_tool_prefs(self.TOOL_KEY)
         self.id_field = self.preferences.get("id_field", "")
         self.time_field = self.preferences.get("time_field", "")
         operational_fields = self.preferences.get("operational_fields", {})
@@ -253,21 +257,27 @@ class DividePointsByStripsPlugin(BasePluginMTL):
         self.sensitivity_fields.set_values(
             self.preferences.get("sensitivity_fields", {})
         )
-        selected_output_fields = self.preferences.get(self.PREF_SELECTED_OUTPUT_FIELDS, [])
-        normalized_selected = self._normalize_selected_output_fields(selected_output_fields)
-        if hasattr(self, "output_fields_grid"):
-            self.output_fields_grid.set_checked_keys(normalized_selected)
-            shot_id_checkbox = self.output_fields_grid.get_checkbox(self.REQUIRED_OUTPUT_FIELD)
-            if shot_id_checkbox is not None:
-                shot_id_checkbox.setChecked(True)
-                shot_id_checkbox.setEnabled(False)
-        if hasattr(self, "save_points_selector"):
-            self.save_points_selector.set_enabled(
-                self.preferences.get("save_layer_enabled", False)
-            )
-            self.save_points_selector.set_file_path(
-                self.preferences.get("save_layer_path", "")
-            )
+        selected_output_fields = self.preferences.get(
+            self.PREF_SELECTED_OUTPUT_FIELDS, []
+        )
+        normalized_selected = self._normalize_selected_output_fields(
+            selected_output_fields
+        )
+
+        self.output_fields_grid.set_checked_keys(normalized_selected)
+        shot_id_checkbox = self.output_fields_grid.get_checkbox(
+            self.REQUIRED_OUTPUT_FIELD
+        )
+        if shot_id_checkbox is not None:
+            shot_id_checkbox.setChecked(True)
+            shot_id_checkbox.setEnabled(False)
+
+        self.save_points_selector.set_enabled(
+            self.preferences.get("save_layer_enabled", False)
+        )
+        self.save_points_selector.set_file_path(
+            self.preferences.get("save_layer_path", "")
+        )
         self._refresh_field_selectors()
 
     def _save_prefs(self):
@@ -277,10 +287,11 @@ class DividePointsByStripsPlugin(BasePluginMTL):
         )
         self.preferences["operational_fields"] = self.operational_fields.get_values()
         self.preferences["sensitivity_fields"] = self.sensitivity_fields.get_values()
-        self.preferences[self.PREF_SELECTED_OUTPUT_FIELDS] = self._get_selected_output_fields()
-        if hasattr(self, "save_points_selector"):
-            self.preferences["save_layer_enabled"] = self.save_points_selector.is_enabled()
-            self.preferences["save_layer_path"] = self.save_points_selector.get_file_path()
+        self.preferences[self.PREF_SELECTED_OUTPUT_FIELDS] = (
+            self._get_selected_output_fields()
+        )
+        self.preferences["save_layer_enabled"] = self.save_points_selector.is_enabled()
+        self.preferences["save_layer_path"] = self.save_points_selector.get_file_path()
         self.preferences["window_width"] = self.width()
         self.preferences["window_height"] = self.height()
         save_tool_prefs(self.TOOL_KEY, self.preferences)
@@ -413,9 +424,7 @@ class DividePointsByStripsPlugin(BasePluginMTL):
     def execute_tool(self):
         layer = self.layer_input.current_layer()
         if not isinstance(layer, QgsVectorLayer):
-            QgisMessageUtil.bar_warning(
-                self.iface, STR.SELECT_POINT_VECTOR_LAYER
-            )
+            QgisMessageUtil.bar_warning(self.iface, STR.SELECT_POINT_VECTOR_LAYER)
             return
 
         field_id = self.id_field_selector.get_selected_key()
@@ -438,6 +447,7 @@ class DividePointsByStripsPlugin(BasePluginMTL):
         )
 
         import time
+
         start_time = time.time()
         self.logger.info("Iniciando processamento síncrono da segmentação")
 
@@ -454,9 +464,7 @@ class DividePointsByStripsPlugin(BasePluginMTL):
                 strip_width_meters=float(
                     operational_values.get("largura_tiro", 20.0) or 20.0
                 ),
-                azimuth_window=int(
-                    sensitivity_values.get("janela_azimute", 10) or 10
-                ),
+                azimuth_window=int(sensitivity_values.get("janela_azimute", 10) or 10),
                 light_azimuth_threshold=float(
                     sensitivity_values.get("threshold_azimute_leve", 20.0) or 20.0
                 ),
@@ -472,9 +480,7 @@ class DividePointsByStripsPlugin(BasePluginMTL):
                 time_tolerance_multiplier=float(
                     sensitivity_values.get("tolerancia_tempo", 3.0) or 3.0
                 ),
-                max_desvio=int(
-                    sensitivity_values.get("max_desvio", 5) or 5
-                ),
+                max_desvio=int(sensitivity_values.get("max_desvio", 5) or 5),
                 confirmation_window=3,
                 min_confirmed=2,
                 border_azimuth_threshold=90.0,
@@ -490,14 +496,16 @@ class DividePointsByStripsPlugin(BasePluginMTL):
             self.logger.info(
                 "Segmentação concluída com sucesso",
                 processing_time_seconds=round(processing_time, 2),
-                summary=summary
+                summary=summary,
             )
 
             # Adicionar nova camada ao projeto
             result_layer = summary.get("result_layer")
             if result_layer and result_layer.isValid():
                 QgsProject.instance().addMapLayer(result_layer)
-                self.logger.info("Nova camada adicionada ao projeto", layer_name=result_layer.name())
+                self.logger.info(
+                    "Nova camada adicionada ao projeto", layer_name=result_layer.name()
+                )
             else:
                 self.logger.warning("Camada de resultado inválida ou não encontrada")
 
@@ -534,18 +542,18 @@ class DividePointsByStripsPlugin(BasePluginMTL):
             processing_time = time.time() - start_time
             self.logger.error(
                 f"Erro na segmentação de tiros após {processing_time:.2f}s: {e}",
-                exception_details=str(e)
+                exception_details=str(e),
             )
             self.logger.exception(e)
-            QgisMessageUtil.bar_critical(
-                self.iface, f"{STR.ERROR}\n{e}"
-            )
+            QgisMessageUtil.bar_critical(self.iface, f"{STR.ERROR}\n{e}")
             return
 
         try:
             layer.triggerRepaint()
         except Exception as e:
-            self.logger.warning(f"Falha ao atualizar camada original após julgamento: {e}")
+            self.logger.warning(
+                f"Falha ao atualizar camada original após julgamento: {e}"
+            )
 
         QgisMessageUtil.bar_success(
             self.iface,

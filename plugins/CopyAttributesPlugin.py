@@ -4,7 +4,7 @@ from qgis.core import QgsVectorLayer, QgsMapLayerProxyModel
 from ..utils.ToolKeys import ToolKey
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..core.ui.WidgetFactory import WidgetFactory
-from ..utils.Preferences import load_tool_prefs, save_tool_prefs
+from ..utils.Preferences import Preferences
 from ..utils.vector.VectorLayerAttributes import VectorLayerAttributes
 from .BasePlugin import BasePluginMTL
 from ..i18n.TranslationManager import STR
@@ -75,15 +75,15 @@ class CopyAttributes(BasePluginMTL):
         self.attr_widget.set_fields([f.name() for f in layer.fields()])
 
     def _load_prefs(self):
-        prefs = load_tool_prefs(self.TOOL_KEY)
-        self.attr_widget.set_checked_all(prefs.get("chk_all", False))
+        self.attr_widget.set_checked_all(
+            self.preferences.get("chk_all", False)
+        )
 
     def _save_prefs(self):
-        data = {}
-        data["chk_all"] = bool(self.attr_widget.use_all_fields())
-        data["window_width"] = self.width()
-        data["window_height"] = self.height()
-        save_tool_prefs(self.TOOL_KEY, data)
+        self.preferences["chk_all"] = bool(self.attr_widget.use_all_fields())
+        self.preferences["window_width"] = self.width()
+        self.preferences["window_height"] = self.height()
+        Preferences.save_tool_prefs(self.TOOL_KEY, self.preferences)
 
     # =========================
     # CONTROLLER

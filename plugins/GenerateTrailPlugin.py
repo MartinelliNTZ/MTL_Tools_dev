@@ -8,7 +8,7 @@ from ..utils.StringManager import StringManager
 from ..utils.vector.VectorLayerGeometry import VectorLayerGeometry
 from ..utils.vector.VectorLayerProjection import VectorLayerProjection
 from ..utils.vector.VectorLayerSource import VectorLayerSource
-from ..utils.Preferences import save_tool_prefs
+from ..utils.Preferences import Preferences
 from ..utils.ToolKeys import ToolKey
 from ..core.ui.WidgetFactory import WidgetFactory
 from ..core.engine_tasks.AsyncPipelineEngine import AsyncPipelineEngine
@@ -133,7 +133,7 @@ class GenerateTrailPlugin(BasePluginMTL):
         self.preferences["window_width"] = self.width()
         self.preferences["window_height"] = self.height()
 
-        save_tool_prefs(self.TOOL_KEY, self.preferences)
+        Preferences.save_tool_prefs(self.TOOL_KEY, self.preferences)
         self.logger.debug(
             f"Preferências salvas: tamanho={self.preferences['last_implement_length']}m, salvar_arquivo={self.preferences['save_to_folder']}"
         )

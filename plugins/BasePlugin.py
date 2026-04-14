@@ -168,7 +168,7 @@ class BasePluginMTL(BaseDialog):
             
             # 3. Onde pode estar o erro:
             prefs_por_tool = Preferences.load_pref_key_by_tool("usages")
-            self.logger.debug(f"DEBUG: {prefs_por_tool}")
+            self.logger.debug(f"DEBUG cv5555: {prefs_por_tool}")
             
         except Exception as e:
             print(f"ERRO CRÍTICO no increment_usage: {e}")

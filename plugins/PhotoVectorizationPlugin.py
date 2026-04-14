@@ -8,7 +8,7 @@ from ..core.engine_tasks.PhotoVectorizationStep import PhotoVectorizationStep
 from ..core.engine_tasks.ReportGenerationStep import ReportGenerationStep
 from ..i18n.TranslationManager import STR
 from ..plugins.BasePlugin import BasePluginMTL
-from ..utils.Preferences import  Preferences
+from ..utils.Preferences import Preferences
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.ToolKeys import ToolKey
 
