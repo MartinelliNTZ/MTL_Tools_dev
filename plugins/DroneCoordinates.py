@@ -37,6 +37,7 @@ class DroneCordinates(BasePluginMTL):
     PREF_XMP_FIELDS = "xmp_fields_selected"
     PREF_CUSTOM_FIELDS = "custom_fields_selected"
     PREF_MRK_FIELDS = "mrk_fields_selected"
+    AUTO_SAVE_PREFS_ON_CLOSE = True 
 
     def __init__(self, iface):
         super().__init__(iface.mainWindow())
@@ -315,10 +316,10 @@ class DroneCordinates(BasePluginMTL):
         )
 
     def _load_prefs(self):
-        self.logger.debug("Carregando preferÃªncias", code="PREFS_LOAD_START")
-        prefs = load_tool_prefs(self.TOOL_KEY)
+        #self.logger.debug("Carregando preferÃªncias", code="PREFS_LOAD_START")
+        #self.preferences = load_tool_prefs(self.TOOL_KEY)
 
-        folder_path = prefs.get("folder", "")
+        folder_path = self.preferences.get("folder", "")
         if folder_path:
             self.folder_selector.set_path(folder_path)
             self.logger.debug(
@@ -326,17 +327,17 @@ class DroneCordinates(BasePluginMTL):
             )
 
         # Checkboxes
-        self.checkbox_map["recursive"].setChecked(prefs.get("recursive", True))
-        self.checkbox_map["photos"].setChecked(prefs.get("photos", True))
+        self.checkbox_map["recursive"].setChecked(self.preferences.get("recursive", True))
+        self.checkbox_map["photos"].setChecked(self.preferences.get("photos", True))
         self.checkbox_map["generate_report"].setChecked(
-            prefs.get("generate_report", True)
+            self.preferences.get("generate_report", True)
         )
 
         # Filtros de campos de metadata
-        exif_selected = prefs.get(self.PREF_EXIF_FIELDS)
-        xmp_selected = prefs.get(self.PREF_XMP_FIELDS)
-        custom_selected = prefs.get(self.PREF_CUSTOM_FIELDS)
-        mrk_selected = prefs.get(self.PREF_MRK_FIELDS)
+        exif_selected = self.preferences.get(self.PREF_EXIF_FIELDS)
+        xmp_selected = self.preferences.get(self.PREF_XMP_FIELDS)
+        custom_selected = self.preferences.get(self.PREF_CUSTOM_FIELDS)
+        mrk_selected = self.preferences.get(self.PREF_MRK_FIELDS)
 
         if isinstance(exif_selected, list):
             self.exif_fields_grid.set_checked_keys(
@@ -369,33 +370,33 @@ class DroneCordinates(BasePluginMTL):
 
 
         # Salvamento
-        self.save_points_selector.set_enabled(prefs.get("save_file_pts", False))
-        self.save_points_selector.set_file_path(prefs.get("output_path_pts", ""))
-        self.save_track_selector.set_enabled(prefs.get("save_file", False))
-        self.save_track_selector.set_file_path(prefs.get("output_path", ""))
+        self.save_points_selector.set_enabled(self.preferences.get("save_file_pts", False))
+        self.save_points_selector.set_file_path(self.preferences.get("output_path_pts", ""))
+        self.save_track_selector.set_enabled(self.preferences.get("save_file", False))
+        self.save_track_selector.set_file_path(self.preferences.get("output_path", ""))
 
         # Estilo (QML)
-        self.qml_points_selector.set_enabled(prefs.get("apply_style_points", False))
-        self.qml_points_selector.set_file_path(prefs.get("qml_path_points", ""))
-        self.qml_track_selector.set_enabled(prefs.get("apply_style_track", False))
-        self.qml_track_selector.set_file_path(prefs.get("qml_path_track", ""))
+        self.qml_points_selector.set_enabled(self.preferences.get("apply_style_points", False))
+        self.qml_points_selector.set_file_path(self.preferences.get("qml_path_points", ""))
+        self.qml_track_selector.set_enabled(self.preferences.get("apply_style_track", False))
+        self.qml_track_selector.set_file_path(self.preferences.get("qml_path_track", ""))
 
         # Estados dos CollapsibleParametersWidget
-        self.opts_collapsible.set_expanded(prefs.get("opts_expanded", True))
+        self.opts_collapsible.set_expanded(self.preferences.get("opts_expanded", True))
         self.exif_fields_collapsible.set_expanded(
-            prefs.get("exif_expanded", False)
+            self.preferences.get("exif_expanded", False)
         )
         self.xmp_fields_collapsible.set_expanded(
-            prefs.get("xmp_expanded", False)
+            self.preferences.get("xmp_expanded", False)
         )
         self.custom_fields_collapsible.set_expanded(
-            prefs.get("custom_expanded", False)
+            self.preferences.get("custom_expanded", False)
         )
         self.mrk_fields_collapsible.set_expanded(
-            prefs.get("mrk_expanded", False)
+            self.preferences.get("mrk_expanded", False)
         )
-        self.save_collapsible.set_expanded(prefs.get("save_expanded", False))
-        self.styles_collapsible.set_expanded(prefs.get("styles_expanded", False))
+        self.save_collapsible.set_expanded(self.preferences.get("save_expanded", False))
+        self.styles_collapsible.set_expanded(self.preferences.get("styles_expanded", False))
 
         self.logger.debug("PreferÃªncias carregadas", code="PREFS_LOAD_COMPLETE")
 

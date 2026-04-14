@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 import os
 import json
 from qgis.PyQt.QtCore import QStandardPaths
@@ -65,7 +65,23 @@ class Preferences:
         prefs[tool_key] = values
         Preferences.save_prefs(prefs)
 
-#DEPRECATED - manter funções abaixo para compatibilidade, mas usar as versões da classe Preferences acima.
+    @staticmethod
+    def load_pref_key_by_tool(pref_key):
+        """
+        Retorna {tool_key: valor} para todos os tools
+        que possuem a chave informada.
+        """
+        prefs = Preferences.load_prefs()
+        result = {}
+
+        for tool_key, tool_prefs in prefs.items():
+            if isinstance(tool_prefs, dict) and pref_key in tool_prefs:
+                result[tool_key] = tool_prefs[pref_key]
+
+        return result
+
+
+# DEPRECATED - manter funções abaixo para compatibilidade, mas usar as versões da classe Preferences acima.
 PREF_FOLDER = os.path.join(_resolve_app_data_path(), "MTLTools")
 PREF_FILE = os.path.join(PREF_FOLDER, "mtl_prefs.json")
 
@@ -107,3 +123,8 @@ def save_tool_prefs(tool_key, values: dict):
     prefs = load_prefs()
     prefs[tool_key] = values
     save_prefs(prefs)
+
+
+def load_pref_key_by_tool(pref_key):
+    """DEPRECATED USE Preferences.load_pref_key_by_tool() instead."""
+    return Preferences.load_pref_key_by_tool(pref_key)

@@ -42,6 +42,24 @@ Traducao: 9
   - Usar iconManager para carregar ícones de forma centralizada e eficiente
  changelog=
  use def load_vector_layer_from_file( e elimine o def load_vector_layer_from_source_path( mnao e necessario novo metodo, 
+2.3.14 14/04/2026
+
+
+2.3.13 13/04/2026
+    - Início da ferramenta de divisão de pontos por faixas com estrutura completa (registro, UI, i18n, help), execução ainda como placeholder
+    - Melhoria da interface reutilizando textos, uso de dropdowns dinâmicos de atributos, organização de parâmetros e criação de helper para leitura de campos
+    - Implementação da segmentação de pontos com análise de azimute, médias, deltas e score, incluindo escrita de atributos derivados e integração ao plugin
+    - Aumento da robustez aceitando diferentes geometrias, ordenação segura de IDs e suporte a múltiplos formatos de data/hora
+    - Adição de logs detalhados para monitoramento de progresso e desempenho em grandes volumes de dados
+    - Alteração da estratégia de saída para gerar nova camada em memória, evitando travamentos na interface
+    - Correção no uso da API para criação de atributos em camadas de memória
+    - Correção na cópia de atributos entre features evitando erros de chave
+    - Simplificação da estrutura de campos, padronização em português e adição de comentários no código principal
+    - Adição de seleção de campos de saída, permitindo salvar apenas os desejados
+    - Melhoria da interface com tooltips e simplificação de textos
+    - Redução e padronização de nomes e descrições para maior clareza
+    - Refinamento das descrições dos parâmetros de sensibilidade para facilitar entendimento
+
 2.3.12 11/04/2026
     - RasterLayerProjection: implementado reproject_raster_to_crs() usando gdal:warpreproject
     - RasterLayerProjection: reproject_raster_to_crs() passou a usar ResamplingMethod com padrão CUBICO_SUAVIZADO

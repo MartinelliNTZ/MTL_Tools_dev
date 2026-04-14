@@ -54,9 +54,14 @@ class BasePluginMTL(BaseDialog):
         self.logger = LogUtils(
             tool=self.TOOL_KEY, class_name=class_name, level=LogUtils.DEBUG
         )
+
         self.preferences = {}
         self.preferences.clear()
         self.preferences = Preferences.load_tool_prefs(self.TOOL_KEY)
+        self.preferences["usages"] = self.preferences.get("usages", 0) + 1
+        prefs_por_tool = Preferences.load_pref_key_by_tool("usages")
+
+        self.logger.debug(f"Testando c321: {prefs_por_tool}Prefs :{self.preferences}")
 
         # Carregar preferências globais do Settings se solicitado
         if load_settings_prefs:
