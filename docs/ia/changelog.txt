@@ -1,16 +1,3 @@
 #inicie aqui sempre use a data atual nos logs sempre insira na sequencia
-2.3.12 11/04/2026
-[2.3.12.1][11/04/2026] comece aqui
-[2.3.12.2][11/04/2026] criada a ferramenta dialog/vector "Dividir Vetor de Pontos por Faixas", com registro no ToolRegistry, ToolKey, icon manager, i18n, help e UI inicial via WidgetFactory; execucao ficou como placeholder para a proxima etapa
-[2.3.12.3][12/04/2026] refatorada a UI da ferramenta de divisao por faixas para reaproveitar strings genericas, usar dropdowns de atributos populados pela camada, mover parametros operacionais para collapsible e adicionar helper generico get_field_options em VectorLayerAttributes
-[2.3.12.4][12/04/2026] finalizada a segmentacao de tiros em camadas de pontos com juiz generico em utils/judge/SequentialPointBreakJudge.py, calculo de azimute/media/deltas/score, escrita de campos derivados na camada original via source_path e integracao completa no plugin
-[2.3.12.5][12/04/2026] corrigida a robustez do juiz de segmentacao para aceitar geometrias Point e MultiPoint, ordenar IDs heterogeneos sem conflito de tipos e interpretar timestamps textuais/numericos em formatos mais amplos
-[2.3.12.6][13/04/2026] melhorado o logging detalhado na ferramenta DividePointsByStripsPlugin e SequentialPointBreakJudge para rastrear progresso em datasets grandes, incluindo tempos de processamento, contadores de pontos processados e marcadores de etapas para diagnosticar travamentos
-[2.3.12.7][13/04/2026] refatorada a ferramenta DividePointsByStripsPlugin para criar uma nova camada de memória com os resultados em vez de modificar a camada original, evitando travamentos na UI ao aplicar updates em datasets grandes
-[2.3.12.8][13/04/2026] corrigido erro de API no método _create_memory_layer_with_updates ao usar dataProvider().addAttributes() em vez de setFields() inexistente para camadas de memória
-[2.3.12.9][13/04/2026] corrigido erro de KeyError ao copiar atributos de features: criando nova feature com campos da nova camada e copiando atributos por índice de campo
-[2.3.12.15][13/04/2026] simplificado Field.py removendo core, normalized, level; alterado OUTPUT_FIELDS para português nas descrições; adicionado comentários simples em todos os métodos de SequentialPointBreakJudge.py
-[2.3.12.16][13/04/2026] adicionada seleção de campos de saída em DividePointsByStripsPlugin; campos calculados continuam sendo gerados, mas apenas os checkados são gravados no shapefile final
-[2.3.12.17][13/04/2026] atualizado WidgetFactory para suportar tooltips via description em checkbox e campos de input; simplificados títulos PT-BR para labels menos verbosos
-[2.3.12.18][13/04/2026] reduzidos nomes de título em Strings_pt_BR para parâmetros de sensibilidade e simplificada a descrição de fields_dict no WidgetFactory
-[2.3.12.19][13/04/2026] tornadas mais claras as descrições de parâmetros de sensibilidade em DividePointsByStripsPlugin
+2.3.14 14/04/2026
+[2.3.14.1][14/04/2026] comece aqui

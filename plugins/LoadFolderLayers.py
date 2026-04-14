@@ -3,7 +3,7 @@ import os
 from qgis.core import QgsProject
 from ..plugins.BasePlugin import BasePluginMTL
 from ..core.ui.WidgetFactory import WidgetFactory
-from ..utils.Preferences import load_tool_prefs, save_tool_prefs
+from ..utils.Preferences import save_tool_prefs
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.ExplorerUtils import ExplorerUtils
 from ..utils.ProjectUtils import ProjectUtils
@@ -161,34 +161,31 @@ class LoadFolderLayersDialog(BasePluginMTL):
     # ------------------------------------------------------------------
     def _load_prefs(self):
         # Carregar preferências e repopular widgets (assume widgets criados em _build_ui)
-        prefs = load_tool_prefs(self.TOOL_KEY)
         try:
             # Pasta
-            folder = prefs.get("folder", "")
+            folder = self.preferences.get("folder", "")
             if folder:
                 self.folder_selector.set_paths([folder])
 
             # Tipos
-            saved_types = prefs.get("types", [])
+            saved_types = self.preferences.get("types", [])
             for label, chk in self.chk_types.items():
                 chk.setChecked(label in saved_types)
-            self.coll_widget.set_expanded(prefs.get("types_expanded", False))
+            self.coll_widget.set_expanded(self.preferences.get("types_expanded", False))
             # Opções
-            self.chk_load_missing_only.setChecked(prefs.get("missing_only", False))
-            self.chk_preserve_structure.setChecked(prefs.get("preserve", True))
-            self.chk_last_folder.setChecked(prefs.get("lastfolder", False))
-            self.chk_backup.setChecked(prefs.get("backup", True))
+            self.chk_load_missing_only.setChecked(
+                self.preferences.get("missing_only", False)
+            )
+            self.chk_preserve_structure.setChecked(
+                self.preferences.get("preserve", True)
+            )
+            self.chk_last_folder.setChecked(self.preferences.get("lastfolder", False))
+            self.chk_backup.setChecked(self.preferences.get("backup", True))
 
             # backup só se projeto salvo
             if not QgsProject.instance().fileName():
                 self.chk_backup.setChecked(False)
                 self.chk_backup.setEnabled(False)
-
-            # Layout / janela
-            w = prefs.get("window_width")
-            h = prefs.get("window_height")
-            if w and h:
-                self.resize(int(w), int(h))
 
         except Exception as e:
             # Mantém comportamento tolerante: não falhar ao carregar prefs
@@ -204,19 +201,17 @@ class LoadFolderLayersDialog(BasePluginMTL):
             paths = self.folder_selector.get_paths()
             folder = paths[0] if paths else ""
 
-            data = {
-                "folder": folder,
-                "types": selected_types,
-                "missing_only": self.chk_load_missing_only.isChecked(),
-                "preserve": self.chk_preserve_structure.isChecked(),
-                "lastfolder": self.chk_last_folder.isChecked(),
-                "backup": self.chk_backup.isChecked(),
-                "window_width": self.width(),
-                "window_height": self.height(),
-                "types_expanded": self.coll_widget.is_expanded(),
-            }
+            self.preferences["folder"] = folder
+            self.preferences["types"] = selected_types
+            self.preferences["missing_only"] = self.chk_load_missing_only.isChecked()
+            self.preferences["preserve"] = self.chk_preserve_structure.isChecked()
+            self.preferences["lastfolder"] = self.chk_last_folder.isChecked()
+            self.preferences["backup"] = self.chk_backup.isChecked()
+            self.preferences["window_width"] = self.width()
+            self.preferences["window_height"] = self.height()
+            self.preferences["types_expanded"] = self.coll_widget.is_expanded()
 
-            save_tool_prefs(self.TOOL_KEY, data)
+            save_tool_prefs(self.TOOL_KEY, self.preferences)
         except Exception as e:
             # não falhar ao salvar preferências
             self.logger.error(f"Erro {e}")
@@ -234,9 +229,7 @@ class LoadFolderLayersDialog(BasePluginMTL):
         self.logger.info(f"Iniciando execução: pasta={folder}", code="EXEC_START")
 
         if not folder or not os.path.isdir(folder):
-            QgisMessageUtil.bar_warning(
-                self.iface, STR.SELECT_VALID_FOLDER
-            )
+            QgisMessageUtil.bar_warning(self.iface, STR.SELECT_VALID_FOLDER)
             return
 
         backup_file = None
@@ -256,9 +249,7 @@ class LoadFolderLayersDialog(BasePluginMTL):
                 extensions.extend(self.FILE_TYPES.get(label, []))
 
         if not extensions:
-            QgisMessageUtil.bar_warning(
-                self.iface, STR.SELECT_AT_LEAST_ONE_FILE_TYPE
-            )
+            QgisMessageUtil.bar_warning(self.iface, STR.SELECT_AT_LEAST_ONE_FILE_TYPE)
             return
 
         # scan via ExplorerUtils
@@ -378,9 +369,7 @@ class LoadFolderLayersDialog(BasePluginMTL):
             self.logger.error(
                 f"Falha iniciando pipeline assíncrona: {e}", code="ASYNC_ERROR"
             )
-            QgisMessageUtil.bar_critical(
-                self.iface, f"{STR.ASYNC_START_ERROR} {e}"
-            )
+            QgisMessageUtil.bar_critical(self.iface, f"{STR.ASYNC_START_ERROR} {e}")
         return None
 
     def _on_async_finished(self, context: ExecutionContext):
@@ -394,9 +383,7 @@ class LoadFolderLayersDialog(BasePluginMTL):
 
     def _on_async_error(self, errors):
         self.logger.error(f"_on_async_error: {errors}", code="ASYNC_ERROR")
-        QgisMessageUtil.modal_error(
-            self.iface, f"{STR.ASYNC_EXECUTION_ERROR} {errors}"
-        )
+        QgisMessageUtil.modal_error(self.iface, f"{STR.ASYNC_EXECUTION_ERROR} {errors}")
 
 
 # Função pública
