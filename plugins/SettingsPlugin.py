@@ -326,6 +326,11 @@ class SettingsPlugin(BasePluginMTL):
             category: bool(checkbox.isChecked())
             for category, checkbox in self.toolbar_category_checks.items()
         }
+
+        # Detecta se houve alteração na visibilidade para disparar refresh dinâmico
+        old_visibility = self.system_preferences.get(MenuManager.TOOLBAR_VISIBILITY_PREF_KEY, {})
+        needs_toolbar_refresh = old_visibility != toolbar_visibility
+
         self.system_preferences[MenuManager.TOOLBAR_VISIBILITY_PREF_KEY] = (
             toolbar_visibility
         )
@@ -362,6 +367,13 @@ class SettingsPlugin(BasePluginMTL):
         self.logger.info(
             f"Preferências salvas:{self.system_preferences}==={self.preferences}"
         )
+
+        # Se a visibilidade mudou, solicita ao MenuManager que reconstrua a toolbar imediatamente
+        if needs_toolbar_refresh:
+            mgr = MenuManager.get_instance()
+            if mgr:
+                mgr.reconstruct_toolbar()
+
         return True
 
     def execute_tool(self):

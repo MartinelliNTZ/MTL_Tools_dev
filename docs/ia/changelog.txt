@@ -3,3 +3,4 @@
 [2.3.14.1][14/04/2026] comece aqui
 [2.3.14.2][14/04/2026] Alinhado padrão de carregamento/salvamento de preferências em GenerateTrailPlugin, PhotoVectorizationPlugin e LoadFolderLayers.
 [2.3.14.3][14/04/2026] Atualizado import e chamada de Preferences.save_tool_prefs no padrão de preferências.
+[2.3.14.4][14/04/2026] Implementada reconstrução dinâmica da toolbar no MenuManager e gatilho automático no SettingsPlugin ao alterar visibilidade de categorias.

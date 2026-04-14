@@ -10,11 +10,17 @@ from ...utils.StringManager import StringManager
 
 class MenuManager:
     TOOLBAR_VISIBILITY_PREF_KEY = "toolbar_category_visibility"
+    _instance = None  # Instância única para acesso global interno
 
     @classmethod
     def toolbar_category_options(cls):
         """Retorna as categorias configuráveis da toolbar."""
         return dict(StringManager.MENU_CATEGORIES)
+
+    @classmethod
+    def get_instance(cls):
+        """Retorna a instância ativa do MenuManager."""
+        return cls._instance
 
     @classmethod
     def default_toolbar_category_visibility(cls):
@@ -52,6 +58,8 @@ class MenuManager:
             f"Toolbar: {self.toolbar}. "
             f"Toolbar categories: {self.toolbar_category_visibility}."
         )
+        # Armazenar referência da instância para reconstrução dinâmica
+        MenuManager._instance = self
 
     def _create_actions_for_tools(self):
         """Cria QActions para todas as ferramentas e conecta executores."""
@@ -212,6 +220,28 @@ class MenuManager:
             for tool in sorted_tools:
                 self.submenus[category].addAction(tool.action)
         self.logger.debug("Submenus populados com ferramentas (ordenadas)")
+
+    def reconstruct_toolbar(self):
+        """Remove a toolbar atual e reconstrói com base nas novas preferências."""
+        self.logger.info("Solicitação de reconstrução da toolbar recebida")
+
+        # 1. Remover toolbar existente da interface se ela existir
+        if self.toolbar:
+            self.logger.debug(f"Limpando toolbar anterior: {self.toolbar.objectName()}")
+            self.iface.mainWindow().removeToolBar(self.toolbar)
+            self.toolbar.deleteLater()
+            self.toolbar = None
+
+        # 2. Recarregar as preferências de visibilidade (já salvas em ToolKey.SYSTEM)
+        self.prefs = Preferences.load_tool_prefs(self.TOOLKEY)
+        self.toolbar_category_visibility = self.normalize_toolbar_category_visibility(
+            self.prefs.get(self.TOOLBAR_VISIBILITY_PREF_KEY)
+        )
+        self.logger.debug(f"Novas configurações de visibilidade: {self.toolbar_category_visibility}")
+
+        # 3. Recriar a toolbar
+        self.create_toolbar()
+        self.logger.info("Toolbar reconstruída com sucesso")
 
     def unload(self):
         # Remover ações do menu
