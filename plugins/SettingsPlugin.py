@@ -3,7 +3,7 @@ from qgis.core import QgsCoordinateReferenceSystem
 
 from ..utils.StringManager import StringManager
 from ..plugins.BasePlugin import BasePluginMTL
-from ..utils.Preferences import load_tool_prefs, save_tool_prefs
+from ..utils.Preferences import Preferences
 from ..utils.ToolKeys import ToolKey
 from ..utils.ExplorerUtils import ExplorerUtils
 from ..core.ui.WidgetFactory import WidgetFactory
@@ -35,7 +35,7 @@ class SettingsPlugin(BasePluginMTL):
     def __init__(self, iface):
         super().__init__(iface.mainWindow())
         self.iface = iface
-        self.init(ToolKey.SETTINGS, "SettingsPlugin")
+        self.init(ToolKey.SETTINGS, "SettingsPlugin",load_system_prefs=True)
         self.logger.info("SettingsPlugin inicializado")
 
     def _build_ui(self, **kwargs):
@@ -209,24 +209,23 @@ class SettingsPlugin(BasePluginMTL):
     def _load_prefs(self):
         """Carrega preferências salvas."""
         self.logger.debug("Carregando preferências")
-        self.prefer_VectorFields = load_tool_prefs(ToolKey.VECTOR_FIELDS)
+        self.prefer_VectorFields = Preferences.load_tool_prefs(ToolKey.VECTOR_FIELDS)
 
         calc_method = self.system_preferences.get("calculation_method", STR.ELLIPSOIDAL)
-        try:
-            idx = self.CALCULATION_METHODS.index(calc_method)
-            self.radio_calc.set_selected_index(idx)
+        if calc_method in self.CALCULATION_METHODS:
+            self.radio_calc.set_selected_index(self.CALCULATION_METHODS.index(calc_method))
             self.logger.debug(f"Método de cálculo carregado: {calc_method}")
-        except (ValueError, IndexError):
+        else:
             self.logger.warning(
                 f"Método de cálculo inválido: {calc_method}, usando padrão"
             )
             self.radio_calc.set_selected_index(0)
 
         selected_language = self.system_preferences.get("plugin_language", "none")
-        try:
+        if selected_language in StringManager.AVAILABLE_LANGUAGES:
             self.lang_selector.set_selected_key(selected_language)
             self.logger.debug(f"Idioma selecionado carregado: {selected_language}")
-        except Exception:
+        else:
             self.logger.warning(f"Idioma inválido: {selected_language}, usando padrão")
             self.lang_selector.set_selected_key("pt_BR")
 
@@ -252,20 +251,18 @@ class SettingsPlugin(BasePluginMTL):
                 )
             thresh_feats = 1000
 
-        try:
-            self.spin_threshold.setValue(int(thresh_feats))
-            self.logger.debug(f"Limiar assíncrono carregado: {thresh_feats} feições")
-        except Exception:
-            self.logger.warning(f"Erro ao carregar limiar assíncrono: {thresh_feats}")
+        thresh_value = int(thresh_feats) if isinstance(thresh_feats, int) else (
+            int(thresh_feats) if str(thresh_feats).isdigit() else 1000
+        )
+        self.spin_threshold.setValue(thresh_value)
+        self.logger.debug(f"Limiar assíncrono carregado: {thresh_value} feições")
 
         prec = self.system_preferences.get("vector_field_precision", 2)
-        try:
-            self.spin_precision.setValue(int(prec))
-            self.logger.debug(f"Precisão de campos vetoriais carregada: {prec}")
-        except Exception:
-            self.logger.warning(
-                f"Erro ao carregar precisão de campos vetoriais: {prec}"
-            )
+        precision_value = int(prec) if isinstance(prec, int) else (
+            int(prec) if str(prec).isdigit() else 2
+        )
+        self.spin_precision.setValue(precision_value)
+        self.logger.debug(f"Precisão de campos vetoriais carregada: {precision_value}")
 
         self.area_fields_inputs.set_values(
             {
@@ -357,9 +354,11 @@ class SettingsPlugin(BasePluginMTL):
         self.prefer_VectorFields["cartesian_suffix"] = cartesian_suffix
         self.prefer_VectorFields["ellipsoidal_suffix"] = ellipsoidal_suffix
 
-        save_tool_prefs(ToolKey.SYSTEM, self.system_preferences)
-        save_tool_prefs(ToolKey.VECTOR_FIELDS, self.prefer_VectorFields)
-        save_tool_prefs(self.TOOL_KEY, self.preferences)
+        self._persist_window_size()
+        self.increment_usage()
+        Preferences.save_tool_prefs(ToolKey.SYSTEM, self.system_preferences)
+        Preferences.save_tool_prefs(ToolKey.VECTOR_FIELDS, self.prefer_VectorFields)
+        Preferences.save_tool_prefs(self.TOOL_KEY, self.preferences)
         self.logger.info(
             f"Preferências salvas:{self.system_preferences}==={self.preferences}"
         )
