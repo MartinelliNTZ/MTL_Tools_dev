@@ -147,15 +147,33 @@ class BasePluginMTL(BaseDialog):
 
         Salva tamanho da janela e demais preferências antes de fechar.
         """
+        self.logger.debug("Fechando plugin, persistindo preferências")
         self._persist_window_size()
-        self.preferences["usages"] = self.preferences.get("usages", 0) + 1
-        prefs_por_tool = Preferences.load_pref_key_by_tool("usages")
-
-        self.logger.debug(f"Testando c321: {prefs_por_tool}Prefs :{self.preferences}")
+        self.logger.debug(f"{self.increment_usage()}")  # Incrementa o contador de uso ao fechar o plugin
         if self.AUTO_SAVE_PREFS_ON_CLOSE:
             self._save_prefs()
 
         super().closeEvent(event)
+        
+    # No PluginPai
+    def increment_usage(self):
+        try:
+            print("DEBUG: Entrei no increment_usage do Pai")
+            # 1. Operação simples primeiro
+            valor_atual = self.preferences.get("usages", 0)
+            self.preferences["usages"] = valor_atual + 1
+            
+            # 2. Teste o logger sem variáveis complexas primeiro
+            self.logger.debug("DEBUG: Incremento funcionou")
+            
+            # 3. Onde pode estar o erro:
+            prefs_por_tool = Preferences.load_pref_key_by_tool("usages")
+            self.logger.debug(f"DEBUG: {prefs_por_tool}")
+            
+        except Exception as e:
+            print(f"ERRO CRÍTICO no increment_usage: {e}")
+        return "increment_usage executado"
+            
 
     def _save_prefs(self):
         """Salva preferências."""

@@ -98,18 +98,18 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
         )
 
     def _load_prefs(self):
-        prefs = load_tool_prefs(self.TOOL_KEY)
+        #prefs = load_tool_prefs(self.TOOL_KEY)
 
         self.input_fields_widget.set_values(
             {
-                "old_text": prefs.get("old_text", ""),
-                "new_text": prefs.get("new_text", ""),
+                "old_text": self.preferences.get("old_text", ""),
+                "new_text": self.preferences.get("new_text", ""),
             }
         )
         self.checkbox_map["case_sensitive"].setChecked(
-            prefs.get("case_sensitive", True)
+            self.preferences.get("case_sensitive", True)
         )
-        self.checkbox_map["full_replace"].setChecked(prefs.get("full_replace", False))
+        self.checkbox_map["full_replace"].setChecked(self.preferences.get("full_replace", False))
 
     def _save_prefs(self):
         values = self.input_fields_widget.get_values()
