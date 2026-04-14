@@ -45,7 +45,7 @@ class ExportAllLayoutsDialog(BasePluginMTL):
         self.init(
             self.TOOL_KEY,
             "ExportAllLayoutsDialog",
-            load_settings_prefs=False,
+            load_system_prefs=False,
             build_ui=True,
         )
 

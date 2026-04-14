@@ -26,7 +26,7 @@ class BasePluginMTL(BaseDialog):
     prefs = None
     preferences = {}
     """Dicionario de status"""
-    settings_preferences = {}
+    system_preferences = {}
     AUTO_SAVE_PREFS_ON_CLOSE = True  # Define se as preferências devem ser salvas automaticamente ao fechar o plugin
     """Preferências globais do aplicativo (Cadmus Settings)"""
 
@@ -34,7 +34,7 @@ class BasePluginMTL(BaseDialog):
         self,
         tool_key="base_plugin",
         class_name="BasePluginMTL",
-        load_settings_prefs=False,
+        load_system_prefs=False,
         build_ui=True,
     ):
         """Inicializa o plugin base.
@@ -60,14 +60,14 @@ class BasePluginMTL(BaseDialog):
         self.preferences = Preferences.load_tool_prefs(self.TOOL_KEY)
 
         # Carregar preferências globais do Settings se solicitado
-        if load_settings_prefs:
+        if load_system_prefs:
             self.logger.debug("Carregando preferências globais do Cadmus Settings")
-            self.settings_preferences = Preferences.load_tool_prefs(ToolKey.SYSTEM)
+            self.system_preferences = Preferences.load_tool_prefs(ToolKey.SYSTEM)
             self.logger.debug(
-                f"Preferências globais carregadas: {list(self.settings_preferences.keys())}"
+                f"Preferências globais carregadas: {list(self.system_preferences.keys())}"
             )
         else:
-            self.settings_preferences = {}
+            self.system_preferences = {}
 
         # Construir UI apenas se solicitado
         if build_ui:

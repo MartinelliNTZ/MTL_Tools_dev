@@ -5,6 +5,7 @@ from ..i18n.TranslationManager import STR
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.ToolKeys import ToolKey
 from ..utils.vector.VectorLayerGeometry import VectorLayerGeometry
+from ..utils.Preferences import Preferences
 from .BasePlugin import BasePluginMTL
 
 
@@ -18,7 +19,10 @@ class VectorMultipartPlugin(BasePluginMTL):
             tool_key=ToolKey.CONVERTER_MULTIPART,
             class_name="VectorMultipartPlugin",
             build_ui=False,
-        )
+        )        
+        
+        
+        
 
     def initGui(self):
         self.create_action(
@@ -36,6 +40,8 @@ class VectorMultipartPlugin(BasePluginMTL):
     # --------------------------------------------------
     def run_multpart(self):
         self.logger.info("Iniciando conversão de multipart para singlepart")
+        self.increment_usage()
+        Preferences.save_tool_prefs(self.TOOL_KEY, self.preferences)
 
         layer = self.iface.activeLayer()
 
@@ -106,3 +112,4 @@ class VectorMultipartPlugin(BasePluginMTL):
                 self.iface, STR.GEOMETRIES_CONVERTED_TO_MULTIPART_NOT_SAVED
             )
             return
+        

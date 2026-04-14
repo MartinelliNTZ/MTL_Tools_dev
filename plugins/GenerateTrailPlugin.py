@@ -32,7 +32,7 @@ class GenerateTrailPlugin(BasePluginMTL):
         self.init(
             ToolKey.GENERATE_TRAIL,
             "GenerateTrailPlugin",
-            load_settings_prefs=True,
+            load_system_prefs=True,
         )
 
     def _build_ui(self, **kwargs):
@@ -218,7 +218,7 @@ class GenerateTrailPlugin(BasePluginMTL):
         )
 
         feature_count = layer.featureCount() if layer else 0
-        threshold = int(self.settings_preferences.get("async_threshold_features", 1000))
+        threshold = int(self.system_preferences.get("async_threshold_features", 1000))
         self.logger.debug(
             f"Comparando feições: {feature_count} versus {threshold} (limiar)"
         )

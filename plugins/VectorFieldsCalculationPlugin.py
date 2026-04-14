@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsWkbTypes
+from ..utils.Preferences import Preferences
 
 from ..core.engine_tasks.AsyncPipelineEngine import AsyncPipelineEngine
 from ..core.engine_tasks.ExecutionContext import ExecutionContext
@@ -24,7 +25,7 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
             tool_key=ToolKey.VECTOR_FIELDS,
             class_name="VectorFieldsCalculationPlugin",
             build_ui=False,
-            load_settings_prefs=True,
+            load_system_prefs=True,
         )
 
     def initGui(self):
@@ -45,6 +46,8 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
         self.logger.info("Iniciando Calcular Campos Vetoriais")
 
         from ..utils.ProjectUtils import ProjectUtils
+        self.increment_usage()
+        Preferences.save_tool_prefs(self.TOOL_KEY, self.preferences)
 
         layer = ProjectUtils.get_active_vector_layer(
             self.iface.activeLayer(), self.logger, require_editable=True
@@ -101,10 +104,10 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
             )
             return
 
-        precision = int(self.settings_preferences.get("vector_field_precision", 2))
+        precision = int(self.system_preferences.get("vector_field_precision", 2))
         feature_count = layer.featureCount()
         threshold_features = int(
-            self.settings_preferences.get("async_threshold_features", 1000)
+            self.system_preferences.get("async_threshold_features", 1000)
         )
 
         self.logger.debug(
@@ -152,7 +155,7 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
 
     def _prepare_line_fields(self, layer):
         """Prepara field_map para cálculo de comprimento."""
-        requested_mode = self.settings_preferences.get(
+        requested_mode = self.system_preferences.get(
             "calculation_method", STR.ELLIPSOIDAL
         )
         calc_mode, mode_altered = self._resolve_calculation_mode(layer, requested_mode)
@@ -178,7 +181,7 @@ class VectorFieldsCalculationPlugin(BasePluginMTL):
 
     def _prepare_polygon_fields(self, layer):
         """Prepara field_map para cálculo de área."""
-        requested_mode = self.settings_preferences.get(
+        requested_mode = self.system_preferences.get(
             "calculation_method", STR.ELLIPSOIDAL
         )
         calc_mode, mode_altered = self._resolve_calculation_mode(layer, requested_mode)

@@ -24,7 +24,7 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
         self.init(
             self.TOOL_KEY,
             "ReplaceInLayoutsDialog",
-            load_settings_prefs=False,
+            load_system_prefs=False,
             build_ui=True,
         )
 

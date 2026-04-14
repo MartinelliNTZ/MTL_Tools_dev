@@ -10,7 +10,7 @@ from ..core.services.ReportGenerationService import ReportGenerationService
 from ..i18n.TranslationManager import STR
 from ..plugins.BasePlugin import BasePluginMTL
 from ..utils.ExplorerUtils import ExplorerUtils
-from ..utils.Preferences import load_tool_prefs, save_tool_prefs
+from ..utils.Preferences import Preferences
 from ..utils.QgisMessageUtil import QgisMessageUtil
 from ..utils.ToolKeys import ToolKey
 
@@ -176,10 +176,10 @@ class ReportMetadataPlugin(BasePluginMTL):
     def _save_prefs(self):
         selected = self.json_selector.get_selected_key() if self.json_selector else ""
         self.preferences[self.PREF_SELECTED_JSON] = selected or ""
-        save_tool_prefs(self.TOOL_KEY, self.preferences)
+        Preferences.save_tool_prefs(self.TOOL_KEY, self.preferences)
 
-    def _load_prefs(self):       
-        self.logger.debug("")
+    def _load_prefs(self):
+        self.logger.debug("Carregando preferências do ReportMetadataPlugin")
 
     def execute_tool(self):
         selected_json = self.json_selector.get_selected_key() if self.json_selector else ""

@@ -47,7 +47,7 @@ class LoadFolderLayersDialog(BasePluginMTL):
         self.init(
             self.TOOL_KEY,
             "LoadFolderLayersDialog",
-            load_settings_prefs=False,
+            load_system_prefs=False,
             build_ui=True,
         )
 

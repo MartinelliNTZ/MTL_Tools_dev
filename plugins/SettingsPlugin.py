@@ -28,7 +28,7 @@ class SettingsPlugin(BasePluginMTL):
     ]
     DEFAULT_CRS_AUTHID = "EPSG:4326"
     AUTO_SAVE_PREFS_ON_CLOSE = False
-    prefer_System = {}
+    system_preferences = {}
     prefer_VectorFields = {}
     toolbar_category_checks = {}
 
@@ -71,7 +71,7 @@ class SettingsPlugin(BasePluginMTL):
         self.logger.debug("Widget de cálculo vetorial adicionado")
 
         langs = StringManager.AVAILABLE_LANGUAGES
-        selected_lang = self.prefer_System.get("plugin_language", "none")
+        selected_lang = self.system_preferences.get("plugin_language", "none")
         lang_layout, self.lang_selector = WidgetFactory.create_dropdown_selector(
             title=f"⚙️ {STR.PLUGIN_LANGUAGE}",
             options_dict=langs,
@@ -84,7 +84,7 @@ class SettingsPlugin(BasePluginMTL):
         crs_layout, self.crs_selector = WidgetFactory.create_crs_selector(
             title=STR.DEFAULT_CRS,
             tool_key=ToolKey.SETTINGS,
-            default_auth_id=self.prefer_System.get(
+            default_auth_id=self.system_preferences.get(
                 "default_crs_authid", self.DEFAULT_CRS_AUTHID
             ),
             separator_top=False,
@@ -209,11 +209,9 @@ class SettingsPlugin(BasePluginMTL):
     def _load_prefs(self):
         """Carrega preferências salvas."""
         self.logger.debug("Carregando preferências")
-        self.preferences = load_tool_prefs(ToolKey.SETTINGS)
-        self.prefer_System = load_tool_prefs(ToolKey.SYSTEM)
         self.prefer_VectorFields = load_tool_prefs(ToolKey.VECTOR_FIELDS)
 
-        calc_method = self.prefer_System.get("calculation_method", STR.ELLIPSOIDAL)
+        calc_method = self.system_preferences.get("calculation_method", STR.ELLIPSOIDAL)
         try:
             idx = self.CALCULATION_METHODS.index(calc_method)
             self.radio_calc.set_selected_index(idx)
@@ -224,7 +222,7 @@ class SettingsPlugin(BasePluginMTL):
             )
             self.radio_calc.set_selected_index(0)
 
-        selected_language = self.prefer_System.get("plugin_language", "none")
+        selected_language = self.system_preferences.get("plugin_language", "none")
         try:
             self.lang_selector.set_selected_key(selected_language)
             self.logger.debug(f"Idioma selecionado carregado: {selected_language}")
@@ -232,7 +230,7 @@ class SettingsPlugin(BasePluginMTL):
             self.logger.warning(f"Idioma inválido: {selected_language}, usando padrão")
             self.lang_selector.set_selected_key("pt_BR")
 
-        selected_crs_authid = self.prefer_System.get(
+        selected_crs_authid = self.system_preferences.get(
             "default_crs_authid", self.DEFAULT_CRS_AUTHID
         )
         if not self.crs_selector.set_crs_authid(selected_crs_authid):
@@ -244,10 +242,10 @@ class SettingsPlugin(BasePluginMTL):
             f"SRC padrao carregado: {self.crs_selector.get_crs_authid()}"
         )
 
-        if "async_threshold_features" in self.prefer_System:
-            thresh_feats = self.prefer_System.get("async_threshold_features", 1000)
+        if "async_threshold_features" in self.system_preferences:
+            thresh_feats = self.system_preferences.get("async_threshold_features", 1000)
         else:
-            old_bytes = self.prefer_System.get("async_threshold_bytes")
+            old_bytes = self.system_preferences.get("async_threshold_bytes")
             if old_bytes is not None:
                 self.logger.warning(
                     "Preferência antiga 'async_threshold_bytes' encontrada, substituindo por limite de feições padrão"
@@ -260,7 +258,7 @@ class SettingsPlugin(BasePluginMTL):
         except Exception:
             self.logger.warning(f"Erro ao carregar limiar assíncrono: {thresh_feats}")
 
-        prec = self.prefer_System.get("vector_field_precision", 2)
+        prec = self.system_preferences.get("vector_field_precision", 2)
         try:
             self.spin_precision.setValue(int(prec))
             self.logger.debug(f"Precisão de campos vetoriais carregada: {prec}")
@@ -281,7 +279,7 @@ class SettingsPlugin(BasePluginMTL):
         )
 
         toolbar_visibility = MenuManager.normalize_toolbar_category_visibility(
-            self.prefer_System.get(MenuManager.TOOLBAR_VISIBILITY_PREF_KEY)
+            self.system_preferences.get(MenuManager.TOOLBAR_VISIBILITY_PREF_KEY)
         )
         for category, checkbox in self.toolbar_category_checks.items():
             checkbox.setChecked(toolbar_visibility.get(category, True))
@@ -298,41 +296,40 @@ class SettingsPlugin(BasePluginMTL):
     def _save_prefs(self):
         """Salva preferências."""
         self.logger.debug("Salvando preferências")
-        self._persist_window_size()
         self.preferences["calc_expanded"] = self.calc_collapsable.is_expanded()
         self.preferences["geral_expanded"] = self.geral_collapsable.is_expanded()
 
         selected_text = self.radio_calc.get_selected_text()
-        self.prefer_System["calculation_method"] = selected_text
+        self.system_preferences["calculation_method"] = selected_text
         selected_crs = self.crs_selector.get_crs()
         if not selected_crs or not selected_crs.isValid():
             selected_crs = QgsCoordinateReferenceSystem(self.DEFAULT_CRS_AUTHID)
             self.crs_selector.set_crs(selected_crs)
-        self.prefer_System["default_crs_authid"] = selected_crs.authid()
+        self.system_preferences["default_crs_authid"] = selected_crs.authid()
         self.logger.debug(f"SRC padrao salvo: {selected_crs.authid()}")
 
         feats_value = int(self.spin_threshold.value())
-        self.prefer_System["async_threshold_features"] = feats_value
+        self.system_preferences["async_threshold_features"] = feats_value
         self.logger.debug(f"Limiar assíncrono por feições salvo: {feats_value} feições")
 
         precision_val = int(self.spin_precision.value())
-        self.prefer_System["vector_field_precision"] = precision_val
+        self.system_preferences["vector_field_precision"] = precision_val
         self.logger.debug(f"Precisão de campos vetoriais salva: {precision_val} casas")
 
         selected_language = self.lang_selector.get_selected_key()
         if selected_language != "none":
-            self.prefer_System["plugin_language"] = selected_language
+            self.system_preferences["plugin_language"] = selected_language
             self.logger.debug(f"Idioma selecionado salvo: {selected_language}")
         else:
-            if "plugin_language" in self.prefer_System:
-                del self.prefer_System["plugin_language"]
+            if "plugin_language" in self.system_preferences:
+                del self.system_preferences["plugin_language"]
                 self.logger.debug("Idioma selecionado removido para auto-detectar")
 
         toolbar_visibility = {
             category: bool(checkbox.isChecked())
             for category, checkbox in self.toolbar_category_checks.items()
         }
-        self.prefer_System[MenuManager.TOOLBAR_VISIBILITY_PREF_KEY] = (
+        self.system_preferences[MenuManager.TOOLBAR_VISIBILITY_PREF_KEY] = (
             toolbar_visibility
         )
         self.logger.debug(
@@ -360,11 +357,11 @@ class SettingsPlugin(BasePluginMTL):
         self.prefer_VectorFields["cartesian_suffix"] = cartesian_suffix
         self.prefer_VectorFields["ellipsoidal_suffix"] = ellipsoidal_suffix
 
-        save_tool_prefs(ToolKey.SYSTEM, self.prefer_System)
+        save_tool_prefs(ToolKey.SYSTEM, self.system_preferences)
         save_tool_prefs(ToolKey.VECTOR_FIELDS, self.prefer_VectorFields)
         save_tool_prefs(self.TOOL_KEY, self.preferences)
         self.logger.info(
-            f"Preferências salvas:{self.prefer_System}==={self.preferences}"
+            f"Preferências salvas:{self.system_preferences}==={self.preferences}"
         )
         return True
 

@@ -27,7 +27,7 @@ class VectorToSvgPlugin(BasePluginMTL):
         self.init(
             tool_key=self.TOOL_KEY,
             class_name=self.__class__.__name__,
-            load_settings_prefs=False,
+            load_system_prefs=False,
             build_ui=True,
         )
 
