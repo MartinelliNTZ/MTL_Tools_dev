@@ -37,7 +37,7 @@ class DroneCordinates(BasePluginMTL):
     PREF_XMP_FIELDS = "xmp_fields_selected"
     PREF_CUSTOM_FIELDS = "custom_fields_selected"
     PREF_MRK_FIELDS = "mrk_fields_selected"
-    AUTO_SAVE_PREFS_ON_CLOSE = True 
+    AUTO_SAVE_PREFS_ON_CLOSE = True
 
     def __init__(self, iface):
         super().__init__(iface.mainWindow())
@@ -97,9 +97,7 @@ class DroneCordinates(BasePluginMTL):
                 expanded_by_default=False,
             )
         )
-        exif_items = StringAdapter.to_key_label_description(
-            MetadataFields.EXIF_FIELDS
-        )
+        exif_items = StringAdapter.to_key_label_description(MetadataFields.EXIF_FIELDS)
         exif_grid_layout, self.exif_fields_grid = WidgetFactory.create_checkbox_grid(
             options_data=exif_items,
             items_per_row=2,
@@ -139,14 +137,18 @@ class DroneCordinates(BasePluginMTL):
                 expanded_by_default=False,
             )
         )
-        custom_items = StringAdapter.to_key_label_description(MetadataFields.CUSTOM_FIELDS)
-        custom_grid_layout, self.custom_fields_grid = WidgetFactory.create_checkbox_grid(
-            options_data=custom_items,
-            items_per_row=2,
-            checked_by_default=False,
-            return_widget=True,
-            separator_bottom=False,
-            show_control_buttons=True,
+        custom_items = StringAdapter.to_key_label_description(
+            MetadataFields.CUSTOM_FIELDS
+        )
+        custom_grid_layout, self.custom_fields_grid = (
+            WidgetFactory.create_checkbox_grid(
+                options_data=custom_items,
+                items_per_row=2,
+                checked_by_default=False,
+                return_widget=True,
+                separator_bottom=False,
+                show_control_buttons=True,
+            )
         )
         self.custom_fields_collapsible.add_content_layout(custom_grid_layout)
 
@@ -165,7 +167,7 @@ class DroneCordinates(BasePluginMTL):
             checked_by_default=True,
             return_widget=True,
             separator_bottom=False,
-            show_control_buttons=True,  
+            show_control_buttons=True,
         )
         self.mrk_fields_collapsible.add_content_layout(mrk_grid_layout)
 
@@ -290,7 +292,6 @@ class DroneCordinates(BasePluginMTL):
     def on_photos_changed(self, checked: bool):
         self._ensure_photos_dependency(checked)
 
-
     def _get_selected_exif_fields(self):
         return MetadataFields.normalize_selected_keys(
             self.exif_fields_grid.get_checked_keys(),
@@ -316,8 +317,8 @@ class DroneCordinates(BasePluginMTL):
         )
 
     def _load_prefs(self):
-        #self.logger.debug("Carregando preferÃªncias", code="PREFS_LOAD_START")
-        #self.preferences = load_tool_prefs(self.TOOL_KEY)
+        # self.logger.debug("Carregando preferÃªncias", code="PREFS_LOAD_START")
+        # self.preferences = load_tool_prefs(self.TOOL_KEY)
 
         folder_path = self.preferences.get("folder", "")
         if folder_path:
@@ -327,7 +328,9 @@ class DroneCordinates(BasePluginMTL):
             )
 
         # Checkboxes
-        self.checkbox_map["recursive"].setChecked(self.preferences.get("recursive", True))
+        self.checkbox_map["recursive"].setChecked(
+            self.preferences.get("recursive", True)
+        )
         self.checkbox_map["photos"].setChecked(self.preferences.get("photos", True))
         self.checkbox_map["generate_report"].setChecked(
             self.preferences.get("generate_report", True)
@@ -368,18 +371,29 @@ class DroneCordinates(BasePluginMTL):
                 )
             )
 
-
         # Salvamento
-        self.save_points_selector.set_enabled(self.preferences.get("save_file_pts", False))
-        self.save_points_selector.set_file_path(self.preferences.get("output_path_pts", ""))
+        self.save_points_selector.set_enabled(
+            self.preferences.get("save_file_pts", False)
+        )
+        self.save_points_selector.set_file_path(
+            self.preferences.get("output_path_pts", "")
+        )
         self.save_track_selector.set_enabled(self.preferences.get("save_file", False))
         self.save_track_selector.set_file_path(self.preferences.get("output_path", ""))
 
         # Estilo (QML)
-        self.qml_points_selector.set_enabled(self.preferences.get("apply_style_points", False))
-        self.qml_points_selector.set_file_path(self.preferences.get("qml_path_points", ""))
-        self.qml_track_selector.set_enabled(self.preferences.get("apply_style_track", False))
-        self.qml_track_selector.set_file_path(self.preferences.get("qml_path_track", ""))
+        self.qml_points_selector.set_enabled(
+            self.preferences.get("apply_style_points", False)
+        )
+        self.qml_points_selector.set_file_path(
+            self.preferences.get("qml_path_points", "")
+        )
+        self.qml_track_selector.set_enabled(
+            self.preferences.get("apply_style_track", False)
+        )
+        self.qml_track_selector.set_file_path(
+            self.preferences.get("qml_path_track", "")
+        )
 
         # Estados dos CollapsibleParametersWidget
         self.opts_collapsible.set_expanded(self.preferences.get("opts_expanded", True))
@@ -396,10 +410,11 @@ class DroneCordinates(BasePluginMTL):
             self.preferences.get("mrk_expanded", False)
         )
         self.save_collapsible.set_expanded(self.preferences.get("save_expanded", False))
-        self.styles_collapsible.set_expanded(self.preferences.get("styles_expanded", False))
+        self.styles_collapsible.set_expanded(
+            self.preferences.get("styles_expanded", False)
+        )
 
         self.logger.debug("PreferÃªncias carregadas", code="PREFS_LOAD_COMPLETE")
-
 
     def _save_prefs(self):
         self.logger.debug("Salvando preferÃªncias", code="PREFS_SAVE_START")
@@ -429,19 +444,16 @@ class DroneCordinates(BasePluginMTL):
         self.preferences["opts_expanded"] = self.opts_collapsible.is_expanded()
         self.preferences["exif_expanded"] = self.exif_fields_collapsible.is_expanded()
         self.preferences["xmp_expanded"] = self.xmp_fields_collapsible.is_expanded()
-        self.preferences["custom_expanded"] = self.custom_fields_collapsible.is_expanded()
+        self.preferences["custom_expanded"] = (
+            self.custom_fields_collapsible.is_expanded()
+        )
         self.preferences["mrk_expanded"] = self.mrk_fields_collapsible.is_expanded()
         self.preferences["save_expanded"] = self.save_collapsible.is_expanded()
         self.preferences["styles_expanded"] = self.styles_collapsible.is_expanded()
-        # Tamanho da janela (persistido automaticamente por BasePlugin.closeEvent)
-        self.preferences["window_width"] = self.width()
-        self.preferences["window_height"] = self.height()
 
-        
         save_tool_prefs(self.TOOL_KEY, self.preferences)
 
         self.logger.debug("PreferÃªncias salvas", code="PREFS_SAVE_COMPLETE")
-
 
     def execute_tool(self):
         self.logger.info(
@@ -456,7 +468,9 @@ class DroneCordinates(BasePluginMTL):
         recursive = self.checkbox_map["recursive"].isChecked()
         apply_photos = self.checkbox_map["photos"].isChecked()
 
-        if apply_photos and not DependenciesManager.check_dependency("Pillow", self.TOOL_KEY):
+        if apply_photos and not DependenciesManager.check_dependency(
+            "Pillow", self.TOOL_KEY
+        ):
             self.logger.warning(
                 "Cruzamento com metadados solicitado sem Pillow disponÃ­vel; serÃ¡ ignorado"
             )

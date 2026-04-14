@@ -192,8 +192,8 @@ class ExportAllLayoutsDialog(BasePluginMTL):
         )
 
     def _load_prefs(self):
-        #self.logger.debug("Carregando preferências de exportação")
-        #self.preferences = load_tool_prefs(self.TOOL_KEY)
+        # self.logger.debug("Carregando preferências de exportação")
+        # self.preferences = load_tool_prefs(self.TOOL_KEY)
 
         self._suppress_merge_dependency_check = True
         try:
@@ -245,9 +245,6 @@ class ExportAllLayoutsDialog(BasePluginMTL):
             else os.path.join(QgsProject.instance().homePath(), "exports")
         )
         self.preferences["output_folder"] = pasta
-
-        self.preferences["window_width"] = self.width()
-        self.preferences["window_height"] = self.height()
 
         save_tool_prefs(self.TOOL_KEY, self.preferences)
         self.logger.info(

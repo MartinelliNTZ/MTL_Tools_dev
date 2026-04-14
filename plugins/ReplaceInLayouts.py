@@ -98,7 +98,6 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
         )
 
     def _load_prefs(self):
-        #prefs = load_tool_prefs(self.TOOL_KEY)
 
         self.input_fields_widget.set_values(
             {
@@ -113,18 +112,12 @@ class ReplaceInLayoutsDialog(BasePluginMTL):
 
     def _save_prefs(self):
         values = self.input_fields_widget.get_values()
-        save_tool_prefs(
-            self.TOOL_KEY,
-            {
-                "old_text": values.get("old_text", ""),
-                "new_text": values.get("new_text", ""),
-                "case_sensitive": self.checkbox_map["case_sensitive"].isChecked(),
-                "full_replace": self.checkbox_map["full_replace"].isChecked(),
-                # Tamanho da janela (persistido automaticamente por BasePlugin.closeEvent)
-                "window_width": self.width(),
-                "window_height": self.height(),
-            },
-        )
+        self.preferences["old_text"] = values.get("old_text", "")
+        self.preferences["new_text"] = values.get("new_text", "")
+        self.preferences["case_sensitive"] = self.checkbox_map["case_sensitive"].isChecked()
+        self.preferences["full_replace"] = self.checkbox_map["full_replace"].isChecked()
+        # Tamanho da janela (persistido automaticamente por BasePlugin.closeEvent)
+        save_tool_prefs(self.TOOL_KEY, self.preferences)
 
     def _swap_fields(self):
         """Inverte o conteúdo dos campos old_text e new_text."""
