@@ -18,3 +18,12 @@ __pycache__/
 # OS
 .DS_Store
 Thumbs.db
+
+#gis
+*.csv
+*.kml
+*.kmz
+*.gpkg
+*.dbf
+*.shp
+*.shx
