@@ -8,6 +8,7 @@ class Tool:
 
     def __init__(
         self,
+        tool_key,
         name,
         icon,
         category,
@@ -20,6 +21,7 @@ class Tool:
     ):
         self.logger = LogUtils(tool=ToolKey.SYSTEM, class_name="Tool")
 
+        self.tool_key = tool_key
         self.name = name
         self.icon = icon
         self.category = category

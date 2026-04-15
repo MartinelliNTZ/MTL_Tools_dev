@@ -217,13 +217,45 @@ class MenuManager:
                 self.submenus[category].addAction(tool.action)
         self.logger.debug("Submenus populados com ferramentas (ordenadas)")
 
+    def _refresh_tool_main_actions(self):
+        """
+        Recarrega os valores de main_action das tools a partir das preferências.
+        Essencial antes de reconstruir a toolbar para garantir que os estados
+        estejam sincronizados com as prefs atualizadas.
+        """
+        self.logger.debug("[_refresh_tool_main_actions] Recarregando main_action das tools")
+        
+        for tool in self.tools:
+            try:
+                tool_prefs = Preferences.load_tool_prefs(tool.tool_key)
+                old_main_action = tool.main_action
+                new_main_action = tool_prefs.get("main_action", False)
+                
+                if old_main_action != new_main_action:
+                    tool.main_action = new_main_action
+                    self.logger.debug(
+                        f"[_refresh_tool_main_actions] Tool '{tool.tool_key}': "
+                        f"main_action {old_main_action} → {new_main_action}"
+                    )
+                else:
+                    self.logger.debug(
+                        f"[_refresh_tool_main_actions] Tool '{tool.tool_key}': "
+                        f"main_action sem mudança ({old_main_action})"
+                    )
+            except Exception as e:
+                self.logger.error(
+                    f"[_refresh_tool_main_actions] Erro ao recarregar '{tool.tool_key}': {e}"
+                )
+        
+        self.logger.info("[_refresh_tool_main_actions] ✓ Recarregamento concluído")
+
     def reconstruct_toolbar(self):
         """Remove a toolbar atual e reconstrói com base nas novas preferências."""
-        self.logger.info("Solicitação de reconstrução da toolbar recebida")
+        self.logger.info("[reconstruct_toolbar] Iniciando reconstrução da toolbar")
 
         # 1. Remover toolbar existente da interface se ela existir
         if self.toolbar:
-            self.logger.debug(f"Limpando toolbar anterior: {self.toolbar.objectName()}")
+            self.logger.debug(f"[reconstruct_toolbar] Limpando toolbar anterior: {self.toolbar.objectName()}")
             self.iface.mainWindow().removeToolBar(self.toolbar)
             self.toolbar.deleteLater()
             self.toolbar = None
@@ -233,11 +265,19 @@ class MenuManager:
         self.toolbar_category_visibility = self.normalize_toolbar_category_visibility(
             self.prefs.get(self.TOOLBAR_VISIBILITY_PREF_KEY)
         )
-        self.logger.debug(f"Novas configurações de visibilidade: {self.toolbar_category_visibility}")
+        self.logger.debug(
+            f"[reconstruct_toolbar] Novas configurações de visibilidade: "
+            f"{self.toolbar_category_visibility}"
+        )
 
-        # 3. Recriar a toolbar
+        # 3. CRÍTICO: Recarregar os valores de main_action das tools
+        self.logger.info("[reconstruct_toolbar] Atualizando estados das tools...")
+        self._refresh_tool_main_actions()
+
+        # 4. Recriar a toolbar
+        self.logger.info("[reconstruct_toolbar] Recriando toolbar com estados atualizados")
         self.create_toolbar()
-        self.logger.info("Toolbar reconstruída com sucesso")
+        self.logger.info("[reconstruct_toolbar] ✓ Toolbar reconstruída com sucesso")
 
     def unload(self):
         # Remover ações do menu

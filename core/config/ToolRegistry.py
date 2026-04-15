@@ -8,6 +8,7 @@ from ...utils.ToolKeys import ToolKey
 from ...utils.QgisMessageUtil import QgisMessageUtil
 from ...i18n.TranslationManager import STR
 from ...utils.StringManager import StringManager
+from ...utils.Preferences import Preferences
 from ..enum import ToolTypeEnum
 
 
@@ -20,7 +21,114 @@ class ToolRegistry:
     def __init__(self, iface):
         self.iface = iface
         self.logger = LogUtils(tool=ToolKey.SYSTEM, class_name="ToolRegistry")
+        self._main_action_prefs = {}  # Inicializar primeiro (vazio, será carregado depois)
         self.tools = self._create_tool_list()
+        self._save_tool_metadata()
+        self._main_action_prefs = self._load_and_validate_main_actions()
+        # Recarregar tools com main_actions validadas
+        self.tools = self._create_tool_list()
+
+    def _save_tool_metadata(self):
+        """
+        Salva category e tool_type nas preferências de cada ferramenta.
+        Isso permite que Preferences filtre por categoria posteriormente.
+        """
+        for tool in self.tools:
+            try:
+                prefs = Preferences.load_tool_prefs(tool.tool_key)
+                prefs["category"] = tool.category
+                prefs["tool_type"] = tool.tool_type
+                Preferences.save_tool_prefs(tool.tool_key, prefs)
+            except Exception as e:
+                self.logger.error(
+                    f"Erro ao salvar metadata do tool '{tool.tool_key}': {e}"
+                )
+
+    def _load_and_validate_main_actions(self):
+        """
+        Carrega as preferências de main_action de todas as ferramentas,
+        valida que exista apenas uma com True POR CATEGORIA, e retorna dict {tool_key: bool}.
+        
+        Regras por categoria:
+        - Se 2+ têm True, mantém apenas a primeira e reseta o resto
+        - Se nenhuma tem True, retorna False para todas (padrões em _create_tool_list usam True)
+        - Se exatamente 1 é True, retorna normalmente
+        """
+        main_action_prefs = Preferences.load_pref_key_by_tool("main_action")
+        categories = StringManager.MENU_CATEGORIES.keys()
+        
+        self.logger.info(
+            f"[_load_and_validate_main_actions] Iniciando validação. "
+            f"Total de ferramentas carregadas: {len(main_action_prefs)}"
+        )
+        self.logger.debug(f"[_load_and_validate_main_actions] Prefs carregadas: {main_action_prefs}")
+        
+        # Validar por CATEGORIA
+        for category in categories:
+            self.logger.debug(f"[_load_and_validate_main_actions] Validando categoria '{category}'")
+            
+            # Filtrar apenas ferramentas desta categoria
+            tools_in_category = {}
+            for k, v in main_action_prefs.items():
+                tool_cat = Preferences.load_tool_prefs(k).get("category")
+                self.logger.debug(
+                    f"[_load_and_validate_main_actions] Tool '{k}': "
+                    f"category={tool_cat}, main_action={v}"
+                )
+                if tool_cat == category:
+                    tools_in_category[k] = v
+            
+            self.logger.debug(
+                f"[_load_and_validate_main_actions] Categoria '{category}': "
+                f"{len(tools_in_category)} ferramentas. "
+                f"Tools: {tools_in_category}"
+            )
+            
+            true_count = sum(1 for v in tools_in_category.values() if v is True)
+            self.logger.debug(
+                f"[_load_and_validate_main_actions] Categoria '{category}': "
+                f"{true_count} com main_action=True"
+            )
+            
+            if true_count > 1:
+                # Caso 2+: pega a primeira ocorrência e reseta o resto
+                self.logger.warning(
+                    f"[_load_and_validate_main_actions] Categoria '{category}': "
+                    f"{true_count} ferramentas com main_action=True. "
+                    f"Mantendo apenas a primeira."
+                )
+                first_key = next(k for k, v in tools_in_category.items() if v is True)
+                for k in tools_in_category:
+                    main_action_prefs[k] = (k == first_key)
+                    self.logger.debug(
+                        f"[_load_and_validate_main_actions] Corrigido '{k}': "
+                        f"main_action={(k == first_key)}"
+                    )
+            elif true_count == 0:
+                # Caso 0: nenhuma true nesta categoria - deixar como está
+                self.logger.debug(
+                    f"[_load_and_validate_main_actions] Categoria '{category}': "
+                    f"nenhuma com main_action=True. Usando padrão."
+                )
+        
+        # Salvar correções se necessário
+        self.logger.info(
+            f"[_load_and_validate_main_actions] Salvando preferências validadas"
+        )
+        for tool_key, is_main in main_action_prefs.items():
+            prefs = Preferences.load_tool_prefs(tool_key)
+            prefs["main_action"] = is_main
+            Preferences.save_tool_prefs(tool_key, prefs)
+            self.logger.debug(
+                f"[_load_and_validate_main_actions] Salvo '{tool_key}': "
+                f"main_action={is_main}"
+            )
+        
+        self.logger.info(
+            f"[_load_and_validate_main_actions] ✓ Validação concluída. "
+            f"Result: {main_action_prefs}"
+        )
+        return main_action_prefs
 
     def _create_tool_list(self):
         tools = []
@@ -30,11 +138,12 @@ class ToolRegistry:
         # =====================================================
 
         export_layouts = Tool(
+            tool_key=ToolKey.EXPORT_ALL_LAYOUTS,
             name=STR.EXPORT_ALL_LAYOUTS_TITLE,
             icon=im.icon(im.EXPORT_ALL_LAYOUTS),
             category=self.LAYOUTS,
             tool_type=ToolTypeEnum.DIALOG,
-            main_action=True,
+            main_action=self._main_action_prefs.get(ToolKey.EXPORT_ALL_LAYOUTS, True),
             executor=self.run_export_layouts,
             tooltip=STR.EXPORT_ALL_LAYOUTS_TOOLTIP,
             order=10,
@@ -43,10 +152,12 @@ class ToolRegistry:
         tools.append(export_layouts)
 
         replace_layouts = Tool(
+            tool_key=ToolKey.REPLACE_IN_LAYOUTS,
             name=STR.REPLACE_IN_LAYOUTS_TITLE,
             icon=im.icon(im.REPLACE_IN_LAYOUTS),
             category=self.LAYOUTS,
             tool_type=ToolTypeEnum.DIALOG,
+            main_action=self._main_action_prefs.get(ToolKey.REPLACE_IN_LAYOUTS, False),
             executor=self.run_replace_layouts,
             tooltip=STR.REPLACE_IN_LAYOUTS_TOOLTIP,
             order=20,
@@ -59,11 +170,12 @@ class ToolRegistry:
         # =====================================================
 
         restart_qgis = Tool(
+            tool_key=ToolKey.RESTART_QGIS,
             name=STR.RESTART_QGIS_TITLE,
             icon=im.icon(im.RESTART_QGIS),
             category=self.SYSTEM,
             tool_type=ToolTypeEnum.INSTANT,
-            #main_action=True,
+            main_action=self._main_action_prefs.get(ToolKey.RESTART_QGIS, False),
             executor=self.run_restart_qgis,
             tooltip=STR.RESTART_QGIS_TOOLTIP,
             order=10,
@@ -72,10 +184,12 @@ class ToolRegistry:
         tools.append(restart_qgis)
 
         logcat = Tool(
+            tool_key=ToolKey.LOGCAT,
             name=STR.LOGCAT_TITLE,
             icon=im.icon(im.LOGCAT),
             category=self.SYSTEM,
             tool_type=ToolTypeEnum.DIALOG,
+            main_action=self._main_action_prefs.get(ToolKey.LOGCAT, False),
             executor=self.run_logcat,
             tooltip=STR.LOGCAT_TOOLTIP,
             order=20,
@@ -84,11 +198,12 @@ class ToolRegistry:
         tools.append(logcat)
 
         settings = Tool(
+            tool_key=ToolKey.SETTINGS,
             name=STR.SETTINGS_TITLE,
             icon=im.icon(im.SETTINGS),
             category=self.SYSTEM,
             tool_type=ToolTypeEnum.DIALOG,
-            main_action=True,
+            main_action=self._main_action_prefs.get(ToolKey.SETTINGS, True),
             executor=self.run_settings,
             tooltip=STR.SETTINGS_TOOLTIP,
             order=30,
@@ -97,10 +212,12 @@ class ToolRegistry:
         tools.append(settings)
 
         about = Tool(
+            tool_key=ToolKey.ABOUT_DIALOG,
             name=STR.ABOUT_CADMUS,
             icon=im.icon(im.ABOUT),
             category=self.SYSTEM,
             tool_type=ToolTypeEnum.DIALOG,
+            main_action=self._main_action_prefs.get(ToolKey.ABOUT_DIALOG, False),
             executor=self.run_about_dialog,
             tooltip=STR.ABOUT_DIALOG_TOOLTIP,
             order=40,
@@ -113,10 +230,12 @@ class ToolRegistry:
         # =====================================================
 
         load_folder = Tool(
+            tool_key=ToolKey.LOAD_FOLDER_LAYERS,
             name=STR.LOAD_FOLDER_LAYERS_TITLE,
             icon=im.icon(im.LOAD_FOLDER_LAYER),
             category=self.FOLDER,
             tool_type=ToolTypeEnum.DIALOG,
+            main_action=self._main_action_prefs.get(ToolKey.LOAD_FOLDER_LAYERS, False),
             executor=self.run_load_folder,
             tooltip=STR.LOAD_FOLDER_LAYERS_TOOLTIP,
             order=10,
@@ -125,11 +244,12 @@ class ToolRegistry:
         tools.append(load_folder)
 
         create_project = Tool(
+            tool_key=ToolKey.CREATE_PROJECT,
             name=STR.CREATE_PROJECT_TITLE,
             icon=im.icon(im.CREATE_PROJECT),
             category=self.FOLDER,
             tool_type=ToolTypeEnum.INSTANT,
-            main_action=True,
+            main_action=self._main_action_prefs.get(ToolKey.CREATE_PROJECT, True),
             executor=self.run_create_project,
             tooltip=STR.CREATE_PROJECT_TOOLTIP,
             order=15,
@@ -138,10 +258,12 @@ class ToolRegistry:
         tools.append(create_project)
 
         vector_to_svg = Tool(
+            tool_key=ToolKey.VECTOR_TO_SVG,
             name=STR.VECTOR_TO_SVG_TITLE,
             icon=im.icon(im.VECTOR_TO_SVG),
             category=self.FOLDER,
             tool_type=ToolTypeEnum.DIALOG,
+            main_action=self._main_action_prefs.get(ToolKey.VECTOR_TO_SVG, False),
             executor=self.run_vector_to_svg,
             tooltip=STR.VECTOR_TO_SVG_TOOLTIP,
             order=20,
@@ -154,11 +276,12 @@ class ToolRegistry:
         # =====================================================
 
         vector_fields = Tool(
+            tool_key=ToolKey.VECTOR_FIELDS,
             name=STR.VECTOR_FIELDS_TITLE,
             icon=im.icon(im.VECTOR_FIELD),
             category=self.VECTOR,
             tool_type=ToolTypeEnum.INSTANT,
-            main_action=True,
+            main_action=self._main_action_prefs.get(ToolKey.VECTOR_FIELDS, True),
             executor=self.run_vector_fields,
             tooltip=STR.VECTOR_FIELDS_TOOLTIP,
             order=10,
@@ -167,10 +290,12 @@ class ToolRegistry:
         tools.append(vector_fields)
 
         remove_kml_fields = Tool(
+            tool_key=ToolKey.REMOVE_KML_FIELDS,
             name=STR.REMOVE_KML_FIELDS_TITLE,
             icon=im.icon(im.CADMUS_ICON),
             category=self.VECTOR,
             tool_type=ToolTypeEnum.INSTANT,
+            main_action=self._main_action_prefs.get(ToolKey.REMOVE_KML_FIELDS, False),
             executor=self.run_remove_kml_fields,
             tooltip=STR.REMOVE_KML_FIELDS_TOOLTIP,
             order=15,
@@ -179,10 +304,12 @@ class ToolRegistry:
         tools.append(remove_kml_fields)
 
         coord_click = Tool(
+            tool_key=ToolKey.COORD_CLICK_TOOL,
             name=STR.COORD_CLICK_TOOL_TITLE,
             icon=im.icon(im.COORD_CLICK_TOOL),
             category=self.VECTOR,
             tool_type=ToolTypeEnum.MAP_TOOL,
+            main_action=self._main_action_prefs.get(ToolKey.COORD_CLICK_TOOL, False),
             executor=self.run_coord_click,
             tooltip=STR.COORD_CLICK_TOOL_TOOLTIP,
             order=20,
@@ -191,10 +318,12 @@ class ToolRegistry:
         tools.append(coord_click)
 
         multipart = Tool(
+            tool_key=ToolKey.CONVERTER_MULTIPART,
             name=STR.CONVERTER_MULTIPART_TITLE,
             icon=im.icon(im.VECTOR_MULTPART),
             category=self.VECTOR,
             tool_type=ToolTypeEnum.INSTANT,
+            main_action=self._main_action_prefs.get(ToolKey.CONVERTER_MULTIPART, False),
             executor=self.run_multpart,
             tooltip=STR.CONVERTER_MULTIPART_TOOLTIP,
             order=40,
@@ -203,10 +332,12 @@ class ToolRegistry:
         tools.append(multipart)
 
         copy_attributes = Tool(
+            tool_key=ToolKey.COPY_ATTRIBUTES,
             name=STR.COPY_ATTRIBUTES_TITLE,
             icon=im.icon(im.COPY_ATTRIBUTES),
             category=self.VECTOR,
             tool_type=ToolTypeEnum.DIALOG,
+            main_action=self._main_action_prefs.get(ToolKey.COPY_ATTRIBUTES, False),
             executor=self.run_copy_atributes,
             tooltip=STR.COPY_ATTRIBUTES_TOOLTIP,
             order=50,
@@ -215,10 +346,12 @@ class ToolRegistry:
         tools.append(copy_attributes)
 
         divide_points_by_strips = Tool(
+            tool_key=ToolKey.DIVIDE_POINTS_BY_STRIPS,
             name=STR.DIVIDE_POINTS_BY_STRIPS_TITLE,
             icon=im.icon(im.DIVIDE_POINTS_BY_STRIPS),
             category=self.VECTOR,
             tool_type=ToolTypeEnum.DIALOG,
+            main_action=self._main_action_prefs.get(ToolKey.DIVIDE_POINTS_BY_STRIPS, False),
             executor=self.run_divide_points_by_strips,
             tooltip=STR.DIVIDE_POINTS_BY_STRIPS_TOOLTIP,
             order=60,
@@ -231,11 +364,12 @@ class ToolRegistry:
         # =====================================================
 
         drone_coords = Tool(
+            tool_key=ToolKey.DRONE_COORDINATES,
             name=STR.DRONE_COORDINATES_TITLE,
             icon=im.icon(im.DRONE_COORDINATES),
             category=self.AGRICULTURE,
             tool_type=ToolTypeEnum.DIALOG,
-            main_action=True,
+            main_action=self._main_action_prefs.get(ToolKey.DRONE_COORDINATES, True),
             executor=self.run_drone_coords,
             tooltip=STR.DRONE_COORDINATES_TOOLTIP,
             order=10,
@@ -244,10 +378,12 @@ class ToolRegistry:
         tools.append(drone_coords)
 
         gerar_rastro = Tool(
+            tool_key=ToolKey.GENERATE_TRAIL,
             name=STR.GENERATE_TRAIL_TITLE,
             icon=im.icon(im.GENERATE_TRAIL),
             category=self.AGRICULTURE,
             tool_type=ToolTypeEnum.DIALOG,
+            main_action=self._main_action_prefs.get(ToolKey.GENERATE_TRAIL, False),
             executor=self.run_gerar_rastro,
             tooltip=STR.GENERATE_TRAIL_TOOLTIP,
             order=20,
@@ -256,10 +392,12 @@ class ToolRegistry:
         tools.append(gerar_rastro)
 
         photo_vectorization = Tool(
+            tool_key=ToolKey.PHOTO_VECTORIZATION,
             name=STR.PHOTO_VECTORIZATION_TITLE,
             icon=im.icon(im.DRONE_COORDINATES),
             category=self.AGRICULTURE,
             tool_type=ToolTypeEnum.DIALOG,
+            main_action=self._main_action_prefs.get(ToolKey.PHOTO_VECTORIZATION, False),
             executor=self.run_photo_vectorization,
             tooltip=STR.PHOTO_VECTORIZATION_TOOLTIP,
             order=25,
@@ -268,10 +406,12 @@ class ToolRegistry:
         tools.append(photo_vectorization)
 
         report_metadata = Tool(
+            tool_key=ToolKey.REPORT_METADATA,
             name=STR.REPORT_METADATA_TITLE,
             icon=im.icon(im.DRONE_COORDINATES),
             category=self.AGRICULTURE,
             tool_type=ToolTypeEnum.DIALOG,
+            main_action=self._main_action_prefs.get(ToolKey.REPORT_METADATA, False),
             executor=self.run_report_metadata,
             tooltip=STR.REPORT_METADATA_TOOLTIP,
             order=30,
@@ -284,11 +424,12 @@ class ToolRegistry:
         # =====================================================
 
         raster_mass_clipper = Tool(
+            tool_key=ToolKey.RASTER_MASS_CLIPPER,
             name=STR.RASTER_MASS_CLIPPER_TITLE,
             icon=im.icon(im.RASTER_MASS_CLIPPER),
             category=self.RASTER,
             tool_type=ToolTypeEnum.PROCESSING,
-            main_action=True,
+            main_action=self._main_action_prefs.get(ToolKey.RASTER_MASS_CLIPPER, True),
             executor=self.run_raster_mass_clipper,
             tooltip=STR.RASTER_MASS_CLIPPER_TOOLTIP,
             order=10,
@@ -297,10 +438,12 @@ class ToolRegistry:
         tools.append(raster_mass_clipper)
 
         raster_mass_sampler = Tool(
+            tool_key=ToolKey.RASTER_MASS_SAMPLER,
             name=STR.RASTER_MASS_SAMPLER_TITLE,
             icon=im.icon(im.RASTER_MASS_SAMPLER),
             category=self.RASTER,
             tool_type=ToolTypeEnum.PROCESSING,
+            main_action=self._main_action_prefs.get(ToolKey.RASTER_MASS_SAMPLER, False),
             executor=self.run_raster_mass_sampler,
             tooltip=STR.RASTER_MASS_SAMPLER_TOOLTIP,
             order=20,

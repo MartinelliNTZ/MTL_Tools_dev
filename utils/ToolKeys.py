@@ -21,6 +21,7 @@ class ToolKey:
     REMOVE_KML_FIELDS = "remove_kml_fields"
     SETTINGS = "settings"
     SYSTEM = "SYSTEM"  # para logs genericos do sistema, sem tool especifica
+    LOGCAT = "logcat"  # viewer de logs do plugin
     VECTOR_FIELDS = "vector_fields"
     ABOUT_DIALOG = "about_dialog"
     VECTOR_TO_SVG = "vector_to_svg"

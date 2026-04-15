@@ -7,6 +7,7 @@ from typing import Optional
 import time
 from ..utils.FormatUtils import FormatUtils
 from ..core.config.LogUtils import LogUtils
+from ..core.config.MenuManager import MenuManager
 from ..core.ui.info_dialog import InfoDialog
 from ..utils.Preferences import Preferences
 from ..utils.ToolKeys import ToolKey
@@ -157,20 +158,81 @@ class BasePluginMTL(BaseDialog):
 
 
     def on_finish_plugin(self):
+        """
+        Callback executado ao fechar o plugin.
+        Atualiza main_action para a ferramenta atual e reconstrói a toolbar.
+        """
         try:
-
-            # 1. Operação simples primeiro
+            # 1. Incrementar contador de uso
             valor_atual = self.preferences.get("usages", 0)
             self.preferences["usages"] = valor_atual + 1
+            self.logger.debug(f"Usages incrementado: {valor_atual} → {valor_atual + 1}")
 
+            # 2. Obter a categoria desta ferramenta da preferences
+            tool_category = self.preferences.get("category")
+            self.logger.info(
+                f"[on_finish_plugin] Tool={self.TOOL_KEY}, category={tool_category}"
+            )
+            
+            if not tool_category:
+                self.logger.warning(
+                    f"[on_finish_plugin] ✗ Categoria NÃO encontrada nas prefs de "
+                    f"{self.TOOL_KEY}. Prefs keys: {list(self.preferences.keys())}. "
+                    f"NÃO atualizando main_action."
+                )
+                return
 
-            # 3. Onde pode estar o erro:
-            prefs_por_tool = Preferences.load_pref_key_by_tool("usages")
-            self.logger.debug(f"DEBUG cv5555: {prefs_por_tool}")
+            # 3. Reseta main_action para False SOMENTE na categoria desta ferramenta
+            self.logger.info(
+                f"[on_finish_plugin] Chamando set_value_for_all_tools para resetar "
+                f"main_action=False na categoria '{tool_category}'"
+            )
+            modified = Preferences.set_value_for_all_tools(
+                "main_action", 
+                False, 
+                filter_by={"category": tool_category}
+            )
+            self.logger.info(
+                f"[on_finish_plugin] ✓ set_value_for_all_tools retornou: "
+                f"{modified} ferramentas modificadas"
+            )
+
+            # 4. Seta esta ferramenta como main_action=True
+            self.preferences["main_action"] = True
+            self.logger.info(
+                f"[on_finish_plugin] Configurando {self.TOOL_KEY} main_action=True "
+                f"(categoria: {tool_category})"
+            )
+
+            # 5. Salva as preferências desta ferramenta
+            Preferences.save_tool_prefs(self.TOOL_KEY, self.preferences)
+            self.logger.info(
+                f"[on_finish_plugin] ✓ Preferências de {self.TOOL_KEY} salvas"
+            )
+
+            # 6. Reconstrói a toolbar com a nova configuração
+            menu_manager = MenuManager.get_instance()
+            mgr = MenuManager.get_instance()
+            if mgr:
+                mgr.reconstruct_toolbar()
+            if menu_manager is not None:
+                self.logger.info(
+                    f"[on_finish_plugin] MenuManager obtido, reconstruindo toolbar..."
+                )
+                menu_manager.reconstruct_toolbar()
+                self.logger.info(
+                    f"[on_finish_plugin] ✓ Toolbar reconstruída com sucesso"
+                )
+            else:
+                self.logger.error(
+                    f"[on_finish_plugin] ✗ MenuManager é None! Toolbar NÃO será reconstruída."
+                )
 
         except Exception as e:
-            print(f"ERRO CRÍTICO no increment_usage: {e}")
-        return "increment_usage executado"
+            self.logger.error(
+                f"[on_finish_plugin] ✗ Erro: {e}",
+                exc_info=True
+            )
 
     def _save_prefs(self):
         """Salva preferências."""
