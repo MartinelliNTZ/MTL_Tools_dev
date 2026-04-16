@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from .BaseDialog import BaseDialog
 from qgis.PyQt.QtWidgets import QAction
+from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsVectorLayer
 import os
 from typing import Optional
@@ -8,6 +9,7 @@ import time
 from ..utils.FormatUtils import FormatUtils
 from ..core.config.LogUtils import LogUtils
 from ..core.config.MenuManager import MenuManager
+from ..core.config.PyQtSignalManager import get_plugin_signal_hub
 from ..core.ui.info_dialog import InfoDialog
 from ..utils.Preferences import Preferences
 from ..utils.ToolKeys import ToolKey
@@ -21,6 +23,7 @@ from ..i18n.TranslationManager import STR
 #  PLUGIN BasePluginMTL
 # -------------------------------------------------------------
 class BasePluginMTL(BaseDialog):
+    plugin_instantiated = pyqtSignal(dict)
     APP_NAME = STR.APP_NAME
     TOOL_KEY = "base_plugin"  # Identificador padrão
     PLUGIN_NAME = ""
@@ -59,6 +62,7 @@ class BasePluginMTL(BaseDialog):
         self.preferences = {}
         self.preferences.clear()
         self.preferences = Preferences.load_tool_prefs(self.TOOL_KEY)
+        self._emit_plugin_instantiated_signal(class_name, build_ui)
 
         # Carregar preferências globais do Settings se solicitado
         if load_system_prefs:
@@ -79,6 +83,26 @@ class BasePluginMTL(BaseDialog):
             self.logger.info("Plugin inicializado com sucesso")
         else:
             self.logger.debug("Construção de UI desabilitada")
+
+    def _emit_plugin_instantiated_signal(self, class_name, build_ui):
+        """Emite sinal quando uma instÃ¢ncia filha do BasePlugin Ã© iniciada."""
+        payload = {
+            "tool_key": self.TOOL_KEY,
+            "class_name": class_name,
+            "plugin_name": self.PLUGIN_NAME or class_name,
+            "build_ui": bool(build_ui),
+        }
+
+        try:
+            self.plugin_instantiated.emit(payload)
+            get_plugin_signal_hub().plugin_instantiated.emit(payload)
+            self.logger.debug(
+                f"[plugin_instantiated] Sinal emitido com payload: {payload}"
+            )
+        except Exception as e:
+            self.logger.error(
+                f"[plugin_instantiated] Erro ao emitir sinal de instanciaÃ§Ã£o: {e}"
+            )
 
     """
     Classe base para plugins do Cadmus.

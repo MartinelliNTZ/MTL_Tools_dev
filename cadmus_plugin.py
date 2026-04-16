@@ -7,6 +7,7 @@ from .i18n.TranslationManager import STR
 from .core.config.PluginBootstrap import PluginBootstrap
 from .core.config.ToolRegistry import ToolRegistry
 from .core.config.MenuManager import MenuManager
+from .core.config.PyQtSignalManager import PyQtSignalManager
 from .core.services.MrkDropHandler import MrkDropHandler
 
 
@@ -18,6 +19,7 @@ class CadmusPlugin:
         self.tool_registry = None
         self.menu_manager = None
         self.mrk_drop_handler = None
+        self.pyqt_signal_manager = None
         self.TOOL_KEY = ToolKey.SYSTEM
 
     # =====================================================
@@ -39,6 +41,9 @@ class CadmusPlugin:
 
         self.logger.info("Plugin inicializado")
         self.logger.info(f"Locale: {locale}. TM.STR: {STR.APP_NAME}")
+
+        self.pyqt_signal_manager = PyQtSignalManager(tool_key=self.TOOL_KEY)
+        self.pyqt_signal_manager.start()
 
         self.mrk_drop_handler = MrkDropHandler(self.iface)
         self.iface.registerCustomDropHandler(self.mrk_drop_handler)
@@ -85,6 +90,13 @@ class CadmusPlugin:
                 self.logger.info("Processing Provider removido com sucesso")
         except Exception as e:
             self.logger.error(f"Erro ao remover Processing Provider: {str(e)}")
+
+        try:
+            if self.pyqt_signal_manager:
+                self.pyqt_signal_manager.stop()
+                self.logger.info("PyQtSignalManager descarregado com sucesso")
+        except Exception as e:
+            self.logger.error(f"Erro ao descarregar PyQtSignalManager: {str(e)}")
 
         try:
             if self.mrk_drop_handler:
