@@ -159,7 +159,7 @@ class ToolRegistry:
                 f"[_load_and_validate_main_actions] Categoria '{category}': "
                 f"{len(tools_in_category)} ferramentas. "
                 f"Tools: {tools_in_category}"
-            )##
+            )##1
             true_count = sum(1 for v in tools_in_category.values() if v is True)
             self.logger.debug(
                 f"[_load_and_validate_main_actions] Categoria '{category}': "
