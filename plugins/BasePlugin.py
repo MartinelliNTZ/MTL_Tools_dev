@@ -34,6 +34,16 @@ class BasePluginMTL(BaseDialog):
     AUTO_SAVE_PREFS_ON_CLOSE = True  # Define se as preferências devem ser salvas automaticamente ao fechar o plugin
     """Preferências globais do aplicativo (Cadmus Settings)"""
 
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._plugin_signal_emitted = False
+        self._plugin_signal_context = {
+            "tool_key": self.TOOL_KEY,
+            "class_name": self.__class__.__name__,
+            "plugin_name": self.PLUGIN_NAME or self.__class__.__name__,
+            "build_ui": False,
+        }
+
     def init(
         self,
         tool_key="base_plugin",
@@ -62,7 +72,12 @@ class BasePluginMTL(BaseDialog):
         self.preferences = {}
         self.preferences.clear()
         self.preferences = Preferences.load_tool_prefs(self.TOOL_KEY)
-        self._emit_plugin_instantiated_signal(class_name, build_ui)
+        self._plugin_signal_context = {
+            "tool_key": self.TOOL_KEY,
+            "class_name": class_name,
+            "plugin_name": self.PLUGIN_NAME or class_name,
+            "build_ui": bool(build_ui),
+        }
 
         # Carregar preferências globais do Settings se solicitado
         if load_system_prefs:
@@ -84,14 +99,21 @@ class BasePluginMTL(BaseDialog):
         else:
             self.logger.debug("Construção de UI desabilitada")
 
-    def _emit_plugin_instantiated_signal(self, class_name, build_ui):
+    def showEvent(self, event):
+        """Emite o sinal uma Ãºnica vez quando a janela Ã© realmente aberta."""
+        super().showEvent(event)
+
+        if self._plugin_signal_emitted:
+            return
+
+        self._emit_plugin_instantiated_signal()
+        self._plugin_signal_emitted = True
+
+    def _emit_plugin_instantiated_signal(self):
         """Emite sinal quando uma instÃ¢ncia filha do BasePlugin Ã© iniciada."""
-        payload = {
-            "tool_key": self.TOOL_KEY,
-            "class_name": class_name,
-            "plugin_name": self.PLUGIN_NAME or class_name,
-            "build_ui": bool(build_ui),
-        }
+        payload = dict(self._plugin_signal_context)
+        payload["tool_key"] = self.TOOL_KEY
+        payload["plugin_name"] = self.PLUGIN_NAME or payload.get("class_name")
 
         try:
             self.plugin_instantiated.emit(payload)
