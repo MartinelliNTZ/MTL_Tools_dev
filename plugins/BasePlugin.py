@@ -187,9 +187,8 @@ class BasePluginMTL(BaseDialog):
                 f"[on_finish_plugin] Chamando set_value_for_all_tools para resetar "
                 f"main_action=False na categoria '{tool_category}'"
             )
-            modified = Preferences.set_value_for_all_tools(
+            modified = Preferences.delete_value_for_all_tools(
                 "main_action", 
-                False, 
                 filter_by={"category": tool_category}
             )
             self.logger.info(
